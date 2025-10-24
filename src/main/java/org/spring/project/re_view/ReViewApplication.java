@@ -8,6 +8,7 @@ public class ReViewApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ReViewApplication.class, args);
+        //주석 추가
     }
 
 }
