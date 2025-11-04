@@ -1,0 +1,50 @@
+/* 컨테이너 */
+.rv-header {
+    height: 73px;                       /* 규격: 73 */
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: center;             /* 가운데 정렬 */
+    align-items: center;
+    background: #fff;
+}
+
+.rv-header__inner {
+    width: 100%;
+    max-width: 1200px;                   /* 필요시 조절 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+/* 로고 */
+.rv-header__logo {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 네비게이션 */
+.rv-nav {
+    display: flex;
+    gap: 24px;
+}
+
+.rv-nav__item {
+    font-size: 16px;                     /* 규격: 16 */
+    color: #111;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.rv-nav__item:hover {
+    opacity: 0.7;
+}
+
+/* 우측 영역 (검색 + 아바타) */
+.rv-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
