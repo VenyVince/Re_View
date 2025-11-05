@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import logo from "../../../assets/logo.png";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Footer() {
     return (
@@ -10,15 +11,15 @@ export default function Footer() {
             <Sub>피부 타입 테스트와 사용자 후기를 기반으로 뷰티 상품 페이지</Sub>
 
             <LinkNav aria-label="푸터 링크">
-                <a href="/terms">이용약관</a>
-                <span aria-hidden="true">|</span>
-                <a href="/privacy">개인정보처리방침</a>
-                <span aria-hidden="true">|</span>
-                <a href="/notice">공지사항</a>
-                <span aria-hidden="true">|</span>
-                <a href="/faq">FAQ·도움말</a>
-                <span aria-hidden="true">|</span>
-                <a href="/ads">광고 제휴 문의</a>
+                <StyledLink to="/terms">이용약관</StyledLink>
+                <Separator aria-hidden="true">|</Separator>
+                <StyledLink to="/privacy">개인정보처리방침</StyledLink>
+                <Separator aria-hidden="true">|</Separator>
+                <StyledLink to="/notice">공지사항</StyledLink>
+                <Separator aria-hidden="true">|</Separator>
+                <StyledLink to="/faq">FAQ·도움말</StyledLink>
+                <Separator aria-hidden="true">|</Separator>
+                <StyledLink to="/ads">광고 제휴 문의</StyledLink>
             </LinkNav>
         </FooterWrap>
     );
@@ -44,3 +45,10 @@ const LinkNav = styled.nav`
     a { color: #5a5a5a; text-decoration: none; }
     a:hover { text-decoration: underline; }
 `;
+
+const StyledLink = styled(RouterLink)`
+  color: #5a5a5a;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+`;
+const Separator = styled.span``;
