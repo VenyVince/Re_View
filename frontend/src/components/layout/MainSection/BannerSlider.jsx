@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import "./BannerSlider.css";
+import banner1 from "../../../assets/banner1.png"
 
 function BannerSlider() {
   const images = [
-    { id: 1, src: "/images/banner1.jpg", alt: "배너1" },
-    { id: 2, src: "/images/banner2.jpg", alt: "배너2" },
-    { id: 3, src: "/images/banner3.jpg", alt: "배너3" },
+    { id: 1, src: banner1, alt: "배너1" },
+    { id: 2, src: banner1, alt: "배너2" },
+    { id: 3, src: banner1, alt: "배너3" },
   ];
+
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
