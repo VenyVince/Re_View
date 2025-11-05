@@ -3,18 +3,18 @@ import './Header.css';
 import NavItem from './NavItem';
 import TextInput from '../../ui/TextInput';
 import UserAvatar from '../../../features/user/components/UserAvatar';
+import logo from "../../../assets/logo.png";
 
 export default function Header() {
     return (
         <header className="rv-header">
             <div className="rv-header__inner">
-                <h1 className="rv-header__logo">ReView</h1>
-
+                <img className="rv-header__logo" src={logo} alt="ReView logo" height="40" />
                 <nav className="rv-nav">
-                    <NavItem label="All" />
-                    <NavItem label="Review" />
-                    <NavItem label="Like" />
-                    <NavItem label="Q&A" />
+                    <NavItem label="전체" to ="/" />
+                    <NavItem label="카테고리" to ="/categoriy" />
+                    <NavItem label="리뷰"  to ="/review" />
+                    <NavItem label="문의" to ="/qna"  />
                 </nav>
 
                 <div className="rv-right">
