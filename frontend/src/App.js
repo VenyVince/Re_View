@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import Header from './components/layout/Header/Header';
 import MainPage from './pages/main/MainPage';
 import Footer from './components/layout/Footer/Footer';
+import Header from "./components/layout/Header/Header";
 import SearchPage from './pages/search/SearchPage';
 
 export default function App() {
