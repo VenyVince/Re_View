@@ -1,20 +1,21 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // ✅ Link import
 import './Header.css';
 
-export default function NavItem({ label, onClick }) {
+export default function NavItem({ to, label }) {
     return (
-        <button
+        <Link
+            to={to}
             className="rv-nav__item"
-            onClick={onClick}
             style={{
-                background: 'none',
-                border: 'none',
+                textDecoration: 'none',
                 fontSize: 16,
-                cursor: 'pointer',
                 padding: '8px 12px',
+                cursor: 'pointer',
+                color: '#111',
             }}
         >
             {label}
-        </button>
+        </Link>
     );
 }
