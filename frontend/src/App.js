@@ -1,21 +1,24 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
+import Header from './components/layout/Header/Header';
 import MainPage from './pages/main/MainPage';
 import Footer from './components/layout/Footer/Footer';
-import LoginPage from './pages/login/LoginPage'; // ✅ 예시 로그인 페이지 추가
+import SearchPage from './pages/search/SearchPage';
 
 export default function App() {
-    return (
-        <div className="App">
-            {/* 라우트 정의 */}
-            <Routes>
-                <Route path="/" element={<MainPage />} />
-                <Route path="/login" element={<LoginPage />} /> {/* ✅ 로그인 페이지 라우트 */}
-            </Routes>
+  return (
+    <div className="App">
+      {/*Header*/}
+      <Header />
+      {/* 라우트 정의 */}
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/search" element={<SearchPage />} />
+      </Routes>
 
-            {/* 공통 Footer */}
-            <Footer />
-        </div>
-    );
+      {/* 공통 Footer */}
+      <Footer />
+    </div>
+  );
 }
