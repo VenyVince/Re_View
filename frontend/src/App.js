@@ -10,10 +10,12 @@ import FaqPage from './pages/footer/FaqPage'; // Faq 페이지
 import AdsPage from "./pages/footer/AdsPage"; // 광고 문의 페이지
 import NoticeDetail from "./pages/footer/NoticeDetail"; // 공지사항 상세 페이지
 import SearchPage from './pages/search/SearchPage';
+import Header from "./components/layout/Header/Header";
 
 export default function App() {
     return (
         <div className="App">
+            <Header />
             <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/terms" element={<TermsPage />} />
@@ -21,7 +23,7 @@ export default function App() {
                 <Route path="/notice" element={<NoticePage/>} />
                 <Route path="/notice/:id" element={<NoticeDetail />} />
                 <Route path="/faq" element={<FaqPage/>} />
-                   <Route path="/search" element={<SearchPage />} />
+                <Route path="/search" element={<SearchPage />} />
                 <Route path="/ads" element={<AdsPage/>}/>
             </Routes>
             <Footer />
