@@ -6,9 +6,6 @@ import BannerSlider from '../../components/layout/MainSection/BannerSlider';
 export default function MainPage() {
     return (
         <>
-            {/* 상단 헤더 */}
-            <Header />
-
             {/* 메인 영역 */}
             <main style={{ padding: '40px', textAlign: 'center' }}>
                 {/* 배너 슬라이더 */}
