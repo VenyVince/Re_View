@@ -1,4 +1,4 @@
-package com.review.shop.controller.Search;
+package com.review.shop.controller.search;
 
 public class CommonSearchAPI {
 }

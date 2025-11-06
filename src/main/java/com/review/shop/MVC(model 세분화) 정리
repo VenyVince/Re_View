@@ -1,0 +1,12 @@
+controller
+view
+model(service, mapper(repository), dto...)
+
+현 프로젝트에서의 구조
+
+controller
+view
+service
+model(dto)
+
+mapper(repository)
