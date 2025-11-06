@@ -4,7 +4,7 @@ import com.review.shop.dto.search.CommonSearchProductDTO;
 
 import java.util.List;
 
-public class ProductSearchResponse {
+public class ProductPage_SearchResponse {
     private List<CommonSearchProductDTO> products;
 
 
