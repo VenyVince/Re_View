@@ -2,8 +2,6 @@ package com.review.shop.controller.search;
 
 import com.review.shop.dto.search.CommonSearchDTO;
 import com.review.shop.service.search.CommonSearchService;
-import com.review.shop.service.search.CommonSearchService;
-import org.apache.coyote.BadRequestException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
