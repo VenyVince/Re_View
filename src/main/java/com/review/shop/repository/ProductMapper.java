@@ -1,6 +1,6 @@
-package com.review.shop.mapper;
+package com.review.shop.repository;
 
-import com.review.shop.model.ProductDTO;
+import com.review.shop.dto.ProductDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;

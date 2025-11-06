@@ -1,16 +1,14 @@
 package com.review.shop.controller;
 
+import com.review.shop.dto.ProductDTO;
 import com.review.shop.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
-import com.review.shop.model.ProductDTO;
-import org.springframework.web.bind.annotation.RequestParam;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -24,6 +22,8 @@ public class ProductController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "8") int size,
             @RequestParam(value = "sort", defaultValue = "latest") String sort) {
+
+        log.info("=== API 요청 들어옴 ===");
 
         try {
             List<ProductDTO> products = productService.getProductList(page, size, sort);
