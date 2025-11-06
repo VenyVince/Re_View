@@ -20,15 +20,24 @@ export default function Header() {
         if (e.key === 'Enter') handleSearch();
     };
 
+    const handleLogoClick = () => {
+            navigate('/');
+        };
+
     return (
         <header className="rv-header">
             <div className="rv-header__inner">
-                <img className="rv-header__logo" src={logo} alt="ReView logo" height="40" />
+                <img className="rv-header__logo"
+                     src={logo}
+                     alt="ReView logo"
+                     height="40"
+                     onClick={handleLogoClick}/>
+
                 <nav className="rv-nav">
-                    <NavItem label="전체" to ="/" />
-                    <NavItem label="카테고리" to ="/categoriy" />
-                    <NavItem label="리뷰"  to ="/review" />
-                    <NavItem label="문의" to ="/qna"  />
+                    <NavItem label="ALL" to ="/product" />
+                    <NavItem label="Review" to ="/review" />
+                    <NavItem label="Like"  to ="/like" />
+                    <NavItem label="Q&A" to ="/qna"  />
                 </nav>
 
                 <div className="rv-right">

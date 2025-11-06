@@ -20,8 +20,19 @@ export default function SearchPage() {
   );
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>검색 결과: “{keyword}”</h2>
+    <div style={{
+        padding: "40px",
+        marginLeft: "20%",
+        marginRight: "20%"
+         }}>
+
+      <h2 style = {{
+          textAlign:"left"
+          }}>검색 결과: “{keyword}”</h2>
+      <hr />
+      <div style = {{
+          color:"blue"
+          }}>카테고리 스킨/토너</div>
 
       <div
         style={{
