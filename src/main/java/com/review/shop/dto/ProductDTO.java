@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProductDTO {
-    private String product_Id;
+    private Integer product_id;
     private String prd_name;
     private String prd_brand;
     private String image_url;

@@ -1,4 +1,4 @@
-package org.spring.project.re_view;
+package com.review.shop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

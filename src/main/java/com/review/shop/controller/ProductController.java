@@ -23,12 +23,15 @@ public class ProductController {
             @RequestParam(value = "size", defaultValue = "8") int size,
             @RequestParam(value = "sort", defaultValue = "latest") String sort) {
 
-        log.info("=== API 요청 들어옴 ===");
+        log.info("=== API 요청 ===");
+        log.info("파라미터 - page: {}, size: {}, sort: {}", page, size, sort);
 
         try {
             List<ProductDTO> products = productService.getProductList(page, size, sort);
             return ResponseEntity.ok(products);
         } catch (Exception e) {
+            log.error("❌ 에러 발생!!", e);  // ← 이 줄 추가!
+            e.printStackTrace();               // ← 이 줄 추가!
             return ResponseEntity.status(500).build();
         }
     }
