@@ -6,8 +6,9 @@
 }
 
 .best-review__title {
-    font-size: 28px;
-    font-weight: 800;
+    text-align:left;
+    font-size: 26px;
+    font-weight: 700;
     margin: 0 0 16px;
 }
 
