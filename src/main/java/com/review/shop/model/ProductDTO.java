@@ -16,7 +16,7 @@ public class ProductDTO {
     private String prd_name;
     private String prd_brand;
     private String image_url;
-    private int price;
+    private Integer price;
     private String category;
-    private double rating;
+    private float rating;
 }
