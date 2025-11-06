@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class CommonSearchReviewDTO {
-    private String nickname;
-    private String title;
+//    private String nickname;
+//    private String title;
     private String content;
     private float rating;
     private int like_count;
