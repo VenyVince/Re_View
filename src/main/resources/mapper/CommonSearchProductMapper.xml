@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.mapper.search.CommonSearchProductMapper">
+
+    <select id="CommonSearchProductMapper" resultType="com.review.shop.dto.search.CommonSearchProductDTO">
+        select p.prd_name, p.prd_brand, p.price, p.rating, p.baumann_id, b.type as baumann_type
+        from product p
+        join baumann b on p.baumann_id = b.baumann_id
+        where p.prd_name like concat('%', #{keyword}, '%')
+           or p.prd_brand like concat('%', #{keyword}, '%')
+           or p.ingredient like concat('%', #{keyword}, '%')
+           or b.type like concat('%', #{keyword}, '%')
+    </select>
+
+
+</mapper>
