@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-</beans>
+<mapper namespace="com.shopping.mapper.ProductMapper">
+
+    <!-- 상품 목록 조회 -->
+    <select id="selectProductList" resultType="com.shopping.model.ProductDTO">
+        SELECT
+        product_id,
+        prd_name,
+        prd_brand,
+        'https://your-image-url.com/images/' || product_id as image_url,
+        price,
+        category,
+        rating
+        FROM product
+        WHERE deleted_at IS NULL
+        AND is_sold_out = '0'
+        <choose>
+            <when test="sort == 'rating'">
+                ORDER BY rating DESC, product_id DESC
+            </when>
+            <when test="sort == 'price'">
+                ORDER BY price ASC, product_id DESC
+            </when>
+            <otherwise>
+                ORDER BY product_id DESC
+            </otherwise>
+        </choose>
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <!-- 상품 전체 개수 -->
+    <select id="selectProductCount" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+        WHERE deleted_at IS NULL
+        AND is_sold_out = '0'
+    </select>
+
+</mapper>
+
