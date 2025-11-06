@@ -11,11 +11,14 @@ import AdsPage from "./pages/footer/AdsPage"; // 광고 문의 페이지
 import NoticeDetail from "./pages/footer/NoticeDetail"; // 공지사항 상세 페이지
 import SearchPage from './pages/search/SearchPage';
 import Header from "./components/layout/Header/Header";
+import SurveyPage from "./pages/survey/SurveyPage"; // 설문조사 페이지
+import SurveyResult from "./pages/survey/SurveyResult"; // 설문조사 결과 페이지
 
 export default function App() {
     return (
         <div className="App">
             <Header />
+            <main className="page-content"> {/* 푸터를 항상 하단에 고정하기 위해 라우터들 감쌈*/}
             <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/terms" element={<TermsPage />} />
@@ -25,7 +28,10 @@ export default function App() {
                 <Route path="/faq" element={<FaqPage/>} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/ads" element={<AdsPage/>}/>
+                <Route path="/survey" element={<SurveyPage/>}/>
+                <Route path="/survey/result" element={<SurveyResult/>}/>
             </Routes>
+            </main>
             <Footer />
         </div>
     );
