@@ -6,7 +6,7 @@ import java.util.List;
 
 public class MyPage_SearchResponse {
     private List<HeaderSearchReviewDTO> reviews;
-// commit
+
     public List<HeaderSearchReviewDTO> getProducts() {
         return reviews;
     }

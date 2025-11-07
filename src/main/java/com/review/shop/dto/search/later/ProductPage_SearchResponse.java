@@ -9,11 +9,9 @@ public class ProductPage_SearchResponse {
 
 
     public List<HeaderSearchProductDTO> getProducts() {
-
         return products;
     }
     public void setProducts(List<HeaderSearchProductDTO> products) {
-
         this.products = products;
     }
 
