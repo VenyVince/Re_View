@@ -13,6 +13,14 @@ import SearchPage from './pages/search/SearchPage';
 import Header from "./components/layout/Header/Header";
 import SurveyPage from "./pages/survey/SurveyPage"; // 설문조사 페이지
 import SurveyResult from "./pages/survey/SurveyResult"; // 설문조사 결과 페이지
+import MyPage from "./pages/mypage/MyPage"; // 마이 페이지
+import AdminProductPage from "./pages/mypage/admin/AdminProductPage";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AdminLayout from "./pages/mypage/admin/AdminLayout";
+import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
+import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
+import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
+
 
 export default function App() {
     return (
@@ -30,6 +38,17 @@ export default function App() {
                 <Route path="/ads" element={<AdsPage/>}/>
                 <Route path="/survey" element={<SurveyPage/>}/>
                 <Route path="/survey/result" element={<SurveyResult/>}/>
+                <Route path="/mypage" element={<MyPage />} />
+
+                {/* 관리자 전용 영역 */}
+                <Route element={<ProtectedRoute requireAdmin />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route path="products" element={<AdminProductPage />} />
+                        <Route path="products/new" element={<AdminProductNew />} />
+                        <Route path="products/:id/edit" element={<AdminProductEdit />} />
+                        <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
+                    </Route>
+                </Route>
             </Routes>
             </main>
             <Footer />
