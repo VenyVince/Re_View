@@ -37,7 +37,7 @@ public class SecurityConfig {
                 // 주의 !!!! CSRF 비활성화 되어있음
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (개발 기간동안)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/","/api/products","/api/reviews").permitAll()
                         .anyRequest().authenticated()
                 )
 
