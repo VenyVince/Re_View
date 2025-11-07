@@ -11,12 +11,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,22 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController  {
     UserService userService;
     private final AuthenticationManager authenticationManager;
-
-    // 회원가입의 IllegalStateException 예외 처리 메서드 , 에러시 400 상태코드 반환
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleUserRegistrationException(IllegalStateException ex) {
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST).body("회원가입에 실패하였습니다. " + ex.getMessage());
-    }
-
-    // 로그인의 BadCredentialsException 예외 처리 메서드 , 에러시 401 상태코드 반환
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleLoginException(BadCredentialsException ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body("아이디 또는 비밀번호가 일치하지 않습니다. " + ex.getMessage());
-    }
 
     // 회원가입 로직 구현
     @PostMapping("/api/auth/register")
