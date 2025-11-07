@@ -1,18 +1,31 @@
 package com.review.shop.config;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-// Security Config test용으로 임시로 permit ALl 걸어놓음. 테스트용으로만 확인하고 나중에 배포할 때랑 로그인 구현되고 나서는 삭제.
-// 비밀번호랑 아이디는  properties에서 확인.
 @Configuration
-@EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
+    //사용자 인증 처리 Bean 주입
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    //암호화 용 Bean 주입
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,7 +50,7 @@ public class SecurityConfig {
 
                         })
 
-        );
+                );
 
 
         return http.build();
