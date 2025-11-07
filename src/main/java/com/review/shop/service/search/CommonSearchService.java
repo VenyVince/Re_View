@@ -8,22 +8,22 @@ import com.review.shop.exception.ResourceNotFountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import com.review.shop.repository.search.CommonSearchReviewMapper;
-import com.review.shop.repository.search.CommonSearchProductMapper;
+import com.review.shop.repository.search.header.HeaderSearchReviewMapper;
+import com.review.shop.repository.search.header.HeaderSearchProductMapper;
 
 import java.util.List;
 
 @Service
 public class CommonSearchService {
     @Autowired
-    private CommonSearchReviewMapper reviewMapper;
+    private HeaderSearchReviewMapper reviewMapper;
 
     @Autowired
-    private CommonSearchProductMapper productMapper;
+    private HeaderSearchProductMapper productMapper;
 
-    public HeaderSearchDTO search(String keyword) {
+    public HeaderSearchDTO search(String keyword, String sort) {
         try {
-            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword);
+            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort);
             List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword);
 
             if (products.isEmpty() && reviews.isEmpty()) {
