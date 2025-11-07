@@ -2,17 +2,17 @@ package com.review.shop.controller.search;
 
 import com.review.shop.dto.search.header.HeaderSearchResponse;
 import com.review.shop.service.search.HeaderSearchService;
+import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/search")
+@RequiredArgsConstructor
 public class HeaderSearchController {
 
-    @Autowired
-    private HeaderSearchService searchService;
+    private final HeaderSearchService searchService;
 
     @GetMapping
     public ResponseEntity<HeaderSearchResponse> search(
