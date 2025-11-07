@@ -1,77 +1,36 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import "./SearchPage.css";
+import CategoryFilter from "./components/CategoryFilter";
+import BrandFilter from "./components/BrandFilter";
+import SearchBar from "./components/SearchBar";
 
 export default function SearchPage() {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const keyword = queryParams.get("query"); // 주소에서 ?query=값 추출
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const keyword = queryParams.get("query") || ""; // 검색어 값
 
-  // 더미 데이터 (임시로 보여줄 상품 목록)
-  const dummyResults = [
-    { id: 1, name: "수분크림", price: 15000, brand: "Innisfree" },
-    { id: 2, name: "클렌징폼", price: 12000, brand: "HERA" },
-    { id: 3, name: "선크림", price: 17000, brand: "Dr.G" },
-    { id: 4, name: "립밤", price: 9000, brand: "Nivea" },
-  ];
+    return (
+        <section className="search-page">
+            {/*  검색어가 있으면 '검색 결과 = "선크림"' 형태로 표시 */}
+            <h2 className="search-title">
+                검색 결과{keyword && <span> = '{keyword}'</span>}
+            </h2>
+            <hr className="divider-strong" />
 
-  // keyword가 포함된 상품만 필터링
-  const results = dummyResults.filter((item) =>
-    item.name.includes(keyword)
-  );
-
-  return (
-    <div style={{
-        padding: "40px",
-        marginLeft: "20%",
-        marginRight: "20%"
-         }}>
-
-      <h2 style = {{
-          textAlign:"left"
-          }}>검색 결과: “{keyword}”</h2>
-      <hr />
-      <div style = {{
-          color:"blue"
-          }}>카테고리 스킨/토너</div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px",
-          marginTop: "20px",
-        }}
-      >
-        {results.length > 0 ? (
-          results.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "15px",
-                textAlign: "center",
-                backgroundColor: "#fff",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "#f3f3f3",
-                  height: "150px",
-                  borderRadius: "6px",
-                  marginBottom: "10px",
-                }}
-              />
-              <h3 style={{ fontSize: "16px" }}>{item.name}</h3>
-              <p style={{ color: "#666", fontSize: "14px" }}>{item.brand}</p>
-              <strong>{item.price.toLocaleString()}원</strong>
+            {/* 필터 영역 */}
+            <div className="search-filters">
+                <CategoryFilter />
+                <BrandFilter />
+                <hr className="divider-strong" />
             </div>
-          ))
-        ) : (
-          <p>검색 결과가 없습니다.</p>
-        )}
-      </div>
-    </div>
-  );
+            <SearchBar />
+
+
+            {/* 실제 검색 결과 목록 (나중에 연결 가능) */}
+            <div className="search-results">
+                <p>여기에 "{keyword}" 관련 상품이 표시됩니다.</p>
+            </div>
+        </section>
+    );
 }
