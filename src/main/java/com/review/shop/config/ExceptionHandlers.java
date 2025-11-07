@@ -5,6 +5,7 @@ import com.review.shop.exception.ResourceNotFountException;
 import com.review.shop.exception.WrongRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -26,5 +27,11 @@ public class ExceptionHandlers {
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<String> handleDatabase(DatabaseException exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+    }
+
+    // 로그인의 예외처리(내장 예외 클래스)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleLoginException(BadCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
     }
 }

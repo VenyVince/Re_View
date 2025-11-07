@@ -1,5 +1,6 @@
 package com.review.shop.service;
 
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.UserMapper;
 import com.review.shop.dto.login.UserInfoDto;
 import lombok.AllArgsConstructor;
@@ -22,8 +23,9 @@ public class UserService implements UserDetailsService {
 
         // 중복 ID 체크 추가
         if (userMapper.findUserById(userDTO.getId()) != null) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+            throw new WrongRequestException("이미 존재하는 아이디입니다.");
         }
+
         // 컨트롤러 부터 받은 dto 비밀번호를 암호화
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
@@ -41,7 +43,7 @@ public class UserService implements UserDetailsService {
         int affected = userMapper.insertUser(encodedUser);
 
         if (affected != 1) {
-            throw new IllegalStateException("회원가입에 실패했습니다.");
+            throw new WrongRequestException("회원가입에 실패했습니다.");
         }
     }
 
