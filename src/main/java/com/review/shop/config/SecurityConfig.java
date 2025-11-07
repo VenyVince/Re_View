@@ -42,8 +42,8 @@ public class SecurityConfig {
 //                )
                 // api 개발을 위해서 인증 다 풀어놓음 :석현
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").authenticated()   // 인증 필요한 요청
-                        .anyRequest().permitAll()                           // 나머지는 전부 허용
+                        .requestMatchers("/api/admin/**").authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 // 로그아웃 설정
