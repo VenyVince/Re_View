@@ -5,7 +5,10 @@
 
 <mapper namespace="com.review.shop.repository.search.CommonSearchProductMapper">
 
-    <select id="searchProducts" resultType="com.review.shop.dto.search.CommonSearchProductDTO">
+    <select id="searchProducts" resultType="com.review.shop.dto.search.header.HeaderSearchProductDTO">
+
+--         - CommonProduct : prd_name, prd_brand, price, rating
+
         SELECT p.prd_name, p.prd_brand, p.price, p.rating, p.baumann_id, b.type AS baumann_type
         FROM product p
                  JOIN baumann b ON p.baumann_id = b.baumann_id
