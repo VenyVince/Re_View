@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import "./BannerSlider.css";
-import banner1 from "../../../../images/banner/banner1.png"
+import dummyData from "../../../../assets/dummyData.png";
 
 function BannerSlider() {
   const images = [
-    { id: 1, src: banner1, alt: "배너1" },
-    { id: 2, src: banner1, alt: "배너2" },
-    { id: 3, src: banner1, alt: "배너3" },
+    { id: 1, src: dummyData, alt: "배너1" },
+    { id: 2, src: dummyData, alt: "배너2" },
+    { id: 3, src: dummyData, alt: "배너3" },
   ];
 
 
