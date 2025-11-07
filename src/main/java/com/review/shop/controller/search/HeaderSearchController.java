@@ -1,6 +1,6 @@
 package com.review.shop.controller.search;
 
-import com.review.shop.dto.search.header.HeaderSearchDTO;
+import com.review.shop.dto.search.header.HeaderSearchResponse;
 import com.review.shop.service.search.HeaderSearchService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ public class HeaderSearchController {
     private HeaderSearchService searchService;
 
     @GetMapping
-    public ResponseEntity<HeaderSearchDTO> search(
+    public ResponseEntity<HeaderSearchResponse> search(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "latest") String sort,
             @RequestParam(required = false, defaultValue = "0") float filter_rating
