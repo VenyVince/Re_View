@@ -1,4 +1,7 @@
 /* 컨테이너 */
+body{
+    font-family: 'Inter',sans-serif;
+}
 .rv-header {
     height: 73px;                       /* 규격: 73 */
     border-bottom: 1px solid #e5e5e5;
@@ -23,12 +26,14 @@
     font-size: 24px;
     font-weight: 700;
     margin: 0;
+    cursor: pointer;
 }
 
 /* 네비게이션 */
 .rv-nav {
+    margin-left: 100px;
     display: flex;
-    gap: 24px;
+    gap: 40px;
 }
 
 .rv-nav__item {
