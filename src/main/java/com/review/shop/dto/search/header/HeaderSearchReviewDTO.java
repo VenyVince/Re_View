@@ -1,9 +1,9 @@
-package com.review.shop.dto.search;
+package com.review.shop.dto.search.header;
 
 import lombok.Data;
 
 @Data
-public class CommonSearchReviewDTO {
+public class HeaderSearchReviewDTO {
 //    private String nickname;
 //    private String title;
     private String content;

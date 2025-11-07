@@ -1,11 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.review.shop.repository.search.CommonSearchReviewMapper">
 
-    <select id="searchReviews" resultType="com.review.shop.dto.search.CommonSearchReviewDTO">
+    <select id="searchReviews" resultType="com.review.shop.dto.search.header.HeaderSearchReviewDTO">
         <!--기본 검색 결과 -->
 <!--        - CommonReview : nickname, content, rating / prd_name, prd_brand-->
-        select r.content, r.rating, r.nickname, r.rating
+        select r.content, r.rating, p.prd_name, p.prd_brand, u.nickname, u.baumann_id
         from review r
-        join product p
+        join product p on r.product_id = p.product_id
+        join user_table u on r.user_id = u.user_id
         where r.content like concat('%', #{keyword}, '%')
         <!--필터링 구현 ( 아직 미구현 )-->
         <if test="filter != null and filter != ''">
