@@ -1,6 +1,6 @@
 package com.review.shop.controller.search;
 
-import com.review.shop.dto.search.CommonSearchDTO;
+import com.review.shop.dto.search.header.HeaderSearchDTO;
 import com.review.shop.service.search.CommonSearchService;
 import com.review.shop.service.search.CommonSearchService;
 import org.apache.coyote.BadRequestException;
@@ -17,7 +17,7 @@ public class CommonSearchController {
     private CommonSearchService searchService;
 
     @GetMapping
-    public ResponseEntity<CommonSearchDTO> search(
+    public ResponseEntity<HeaderSearchDTO> search(
             @RequestParam(required = false, defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "latest") String sort, //미구현
             @RequestParam(required = false, defaultValue = "") String filter //미구현

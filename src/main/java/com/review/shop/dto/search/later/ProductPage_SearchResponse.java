@@ -1,17 +1,17 @@
 package com.review.shop.dto.search.later;
 
-import com.review.shop.dto.search.CommonSearchProductDTO;
+import com.review.shop.dto.search.header.HeaderSearchProductDTO;
 
 import java.util.List;
 
 public class ProductPage_SearchResponse {
-    private List<CommonSearchProductDTO> products;
+    private List<HeaderSearchProductDTO> products;
 
 
-    public List<CommonSearchProductDTO> getProducts() {
+    public List<HeaderSearchProductDTO> getProducts() {
         return products;
     }
-    public void setProducts(List<CommonSearchProductDTO> products) {
+    public void setProducts(List<HeaderSearchProductDTO> products) {
         this.products = products;
     }
 
