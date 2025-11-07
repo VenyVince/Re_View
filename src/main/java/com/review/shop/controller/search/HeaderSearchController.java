@@ -25,7 +25,5 @@ public class HeaderSearchController {
         }
 
         return ResponseEntity.ok(searchService.search(keyword, sort, filter_rating));
-//        CommonSearchResponse response = searchService.search(keyword);
-//        return ResponseEntity.ok(response);
     }
 }
