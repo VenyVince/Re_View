@@ -1,0 +1,88 @@
+/* 전체 검색바 컨테이너 */
+.search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* 왼쪽 정렬 (필요 시 center로 조정 가능) */
+    gap: 10px;
+    padding: 10px 0;
+    margin: 0;
+}
+
+/* 입력 필드 */
+.search-input {
+    width: 220px;
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.search-input:focus {
+    border-color: #111; /* 포커스 시 진한 테두리 */
+}
+
+/* 검색 버튼 */
+.search-button {
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid #111;
+    border-radius: 6px;
+    background-color: #111;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-button:hover {
+    background-color: #333;
+}
+
+/* 정렬 드롭다운 */
+.search-sort {
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0 10px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition: border 0.2s;
+}
+
+.search-sort:focus {
+    border-color: #111;
+}
+
+/* 날짜 입력 필드 */
+.search-date {
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.search-date:focus {
+    border-color: #111;
+}
+
+/* 상품명 라벨 */
+.search-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 4px;
+}
+
+/* 안내 텍스트 */
+.search-result-text {
+    text-align: center;
+    margin-top: 12px;
+    color: #444;
+    font-size: 14px;
+}
