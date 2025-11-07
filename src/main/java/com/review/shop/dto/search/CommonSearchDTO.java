@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CommonSearchResponse {
+public class CommonSearchDTO {
     private List<CommonSearchReviewDTO> reviews;
     private List<CommonSearchProductDTO> products;
 }
