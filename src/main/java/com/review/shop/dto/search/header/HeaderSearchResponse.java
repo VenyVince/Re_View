@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class HeaderSearchDTO {
+public class HeaderSearchResponse {
     private List<HeaderSearchReviewDTO> reviews;
     private List<HeaderSearchProductDTO> products;
 }
