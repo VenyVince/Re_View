@@ -18,7 +18,7 @@
         r.content,
         r.rating
         FROM review r
-        JOIN "USER_table" u ON r.user_id = u.user_id
+        JOIN USER_table u ON r.user_id = u.user_id
         JOIN product p ON r.product_id = p.product_id
         LEFT JOIN (
         SELECT review_id, image_url,
@@ -27,14 +27,14 @@
         ) ri ON r.review_id = ri.review_id AND ri.rn = 1
         WHERE r.deleted_at IS NULL
         <choose>
+            <when test="sort == 'latest'">
+                ORDER BY r.created_at DESC
+            </when>
             <when test="sort == 'rating'">
                 ORDER BY r.rating DESC, r.created_at DESC
             </when>
-            <when test="sort == 'like_count'">
-                ORDER BY r.like_count DESC, r.created_at DESC
-            </when>
             <otherwise>
-                ORDER BY r.created_at DESC
+                ORDER BY r.like_count DESC, r.created_at DESC
             </otherwise>
         </choose>
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY

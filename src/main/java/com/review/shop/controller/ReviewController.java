@@ -27,25 +27,17 @@ public class ReviewController {
     @GetMapping
     public ResponseEntity<List<ReviewDTO>> getReviews(
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "8") int size,
-            @RequestParam(value = "sort", defaultValue = "latest") String sort) {
+            @RequestParam(value = "size", defaultValue = "1") int size,
+            @RequestParam(value = "sort", defaultValue = "like_count") String sort) {
 
         log.info("=== 리뷰 API 요청 ===");
         log.info("파라미터 - page: {}, size: {}, sort: {}", page, size, sort);
 
         try {
-            long startTime = System.currentTimeMillis();
-
             List<ReviewDTO> reviews = reviewService.getReviewList(page, size, sort);
-
-            long endTime = System.currentTimeMillis();
-            long duration = endTime - startTime;
-
-            log.info("조회 성공 - 리뷰 개수: {}, 소요 시간: {}ms", reviews.size(), duration);
-
             return ResponseEntity.ok(reviews);
         } catch (Exception e) {
-            log.error("❌ 에러 발생!!", e);
+            log.error("에러 발생", e);
             e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
