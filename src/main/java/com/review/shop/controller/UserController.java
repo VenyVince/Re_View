@@ -2,8 +2,8 @@ package com.review.shop.controller;
 
 //회원가입, 로그인, 로그아웃 등의 기능을 담당하는 컨트롤러
 
-import com.review.shop.model.LoginRequestDto;
-import com.review.shop.model.UserInfoDto;
+import com.review.shop.dto.login.LoginRequestDto;
+import com.review.shop.dto.login.UserInfoDto;
 import com.review.shop.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

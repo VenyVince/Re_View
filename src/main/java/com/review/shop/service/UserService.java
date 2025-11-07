@@ -1,7 +1,7 @@
 package com.review.shop.service;
 
-import com.review.shop.mapper.UserMapper;
-import com.review.shop.model.UserInfoDto;
+import com.review.shop.repository.UserMapper;
+import com.review.shop.dto.login.UserInfoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
