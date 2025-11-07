@@ -14,16 +14,16 @@ import com.review.shop.repository.search.header.HeaderSearchProductMapper;
 import java.util.List;
 
 @Service
-public class CommonSearchService {
+public class HeaderSearchService {
     @Autowired
     private HeaderSearchReviewMapper reviewMapper;
 
     @Autowired
     private HeaderSearchProductMapper productMapper;
 
-    public HeaderSearchDTO search(String keyword, String sort) {
+    public HeaderSearchDTO search(String keyword, String sort, float filter_rating) {
         try {
-            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort);
+            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_rating);
             List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword);
 
             if (products.isEmpty() && reviews.isEmpty()) {
