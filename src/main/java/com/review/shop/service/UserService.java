@@ -43,6 +43,7 @@ public class UserService implements UserDetailsService {
         int affected = userMapper.insertUser(encodedUser);
 
         if (affected != 1) {
+            throw new WrongRequestException("회원가입에 실패했습니다.");
         }
     }
 

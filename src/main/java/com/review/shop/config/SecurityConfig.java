@@ -1,5 +1,7 @@
 package com.review.shop.config;
 
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,14 +36,9 @@ public class SecurityConfig {
 
                 // 주의 !!!! CSRF 비활성화 되어있음
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (개발 기간동안)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/**","/api/products","/api/reviews").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-                // api 개발을 위해서 인증 다 풀어놓음 :석현
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/","/api/products","/api/reviews").permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 // 로그아웃 설정
