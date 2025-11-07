@@ -8,8 +8,9 @@ import lombok.Data;
 public class HeaderSearchProductDTO {
     private String prd_Name;
     private String prd_brand;
+    private String category;
     private int price;
     private float rating;
-    private int baumann_id;
     private String baumann_type;
+    private String description;
 }
