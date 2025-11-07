@@ -11,9 +11,11 @@
         JOIN product p on r.product_id = p.product_id
         JOIN user_table u on r.user_id = u.user_id
         JOIN baumann b ON u.baumann_id = b.baumann_id
-        WHERE r.content LIKE '%' || #{keyword} || '%'
-        OR u.nickname LIKE '%' || #{keyword} || '%'
-
+        WHERE (r.content LIKE '%' || #{keyword} || '%'
+        OR u.nickname LIKE '%' || #{keyword} || '%')
+        <if test="filter_rating != null">
+            AND r.rating &gt;= #{filter_rating}
+        </if>
         <choose>
             <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
@@ -27,7 +29,7 @@
             <when test="sort == 'rating_lowest'">
                 ORDER BY r.rating ASC
             </when>
-            <when test="sort == 'likes">
+            <when test="sort == 'likes'">
                 order by r.like_count DESC
             </when>
             <otherwise>
