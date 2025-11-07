@@ -9,9 +9,9 @@
         SELECT p.prd_name, p.prd_brand, p.price, p.rating, p.baumann_id, b.type AS baumann_type
         FROM product p
                  JOIN baumann b ON p.baumann_id = b.baumann_id
-        WHERE p.prd_name LIKE '%' || #{keyword} || '%'
-           OR p.prd_brand LIKE '%' || #{keyword} || '%'
-           OR p.ingredient LIKE '%' || #{keyword} || '%'
+        WHERE p.prd_name LIKE '%', #{keyword}, '%'
+           OR p.prd_brand LIKE '%', #{keyword}, '%'
+           OR p.ingredient LIKE '%', #{keyword},  '%'
            OR b.type LIKE '%' || #{keyword} || '%'
     </select>
 
