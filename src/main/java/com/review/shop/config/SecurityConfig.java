@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@AllArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig {
     //사용자 인증 처리 Bean 주입
     @Bean
