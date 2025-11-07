@@ -40,7 +40,7 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/","/api/products","/api/reviews").permitAll()
 //                        .anyRequest().authenticated()
 //                )
-//                개발용으로 임시 로직 이용하겠습니다.
+                // api 개발을 위해서 인증 다 풀어놓음 :석현
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/admin/**").authenticated()   // 인증 필요한 요청
                         .anyRequest().permitAll()                           // 나머지는 전부 허용
