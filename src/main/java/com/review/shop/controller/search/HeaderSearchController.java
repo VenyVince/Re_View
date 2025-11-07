@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/search")
-public class CommonSearchController {
+public class HeaderSearchController {
 
     @Autowired
     private CommonSearchService searchService;
 
     @GetMapping
     public ResponseEntity<HeaderSearchDTO> search(
-            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "latest") String sort, //미구현
             @RequestParam(required = false, defaultValue = "") String filter //미구현
     ) throws BadRequestException {
@@ -26,7 +26,7 @@ public class CommonSearchController {
             throw new BadRequestException("검색어는 2글자 이상부터입니다.");
         }
 
-        return ResponseEntity.ok(searchService.search(keyword));
+        return ResponseEntity.ok(searchService.search(keyword, sort));
 //        CommonSearchResponse response = searchService.search(keyword);
 //        return ResponseEntity.ok(response);
     }
