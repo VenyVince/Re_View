@@ -40,6 +40,15 @@ export default function SurveyResult() {
         // 이미 surveyResult에 저장되어 있지만, 안전하게 한 번 더 저장
         localStorage.setItem("surveyResult", JSON.stringify({ type, score }));
         nav(returnTo, { replace: true }); // 회원가입으로 복귀
+
+        // /register로 돌아갈 때 from=survey 플래그를 쿼리와 state로 함께 전달
+        const url = new URL(returnTo, window.location.origin);
+        if (!url.searchParams.get('from')) url.searchParams.set('from', 'survey');
+
+        nav(url.pathname + url.search, {
+            replace: true,
+            state: { fromSurvey: true },
+        });
     };
 
     return (
