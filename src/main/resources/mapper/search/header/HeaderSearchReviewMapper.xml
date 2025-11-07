@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--sort: 생성일, 별점, 추천-->
+<mapper namespace="com.review.shop.repository.search.header.HeaderSearchReviewMapper">
+
+    <select id="searchReviews" resultType="com.review.shop.dto.search.header.HeaderSearchReviewDTO">
+        SELECT r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at, p. prd_name, p.prd_brand, u.nickname, b.type as user_baumann_type
+        FROM review r
+        JOIN product p on r.product_id = p.product_id
+        JOIN user_table u on r.user_id = u.user_id
+        JOIN baumann b ON u.baumann_id = b.baumann_id
+        WHERE (r.content LIKE '%' || #{keyword} || '%'
+        OR u.nickname LIKE '%' || #{keyword} || '%')
+        <if test="filter_rating != null">
+            AND r.rating &gt;= #{filter_rating}
+        </if>
+        <choose>
+            <when test="sort == 'latest'">
+                ORDER BY r.created_at DESC
+            </when>
+            <when test="sort == 'oldest'">
+                ORDER BY r.created_at ASC
+            </when>
+            <when test="sort == 'rating_highest'">
+                ORDER BY r.rating DESC
+            </when>
+            <when test="sort == 'rating_lowest'">
+                ORDER BY r.rating ASC
+            </when>
+            <when test="sort == 'likes'">
+                order by r.like_count DESC
+            </when>
+            <otherwise>
+                ORDER BY r.created_at DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+</mapper>
