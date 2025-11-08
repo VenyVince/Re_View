@@ -1,27 +1,26 @@
 package com.review.shop.service.search;
 
 import com.review.shop.dto.search.header.HeaderSearchProductDTO;
-import com.review.shop.dto.search.header.HeaderSearchDTO;
+import com.review.shop.dto.search.header.HeaderSearchResponse;
 import com.review.shop.dto.search.header.HeaderSearchReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFountException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.review.shop.repository.search.header.HeaderSearchProductMapper;
+import com.review.shop.repository.search.header.HeaderSearchReviewMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import com.review.shop.repository.search.header.HeaderSearchReviewMapper;
-import com.review.shop.repository.search.header.HeaderSearchProductMapper;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class HeaderSearchService {
-    @Autowired
-    private HeaderSearchReviewMapper reviewMapper;
+    private final HeaderSearchReviewMapper reviewMapper;
 
-    @Autowired
-    private HeaderSearchProductMapper productMapper;
+    private final HeaderSearchProductMapper productMapper;
 
-    public HeaderSearchDTO search(String keyword, String sort, float filter_rating) {
+    public HeaderSearchResponse search(String keyword, String sort, float filter_rating) {
         try {
             List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_rating);
             List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword, sort, filter_rating);
@@ -30,7 +29,7 @@ public class HeaderSearchService {
                 throw new ResourceNotFountException("검색 결과가 존재하지 않습니다");
             }
 
-            HeaderSearchDTO response = new HeaderSearchDTO();
+            HeaderSearchResponse response = new HeaderSearchResponse();
             response.setReviews(reviews);
             response.setProducts(products);
 
