@@ -9,20 +9,10 @@ import NoticePage from './pages/footer/NoticePage'; // 공지사항 페이지
 import FaqPage from './pages/footer/FaqPage'; // Faq 페이지
 import AdsPage from "./pages/footer/AdsPage"; // 광고 문의 페이지
 import NoticeDetail from "./pages/footer/NoticeDetail"; // 공지사항 상세 페이지
-import SearchPage from './pages/search/SearchPage';
-import Header from "./components/layout/Header/Header";
 import SurveyIntro from './pages/survey/SurveyIntro'; // 설문조사 인트로
 import SurveyPage from "./pages/survey/SurveyPage"; // 설문조사 페이지
 import SurveyResult from "./pages/survey/SurveyResult"; // 설문조사 결과 페이지
 import MyPage from "./pages/mypage/MyPage"; // 마이 페이지
-import AdminProductPage from "./pages/mypage/admin/AdminProductPage";
-import ProtectedRoute from "./components/admin/ProtectedRoute";
-import AdminLayout from "./pages/mypage/admin/AdminLayout";
-import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
-import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
-import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
-
-
 import LoginPage from './pages/login/LoginPage'; // 로그인 페이지
 import FindSelect from './pages/login/find/FindSelect'; // 아이디 비밀번호 찾기 선택 페이지
 import FindIdPage from './pages/login/find/FindIdPage'; // 아이지 찾기 페이지
@@ -30,10 +20,21 @@ import FindIdResult from './pages/login/find/FindIdResult';
 import FindPasswordPage from './pages/login/find/FindPasswordPage'; // 비밀번호 찾기 페이지
 import FindPasswordReset from './pages/login/find/FindPasswordReset';
 import FindPasswordDone from './pages/login/find/FindPasswordDone';
-
-
 import RegisterPage from './pages/register/RegisterPage'; // 회원가입 페이지
 import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가입 성공 페이지
+
+import SearchPage from './pages/search/SearchPage';
+import Header from "./components/layout/Header/Header";
+
+import AdminProductPage from "./pages/mypage/admin/AdminProductPage";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AdminLayout from "./pages/mypage/admin/AdminLayout";
+import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
+import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
+import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
+
+import TestProduct from "./TestProduct";
+
 
 export default function App() {
     return (
@@ -72,6 +73,9 @@ export default function App() {
                         <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
                     </Route>
                 </Route>
+
+                {/*API 커넥트 예시용*/}
+                <Route path="/test-products" element={<TestProduct />} />
             </Routes>
             </main>
             <Footer />
