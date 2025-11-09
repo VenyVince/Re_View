@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface ProductReview_SearchMapper {
-    List<ProductReview_SearchDTO.ProductReview_SearchDTO> searchReviews(
+    List<ProductReview_SearchDTO> searchReviews(
             @Param("product_id") int product_id,
             @Param("keyword") String keyword,
             @Param("sort") String sort,

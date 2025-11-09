@@ -1,6 +1,7 @@
 package com.review.shop.service.search;
 
 import com.review.shop.dto.search.ProductReview_SearchDTO;
+import com.review.shop.dto.search.ProductReview_SearchResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFountException;
 import com.review.shop.repository.search.pages.ProductReview_SearchMapper;
@@ -16,15 +17,15 @@ public class ProductReview_SearchService {
 
     private final ProductReview_SearchMapper reviewMapper;
 
-    public ProductReview_SearchDTO search(int product_id, String keyword, String sort, float filter_rating) {
+    public ProductReview_SearchResponseDTO search(int product_id, String keyword, String sort, float filter_rating) {
         try {
-            List<ProductReview_SearchDTO.ProductReview_SearchDTO> reviews = reviewMapper.searchReviews(product_id, keyword, sort,  filter_rating);
+            List<ProductReview_SearchDTO> reviews = reviewMapper.searchReviews(product_id, keyword, sort,  filter_rating);
 
             if (reviews.isEmpty()) {
                 throw new ResourceNotFountException("검색 결과가 존재하지 않습니다");
             }
 
-            ProductReview_SearchDTO response = new ProductReview_SearchDTO();
+            ProductReview_SearchResponseDTO response = new ProductReview_SearchResponseDTO();
             response.setReviews(reviews);
 
             return response;

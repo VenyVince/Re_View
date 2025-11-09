@@ -1,6 +1,8 @@
 package com.review.shop.service.search;
 
 import com.review.shop.dto.search.HeaderSearchDTO;
+import com.review.shop.dto.search.HeaderSearchProductDTO;
+import com.review.shop.dto.search.HeaderSearchReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFountException;
 import com.review.shop.repository.search.header.HeaderSearchProductMapper;
@@ -20,8 +22,8 @@ public class HeaderSearchService {
 
     public HeaderSearchDTO search(String keyword, String sort, float filter_rating) {
         try {
-            List<HeaderSearchDTO.HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_rating);
-            List<HeaderSearchDTO.HeaderSearchProductDTO> products = productMapper.searchProducts(keyword, sort, filter_rating);
+            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_rating);
+            List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword, sort, filter_rating);
 
             if (products.isEmpty() && reviews.isEmpty()) {
                 throw new ResourceNotFountException("검색 결과가 존재하지 않습니다");

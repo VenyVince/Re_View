@@ -1,0 +1,14 @@
+package com.review.shop.dto.search;
+
+import lombok.Data;
+
+@Data
+public class HeaderSearchProductDTO {
+    private String prd_name;
+    private String prd_brand;
+    private String category;
+    private int price;
+    private float rating;
+    private String baumann_type;
+    private String description;
+}
