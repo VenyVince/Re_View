@@ -1,6 +1,6 @@
 package com.review.shop.controller.search;
 
-import com.review.shop.dto.search.pages.ProductReview_SearchResponse;
+import com.review.shop.dto.search.ProductReview_SearchDTO;
 import com.review.shop.service.search.ProductReview_SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ public class ProductReview_SearchController {
     private final ProductReview_SearchService searchService;
 
     @GetMapping
-    public ResponseEntity<ProductReview_SearchResponse> search(
+    public ResponseEntity<ProductReview_SearchDTO> search(
             @PathVariable("product_id") int product_id,
             @RequestParam(required = false, defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "latest") String sort,

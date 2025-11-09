@@ -1,6 +1,6 @@
 package com.review.shop.repository.search.pages;
 
-import com.review.shop.dto.search.pages.ProductReview_SearchDTO;
+import com.review.shop.dto.search.ProductReview_SearchDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface ProductReview_SearchMapper {
-    List<ProductReview_SearchDTO> searchReviews(
+    List<ProductReview_SearchDTO.ProductReview_SearchDTO> searchReviews(
             @Param("product_id") int product_id,
             @Param("keyword") String keyword,
             @Param("sort") String sort,
