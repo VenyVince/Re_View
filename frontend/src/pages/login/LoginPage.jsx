@@ -2,16 +2,49 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import logo from '../../assets/logo.png';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function LoginPage() {
-    const [email, setEmail] = useState('');
+    const [id, setId] = useState(''); // 🔹 API 명세서에서는 email이 아닌 id 사용
     const [password, setPassword] = useState('');
     const [saveId, setSaveId] = useState(false);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('로그인 시도:', { email, password, saveId });
-        // TODO: 로그인 API 연동
+        setError('');
+
+        try {
+            // 🔹 API 요청
+            const response = await axios.post(
+                "/api/auth/login",
+                { id, password },
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true, // ✅ 쿠키를 포함해야 할 때 필수
+                }
+            );
+
+            console.log('✅ 로그인 성공:', response.data);
+
+            const { status, data } = response.data;
+            if (status === 200) {
+                // 🔹 로그인 성공 시 처리
+                alert(`${data.nickname}님 환영합니다!`);
+                // 예시: 세션 유지용 사용자 정보 저장
+                localStorage.setItem('user', JSON.stringify(data));
+                navigate('/');
+            }
+        } catch (err) {
+
+            if (err.response && err.response.status === 401) {
+                setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+            } else {
+                setError('서버와의 통신 중 오류가 발생했습니다.');
+            }
+
+        }
     };
 
     return (
@@ -22,10 +55,10 @@ export default function LoginPage() {
             {/* 로그인 폼 */}
             <form className="login-form" onSubmit={handleSubmit}>
                 <input
-                    type="email"
-                    placeholder="이메일을 입력해주세요"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="text"
+                    placeholder="아이디를 입력해주세요"
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
                     required
                 />
                 <input
@@ -35,6 +68,8 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
+
+                {error && <p className="error-message">{error}</p>}
 
                 <button type="submit">로그인</button>
             </form>
