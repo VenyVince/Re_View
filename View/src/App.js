@@ -75,7 +75,7 @@ export default function App() {
                 </Route>
 
                 {/*API 커넥트 예시용*/}
-                <Route path="/test-products" element={<TestProduct />} />
+                <Route path="/test/products" element={<TestProduct />} />
             </Routes>
             </main>
             <Footer />
