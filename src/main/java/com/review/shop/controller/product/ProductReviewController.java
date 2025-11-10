@@ -1,7 +1,7 @@
-package com.review.shop.controller.review;
+package com.review.shop.controller.product;
 
-import com.review.shop.dto.review.ProductReviewDTO;
-import com.review.shop.service.review.ProductReviewService;
+import com.review.shop.dto.product.ProductReviewDTO;
+import com.review.shop.service.product.ProductReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

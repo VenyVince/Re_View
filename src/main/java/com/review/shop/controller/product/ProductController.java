@@ -1,7 +1,7 @@
-package com.review.shop.controller;
+package com.review.shop.controller.product;
 
-import com.review.shop.dto.ProductDTO;
-import com.review.shop.service.ProductService;
+import com.review.shop.dto.product.ProductDTO;
+import com.review.shop.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
