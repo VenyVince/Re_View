@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.review.shop.repository.ReviewMapper">
+<mapper namespace="com.review.shop.repository.review.ReviewMapper">
 
     <!-- 리뷰 목록 조회 (JOIN 포함) -->
-    <select id="selectReviewList" resultType="com.review.shop.dto.ReviewDTO">
+    <select id="selectReviewList" resultType="com.review.shop.dto.review.ReviewDTO">
         SELECT
         r.review_id,
         COALESCE(u.nickname, u.name) AS writer,

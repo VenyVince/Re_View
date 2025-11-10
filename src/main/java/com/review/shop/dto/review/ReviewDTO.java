@@ -1,4 +1,4 @@
-package com.review.shop.dto;
+package com.review.shop.dto.review;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

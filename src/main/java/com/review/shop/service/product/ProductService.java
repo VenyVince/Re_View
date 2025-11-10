@@ -1,8 +1,8 @@
-package com.review.shop.service;
+package com.review.shop.service.product;
 
 
-import com.review.shop.repository.ProductMapper;
-import com.review.shop.dto.ProductDTO;
+import com.review.shop.repository.product.ProductMapper;
+import com.review.shop.dto.product.ProductDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
