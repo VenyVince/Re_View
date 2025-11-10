@@ -2,6 +2,8 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SECTIONS, QUESTION_COUNT, buildTallyFromSelections, selectionsToAnswerArray } from "./questions";
+import { submitBaumannSurvey } from "../../api/survey/surveyApi";
+import styles from "./SurveyPage.module.css";
 
 // 간단한 바우만 코드 계산기
 function computeBaumann(t) {
@@ -14,20 +16,22 @@ function computeBaumann(t) {
     return `${od}${sr}${pw}${nt}`;
 }
 
-// 서버 POST 호출 – 아직 백엔드 없으면 주석 유지
-// import { submitBaumann } from "../../api/survey";
-
 export default function SurveyPage() {
     // selections: { [qid]: index(0~3) }
     const [selections, setSelections] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const navigate = useNavigate();
     const { search } = useLocation();
+    const answeredCount = Object.keys(selections).length;
 
     const progress = useMemo(
-        () => Math.round((Object.keys(selections).length / QUESTION_COUNT) * 100),
-        [selections]
+        () =>
+            Math.round(
+                (Math.min(answeredCount, QUESTION_COUNT) / QUESTION_COUNT) * 100
+            ),
+        [answeredCount]
     );
+    const allAnswered = answeredCount === QUESTION_COUNT;
 
     const handleChange = (qid, idx) =>
         setSelections((prev) => ({ ...prev, [qid]: idx }));
@@ -47,50 +51,69 @@ export default function SurveyPage() {
         // 2) 로컬 저장
         localStorage.setItem("surveyResult", JSON.stringify({ type, score: tally }));
 
-        // 3) 서버 제출
-        // try {
-        //   const userId = localStorage.getItem("userId");
-        //   const answers = selectionsToAnswerArray(selections); // [0,2,1,...]
-        //   await submitBaumann({ userId, answers });
-        // } catch (e) {
-        //   console.error(e);
-        // }
+        // 3) 서버 제출 (axios 연동)
+        try {
+            const userId = localStorage.getItem("userId") || "user123";
+            const answers = selectionsToAnswerArray(selections); // [0,2,1,...]
+            await submitBaumannSurvey({ userId, answers });
+        } catch (err) {
+            console.error(err);
+            const st = err?.response?.status;
+            if (st === 400) alert("빠뜨린 항목이 있습니다. 모든 항목에 체크해주세요.");
+            else if (st === 401) alert("로그인이 필요합니다.");
+            else alert("서버 오류입니다. 관리자에게 문의하세요.");
+            setSubmitting(false);
+            return;
+        }
 
-        // 4) 돌아가기 (기본 /register)
+        // 4) 결과 페이지 이동
         const params = new URLSearchParams(search);
         const returnTo = params.get("return") || "/register";
         navigate(`/survey/result?return=${encodeURIComponent(returnTo)}`, {
-            state: {type, score: tally, returnTo},
+            state: { type, score: tally, returnTo },
             replace: true,
         });
     };
 
     return (
-        <div style={{ maxWidth: 1024, margin: "40px auto", padding: "0 24px" }}>
-            <h1 style={{ fontSize: 28, fontWeight: 800, textAlign: "center" }}>피부 타입 설문조사</h1>
-            <p style={{ color: "#666", textAlign: "center" }}>진행도 {progress}%</p>
+        <div className={styles.container}>
+            <h1 className={styles.title}>피부 타입 설문조사</h1>
+            <p className={styles.progress}>진행도 {progress}%</p>
 
             <form onSubmit={handleSubmit}>
                 {SECTIONS.map((sec) => (
-                    <section key={sec.key} style={{ background: "#fafafa", border: "1px solid #eee", borderRadius: 16, padding: 24, marginTop: 24 }}>
-                        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{sec.title}</h2>
-                        <ol style={{ margin: 0, paddingLeft: 0, listStyleType:"none" }}>
+                    <section key={sec.key} className={styles.section}>
+                        <h2 className={styles.sectionTitle}>{sec.title}</h2>
+                        <ol className={styles.list}>
                             {sec.questions.map((q, qi) => (
-                                <li key={q.id} style={{ margin: "12px 0" }}>
-                                    <div style={{ fontWeight: 600, marginBottom: 8 }}>{qi + 1}. {q.text}</div>
-                                    <div style={{ display: "grid", gap: 8 }}>
-                                        {q.options.map((opt, idx) => (
-                                            <label key={idx} style={{ display: "flex", gap: 10, alignItems: "flex-start", border: "1px solid #e5e5e5", borderRadius: 12, padding: "12px 14px", background: selections[q.id] === idx ? "#fff" : "#fff" }}>
-                                                <input
-                                                    type="radio"
-                                                    name={q.id}
-                                                    checked={selections[q.id] === idx}
-                                                    onChange={() => handleChange(q.id, idx)}
-                                                    style={{ marginTop: 3 }}
-                                                />
-                                                <span>{opt.label}</span>
-                                            </label>
-                                        ))}
+                                <li key={q.id} className={styles.listItem}>
+                                    <div className={styles.question}>
+                                        {qi + 1}. {q.text}
+                                    </div>
+                                    <div className={styles.options}>
+                                        {q.options.map((opt, idx) => {
+                                            const checked = selections[q.id] === idx;
+                                            const inputId = `${q.id}-${idx}`;
+                                            return (
+                                                <label
+                                                    key={idx}
+                                                    htmlFor={inputId}
+                                                    className={`${styles.optionLabel} ${checked ? styles.checked : ""}`}
+                                                >
+                                                    <input
+                                                        id={inputId}
+                                                        type="radio"
+                                                        name={q.id}
+                                                        value={idx}
+                                                        checked={checked}
+                                                        onChange={() => handleChange(q.id, idx)}
+                                                        required={idx === 0} /* 그룹 필수 응답 */
+                                                        style={{ marginTop: 3 }}
+                                                    />
+                                                    <span>{opt.label}</span>
+                                                </label>
+                                            );
+                                        })}
                                     </div>
                                 </li>
                             ))}
@@ -98,18 +121,18 @@ export default function SurveyPage() {
                     </section>
                 ))}
 
-                <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+                <div className={styles.btnRow}>
                     <button
                         type="submit"
-                        disabled={submitting}
-                        style={{ padding: "12px 18px", borderRadius: 10, border: "none", background: "#111", color: "#fff", cursor: "pointer" }}
+                        disabled={submitting || !allAnswered}
+                        className={`${styles.btnPrimary} ${submitting || !allAnswered ? styles.disabled : ""}`}
                     >
-                        결과 보기
+                        {submitting ? "제출 중..." : "결과 보기"}
                     </button>
                     <button
                         type="button"
                         onClick={() => setSelections({})}
-                        style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #ddd", background: "#fff", cursor: "pointer" }}
+                        className={styles.btnGhost}
                     >
                         초기화
                     </button>
