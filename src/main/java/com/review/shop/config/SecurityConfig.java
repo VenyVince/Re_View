@@ -40,9 +40,10 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/**","/api/products","/api/reviews").permitAll()
 //                        .anyRequest().authenticated()
 //                )
-                // api 개발을 위해서 인증 다 풀어놓음 :석현
+
+                // 어드민 제외 모두 해제
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
 
@@ -52,7 +53,6 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
-
                         })
 
                 );

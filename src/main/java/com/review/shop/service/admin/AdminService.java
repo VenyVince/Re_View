@@ -1,11 +1,13 @@
-package com.review.shop.service;
+package com.review.shop.service.admin;
 
 
 import com.review.shop.dto.ProductDetailDTO;
 import com.review.shop.exception.DatabaseException;
-import com.review.shop.repository.AdminMapper;
+import com.review.shop.repository.admin.AdminMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -61,6 +63,11 @@ public class AdminService {
             throw new DatabaseException("존재하지 않는 회원입니다", null);
         }
         return points;
+    }
+
+    //getAllProducts
+    public List<ProductDetailDTO> getAllProducts() {
+        return adminMapper.getAllProducts();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.review.shop.dto.login;
+package com.review.shop.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;
