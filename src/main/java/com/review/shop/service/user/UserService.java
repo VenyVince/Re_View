@@ -1,7 +1,7 @@
 package com.review.shop.service.user;
 
-import com.review.shop.dto.user.PasswordUpdateDto;
-import com.review.shop.dto.user.UserInfoDto;
+import com.review.shop.dto.user.PasswordUpdateDTO;
+import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입 로직 구현, DB 결과에 따른 예외 처리
-    public void registerUser(UserInfoDto userDTO) {
+    public void registerUser(UserInfoDTO userDTO) {
 
         // 중복 ID 체크 추가
         if (userMapper.findUserById(userDTO.getId()) != null) {
@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
         // 컨트롤러 부터 받은 dto 비밀번호를 암호화
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
-        UserInfoDto encodedUser = new UserInfoDto(
+        UserInfoDTO encodedUser = new UserInfoDTO(
                 userDTO.getId(),
                 encodedPassword,
                 userDTO.getName(),
@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
@@ -70,16 +70,16 @@ public class UserService implements UserDetailsService {
 
     // 아이디 중복 확인 메서드
     public boolean isDuplicateId(String id) {
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
         return user != null;
 
     }
 
     // 비밀번호 재설정 메서드
-    public void resetPassword(PasswordUpdateDto passwordUpdateDto, UserDetails userDetails) {
+    public void resetPassword(PasswordUpdateDTO passwordUpdateDto, UserDetails userDetails) {
 
         String currentId = userDetails.getUsername();
-        UserInfoDto user = userMapper.findUserById(currentId);
+        UserInfoDTO user = userMapper.findUserById(currentId);
         if(user == null) throw new WrongRequestException("사용자를 찾을 수 없습니다.");
 
         String currentPassword = user.getPassword();
