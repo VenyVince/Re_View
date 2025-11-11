@@ -58,7 +58,7 @@ public class UserController  {
     // 로그인 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/login")
     public ResponseEntity<String> login(
-            @RequestBody LoginRequestDto loginDto,
+            @RequestBody LoginRequestDTO loginDto,
             HttpServletRequest request
     ) {
 
