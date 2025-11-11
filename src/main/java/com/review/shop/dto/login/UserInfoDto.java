@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UserInfoDto {
+    private int user_id;
     private String id;
     private String password;
     private String name;
