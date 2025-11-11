@@ -56,7 +56,7 @@ public class AdminController {
         return ResponseEntity.ok("주문 상태가 변경되었습니다");
     }
 
-    // QnA 답변 등록/수정 (FK가 구현되지 않아 테스트 불가)
+    // QnA 답변 등록/수정 (테스트 완료)
     @PatchMapping("/qna/{qnaId}/answer")
     public ResponseEntity<String> updateQnaAnswer(
             @PathVariable int qnaId,
