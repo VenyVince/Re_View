@@ -1,8 +1,8 @@
-package com.review.shop.service;
+package com.review.shop.service.user;
 
 import com.review.shop.exception.WrongRequestException;
-import com.review.shop.repository.UserMapper;
-import com.review.shop.dto.login.UserInfoDto;
+import com.review.shop.repository.user.UserMapper;
+import com.review.shop.dto.user.UserInfoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,5 +63,12 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword()) // DB에 저장된 암호화된 비밀번호
                 .roles(user.getRole()) // 사용자의 권한
                 .build();
+    }
+
+    // 아이디 중복 확인 메서드
+    public boolean isDuplicateId(String id) {
+        UserInfoDto user = userMapper.findUserById(id);
+        return user != null;
+
     }
 }
