@@ -171,4 +171,40 @@ public class ProductReviewController {
         // 저장된 파일의 접근 경로 반환
         return "/uploads/reviews/" + savedFileName;
     }
+
+    /**
+     * 리뷰 삭제 (Soft Delete)
+     */
+    @DeleteMapping("/{productId}/reviews/{reviewId}")
+    public ResponseEntity<String> deleteReview(
+            @PathVariable int productId,
+            @PathVariable int reviewId,
+            HttpSession session
+    ) {
+        try {
+            // 세션에서 userId 조회
+            Integer userId = (Integer) session.getAttribute("userId");
+
+            if (userId == null) {
+                log.warn("인증되지 않은 요청 - 리뷰 삭제");
+                return ResponseEntity.status(401).body("로그인이 필요합니다");
+            }
+
+            log.info("=== 리뷰 삭제 API 요청 ===");
+            log.info("reviewId: {}, userId: {}, productId: {}", reviewId, userId, productId);
+
+            // Service 호출
+            productReviewService.deleteReview(reviewId, userId);
+
+            log.info("리뷰 삭제 성공 - review_id: {}", reviewId);
+            return ResponseEntity.status(204).build();
+
+        } catch (IllegalArgumentException e) {
+            log.warn("삭제 권한 없음: {}", e.getMessage());
+            return ResponseEntity.status(403).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("리뷰 삭제 에러!!", e);
+            return ResponseEntity.status(500).body("리뷰 삭제 실패");
+        }
+    }
 }

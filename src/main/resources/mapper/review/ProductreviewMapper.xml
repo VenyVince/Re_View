@@ -73,4 +73,30 @@
         ORDER BY r.review_id DESC
         FETCH FIRST 1 ROWS ONLY
     </select>
+
+    <!-- 리뷰 ID로 조회 -->
+    <select id="selectReviewById" parameterType="int" resultType="com.review.shop.dto.product.ProductReviewDTO">
+        SELECT
+        r.review_id,
+        r.product_id,
+        r.user_id,
+        r.content,
+        r.rating,
+        r.like_count,
+        r.dislike_count,
+        r.is_checked,
+        r.is_selected,
+        TO_CHAR(r.created_at, 'YYYY-MM-DD') AS created_at,
+        TO_CHAR(r.updated_at, 'YYYY-MM-DD') AS updated_at,
+        r.deleted_at
+        FROM review r
+        WHERE r.review_id = #{reviewId}
+    </select>
+
+    <!-- 리뷰 삭제 (Soft Delete) -->
+    <update id="deleteReview" parameterType="int">
+        UPDATE review
+        SET deleted_at = SYSDATE
+        WHERE review_id = #{reviewId}
+    </update>
 </mapper>

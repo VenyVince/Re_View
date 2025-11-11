@@ -42,4 +42,13 @@ public interface ProductReviewMapper {
             @Param("productId") int productId,
             @Param("userId") int userId
     );
+    /**
+     * 리뷰 ID로 조회
+     */
+    ProductReviewDTO selectReviewById(int reviewId);
+
+    /**
+     * 리뷰 삭제 (Soft Delete)
+     */
+    void deleteReview(int reviewId);
 }

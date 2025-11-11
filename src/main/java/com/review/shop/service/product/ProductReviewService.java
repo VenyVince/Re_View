@@ -132,4 +132,26 @@ public class ProductReviewService {
 
         return createdReview;
     }
+
+    /**
+     * 리뷰 삭제 (Soft Delete)
+     */
+    public void deleteReview(int reviewId, int userId) {
+        // 1. 리뷰 존재 여부 확인
+        ProductReviewDTO review = productReviewMapper.selectReviewById(reviewId);
+
+        if (review == null) {
+            throw new IllegalArgumentException("존재하지 않는 리뷰입니다");
+        }
+
+        // 2. 삭제 권한 확인 (본인만 삭제 가능)
+        if (review.getUser_id() != userId) {
+            throw new IllegalArgumentException("본인의 리뷰만 삭제할 수 있습니다");
+        }
+
+        // 3. 삭제 (Soft Delete - deleted_at 업데이트)
+        productReviewMapper.deleteReview(reviewId);
+
+        log.info("리뷰 삭제 완료 - review_id: {}, user_id: {}", reviewId, userId);
+    }
 }
