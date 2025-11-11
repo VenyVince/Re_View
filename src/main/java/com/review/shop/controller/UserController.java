@@ -21,14 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-// Controller에서 Service의 예외처리를 위임 받음
+
 public class UserController  {
     UserService userService;
     private final AuthenticationManager authenticationManager;
 
-    // 회원가입 로직 구현
+    // 회원가입 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/register")
-    // 전달받은 파라미터로 DTO 생성, 회원가입 서비스 호출
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDto userDTO) {
 
         userService.registerUser(userDTO);
@@ -37,9 +36,7 @@ public class UserController  {
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
 
-    // 로그인 로직 구현
-    // 기존엔 SecurityConfig로 인증처리를 했으나, Restful API 방식이므로 수동으로 인증처리
-    // 사용자의 ID/PW를 받아 토큰으로 생성하고, 해당 토큰을 UserDetails 비교하여 인증 수행
+    // 로그인 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/login")
     public ResponseEntity<String> login(
             @RequestBody LoginRequestDto loginDto,
