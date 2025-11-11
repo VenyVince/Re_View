@@ -36,7 +36,6 @@ public class UserController  {
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDto userDTO) {
 
         userService.registerUser(userDTO);
-
         return ResponseEntity
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
@@ -78,7 +77,6 @@ public class UserController  {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
-
         return ResponseEntity.ok("로그인 성공");
     }
 
