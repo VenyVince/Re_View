@@ -6,5 +6,5 @@ import java.util.List;
 
 @Data
 public class GetUserInfoResponseDTO {
-    List<GetUserInfoDTO> userInfos;
+    private List<GetUserInfoDTO> userInfos;
 }

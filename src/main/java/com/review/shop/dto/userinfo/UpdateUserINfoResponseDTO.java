@@ -6,5 +6,5 @@ import java.util.List;
 
 @Data
 public class UpdateUserINfoResponseDTO {
-    List<UpdateUserInfoDTO> userinfosUpdate;
+    private List<UpdateUserInfoDTO> userinfosUpdate;
 }
