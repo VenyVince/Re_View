@@ -12,7 +12,7 @@ export default function SurveyIntro() {
                 <p className="sv-intro__desc">
                     당신의 피부 타입을 알아보세요. 아래 질문에 답해 주세요.
                 </p>
-                <button className="sv-intro__cta" onClick={() => navigate('/survey')}>
+                <button className="sv-intro__cta" onClick={() => navigate('/survey/baumann')}>
                     설문하기
                 </button>
             </div>
