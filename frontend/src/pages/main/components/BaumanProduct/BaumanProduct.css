@@ -9,7 +9,7 @@
     font-size: 22px;
     font-weight: 800;
     margin-bottom: 20px;
-    text-align: left;
+    text-align: left; /* 왼쪽 정렬 */
 }
 
 /* 전체 박스 */
@@ -17,21 +17,19 @@
     background: #ffffff;
 }
 
-/* 상단 큰 박스 (이제 오른쪽만, 100% 사용) */
+/* 상단 타입/태그 박스 */
 .bauman-header {
-    width: 100%;
+    /* 왼쪽 큰 이미지 제거해서 한 칸만 사용 */
+    display: block;
     margin-bottom: 20px;
 }
 
-/* 왼쪽 박스(.bauman-header-left / .bauman-header-thumb)는 JSX에서 안 쓰이므로 삭제 */
-
-/* 오른쪽 타입/태그 박스 */
 .bauman-header-right {
-    width: 100%;
     border-radius: 8px;
-    padding: 20px 24px;
+    padding: 24px 28px;
     box-sizing: border-box;
     border: 1px solid #eee;
+    background: #fff;
 }
 
 /* DRNT 큰 뱃지 + 텍스트 라인 */
@@ -40,12 +38,11 @@
     align-items: center;
     gap: 20px;
     margin-bottom: 20px;
-    text-align: left;
 }
 
 .bauman-main-img {
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
     border-radius: 16px;
     object-fit: cover;
 }
@@ -57,12 +54,12 @@
 }
 
 .bauman-type-code {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
 }
 
 .bauman-type-tags {
-    font-size: 18px;
+    font-size: 14px;
     color: #555;
 }
 
@@ -87,9 +84,22 @@
     background: #ffd966;
 }
 
-/* 중간 아이콘 라인: 지금은 숨기고 싶다고 해서 그대로 숨김 */
+/* (예전 아이콘 라인 제거) */
 .bauman-right_img {
     display: none !important;
+}
+
+/* 에러/로딩 텍스트 */
+.bauman-error {
+    margin: 12px 0;
+    color: #d32f2f;
+    font-size: 14px;
+}
+
+.bauman-loading,
+.bauman-empty {
+    font-size: 14px;
+    color: #777;
 }
 
 /* ===== 상품 카드 그리드 ===== */
@@ -111,7 +121,7 @@
     position: relative;
     background: #f4f6ff;
     border-radius: 8px;
-    aspect-ratio: 1 / 1;          /* ✅ 정사각형 비율 고정 */
+    aspect-ratio: 1 / 1; /* 정사각형 비율 고정 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -155,6 +165,9 @@
 
 .product-brand {
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
 }
 
 .product-rating {
@@ -167,13 +180,6 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 1.5;
-}
-
-/* 해시태그 줄 */
-.product-tags {
-    margin: 0 0 6px;
-    font-size: 14px;
-    color: #999;
 }
 
 /* 가격 줄 */
@@ -214,6 +220,11 @@
     border-radius: 8px;
     border: none;
     background: #f0f0f0;
+    cursor: pointer;
+}
+
+.page-arrow:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
 }
 

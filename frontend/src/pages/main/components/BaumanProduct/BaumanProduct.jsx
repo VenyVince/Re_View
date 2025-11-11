@@ -1,105 +1,12 @@
-// src/features/skin/components/BaumanProduct/BaumanProduct.jsx
 import React, { useEffect, useState } from "react";
 import "./BaumanProduct.css";
 import dummyData from "../../../../assets/dummyData.png";
 import { getBaumannBadge } from "../../../../assets/baumann";
-import { getTagIcon as getSkinTagIcon } from "../../../../assets/skinTag";
 import axios from "axios";
 
-// ✅ 먼저 화면에 보여줄 기본 더미 상품들
-const DEFAULT_PRODUCTS = [
-    {
-        id: 1,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 2,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 3,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 4,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 5,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 6,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 7,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 8,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-];
+const PAGE_SIZE = 32; // 한 페이지 32개
 
 export default function BaumanProduct() {
-    // TODO: 나중에 로그인한 유저의 타입으로 교체
     const currentType = "DRNW";
 
     const skinTypeList = [
@@ -123,72 +30,101 @@ export default function BaumanProduct() {
 
     const selectedType = skinTypeList.find((t) => t.type === currentType);
 
-    // ✅ 처음에는 더미 상품이 바로 보이도록
-    const [products, setProducts] = useState(DEFAULT_PRODUCTS);
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1); // ✅ 전체 페이지 수
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // 마운트 시 백엔드 추천 상품 불러오기 (성공하면 덮어쓰기)
     useEffect(() => {
-        const fetchRecommendations = async () => {
+        const fetchProducts = async () => {
             try {
+                setLoading(true);
                 setError("");
 
-                const res = await axios.get("/api/products/recommendations/baumann");
+                const res = await axios.get("/api/products", {
+                    params: { page, size: PAGE_SIZE, sort: "latest" },
+                });
 
+                // 응답 구조 확인
                 const raw = Array.isArray(res.data)
                     ? res.data
                     : Array.isArray(res.data?.data)
                         ? res.data.data
                         : [];
 
-                // 응답이 비어있으면 그냥 더미 유지
-                if (!raw.length) return;
+                // ✅ 백엔드가 totalCount 내려줄 경우 사용
+                const totalCount = res.data?.totalCount || 0;
+                if (totalCount > 0) {
+                    setTotalPages(Math.ceil(totalCount / PAGE_SIZE));
+                } else {
+                    // 혹시 totalCount가 없으면 임시 추정 (상품이 꽉 차면 다음 페이지 있다고 가정)
+                    setTotalPages(raw.length < PAGE_SIZE ? page : page + 1);
+                }
 
-                const mapped = raw.map((p, idx) => {
-                    const ratingValue =
-                        typeof p.rating === "number" ? p.rating : Number(p.rating || 0);
+                // 백엔드 → 프론트 매핑
+                const mapped = raw.map((p) => {
+                    const id = p.product_id ?? p.id;
+                    const name = p.prd_name ?? p.name ?? "-";
+                    const brand = p.prd_brand ?? p.brand ?? "브랜드 미정";
+                    const imageUrl = p.image_url ?? p.imageUrl ?? null;
+                    const price =
+                        typeof p.price === "number" ? p.price : Number(p.price || 0);
+                    const rating =
+                        typeof p.rating === "number"
+                            ? p.rating
+                            : Number(p.rating || 0);
 
                     return {
-                        id: p.product_id ?? p.id ?? idx,
-                        brand: p.prd_brand ?? p.brand ?? "",
-                        name: p.prd_name ?? p.name ?? "",
-                        price: p.price ?? 0,
-                        ratingText: `${ratingValue.toFixed(1)}/5.0`,
-                        imageUrl: p.image_url || null,
-                        tags: [],      // 아직 API에 태그 정보 없으니 비워둠
+                        id,
+                        name,
+                        brand,
+                        imageUrl,
+                        price,
+                        ratingText: rating ? `${rating.toFixed(1)}/5.0` : "-",
                         discount: 0,
                         isBest: true,
                     };
                 });
 
                 setProducts(mapped);
-            } catch (e) {
-                console.error("추천 상품 불러오기 실패:", e);
-                // 에러가 나더라도 화면은 DEFAULT_PRODUCTS 그대로 보여줌
+            } catch (err) {
+                console.error("상품 조회 실패:", err);
                 setError("추천 상품을 불러오지 못했습니다.");
+                setProducts([]);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchRecommendations();
-    }, []);
+        fetchProducts();
+    }, [page]);
 
     if (!selectedType) return null;
 
-    const handleClickProduct = (id) => {
-        console.log("상품 클릭:", id);
-        // 나중에 상세 페이지 있으면 여기서 navigate(`/products/${id}`)
+    const hasNext = !loading && products.length === PAGE_SIZE;
+
+    const handlePrevPage = () => {
+        if (page > 1 && !loading) {
+            setPage((prev) => prev - 1);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+
+    const handleNextPage = () => {
+        if ((hasNext || page < totalPages) && !loading) {
+            setPage((prev) => prev + 1);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
     };
 
     return (
         <section className="bauman-section">
-            {/* 상단 제목 */}
-            <h2 className="bauman-title">{selectedType.type} 의 추천 상품</h2>
+            <h2 className="bauman-title">{selectedType.type}의 추천 상품</h2>
 
             <div className="bauman-box">
-                {/* 상단 타입 박스 영역 */}
                 <div className="bauman-header">
                     <div className="bauman-header-right">
-                        {/* 타입 배지 */}
                         <div className="bauman-type-badge">
                             <img
                                 src={getBaumannBadge(currentType)}
@@ -205,7 +141,6 @@ export default function BaumanProduct() {
                             </div>
                         </div>
 
-                        {/* 태그 버튼들 */}
                         <div className="bauman-tag-buttons">
                             <button className="bauman-tag-btn bauman-tag-all">ALL</button>
                             {selectedType.tags.map((tag, idx) => (
@@ -217,68 +152,86 @@ export default function BaumanProduct() {
                     </div>
                 </div>
 
-                {/* (선택) 에러 메시지 */}
-                {error && (
-                    <p className="bauman-error">
-                        {error}
-                    </p>
-                )}
+                {error && <p className="bauman-error">{error}</p>}
 
-                {/* ===== 상품 카드 그리드 ===== */}
                 <div className="product-grid">
-                    {products.map((item) => (
-                        <article
-                            key={item.id}
-                            className="product-card"
-                            onClick={() => handleClickProduct(item.id)}
-                            style={{ cursor: "pointer" }}
+                    {loading && products.length === 0 ? (
+                        <p
+                            className="bauman-loading"
+                            style={{
+                                gridColumn: "1 / -1",
+                                textAlign: "center",
+                            }}
                         >
-                            {/* 썸네일 + BEST 뱃지 */}
-                            <div className="product-thumb">
-                                {item.isBest && <span className="product-badge">Best</span>}
-                                <div className="product-thumb-inner">
-                                    <img src={item.imageUrl || dummyData} alt={item.name} />
+                            상품을 불러오는 중입니다...
+                        </p>
+                    ) : products.length === 0 ? (
+                        <p
+                            className="bauman-empty"
+                            style={{
+                                gridColumn: "1 / -1",
+                                textAlign: "center",
+                            }}
+                        >
+                            추천 상품이 없습니다.
+                        </p>
+                    ) : (
+                        products.map((item) => (
+                            <article
+                                key={item.id}
+                                className="product-card"
+                                onClick={() => console.log("상품 클릭:", item.id)}
+                                style={{ cursor: "pointer" }}
+                            >
+                                <div className="product-thumb">
+                                    {item.isBest && <span className="product-badge">Best</span>}
+                                    <div className="product-thumb-inner">
+                                        <img
+                                            src={item.imageUrl || dummyData}
+                                            alt={item.name}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* 텍스트 영역 */}
-                            <div className="product-meta">
-                                <div className="product-brand-row">
-                                    <span className="product-brand">{item.brand}</span>
-                                    <span className="product-rating">{item.ratingText}</span>
+                                <div className="product-meta">
+                                    <div className="product-brand-row">
+                                        <span className="product-brand">{item.brand}</span>
+                                        <span className="product-rating">{item.ratingText}</span>
+                                    </div>
+                                    <p className="product-name">{item.name}</p>
+
+                                    <div className="product-price-row">
+                    <span className="product-discount">
+                      {item.discount.toString().padStart(2, "0")}%
+                    </span>
+                                        <span className="product-price">
+                      {item.price.toLocaleString()}
+                                            <span className="product-price-unit"> 원</span>
+                    </span>
+                                    </div>
                                 </div>
-
-                                <p className="product-name">{item.name}</p>
-
-                                {item.tags?.length > 0 && (
-                                    <p className="product-tags">
-                                        {item.tags.map((tag, i) => (
-                                            <span key={i}>#{tag} </span>
-                                        ))}
-                                    </p>
-                                )}
-
-                                <div className="product-price-row">
-                  <span className="product-discount">
-                    {item.discount.toString().padStart(2, "0")}%
-                  </span>
-                                    <span className="product-price">
-                    {item.price.toLocaleString()}
-                                        <span className="product-price-unit"> 원</span>
-                  </span>
-                                </div>
-                            </div>
-                        </article>
-                    ))}
+                            </article>
+                        ))
+                    )}
                 </div>
 
-                {/* 하단 페이지네이션 (모양만) */}
+                {/* ✅ 페이지네이션 */}
                 <div className="bauman-pagination">
-                    <button className="page-arrow" disabled>
+                    <button
+                        className="page-arrow"
+                        onClick={handlePrevPage}
+                        disabled={page === 1 || loading}
+                    >
                         &lt;
                     </button>
-                    <span className="page-indicator">1 / 3</span>
-                    <button className="page-arrow" disabled>
+                    <span className="page-indicator">
+            {page} / {totalPages}
+          </span>
+                    <button
+                        className="page-arrow"
+                        onClick={handleNextPage}
+                        disabled={page >= totalPages || loading}
+                    >
                         &gt;
                     </button>
                 </div>
