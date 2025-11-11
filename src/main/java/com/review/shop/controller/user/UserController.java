@@ -14,13 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -79,6 +79,25 @@ public class UserController  {
         );
 
         return ResponseEntity.ok("로그인 성공");
+    }
+
+
+    //디버깅용, 추후에 삭제 예정
+    @GetMapping("/api/auth/me")
+    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
+
+        if (userDetails != null) {
+            String id = userDetails.getUsername();
+            String role = userDetails.getAuthorities().iterator().next().getAuthority();
+
+            Map<String, String> userInfo = new HashMap<>();
+            userInfo.put("id", id);
+            userInfo.put("role", role);
+
+            return ResponseEntity.ok(userInfo);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 정보가 없습니다.");
+        }
     }
 
         //회원가입 예외처리 핸들러
