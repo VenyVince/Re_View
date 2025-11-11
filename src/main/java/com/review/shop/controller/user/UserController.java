@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @AllArgsConstructor
 
@@ -36,6 +38,21 @@ public class UserController  {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
+    }
+
+    //아이디 중복 확인 (테스트 완료)
+    @PostMapping("/api/auth/check-id")
+    public ResponseEntity<String> checkDuplicateId(@RequestBody Map<String, String> payload) {
+        boolean isDuplicate = userService.isDuplicateId(payload.get("id"));
+
+        if (isDuplicate) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("이미 사용 중인 아이디입니다.");
+        } else {
+            return ResponseEntity
+                    .ok("사용 가능한 아이디입니다.");
+        }
     }
 
     // 로그인 로직 구현 (테스트 완료)

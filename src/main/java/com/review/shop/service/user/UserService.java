@@ -64,4 +64,11 @@ public class UserService implements UserDetailsService {
                 .roles(user.getRole()) // 사용자의 권한
                 .build();
     }
+
+    // 아이디 중복 확인 메서드
+    public boolean isDuplicateId(String id) {
+        UserInfoDto user = userMapper.findUserById(id);
+        return user != null;
+
+    }
 }
