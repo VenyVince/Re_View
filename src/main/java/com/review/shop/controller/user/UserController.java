@@ -3,6 +3,7 @@ package com.review.shop.controller.user;
 //회원가입, 로그인, 로그아웃 등의 기능을 담당하는 컨트롤러
 
 import com.review.shop.dto.user.LoginRequestDto;
+import com.review.shop.dto.user.PasswordUpdateDto;
 import com.review.shop.dto.user.UserInfoDto;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
@@ -81,6 +82,15 @@ public class UserController  {
         return ResponseEntity.ok("로그인 성공");
     }
 
+    // 비밀번호 재설정 로직 구현 (테스트 완료)
+    //passwordUpdateDto는 기존 비밀번호, 새 비밀번호를 포함
+    @PostMapping("/api/auth/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody PasswordUpdateDto passwordUpdateDto, @AuthenticationPrincipal UserDetails userDetails) {
+        userService.resetPassword(passwordUpdateDto, userDetails);
+
+        return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
+    }
+
 
     //디버깅용, 추후에 삭제 예정
     @GetMapping("/api/auth/me")
@@ -89,10 +99,13 @@ public class UserController  {
         if (userDetails != null) {
             String id = userDetails.getUsername();
             String role = userDetails.getAuthorities().iterator().next().getAuthority();
+            String password = userDetails.getPassword();
 
             Map<String, String> userInfo = new HashMap<>();
             userInfo.put("id", id);
             userInfo.put("role", role);
+            //userDetails에서 password를 가져오면 null로 지워버림 (보안상 이유)
+            userInfo.put("password", password);
 
             return ResponseEntity.ok(userInfo);
         } else {
@@ -100,7 +113,7 @@ public class UserController  {
         }
     }
 
-        //회원가입 예외처리 핸들러
+    //회원가입 예외처리 핸들러
     @ExceptionHandler(WrongRequestException.class)
     public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
         return ResponseEntity
