@@ -1,9 +1,10 @@
 package com.review.shop.service;
 
+import com.review.shop.dto.login.UserInfoDto;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.UserMapper;
-import com.review.shop.dto.login.UserInfoDto;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
@@ -45,6 +47,19 @@ public class UserService implements UserDetailsService {
         if (affected != 1) {
             throw new WrongRequestException("회원가입에 실패했습니다.");
         }
+    }
+
+    // ID로 사용자 정보 조회(user_id포함)
+    public UserInfoDto getUserByLoginId(String id) {
+        log.debug("getUserByLoginId 호출 - id: {}", id);
+
+        UserInfoDto user = userMapper.findUserById(id);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
+        }
+
+        return user;
     }
 
     // AuthenticationManager가 UserDetails을 받기위한 메소드

@@ -52,12 +52,19 @@ public class UserController  {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        //user_id 조회
+        UserInfoDto user = userService.getUserByLoginId(loginDto.getId());
+
         //세션 저장, JessionID 자동 생성
         HttpSession session = request.getSession(true);
+
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
+
+        //user_id를 세션에 저장
+        session.setAttribute("userId", user.getUser_id());
 
         return ResponseEntity.ok("로그인 성공");
     }
