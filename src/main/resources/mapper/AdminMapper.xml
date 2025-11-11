@@ -59,8 +59,7 @@
 
     <update id="updateOrderStatus">
         UPDATE ORDERS SET
-                          ORDER_STATUS = #{orderStatus},
-                          UPDATED_AT = SYSDATE
+                          ORDER_STATUS = #{orderStatus}
         WHERE
             ORDER_ID = #{orderId}
     </update>

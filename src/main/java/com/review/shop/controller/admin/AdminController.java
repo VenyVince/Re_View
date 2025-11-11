@@ -46,7 +46,7 @@ public class AdminController {
         return ResponseEntity.ok("상품이 삭제되었습니다");
     }
 
-    // 상품 주문 현황 변경 (FK가 구현되지 않아 테스트 불가)
+    // 상품 주문 현황 변경 (테스트 완료)
     @PatchMapping("/orders/{orderId}/status")
     public ResponseEntity<String> updateOrderStatus(
             @PathVariable int orderId,
