@@ -14,23 +14,12 @@
         SELECT
         USER_ID,ID,PASSWORD,NAME,EMAIL,NICKNAME,PHONE_NUMBER,BAUMANN_ID,ROLE
         FROM
-        "USER" WHERE
-        ID = #{id}
-    </select>
-
-    <!-- UserInfoDto findUserById(String id)에 대한 sql문-->
-    <select id="findUserById" resultType="com.review.shop.dto.login.UserInfoDto">
-        SELECT
-        USER_ID,ID,PASSWORD,NAME,EMAIL,NICKNAME,PHONE_NUMBER,BAUMANN_ID,ROLE
-        FROM
-        "USER" WHERE
-        ID = #{id}
+        USER_TABLE
+        WHERE ID = #{id}
     </select>
 
     <!-- id로 user_id 조회 -->
     <select id="findUserIdById" resultType="int">
-        SELECT USER_ID FROM "USER" WHERE ID = #{id}
+        SELECT USER_ID FROM USER_TABLE WHERE ID = #{id}
     </select>
 </mapper>
-
-

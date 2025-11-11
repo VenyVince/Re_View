@@ -32,6 +32,7 @@ public class UserService implements UserDetailsService {
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
         UserInfoDto encodedUser = new UserInfoDto(
+                0,
                 userDTO.getId(),
                 encodedPassword,
                 userDTO.getName(),
