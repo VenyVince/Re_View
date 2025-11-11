@@ -43,7 +43,7 @@ public class SecurityConfig {
 
                 // 어드민 제외 모두 해제
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
 
