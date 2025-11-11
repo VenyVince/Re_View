@@ -1,14 +1,12 @@
-// src/features/skin/components/BaumanProduct/BaumanProduct.jsx
 import React, { useEffect, useState } from "react";
 import "./BaumanProduct.css";
 import dummyData from "../../../../assets/dummyData.png";
 import { getBaumannBadge } from "../../../../assets/baumann";
 import axios from "axios";
 
-const PAGE_SIZE = 12; // ✅ 한 페이지에 32개
+const PAGE_SIZE = 32; // 한 페이지 32개
 
 export default function BaumanProduct() {
-    // TODO: 나중에 로그인한 유저의 바우만 타입으로 교체
     const currentType = "DRNW";
 
     const skinTypeList = [
@@ -33,11 +31,11 @@ export default function BaumanProduct() {
     const selectedType = skinTypeList.find((t) => t.type === currentType);
 
     const [products, setProducts] = useState([]);
-    const [page, setPage] = useState(1);      // ✅ 현재 페이지
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1); // ✅ 전체 페이지 수
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // 페이지 바뀔 때마다 상품 다시 요청
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -48,18 +46,28 @@ export default function BaumanProduct() {
                     params: { page, size: PAGE_SIZE, sort: "latest" },
                 });
 
+                // 응답 구조 확인
                 const raw = Array.isArray(res.data)
                     ? res.data
                     : Array.isArray(res.data?.data)
                         ? res.data.data
                         : [];
 
+                // ✅ 백엔드가 totalCount 내려줄 경우 사용
+                const totalCount = res.data?.totalCount || 0;
+                if (totalCount > 0) {
+                    setTotalPages(Math.ceil(totalCount / PAGE_SIZE));
+                } else {
+                    // 혹시 totalCount가 없으면 임시 추정 (상품이 꽉 차면 다음 페이지 있다고 가정)
+                    setTotalPages(raw.length < PAGE_SIZE ? page : page + 1);
+                }
+
+                // 백엔드 → 프론트 매핑
                 const mapped = raw.map((p) => {
                     const id = p.product_id ?? p.id;
                     const name = p.prd_name ?? p.name ?? "-";
                     const brand = p.prd_brand ?? p.brand ?? "브랜드 미정";
                     const imageUrl = p.image_url ?? p.imageUrl ?? null;
-
                     const price =
                         typeof p.price === "number" ? p.price : Number(p.price || 0);
                     const rating =
@@ -90,16 +98,10 @@ export default function BaumanProduct() {
         };
 
         fetchProducts();
-    }, [page]); // ✅ page가 바뀔 때마다 호출
+    }, [page]);
 
     if (!selectedType) return null;
 
-    const handleClickProduct = (id) => {
-        console.log("상품 클릭:", id);
-        // TODO: 상세 페이지 연결
-    };
-
-    // 다음 페이지가 있는지 대략 판별 (상품이 꽉 차 있으면 더 있다고 가정)
     const hasNext = !loading && products.length === PAGE_SIZE;
 
     const handlePrevPage = () => {
@@ -110,7 +112,7 @@ export default function BaumanProduct() {
     };
 
     const handleNextPage = () => {
-        if (hasNext && !loading) {
+        if ((hasNext || page < totalPages) && !loading) {
             setPage((prev) => prev + 1);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
@@ -121,7 +123,6 @@ export default function BaumanProduct() {
             <h2 className="bauman-title">{selectedType.type}의 추천 상품</h2>
 
             <div className="bauman-box">
-                {/* 상단 타입/태그 영역 */}
                 <div className="bauman-header">
                     <div className="bauman-header-right">
                         <div className="bauman-type-badge">
@@ -179,7 +180,7 @@ export default function BaumanProduct() {
                             <article
                                 key={item.id}
                                 className="product-card"
-                                onClick={() => handleClickProduct(item.id)}
+                                onClick={() => console.log("상품 클릭:", item.id)}
                                 style={{ cursor: "pointer" }}
                             >
                                 <div className="product-thumb">
@@ -197,7 +198,6 @@ export default function BaumanProduct() {
                                         <span className="product-brand">{item.brand}</span>
                                         <span className="product-rating">{item.ratingText}</span>
                                     </div>
-
                                     <p className="product-name">{item.name}</p>
 
                                     <div className="product-price-row">
@@ -215,7 +215,7 @@ export default function BaumanProduct() {
                     )}
                 </div>
 
-                {/* 페이지네이션 */}
+                {/* ✅ 페이지네이션 */}
                 <div className="bauman-pagination">
                     <button
                         className="page-arrow"
@@ -224,12 +224,13 @@ export default function BaumanProduct() {
                     >
                         &lt;
                     </button>
-                    {/* 전체 페이지 수는 모르니까 일단 현재 페이지만 표시 */}
-                    <span className="page-indicator">{page}</span>
+                    <span className="page-indicator">
+            {page} / {totalPages}
+          </span>
                     <button
                         className="page-arrow"
                         onClick={handleNextPage}
-                        disabled={!hasNext || loading}
+                        disabled={page >= totalPages || loading}
                     >
                         &gt;
                     </button>
