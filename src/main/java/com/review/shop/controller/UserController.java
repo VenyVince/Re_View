@@ -3,7 +3,7 @@ package com.review.shop.controller;
 //회원가입, 로그인, 로그아웃 등의 기능을 담당하는 컨트롤러
 
 import com.review.shop.dto.login.LoginRequestDto;
-import com.review.shop.dto.login.UserInfoDto;
+import com.review.shop.dto.login.UserInfoDTO;
 import com.review.shop.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -29,7 +29,7 @@ public class UserController  {
     // 회원가입 로직 구현
     @PostMapping("/api/auth/register")
     // 전달받은 파라미터로 DTO 생성, 회원가입 서비스 호출
-    public ResponseEntity<String> registerUser(@RequestBody UserInfoDto userDTO) {
+    public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
         userService.registerUser(userDTO);
 

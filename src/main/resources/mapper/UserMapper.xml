@@ -9,7 +9,7 @@
         VALUES (#{id}, #{password}, #{name}, #{email}, #{nickname}, #{phoneNumber}, #{baumannId}, #{role})
     </insert>
 <!--    UserInfoDto findUserById(String id)에 대한 sql문-->
-    <select id="findUserById" resultType="com.review.shop.dto.login.UserInfoDto">
+    <select id="findUserById" resultType="com.review.shop.dto.login.UserInfoDTO">
         SELECT
             ID,PASSWORD,NAME,EMAIL,NICKNAME,PHONE_NUMBER,BAUMANN_ID,ROLE
         FROM

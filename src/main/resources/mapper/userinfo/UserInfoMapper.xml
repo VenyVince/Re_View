@@ -6,22 +6,22 @@
 <mapper namespace="com.review.shop.repository.userinfo.UserInfoMapper">
 
 
-    <select id="findById" resultType="com.review.shop.dto.userinfo.UserInfoResponseDTO">
+    <select id="getInfo" resultType="com.review.shop.dto.userinfo.GetUserInfoDTO">
         SELECT
-            USER_ID as user_id, NAME, NICKNAME, EMAIL, PHONE_NUMBER as phoneNumber, POINT,
-            BAUMANN_ID as baumann_id, CREATED_AT as createdAt, UPDATED_AT as updatedAt
+            USER_ID as user_id, NAME, NICKNAME, PHONE_NUMBER as phoneNumber,
+            BAUMANN_ID as baumann_id, UPDATED_AT as updatedAt
         FROM USER_TABLE
         WHERE USER_ID = #{user_id}
           AND DELETED_AT IS NULL
     </select>
 
-    <update id="updateUser">
+    <update id="updateInfo">
         UPDATE USER_TABLE
         <set>
-            <if test="updateDTO.name != null">NAME = #{updateDTO.name},</if>
             <if test="updateDTO.nickname != null">NICKNAME = #{updateDTO.nickname},</if>
             <if test="updateDTO.phoneNumber != null">PHONE_NUMBER = #{updateDTO.phoneNumber},</if>
             <if test="updateDTO.password != null">PASSWORD = #{updateDTO.password},</if>
+            <if test="updateDTO.baumann_id != null">BAUMANN = #{updateDTO.Baumann},</if>
             UPDATED_AT = SYSDATE
         </set>
         WHERE USER_ID = #{user_id}

@@ -3,8 +3,8 @@ package com.review.shop.dto.userinfo;
 import lombok.Data;
 
 @Data
-public class UserInfoUpdateDTO {
-    private int user_id;
+public class UpdateUserInfoDTO {
+    private String nickname;
     private String password;
     private String phoneNumber;
     private int baumann_id;

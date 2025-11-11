@@ -2,7 +2,7 @@ package com.review.shop.service;
 
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.UserMapper;
-import com.review.shop.dto.login.UserInfoDto;
+import com.review.shop.dto.login.UserInfoDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +19,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입 로직 구현, DB 결과에 따른 예외 처리
-    public void registerUser(UserInfoDto userDTO) {
+    public void registerUser(UserInfoDTO userDTO) {
 
         // 중복 ID 체크 추가
         if (userMapper.findUserById(userDTO.getId()) != null) {
@@ -29,7 +29,7 @@ public class UserService implements UserDetailsService {
         // 컨트롤러 부터 받은 dto 비밀번호를 암호화
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
-        UserInfoDto encodedUser = new UserInfoDto(
+        UserInfoDTO encodedUser = new UserInfoDTO(
                 userDTO.getId(),
                 encodedPassword,
                 userDTO.getName(),
@@ -52,7 +52,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);

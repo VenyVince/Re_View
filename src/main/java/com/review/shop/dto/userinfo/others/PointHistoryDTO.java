@@ -1,4 +1,4 @@
-package com.review.shop.dto.userinfo;
+package com.review.shop.dto.userinfo.others;
 
 import java.sql.Date;
 

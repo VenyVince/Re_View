@@ -1,26 +1,35 @@
 package com.review.shop.service.userinfo;
 
-import com.review.shop.dto.userinfo.UserInfoResponseDTO;
-import com.review.shop.dto.userinfo.UserInfoUpdateDTO;
+import com.review.shop.dto.userinfo.GetUserInfoDTO;
+import com.review.shop.dto.userinfo.GetUserInfoResponseDTO;
+import com.review.shop.dto.userinfo.UpdateUserINfoResponseDTO;
+import com.review.shop.dto.userinfo.UpdateUserInfoDTO;
+import com.review.shop.repository.UserIdMapper;
 import com.review.shop.repository.userinfo.UserInfoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserInfoService {
 
+    private final UserIdMapper userIdMapper;
     private final UserInfoMapper userInfoMapper;
 
-    public UserInfoResponseDTO getUserInfo(String id) {
-        return userInfoMapper.findById();
+    public int getUser_id(String id) {
+        return userIdMapper.getUser_id(id);
     }
 
-    public void updateUserInfo(int user_id, UserInfoUpdateDTO updateDTO) {
-        userInfoMapper.updateUser(user_id, updateDTO);
+    public GetUserInfoResponseDTO getUserInfo(int user_id) {
+        List<GetUserInfoDTO> userinfo = userInfoMapper.getInfo(user_id);
+        GetUserInfoResponseDTO response = new GetUserInfoResponseDTO();
+        response.setUserInfos(userinfo);
+        return response;
     }
 
-    public void deleteUser(int user_id) {
-        userInfoMapper.deleteUser(user_id);
+    public void updateUserInfo(int user_id, UpdateUserInfoDTO updateDTO) {
+        userInfoMapper.updateInfo(user_id, updateDTO);
     }
 }

@@ -1,4 +1,4 @@
-package com.review.shop.dto.userinfo;
+package com.review.shop.dto.userinfo.others;
 
 public class Payment_MethodDTO {
     private String payment_id;
