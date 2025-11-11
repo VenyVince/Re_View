@@ -4,6 +4,8 @@ import com.review.shop.dto.ProductDetailDTO;
 import org.apache.ibatis.annotations.Mapper; // 👈 추가
 import org.apache.ibatis.annotations.Param; // 👈 추가
 
+import java.util.List;
+
 @Mapper
 public interface AdminMapper {
     //    상품
@@ -30,4 +32,6 @@ public interface AdminMapper {
     //    포인트
     //포인트 조회
     Integer getMemberPoints(int memberId);
+
+    List<ProductDetailDTO> getAllProducts();
 }

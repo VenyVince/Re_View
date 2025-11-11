@@ -74,6 +74,12 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("points", points));
     }
 
+    //어드민 페이지에서 모든 상품 불러오기(테스트 완료)
+    @GetMapping("/allproducts")
+    public ResponseEntity<?> getAllProducts() {
+        return ResponseEntity.ok(adminService.getAllProducts());
+    }
+
     //어드민 관련 예외 처리 핸들러
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<String> handleWrongRequest(DatabaseException ex) {
