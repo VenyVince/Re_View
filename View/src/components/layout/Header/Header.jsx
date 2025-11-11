@@ -34,9 +34,9 @@ export default function Header() {
                      onClick={handleLogoClick}/>
 
                 <nav className="rv-nav">
-                    <NavItem label="ALL" to ="/product" />
+                    <NavItem label="Product" to ="/product" />
                     <NavItem label="Review" to ="/review" />
-                    <NavItem label="Like"  to ="/like" />
+                    <NavItem label="About"  to ="/About" />
                     <NavItem label="Q&A" to ="/qna"  />
                 </nav>
 

@@ -14,8 +14,8 @@ public class TestCorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/test/**")
-                        .allowedOrigins("http://localhost:3000") // React 개발서버 주소
-                        .allowedMethods("*");
+                        .allowedOrigins("http://localhost:3000") // React 개발서버 허용
+                        .allowedMethods("*"); // 모든 HTTP 메소드 허용
             }
         };
     }

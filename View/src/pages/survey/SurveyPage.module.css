@@ -1,0 +1,92 @@
+.container {
+    max-width: 1024px;
+    margin: 40px auto;
+    padding: 0 24px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.progress {
+    color: #666;
+    text-align: center;
+}
+
+.section {
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.listItem {
+    margin: 12px 0;
+}
+
+.question {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.options {
+    display: grid;
+    gap: 8px;
+}
+
+.optionLabel {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.optionLabel.checked {
+    border: 2px solid #111;
+}
+
+.btnRow {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.btnPrimary {
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #111;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btnPrimary.disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+.btnGhost {
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}

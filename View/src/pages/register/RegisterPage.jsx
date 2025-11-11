@@ -1,28 +1,11 @@
+// src/pages/register/RegisterPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './RegisterPage.css';
 import logo from '../../assets/logo.png';
 import { BAUMANN_BADGES, getBaumannBadge } from '../../assets/baumann';
-
-/* -------------------- 더미 API -------------------- */
-// 이미 존재하는 이메일 목록 (대소문자 무시)
-const TAKEN_EMAILS = ['test@review.com', 'user@example.com', 'admin@review.co.kr'];
-
-function fakeCheckEmail(email) {
-    console.log(' [DUMMY] email check:', email);
-    return new Promise((resolve) =>
-        setTimeout(
-            () => resolve({ ok: true, duplicated: TAKEN_EMAILS.includes(email.toLowerCase()) }),
-            500
-        )
-    );
-}
-
-function fakeRegister(payload) {
-    console.log('📦 [DUMMY] register payload:', payload);
-    return new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 600));
-}
-/* -------------------------------------------------- */
+import axios from 'axios';
+import InlineBaumannSurvey from './InlineBaumannSurvey';
 
 const REQUIRED_TERMS = [
     { id: 't1', label: '이용약관 동의 (필수)' },
@@ -35,32 +18,45 @@ export default function RegisterPage() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // baumann 코드 목록 (DRNT, ORNW ...)
     const BAUMANN_TYPES = useMemo(() => Object.keys(BAUMANN_BADGES), []);
 
+    // 코드 → 숫자 ID
+    const BAUMANN_TO_ID = useMemo(
+        () =>
+            BAUMANN_TYPES.reduce((acc, code, i) => {
+                acc[code] = i + 1;
+                return acc;
+            }, {}),
+        [BAUMANN_TYPES]
+    );
+
     const [form, setForm] = useState({
+        id: '',
         email: '',
         password: '',
         password2: '',
         name: '',
         nickname: '',
         phone: '',
-        baumann: '', // ✅ 기본 비어있음
+        baumann: '',
     });
 
-    // 이메일 중복 체크 상태: idle | checking | ok | dup | invalid
-    const [emailStatus, setEmailStatus] = useState('idle');
-    const [emailMsg, setEmailMsg] = useState('');
-
     const [terms, setTerms] = useState(
-        [...REQUIRED_TERMS, ...OPTIONAL_TERMS].reduce((acc, t) => ({ ...acc, [t.id]: false }), {})
+        [...REQUIRED_TERMS, ...OPTIONAL_TERMS].reduce(
+            (acc, t) => ({ ...acc, [t.id]: false }),
+            {}
+        )
     );
 
-    // 혹시 외부에서 ORNW 기본값이 주입되는 경우 초기 마운트에 비워줌
+    // 설문 박스 열림 여부
+    const [showSurvey, setShowSurvey] = useState(false);
+
     useEffect(() => {
         setForm(prev => (prev.baumann === 'ORNW' ? { ...prev, baumann: '' } : prev));
     }, []);
 
-    // 설문에서 돌아온 경우에만 surveyResult 반영
+    // 예전에 /survey 페이지에서 돌아오는 케이스가 있을 수 있으니 기존 로직은 그대로 둠
     useEffect(() => {
         const fromSurvey =
             location.state?.fromSurvey ||
@@ -79,17 +75,16 @@ export default function RegisterPage() {
     }, [location, BAUMANN_TYPES]);
 
     // --- 유효성 ---
-    const isValidEmailFormat = (v) => /\S+@\S+\.\S+/.test(v);
-    const isValidPw = (v) => v.length >= 8;
-    const isValidPhone = (v) => /^01[0-9]-?\d{3,4}-?\d{4}$/.test(v);
-    const isValidBaumann = (v) => BAUMANN_TYPES.includes(v); // 필수
+    const isValidId = v => typeof v === 'string' && v.trim().length >= 3;
+    const isValidEmailFormat = v => /\S+@\S+\.\S+/.test(v);
+    const isValidPw = v => v.length >= 8;
+    const isValidPhone = v => /^01[0-9]-?\d{3,4}-?\d{4}$/.test(v);
+    const isValidBaumann = v => BAUMANN_TYPES.includes(v);
+    const allRequiredTermsChecked = REQUIRED_TERMS.every(t => terms[t.id]);
 
-    const allRequiredTermsChecked = REQUIRED_TERMS.every((t) => terms[t.id]);
-
-    // 폼 전체 유효성 + 이메일 중복 상태(OK이어야 함)
     const formValid =
+        isValidId(form.id) &&
         isValidEmailFormat(form.email) &&
-        emailStatus === 'ok' &&
         isValidPw(form.password) &&
         form.password === form.password2 &&
         form.name.trim() &&
@@ -98,17 +93,10 @@ export default function RegisterPage() {
         isValidBaumann(form.baumann) &&
         allRequiredTermsChecked;
 
-    // --- 이벤트 ---
-    const onChange = (e) => {
+    const onChange = e => {
         const { name, value } = e.target;
         const next = name === 'baumann' ? value.toUpperCase() : value;
-        setForm((prev) => ({ ...prev, [name]: next }));
-
-        // 이메일이 바뀌면 중복체크 초기화
-        if (name === 'email') {
-            setEmailStatus('idle');
-            setEmailMsg('');
-        }
+        setForm(prev => ({ ...prev, [name]: next }));
     };
 
     const toggleAllTerms = () => {
@@ -116,108 +104,88 @@ export default function RegisterPage() {
         setTerms(Object.fromEntries(Object.keys(terms).map(k => [k, next])));
     };
 
-    const toggleOne = (id) => setTerms(prev => ({ ...prev, [id]: !prev[id] }));
+    const toggleOne = id =>
+        setTerms(prev => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
 
-    // 이메일 중복확인 버튼 핸들러
-    const handleCheckEmail = async () => {
-        const email = form.email.trim();
-        if (!isValidEmailFormat(email)) {
-            setEmailStatus('invalid');
-            setEmailMsg('이메일 형식을 확인해 주세요.');
-            return;
-        }
-        setEmailStatus('checking');
-        setEmailMsg('중복 확인 중...');
-        const res = await fakeCheckEmail(email);
-        if (res?.ok) {
-            if (res.duplicated) {
-                setEmailStatus('dup');
-                setEmailMsg('이미 사용 중인 이메일입니다.');
-            } else {
-                setEmailStatus('ok');
-                setEmailMsg('사용 가능한 이메일입니다.');
-            }
-        } else {
-            setEmailStatus('invalid');
-            setEmailMsg('이메일 중복 확인에 실패했습니다.');
-        }
-    };
-
-    // 제출(더미 전송 후 완료 페이지 이동)
-    const onSubmit = async (e) => {
+    const onSubmit = async e => {
         e.preventDefault();
         if (!formValid) return;
 
-        const acceptedTerms = Object.entries(terms)
-            .filter(([, checked]) => checked)
-            .map(([id]) => id);
-
         const payload = {
-            email: form.email,
+            id: form.id,
             password: form.password,
             name: form.name,
+            email: form.email,
             nickname: form.nickname,
-            phone: form.phone,
-            baumann_type: form.baumann,
-            accepted_terms: acceptedTerms,
+            phoneNumber: form.phone,
+            baumannId: BAUMANN_TO_ID[form.baumann],
+            role: 'USER',
         };
 
-        const res = await fakeRegister(payload);
-        if (res?.ok) {
-            navigate('/register/complete', { state: { payload }, replace: true });
+        console.log('[REGISTER PAYLOAD]', payload);
+
+        try {
+            const res = await axios.post('/api/auth/register', payload, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (res.status === 201 || res.data?.status === 201) {
+                navigate('/register/complete', { state: { payload }, replace: true });
+            } else {
+                alert(res.data?.message || '회원가입에 실패했습니다.');
+            }
+        } catch (err) {
+            console.error('register error', err);
+            alert(err.response?.data?.message || '회원가입 중 오류가 발생했습니다.');
         }
     };
 
     return (
         <div className="su-container">
             <img src={logo} alt="Re:View 로고" className="su-logo" />
-            <br/>
+            <br />
 
             <form className="su-form" onSubmit={onSubmit}>
-                {/* 이메일 + 중복확인 */}
+                {/* 아이디 */}
                 <label className="su-label">
-                    <div>이메일<span className="su-req">*</span></div>
-                    <div className="su-row-inline">
-                        <input
-                            name="email"
-                            type="email"
-                            placeholder="이메일을 입력해 주세요"
-                            value={form.email}
-                            onChange={onChange}
-                            autoComplete="off"
-                            required
-                        />
-                        <button
-                            type="button"
-                            className="su-secondary"
-                            onClick={handleCheckEmail}
-                            disabled={!form.email}
-                        >
-                            중복확인
-                        </button>
+                    <div>
+                        아이디<span className="su-req">*</span>
                     </div>
-                    {/* 메시지 */}
-                    {form.email && (
-                        <span
-                            className="su-help"
-                            style={{
-                                color:
-                                    emailStatus === 'ok' ? '#198754' :
-                                        emailStatus === 'dup' || emailStatus === 'invalid' ? '#d32f2f' :
-                                            '#666'
-                            }}
-                        >
-              {emailMsg ||
-                  (emailStatus === 'idle'
-                      ? '이메일 입력 후 중복확인을 눌러주세요.'
-                      : '')}
-            </span>
-                    )}
+                    <input
+                        name="id"
+                        type="text"
+                        placeholder="로그인 아이디를 입력해 주세요 (3자 이상)"
+                        value={form.id}
+                        onChange={onChange}
+                        required
+                        autoComplete="username"
+                    />
+                </label>
+
+                {/* 이메일 */}
+                <label className="su-label">
+                    <div>
+                        이메일<span className="su-req">*</span>
+                    </div>
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="이메일을 입력해 주세요"
+                        value={form.email}
+                        onChange={onChange}
+                        required
+                        autoComplete="email"
+                    />
                 </label>
 
                 {/* 비밀번호 */}
                 <label className="su-label">
-                    <div>비밀번호<span className="su-req">*</span></div>
+                    <div>
+                        비밀번호<span className="su-req">*</span>
+                    </div>
                     <input
                         name="password"
                         type="password"
@@ -234,7 +202,9 @@ export default function RegisterPage() {
 
                 {/* 비밀번호 확인 */}
                 <label className="su-label">
-                    <div>비밀번호 확인<span className="su-req">*</span></div>
+                    <div>
+                        비밀번호 확인<span className="su-req">*</span>
+                    </div>
                     <input
                         name="password2"
                         type="password"
@@ -251,7 +221,9 @@ export default function RegisterPage() {
 
                 {/* 이름 */}
                 <label className="su-label">
-                    <div>이름<span className="su-req">*</span></div>
+                    <div>
+                        이름<span className="su-req">*</span>
+                    </div>
                     <input
                         name="name"
                         type="text"
@@ -259,13 +231,15 @@ export default function RegisterPage() {
                         value={form.name}
                         onChange={onChange}
                         required
-                        autoComplete="off"
+                        autoComplete="name"
                     />
                 </label>
 
                 {/* 닉네임 */}
                 <label className="su-label">
-                    <div>닉네임<span className="su-req">*</span></div>
+                    <div>
+                        닉네임<span className="su-req">*</span>
+                    </div>
                     <input
                         name="nickname"
                         type="text"
@@ -273,13 +247,15 @@ export default function RegisterPage() {
                         value={form.nickname}
                         onChange={onChange}
                         required
-                        autoComplete="off"
+                        autoComplete="nickname"
                     />
                 </label>
 
                 {/* 휴대전화 */}
                 <label className="su-label">
-                    <div>휴대전화 번호<span className="su-req">*</span></div>
+                    <div>
+                        휴대전화 번호<span className="su-req">*</span>
+                    </div>
                     <input
                         name="phone"
                         type="tel"
@@ -287,7 +263,7 @@ export default function RegisterPage() {
                         value={form.phone}
                         onChange={onChange}
                         required
-                        autoComplete="off"
+                        autoComplete="tel"
                     />
                     {form.phone && !isValidPhone(form.phone) && (
                         <span className="su-help">예) 010-1234-5678</span>
@@ -296,7 +272,9 @@ export default function RegisterPage() {
 
                 {/* 바우만 타입 + 버튼 */}
                 <label className="su-label">
-                    <div>바우만 타입<span className="su-req">*</span></div>
+                    <div>
+                        바우만 타입<span className="su-req">*</span>
+                    </div>
                     <div className="su-row-inline">
                         <input
                             name="baumann"
@@ -308,21 +286,24 @@ export default function RegisterPage() {
                             required
                         />
                         <datalist id="baumann-list">
-                            {BAUMANN_TYPES.map(k => (<option key={k} value={k} />))}
+                            {BAUMANN_TYPES.map(k => (
+                                <option key={k} value={k} />
+                            ))}
                         </datalist>
 
                         <button
                             type="button"
                             className="su-secondary"
-                            onClick={() => navigate('/survey/intro')}
+                            onClick={() => setShowSurvey(true)}
                         >
                             내 바우만 타입 찾기
                         </button>
                     </div>
 
-                    {/* 미리보기/검증 */}
                     {form.baumann && !isValidBaumann(form.baumann) && (
-                        <span className="su-help">유효한 코드가 아닙니다. (예: DRNT, DSPW 등)</span>
+                        <span className="su-help">
+                            유효한 코드가 아닙니다. (예: DRNT, DSPW 등)
+                        </span>
                     )}
                     {BAUMANN_TYPES.includes(form.baumann) && (
                         <div className="su-badge-preview">
@@ -331,6 +312,19 @@ export default function RegisterPage() {
                         </div>
                     )}
                 </label>
+
+                {/* 인라인 설문 */}
+                {showSurvey && (
+                    <div className="su-baumann-survey">
+                        <InlineBaumannSurvey
+                            onComplete={type => {
+                                setForm(prev => ({ ...prev, baumann: type }));
+                                setShowSurvey(false);
+                            }}
+                            onCancel={() => setShowSurvey(false)}
+                        />
+                    </div>
+                )}
 
                 <hr className="su-sep" />
 
@@ -370,7 +364,7 @@ export default function RegisterPage() {
                 </div>
 
                 <button type="submit" className="su-submit" disabled={!formValid}>
-                    다음
+                    회원가입
                 </button>
             </form>
         </div>

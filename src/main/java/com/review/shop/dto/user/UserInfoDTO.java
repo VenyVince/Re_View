@@ -1,4 +1,4 @@
-package com.review.shop.dto.login;
+package com.review.shop.dto.user;
 
 //사용자의 정보에 대한 DTO
 

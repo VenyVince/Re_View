@@ -60,7 +60,7 @@ export default function App() {
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/ads" element={<AdsPage/>}/>
                 <Route path="/survey/intro" element={<SurveyIntro/>}/>
-                <Route path="/survey" element={<SurveyPage/>}/>
+                <Route path="/survey/baumann" element={<SurveyPage/>}/>
                 <Route path="/survey/result" element={<SurveyResult/>}/>
                 <Route path="/mypage" element={<MyPage />} />
 
