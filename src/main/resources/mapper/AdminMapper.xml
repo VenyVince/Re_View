@@ -59,16 +59,15 @@
 
     <update id="updateOrderStatus">
         UPDATE ORDERS SET
-                          ORDER_STATUS = #{orderStatus},
-                          UPDATED_AT = SYSDATE
+                          ORDER_STATUS = #{orderStatus}
         WHERE
             ORDER_ID = #{orderId}
     </update>
 
     <update id="updateQnaAnswer">
         UPDATE QNA SET
-                       ADMIN_ANSWER = #{adminAnswer},
-                       ANSWERED_AT = SYSDATE, QNA_STATUS = 'ANSWERED' WHERE
+                       ANSWER = #{adminAnswer},
+                       ANSWERED_AT = SYSDATE WHERE
             QNA_ID = #{qnaId}
     </update>
 

@@ -16,6 +16,16 @@
             USER_TABLE WHERE
             ID = #{id}
     </select>
+
+<!--    비밀번호 재설정-->
+    <update id="updatePassword">
+        UPDATE USER_TABLE
+        SET
+            PASSWORD = #{newEncodedPassword}
+        WHERE
+            id = #{id}
+    </update>
+
 </mapper>
 
 
