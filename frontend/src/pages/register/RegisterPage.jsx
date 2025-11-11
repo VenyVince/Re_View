@@ -1,9 +1,11 @@
+// src/pages/register/RegisterPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './RegisterPage.css';
 import logo from '../../assets/logo.png';
 import { BAUMANN_BADGES, getBaumannBadge } from '../../assets/baumann';
 import axios from 'axios';
+import InlineBaumannSurvey from './InlineBaumannSurvey';
 
 const REQUIRED_TERMS = [
     { id: 't1', label: '이용약관 동의 (필수)' },
@@ -19,7 +21,7 @@ export default function RegisterPage() {
     // baumann 코드 목록 (DRNT, ORNW ...)
     const BAUMANN_TYPES = useMemo(() => Object.keys(BAUMANN_BADGES), []);
 
-    // 단순 매핑: 코드 → 숫자 ID (1부터 시작)
+    // 코드 → 숫자 ID
     const BAUMANN_TO_ID = useMemo(
         () =>
             BAUMANN_TYPES.reduce((acc, code, i) => {
@@ -37,7 +39,7 @@ export default function RegisterPage() {
         name: '',
         nickname: '',
         phone: '',
-        baumann: '', // DRNT, ORNW 같은 코드
+        baumann: '',
     });
 
     const [terms, setTerms] = useState(
@@ -47,12 +49,14 @@ export default function RegisterPage() {
         )
     );
 
-    // 혹시 외부에서 ORNW 기본값이 들어왔다면 비워주기
+    // 설문 박스 열림 여부
+    const [showSurvey, setShowSurvey] = useState(false);
+
     useEffect(() => {
         setForm(prev => (prev.baumann === 'ORNW' ? { ...prev, baumann: '' } : prev));
     }, []);
 
-    // 설문 결과에서 돌아온 경우에만 surveyResult 반영
+    // 예전에 /survey 페이지에서 돌아오는 케이스가 있을 수 있으니 기존 로직은 그대로 둠
     useEffect(() => {
         const fromSurvey =
             location.state?.fromSurvey ||
@@ -65,18 +69,18 @@ export default function RegisterPage() {
             const { type } = JSON.parse(raw) || {};
             if (type && BAUMANN_TYPES.includes(type)) {
                 setForm(prev => ({ ...prev, baumann: type }));
-                localStorage.removeItem('surveyResult'); // 한 번 쓰고 제거
+                localStorage.removeItem('surveyResult');
             }
         } catch {}
     }, [location, BAUMANN_TYPES]);
 
     // --- 유효성 ---
-    const isValidId = (v) => typeof v === 'string' && v.trim().length >= 3;
-    const isValidEmailFormat = (v) => /\S+@\S+\.\S+/.test(v);
-    const isValidPw = (v) => v.length >= 8;
-    const isValidPhone = (v) => /^01[0-9]-?\d{3,4}-?\d{4}$/.test(v);
-    const isValidBaumann = (v) => BAUMANN_TYPES.includes(v);
-    const allRequiredTermsChecked = REQUIRED_TERMS.every((t) => terms[t.id]);
+    const isValidId = v => typeof v === 'string' && v.trim().length >= 3;
+    const isValidEmailFormat = v => /\S+@\S+\.\S+/.test(v);
+    const isValidPw = v => v.length >= 8;
+    const isValidPhone = v => /^01[0-9]-?\d{3,4}-?\d{4}$/.test(v);
+    const isValidBaumann = v => BAUMANN_TYPES.includes(v);
+    const allRequiredTermsChecked = REQUIRED_TERMS.every(t => terms[t.id]);
 
     const formValid =
         isValidId(form.id) &&
@@ -89,28 +93,24 @@ export default function RegisterPage() {
         isValidBaumann(form.baumann) &&
         allRequiredTermsChecked;
 
-    // 입력 변경 핸들러
-    const onChange = (e) => {
+    const onChange = e => {
         const { name, value } = e.target;
         const next = name === 'baumann' ? value.toUpperCase() : value;
-        setForm((prev) => ({ ...prev, [name]: next }));
+        setForm(prev => ({ ...prev, [name]: next }));
     };
 
-    // 약관 전체 선택/해제
     const toggleAllTerms = () => {
         const next = !Object.values(terms).every(Boolean);
         setTerms(Object.fromEntries(Object.keys(terms).map(k => [k, next])));
     };
 
-    // 약관 개별 토글
-    const toggleOne = (id) =>
+    const toggleOne = id =>
         setTerms(prev => ({
             ...prev,
             [id]: !prev[id],
         }));
 
-    // 폼 제출 (회원가입 API 호출)
-    const onSubmit = async (e) => {
+    const onSubmit = async e => {
         e.preventDefault();
         if (!formValid) return;
 
@@ -120,8 +120,6 @@ export default function RegisterPage() {
             name: form.name,
             email: form.email,
             nickname: form.nickname,
-
-            // ⚠️ 백엔드 DTO 필드 이름(camelCase)에 맞춰서 보냄
             phoneNumber: form.phone,
             baumannId: BAUMANN_TO_ID[form.baumann],
             role: 'USER',
@@ -130,11 +128,9 @@ export default function RegisterPage() {
         console.log('[REGISTER PAYLOAD]', payload);
 
         try {
-            const res = await axios.post(
-                '/api/auth/register', // proxy 사용 시 이대로, 아니면 'http://localhost:8080/api/auth/register'
-                payload,
-                { headers: { 'Content-Type': 'application/json' } }
-            );
+            const res = await axios.post('/api/auth/register', payload, {
+                headers: { 'Content-Type': 'application/json' },
+            });
 
             if (res.status === 201 || res.data?.status === 201) {
                 navigate('/register/complete', { state: { payload }, replace: true });
@@ -149,14 +145,15 @@ export default function RegisterPage() {
 
     return (
         <div className="su-container">
-            {/* 로고 (링크 없음) */}
             <img src={logo} alt="Re:View 로고" className="su-logo" />
-            <br/>
+            <br />
 
             <form className="su-form" onSubmit={onSubmit}>
                 {/* 아이디 */}
                 <label className="su-label">
-                    <div>아이디<span className="su-req">*</span></div>
+                    <div>
+                        아이디<span className="su-req">*</span>
+                    </div>
                     <input
                         name="id"
                         type="text"
@@ -170,7 +167,9 @@ export default function RegisterPage() {
 
                 {/* 이메일 */}
                 <label className="su-label">
-                    <div>이메일<span className="su-req">*</span></div>
+                    <div>
+                        이메일<span className="su-req">*</span>
+                    </div>
                     <input
                         name="email"
                         type="email"
@@ -184,7 +183,9 @@ export default function RegisterPage() {
 
                 {/* 비밀번호 */}
                 <label className="su-label">
-                    <div>비밀번호<span className="su-req">*</span></div>
+                    <div>
+                        비밀번호<span className="su-req">*</span>
+                    </div>
                     <input
                         name="password"
                         type="password"
@@ -201,7 +202,9 @@ export default function RegisterPage() {
 
                 {/* 비밀번호 확인 */}
                 <label className="su-label">
-                    <div>비밀번호 확인<span className="su-req">*</span></div>
+                    <div>
+                        비밀번호 확인<span className="su-req">*</span>
+                    </div>
                     <input
                         name="password2"
                         type="password"
@@ -218,7 +221,9 @@ export default function RegisterPage() {
 
                 {/* 이름 */}
                 <label className="su-label">
-                    <div>이름<span className="su-req">*</span></div>
+                    <div>
+                        이름<span className="su-req">*</span>
+                    </div>
                     <input
                         name="name"
                         type="text"
@@ -232,7 +237,9 @@ export default function RegisterPage() {
 
                 {/* 닉네임 */}
                 <label className="su-label">
-                    <div>닉네임<span className="su-req">*</span></div>
+                    <div>
+                        닉네임<span className="su-req">*</span>
+                    </div>
                     <input
                         name="nickname"
                         type="text"
@@ -246,7 +253,9 @@ export default function RegisterPage() {
 
                 {/* 휴대전화 */}
                 <label className="su-label">
-                    <div>휴대전화 번호<span className="su-req">*</span></div>
+                    <div>
+                        휴대전화 번호<span className="su-req">*</span>
+                    </div>
                     <input
                         name="phone"
                         type="tel"
@@ -263,7 +272,9 @@ export default function RegisterPage() {
 
                 {/* 바우만 타입 + 버튼 */}
                 <label className="su-label">
-                    <div>바우만 타입<span className="su-req">*</span></div>
+                    <div>
+                        바우만 타입<span className="su-req">*</span>
+                    </div>
                     <div className="su-row-inline">
                         <input
                             name="baumann"
@@ -283,13 +294,12 @@ export default function RegisterPage() {
                         <button
                             type="button"
                             className="su-secondary"
-                            onClick={() => navigate('/survey/intro')}
+                            onClick={() => setShowSurvey(true)}
                         >
                             내 바우만 타입 찾기
                         </button>
                     </div>
 
-                    {/* 바우만 타입 검증/미리보기 */}
                     {form.baumann && !isValidBaumann(form.baumann) && (
                         <span className="su-help">
                             유효한 코드가 아닙니다. (예: DRNT, DSPW 등)
@@ -302,6 +312,19 @@ export default function RegisterPage() {
                         </div>
                     )}
                 </label>
+
+                {/* 인라인 설문 */}
+                {showSurvey && (
+                    <div className="su-baumann-survey">
+                        <InlineBaumannSurvey
+                            onComplete={type => {
+                                setForm(prev => ({ ...prev, baumann: type }));
+                                setShowSurvey(false);
+                            }}
+                            onCancel={() => setShowSurvey(false)}
+                        />
+                    </div>
+                )}
 
                 <hr className="su-sep" />
 
@@ -321,7 +344,7 @@ export default function RegisterPage() {
                         </label>
 
                         <ul className="su-terms-list">
-                            {[...REQUIRED_TERMS, ...OPTIONAL_TERMS].map((t) => (
+                            {[...REQUIRED_TERMS, ...OPTIONAL_TERMS].map(t => (
                                 <li key={t.id}>
                                     <label className="su-check">
                                         <input
@@ -341,7 +364,7 @@ export default function RegisterPage() {
                 </div>
 
                 <button type="submit" className="su-submit" disabled={!formValid}>
-                    다음
+                    회원가입
                 </button>
             </form>
         </div>
