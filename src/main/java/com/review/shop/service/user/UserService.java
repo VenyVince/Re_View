@@ -2,7 +2,7 @@ package com.review.shop.service.user;
 
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
-import com.review.shop.dto.login.UserInfoDto;
+import com.review.shop.dto.user.UserInfoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

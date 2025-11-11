@@ -1,6 +1,6 @@
 package com.review.shop.repository.user;
 
-import com.review.shop.dto.login.UserInfoDto;
+import com.review.shop.dto.user.UserInfoDto;
 import org.apache.ibatis.annotations.Mapper;
 
 //사용자 관련 데이터베이스 작업을 수행하는 매퍼 인터페이스
