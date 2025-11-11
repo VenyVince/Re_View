@@ -6,98 +6,6 @@ import { getBaumannBadge } from "../../../../assets/baumann";
 import { getTagIcon as getSkinTagIcon } from "../../../../assets/skinTag";
 import axios from "axios";
 
-// ✅ 먼저 화면에 보여줄 기본 더미 상품들
-const DEFAULT_PRODUCTS = [
-    {
-        id: 1,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 2,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 3,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 4,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 5,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 6,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 7,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-    {
-        id: 8,
-        brand: "라곰(LACOM)",
-        name: "셀럽 마이크로 폼 클렌저",
-        ratingText: "5.0/5.0",
-        tags: ["저자극", "수분감"],
-        discount: 0,
-        price: 10000,
-        isBest: true,
-        imageUrl: null,
-    },
-];
-
 export default function BaumanProduct() {
     // TODO: 나중에 로그인한 유저의 타입으로 교체
     const currentType = "DRNW";
@@ -123,39 +31,43 @@ export default function BaumanProduct() {
 
     const selectedType = skinTypeList.find((t) => t.type === currentType);
 
-    // ✅ 처음에는 더미 상품이 바로 보이도록
-    const [products, setProducts] = useState(DEFAULT_PRODUCTS);
+    // 🔥 추천 상품 상태
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // 마운트 시 백엔드 추천 상품 불러오기 (성공하면 덮어쓰기)
+    // 컴포넌트 마운트 시 추천 상품 불러오기
     useEffect(() => {
         const fetchRecommendations = async () => {
             try {
+                setLoading(true);
                 setError("");
 
                 const res = await axios.get("/api/products/recommendations/baumann");
 
-                const raw = Array.isArray(res.data)
-                    ? res.data
-                    : Array.isArray(res.data?.data)
-                        ? res.data.data
-                        : [];
+                // 백엔드에서 오는 형식에 대비해서 두 가지 케이스 처리:
+                // 1) 바로 배열
+                // 2) { status, message, data: [...] }
+                const raw =
+                    Array.isArray(res.data)
+                        ? res.data
+                        : Array.isArray(res.data?.data)
+                            ? res.data.data
+                            : [];
 
-                // 응답이 비어있으면 그냥 더미 유지
-                if (!raw.length) return;
-
-                const mapped = raw.map((p, idx) => {
+                const mapped = raw.map((p) => {
                     const ratingValue =
                         typeof p.rating === "number" ? p.rating : Number(p.rating || 0);
 
                     return {
-                        id: p.product_id ?? p.id ?? idx,
-                        brand: p.prd_brand ?? p.brand ?? "",
-                        name: p.prd_name ?? p.name ?? "",
+                        id: p.product_id ?? p.id,
+                        brand: p.prd_brand ?? p.brand,
+                        name: p.prd_name ?? p.name,
                         price: p.price ?? 0,
                         ratingText: `${ratingValue.toFixed(1)}/5.0`,
                         imageUrl: p.image_url || null,
-                        tags: [],      // 아직 API에 태그 정보 없으니 비워둠
+                        // 태그 정보는 API 명세에 없어서 일단 비워둠 (나중에 추가 가능)
+                        tags: [],
                         discount: 0,
                         isBest: true,
                     };
@@ -164,8 +76,9 @@ export default function BaumanProduct() {
                 setProducts(mapped);
             } catch (e) {
                 console.error("추천 상품 불러오기 실패:", e);
-                // 에러가 나더라도 화면은 DEFAULT_PRODUCTS 그대로 보여줌
                 setError("추천 상품을 불러오지 못했습니다.");
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -174,9 +87,13 @@ export default function BaumanProduct() {
 
     if (!selectedType) return null;
 
+    // (참고) 나중에 상품 클릭 시 상세 조회 / 페이지 이동에 쓸 수 있는 자리
+    // 지금은 아직 상세 페이지 라우트가 없으니 콘솔만 찍어둔다.
     const handleClickProduct = (id) => {
         console.log("상품 클릭:", id);
-        // 나중에 상세 페이지 있으면 여기서 navigate(`/products/${id}`)
+        // 예시) 나중에 만들면
+        // navigate(`/products/${id}`);
+        // 또는 axios.get(`/api/products/${id}`) 로 상세데이터를 따로 가져올 수도 있음
     };
 
     return (
@@ -217,7 +134,7 @@ export default function BaumanProduct() {
                     </div>
                 </div>
 
-                {/* (선택) 에러 메시지 */}
+                {/* (선택) 에러 메시지 표시 */}
                 {error && (
                     <p className="bauman-error">
                         {error}
@@ -226,6 +143,33 @@ export default function BaumanProduct() {
 
                 {/* ===== 상품 카드 그리드 ===== */}
                 <div className="product-grid">
+                    {/* 로딩 중일 때는 더미 카드 몇 개 보여주고 싶으면 여기서 처리해도 됨 */}
+                    {loading && products.length === 0 && (
+                        <>
+                            {Array.from({ length: 8 }).map((_, idx) => (
+                                <article key={idx} className="product-card">
+                                    <div className="product-thumb">
+                                        <div className="product-thumb-inner">
+                                            <img src={dummyData} alt="loading" />
+                                        </div>
+                                    </div>
+                                    <div className="product-meta">
+                                        <div className="product-brand-row">
+                                            <span className="product-brand">로딩 중...</span>
+                                        </div>
+                                        <p className="product-name">&nbsp;</p>
+                                    </div>
+                                </article>
+                            ))}
+                        </>
+                    )}
+
+                    {!loading && products.length === 0 && !error && (
+                        <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#777" }}>
+                            추천 상품이 없습니다.
+                        </p>
+                    )}
+
                     {products.map((item) => (
                         <article
                             key={item.id}
@@ -237,20 +181,26 @@ export default function BaumanProduct() {
                             <div className="product-thumb">
                                 {item.isBest && <span className="product-badge">Best</span>}
                                 <div className="product-thumb-inner">
-                                    <img src={item.imageUrl || dummyData} alt={item.name} />
+                                    <img
+                                        src={item.imageUrl || dummyData}
+                                        alt={item.name}
+                                    />
                                 </div>
                             </div>
 
                             {/* 텍스트 영역 */}
                             <div className="product-meta">
+                                {/* 브랜드 / 평점 */}
                                 <div className="product-brand-row">
                                     <span className="product-brand">{item.brand}</span>
                                     <span className="product-rating">{item.ratingText}</span>
                                 </div>
 
+                                {/* 상품명 */}
                                 <p className="product-name">{item.name}</p>
 
-                                {item.tags?.length > 0 && (
+                                {/* 해시태그 (지금은 더미/빈 데이터) */}
+                                {item.tags.length > 0 && (
                                     <p className="product-tags">
                                         {item.tags.map((tag, i) => (
                                             <span key={i}>#{tag} </span>
@@ -258,14 +208,15 @@ export default function BaumanProduct() {
                                     </p>
                                 )}
 
+                                {/* 가격 */}
                                 <div className="product-price-row">
-                  <span className="product-discount">
-                    {item.discount.toString().padStart(2, "0")}%
-                  </span>
+                                    <span className="product-discount">
+                                        {item.discount.toString().padStart(2, "0")}%
+                                    </span>
                                     <span className="product-price">
-                    {item.price.toLocaleString()}
+                                        {item.price.toLocaleString()}
                                         <span className="product-price-unit"> 원</span>
-                  </span>
+                                    </span>
                                 </div>
                             </div>
                         </article>
@@ -286,3 +237,4 @@ export default function BaumanProduct() {
         </section>
     );
 }
+
