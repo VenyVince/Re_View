@@ -10,6 +10,10 @@ public interface UserInfoMapper {
 
     UserInfoResponseDTO findById(@Param("user_id") int user_id);
 
+    UserInfoResponseDTO findByEmail(@Param("email") String email);
+
+    int findUserIdByEmail(@Param("email") String email);
+
     void updateUser(@Param("user_id") int user_id,
                     @Param("updateDTO") UserInfoUpdateDTO updateDTO);
 

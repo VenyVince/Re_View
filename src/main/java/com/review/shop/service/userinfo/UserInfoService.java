@@ -12,8 +12,8 @@ public class UserInfoService {
 
     private final UserInfoMapper userInfoMapper;
 
-    public UserInfoResponseDTO getUserInfo(int user_id) {
-        return userInfoMapper.findById(user_id);
+    public UserInfoResponseDTO getUserInfo(String id) {
+        return userInfoMapper.findById();
     }
 
     public void updateUserInfo(int user_id, UserInfoUpdateDTO updateDTO) {
