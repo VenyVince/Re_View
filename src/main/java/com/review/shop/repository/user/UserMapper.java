@@ -1,4 +1,4 @@
-package com.review.shop.repository;
+package com.review.shop.repository.user;
 
 import com.review.shop.dto.login.UserInfoDto;
 import org.apache.ibatis.annotations.Mapper;

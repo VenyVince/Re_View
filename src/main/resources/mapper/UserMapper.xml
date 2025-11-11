@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.review.shop.repository.UserMapper">
+<mapper namespace="com.review.shop.repository.user.UserMapper">
     <!-- user id는 Oracle 트리거로 자동 생성, created date는 db에서 default sys date로 지정됨. -->
     <insert id="insertUser" parameterType="UserInfoDto">
         INSERT INTO USER_TABLE (id, password, name, email, nickname, phone_number, baumann_id, role)

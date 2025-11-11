@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.review.shop.repository.AdminMapper">
+<mapper namespace="com.review.shop.repository.admin.AdminMapper">
 
     <insert id="insertProduct" parameterType="com.review.shop.dto.ProductDetailDTO"
             useGeneratedKeys="true">
