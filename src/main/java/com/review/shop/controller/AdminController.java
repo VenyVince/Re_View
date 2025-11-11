@@ -1,6 +1,7 @@
 package com.review.shop.controller;
 
 import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.exception.DatabaseException;
 import com.review.shop.service.AdminService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -71,5 +72,13 @@ public class AdminController {
     public ResponseEntity<Map<String, Integer>> getMemberPoints(@PathVariable int userId) {
         int points = adminService.getMemberPoints(userId);
         return ResponseEntity.ok(Map.of("points", points));
+    }
+
+    //어드민 관련 예외 처리 핸들러
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<String> handleWrongRequest(DatabaseException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 }

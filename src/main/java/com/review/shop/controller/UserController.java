@@ -4,6 +4,7 @@ package com.review.shop.controller;
 
 import com.review.shop.dto.login.LoginRequestDto;
 import com.review.shop.dto.login.UserInfoDto;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,4 +63,13 @@ public class UserController  {
 
         return ResponseEntity.ok("로그인 성공");
     }
+
+        //회원가입 예외처리 핸들러
+    @ExceptionHandler(WrongRequestException.class)
+    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
 }
