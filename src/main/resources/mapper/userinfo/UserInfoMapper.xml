@@ -20,8 +20,7 @@
         <set>
             <if test="updateDTO.nickname != null">NICKNAME = #{updateDTO.nickname},</if>
             <if test="updateDTO.phoneNumber != null">PHONE_NUMBER = #{updateDTO.phoneNumber},</if>
-            <if test="updateDTO.password != null">PASSWORD = #{updateDTO.password},</if>
-            <if test="updateDTO.baumann_id != null">BAUMANN = #{updateDTO.Baumann},</if>
+            <if test="updateDTO.baumann_id != null">BAUMANN_ID = #{updateDTO.baumann_id},</if>
             UPDATED_AT = SYSDATE
         </set>
         WHERE USER_ID = #{user_id}

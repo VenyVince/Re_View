@@ -2,7 +2,6 @@ package com.review.shop.service.userinfo;
 
 import com.review.shop.dto.userinfo.GetUserInfoDTO;
 import com.review.shop.dto.userinfo.GetUserInfoResponseDTO;
-import com.review.shop.dto.userinfo.UpdateUserINfoResponseDTO;
 import com.review.shop.dto.userinfo.UpdateUserInfoDTO;
 import com.review.shop.repository.UserIdMapper;
 import com.review.shop.repository.userinfo.UserInfoMapper;
@@ -30,6 +29,19 @@ public class UserInfoService {
     }
 
     public void updateUserInfo(int user_id, UpdateUserInfoDTO updateDTO) {
+        GetUserInfoResponseDTO existingResponse = getUserInfo(user_id);
+        GetUserInfoDTO existingUser = existingResponse.getUserInfos().get(0); // 단일 유저 기준
+
+        // null이면 기존값 유지
+        if(updateDTO.getNickname() == null) updateDTO.setNickname(existingUser.getNickname());
+        if(updateDTO.getPhoneNumber() == null) updateDTO.setPhoneNumber(existingUser.getPhoneNumber());
+        if(updateDTO.getBaumann_id()==null) updateDTO.setBaumann_id(existingUser.getBaumann_id());
+
+        // Mapper 호출
         userInfoMapper.updateInfo(user_id, updateDTO);
+    }
+
+    public void deleteUserInfo(int user_id) {
+        userInfoMapper.deleteInfo(user_id);
     }
 }

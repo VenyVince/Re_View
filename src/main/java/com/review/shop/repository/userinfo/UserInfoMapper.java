@@ -11,4 +11,7 @@ import java.util.List;
 public interface UserInfoMapper {
     List<GetUserInfoDTO> getInfo(@Param("user_id") int user_id);
 
-    void updateInfo(@Param("user_id") int user_id, @Param("updateDTO") UpdateUserInfoDTO updateDTO);}
+    void updateInfo(@Param("user_id") int user_id, @Param("updateDTO") UpdateUserInfoDTO updateDTO);
+
+    void deleteInfo(@Param("user_id") int user_id);
+}

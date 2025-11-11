@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class UpdateUserInfoDTO {
     private String nickname;
-    private String password;
     private String phoneNumber;
-    private int baumann_id;
+    private Integer baumann_id;
 }

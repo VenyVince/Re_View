@@ -11,4 +11,5 @@ public interface UserMapper {
     int insertUser(UserInfoDTO userDTO);
     // 사용자 검색 메서드
     UserInfoDTO findUserById(String id);
+
 }
