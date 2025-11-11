@@ -1,5 +1,6 @@
 package com.review.shop.controller.product;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.review.shop.dto.product.ProductReviewDTO;
 import com.review.shop.dto.review.CreateReviewRequest;
 import com.review.shop.service.product.ProductReviewService;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/products")
@@ -50,7 +50,7 @@ public class ProductReviewController {
 
             return ResponseEntity.ok(reviews);
         } catch (Exception e) {
-            log.error("❌ 에러 발생!!", e);
+            log.error("에러 발생!!", e);
             e.printStackTrace();
 
             return ResponseEntity.status(500).build();
@@ -59,20 +59,25 @@ public class ProductReviewController {
 
     /**
      * 리뷰 생성
-     * 세션에서 user_id를 직접 가져옴 ✅
+     * 세션에서 user_id를 직접 가져옴
      */
     @PostMapping("/{productId}/reviews")
     public ResponseEntity<?> createReview(
             @PathVariable int productId,
-            @RequestPart(name = "reviewData") CreateReviewRequest reviewRequest,
+            @RequestPart(name = "reviewData") String reviewDataJson,  // ← String으로 받기!
             @RequestPart(name = "images", required = false) MultipartFile[] images,
             HttpSession session) {  // ← 세션 주입
 
         log.info("=== 리뷰 생성 API 요청 ===");
-        log.info("productId: {}, rating: {}", productId, reviewRequest.getRating());
+        log.info("productId: {}", productId);
 
         try {
-            // 1. 세션에서 user_id 직접 가져오기 ✅
+            // 1. JSON String을 CreateReviewRequest 객체로 파싱
+            ObjectMapper objectMapper = new ObjectMapper();
+            CreateReviewRequest reviewRequest = objectMapper.readValue(reviewDataJson, CreateReviewRequest.class);
+            log.debug("JSON 파싱 완료 - rating: {}", reviewRequest.getRating());
+
+            // 2. 세션에서 user_id 직접 가져오기
             Integer userIdObj = (Integer) session.getAttribute("userId");
 
             if (userIdObj == null) {
@@ -102,10 +107,10 @@ public class ProductReviewController {
                 }
             }
 
-            // 3. 리뷰 생성 (userId 직접 전달) ✅
+            // 3. 리뷰 생성 (userId 직접 전달)
             ProductReviewDTO createdReview = productReviewService.createReview(
                     productId,
-                    userId,  // ← 직접 사용 (DB 조회 없음!)
+                    userId,
                     reviewRequest.getContent(),
                     reviewRequest.getRating(),
                     imageUrls
@@ -118,7 +123,7 @@ public class ProductReviewController {
             log.warn("유효성 검사 실패: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            log.error("❌ 리뷰 생성 에러!!", e);
+            log.error("리뷰 생성 에러", e);
             e.printStackTrace();
             return ResponseEntity.status(500).body("리뷰 생성 실패");
         }
@@ -136,12 +141,32 @@ public class ProductReviewController {
 
         // 파일 이름 생성 (UUID + 원본 확장자)
         String originalFileName = image.getOriginalFilename();
-        String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
+
+        // 파일 이름 검증
+        if (originalFileName == null || originalFileName.isEmpty()) {
+            throw new IllegalArgumentException("파일 이름이 없습니다");
+        }
+
+        // 확장자 추출
+        int lastDotIndex = originalFileName.lastIndexOf(".");
+        String ext;
+
+        if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+            // "." 이 있고 파일명 뒤에 있음
+            ext = originalFileName.substring(lastDotIndex);
+        } else {
+            // "." 이 없거나 파일명이 "."으로 시작/끝남
+            ext = ".jpg";  // 기본값
+            log.warn("파일 확장자가 없음. 기본 확장자 .jpg 사용");
+        }
+
         String savedFileName = UUID.randomUUID().toString() + ext;
 
         // 파일 저장
         File savedFile = new File(UPLOAD_DIR + savedFileName);
         image.transferTo(savedFile);
+
+        log.debug("파일 저장 완료 - originalFileName: {}, savedFileName: {}", originalFileName, savedFileName);
 
         // 저장된 파일의 접근 경로 반환
         return "/uploads/reviews/" + savedFileName;

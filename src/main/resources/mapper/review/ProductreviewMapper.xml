@@ -39,7 +39,7 @@
     </select>
 
     <!-- 리뷰 생성 -->
-    <insert id="insertReview" useGeneratedKeys="true" keyProperty="review_id">
+    <insert id="insertReview">
         INSERT INTO review (product_id, user_id, content, rating, created_at)
         VALUES (#{productId}, #{userId}, #{content}, #{rating}, SYSDATE)
     </insert>
@@ -50,7 +50,7 @@
         VALUES (#{reviewId}, #{imageUrl})
     </insert>
 
-    <!-- 가장 최근 생성된 리뷰 조회 -->
+    <!-- 가장 최근 생성된 리뷰 조회 (첫 번째 행만) -->
     <select id="selectLastReview" resultType="com.review.shop.dto.product.ProductReviewDTO">
         SELECT
         r.review_id,
@@ -63,17 +63,14 @@
         u.user_id,
         u.nickname,
         u.baumann_id,
-        b.type AS baumann_type,
-        ri.image_url
+        b.type AS baumann_type
         FROM review r
         JOIN USER_TABLE u ON r.user_id = u.user_id
         LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
-        LEFT JOIN review_images ri ON r.review_id = ri.review_id
         WHERE r.product_id = #{productId}
         AND r.user_id = #{userId}
         AND r.deleted_at IS NULL
         ORDER BY r.review_id DESC
         FETCH FIRST 1 ROWS ONLY
     </select>
-
 </mapper>

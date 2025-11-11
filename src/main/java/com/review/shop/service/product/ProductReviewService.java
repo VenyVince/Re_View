@@ -1,11 +1,15 @@
 package com.review.shop.service.product;
 
 import com.review.shop.dto.product.ProductReviewDTO;
-import com.review.shop.repository.ProductReviewMapper;
+import com.review.shop.repository.product.ProductReviewMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -66,8 +70,7 @@ public class ProductReviewService {
 
     /**
      * 리뷰 생성
-     * userId를 직접 받음 (세션에서 가져온 값) ✅
-     * DB 조회 없음! ✅
+     * userId를 직접 받음 (세션에서 가져온 값)
      */
     public ProductReviewDTO createReview(
             int productId,
@@ -91,7 +94,7 @@ public class ProductReviewService {
 
         log.debug("유효성 검사 완료 - content: {} 글자", content.length());
 
-        // 2. 리뷰 생성 (DB 조회 없음!) ✅
+        // 2. 리뷰 생성 (DB 조회 없음!)
         int insertedRows = productReviewMapper.insertReview(productId, userId, content, rating);
 
         if (insertedRows != 1) {
@@ -100,7 +103,7 @@ public class ProductReviewService {
 
         log.debug("리뷰 INSERT 완료");
 
-        // 3. 생성된 리뷰 조회 (최근에 생성된 리뷰)
+        // 3. 생성된 리뷰 조회
         ProductReviewDTO createdReview = productReviewMapper.selectLastReview(productId, userId);
 
         if (createdReview == null) {
