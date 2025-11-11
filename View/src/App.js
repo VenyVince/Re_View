@@ -67,7 +67,7 @@ export default function App() {
                 {/* 관리자 전용 영역 */}
                 <Route element={<ProtectedRoute requireAdmin />}>
                     <Route path="/admin" element={<AdminLayout />}>
-                        <Route path="products" element={<AdminProductPage />} />
+                        <Route path="allproducts" element={<AdminProductPage />} />
                         <Route path="products/new" element={<AdminProductNew />} />
                         <Route path="products/:id/edit" element={<AdminProductEdit />} />
                         <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />

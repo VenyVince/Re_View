@@ -2,9 +2,9 @@ package com.review.shop.controller.user;
 
 //회원가입, 로그인, 로그아웃 등의 기능을 담당하는 컨트롤러
 
-import com.review.shop.dto.user.LoginRequestDto;
-import com.review.shop.dto.user.PasswordUpdateDto;
-import com.review.shop.dto.user.UserInfoDto;
+import com.review.shop.dto.user.LoginRequestDTO;
+import com.review.shop.dto.user.PasswordUpdateDTO;
+import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class UserController  {
 
     // 회원가입 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserInfoDto userDTO) {
+    public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
         userService.registerUser(userDTO);
         return ResponseEntity
@@ -83,7 +83,7 @@ public class UserController  {
     // 비밀번호 재설정 로직 구현 (테스트 완료)
     //passwordUpdateDto는 기존 비밀번호, 새 비밀번호를 포함
     @PostMapping("/api/auth/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody PasswordUpdateDto passwordUpdateDto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<String> resetPassword(@RequestBody PasswordUpdateDTO passwordUpdateDto, @AuthenticationPrincipal UserDetails userDetails) {
         userService.resetPassword(passwordUpdateDto, userDetails);
 
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
