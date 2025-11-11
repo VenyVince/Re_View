@@ -41,8 +41,9 @@ public class SecurityConfig {
 //                        .anyRequest().authenticated()
 //                )
 
-                // api 개발을 위해서 인증 다 풀어놓음 :석현 (어드민도 풀었습니다)
+                // 어드민 제외 모두 해제
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
 
