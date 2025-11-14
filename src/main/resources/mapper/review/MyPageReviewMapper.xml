@@ -3,26 +3,22 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--sort: 생성일, 별점, 추천-->
-<mapper namespace="com.review.shop.repository.search.pages.ProductReview_SearchMapper">
+<mapper namespace="com.review.shop.repository.review.MyPageReviewMapper">
 
-    <select id="SearchMyReviews" parameterType="int" resultType="com.review.shop.dto.review.MyPageReviewResponseDTO">
+    <select id="SearchMyReviews" resultType="com.review.shop.dto.review.MyPageReviewDTO">
         SELECT
         p.prd_name,
         r.content, r.created_at, r.rating
         FROM review r
         JOIN product p ON r.product_id = p.product_id
-        JOIN User_Table u on r.user_id = u.user_id
-        WHERE (p.prd_name LIKE '%' || #{keyword} || '%'
-        OR p.prd_brand LIKE '%' || #{keyword} || '%'
-        OR r.content LIKE '%' || #{keyword} || '%')
-        AND  LIKE CONCAT('%', #{keyword}, '%')
+        WHERE r.user_id = #{user_id}
 
         <if test="keyword != null and keyword != ''">
-            AND
-            r.content LIKE CONCAT('%', #{keyword}, '%')
+        AND (p.prd_name LIKE '%', #{keyword}, '%'
+            OR r.content LIKE '%', #{keyword}, '%')
         </if>
 
-        <if test="filter_rating != null and filter_rating > 0">
+        <if test="filter_rating > 0">
             AND r.rating &gt;= #{filter_rating}
         </if>
 

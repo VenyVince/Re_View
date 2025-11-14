@@ -24,17 +24,14 @@ public class MyPageReviewService {
 
     public MyPageReviewResponseDTO search(int user_id, String keyword, String sort, float filter_rating) {
         try {
-            // DTO 하나로 파라미터 전달
-            MyPageReviewResponseDTO dto = new MyPageReviewResponseDTO(user_id, keyword, sort, filter_rating);
-
-            // Mapper 호출 → 반환 타입은 List<MyPageReviewDTO>
-            List<MyPageReviewDTO> myreviews = myPageReviewMapper.SearchMyReviews(dto);
+            // Mapper 호출 (파라미터 4개)
+            List<MyPageReviewDTO> myreviews = myPageReviewMapper.SearchMyReviews(user_id, keyword, sort, filter_rating);
 
             if (myreviews.isEmpty()) {
                 throw new ResourceNotFountException("리뷰를 작성한 적이 없습니다!");
             }
 
-            // ResponseDTO에 List<MyPageReviewDTO> 세팅
+            // ResponseDTO에 담아서 반환
             MyPageReviewResponseDTO response = new MyPageReviewResponseDTO();
             response.setMyPageReviews(myreviews);
 
