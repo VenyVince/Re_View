@@ -5,23 +5,21 @@
 <!--sort: 생성일, 별점, 추천-->
 <mapper namespace="com.review.shop.repository.search.pages.ProductReview_SearchMapper">
 
-    <select id="searchReviews" resultType="com.review.shop.dto.search.ProductReview_SearchDTO">
+    <select id="SearchMyReviews" parameterType="int" resultType="com.review.shop.dto.review.MyPageReviewResponseDTO">
         SELECT
-        r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at, r.updated_at,
-        p.prd_name, p.prd_brand,
-        u.nickname,
-        b.type AS user_baumann_type
+        p.prd_name,
+        r.content, r.created_at, r.rating
         FROM review r
         JOIN product p ON r.product_id = p.product_id
-        JOIN user_table u ON r.user_id = u.user_id
-        JOIN baumann b ON u.baumann_id = b.baumann_id
-        WHERE r.product_id = #{product_id}
+        JOIN User_Table u on r.user_id = u.user_id
+        WHERE (p.prd_name LIKE '%' || #{keyword} || '%'
+        OR p.prd_brand LIKE '%' || #{keyword} || '%'
+        OR r.content LIKE '%' || #{keyword} || '%')
+        AND  LIKE CONCAT('%', #{keyword}, '%')
 
         <if test="keyword != null and keyword != ''">
-            AND (
+            AND
             r.content LIKE CONCAT('%', #{keyword}, '%')
-            OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
-            )
         </if>
 
         <if test="filter_rating != null and filter_rating > 0">
