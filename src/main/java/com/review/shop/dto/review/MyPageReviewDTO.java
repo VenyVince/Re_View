@@ -12,4 +12,5 @@ public class MyPageReviewDTO {
     private Date created_at;
     private float rating;
 
+    private int baumann_id;
 }
