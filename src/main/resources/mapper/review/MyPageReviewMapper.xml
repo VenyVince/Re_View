@@ -9,8 +9,10 @@
         SELECT
         p.prd_name,
         r.content, r.created_at, r.rating
+        u.baumann_id
         FROM review r
         JOIN product p ON r.product_id = p.product_id
+        JOIN user_table u on r.user_id = u.user_id
         WHERE r.user_id = #{user_id}
 
         <if test="keyword != null and keyword != ''">
