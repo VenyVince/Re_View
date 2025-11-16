@@ -3,10 +3,9 @@ package com.review.shop.dto.userinfo.others;
 import lombok.Data;
 
 @Data
-public class Payment_MethodDTO {
+public class Payment_MethodsRequestDTO {
     private int payment_id;
-    private String card_company;
+    private int user_id;
     private String card_number;
-    private boolean is_default;
-    private boolean is_active;
+    private String card_company;
 }
