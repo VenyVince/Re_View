@@ -1,6 +1,6 @@
 package com.review.shop.controller.search;
 
-import com.review.shop.dto.search.header.HeaderSearchResponse;
+import com.review.shop.dto.search.HeaderSearchDTO;
 import com.review.shop.service.search.HeaderSearchService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -15,7 +15,7 @@ public class HeaderSearchController {
     private final HeaderSearchService searchService;
 
     @GetMapping
-    public ResponseEntity<HeaderSearchResponse> search(
+    public ResponseEntity<HeaderSearchDTO> search(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "latest") String sort,
             @RequestParam(required = false, defaultValue = "0") float filter_rating

@@ -1,0 +1,221 @@
+.su-container {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 60px 24px 80px;
+    background: #fff; color: #111;
+}
+
+.su-logo-link { display: inline-block; margin-bottom: 24px; }
+.su-logo { width: 200px; height: auto; }
+
+.su-form {
+    width: 100%;
+    max-width: 560px;
+    display: grid;
+    gap: 16px;
+}
+
+.su-label {
+    display: flex;
+    flex-direction: column; /* 인풋은 아래로 */
+    font-size: 14px;
+    text-align: left; /* 왼쪽 정렬 */
+}
+
+.su-label span {
+    display: inline; /* 줄바꿈 방지 */
+}
+
+.su-label .su-req {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+.su-form input {
+    height: 48px;
+    border: 1px solid #ddd;
+    border-radius: 24px;
+    padding: 0 16px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+}
+.su-form input:focus { border-color: #111; }
+
+.su-help { color: #ef4444; font-size: 12px; }
+
+.su-sep { border: none; border-top: 1px solid #eee; margin: 8px 0 0; }
+
+.su-terms { margin-top: 4px; }
+.su-terms-title { font-weight: 800; margin-bottom: 8px; }
+.su-terms-box {
+    border: 1px solid #e5e7eb; border-radius: 12px; background: #fff;
+    padding: 16px; display: grid; gap: 12px;
+}
+
+.su-check { display: inline-flex; align-items: center; gap: 8px; }
+.su-check.all { font-weight: 800; }
+
+.su-terms-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.su-terms-list li {
+    display: grid; grid-template-columns: 1fr auto; align-items: center;
+}
+.su-link {
+    background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 12px;
+}
+
+.su-submit {
+    margin-top: 12px;
+    height: 52px;
+    border: none; border-radius: 26px;
+    background: #e5e5e5; font-weight: 800; cursor: pointer;
+}
+.su-submit:disabled { opacity: .6; cursor: not-allowed; }
+.su-submit:not(:disabled):hover { background: #d4d4d4; }
+
+/* src/pages/auth/RegisterPage.css */
+
+.su-row-inline {
+    display: grid;
+    grid-template-columns: 1fr 180px;  /* 입력 + 버튼 */
+    gap: 12px;
+}
+
+.su-secondary {
+    height: 48px;
+    border-radius: 24px;
+    border: 1px solid #ddd;
+    background: #f9fafb;
+    font-weight: 700;
+    cursor: pointer;
+}
+.su-secondary:hover { background: #f3f4f6; }
+
+.su-badge-preview {
+    margin-top: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
+    color: #374151; font-size: 14px;
+}
+.su-badge-preview img { width: 36px; height: 36px; object-fit: contain; }
+
+/* 인라인 바우만 설문 섹션 */
+.su-baumann-survey {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #eee;
+}
+
+/* 설문 카드 */
+.inline-survey {
+    max-width: 1150px;
+    margin-top: 8px;
+    padding: 24px 20px 20px;
+    border-radius: 12px;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+}
+
+.inline-survey-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.inline-survey-caption {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #777;
+}
+
+/* 진행바 */
+.inline-survey-progress {
+    margin-top: 16px;
+}
+
+.inline-survey-step {
+    font-size: 12px;
+    color: #999;
+}
+
+.inline-survey-bar {
+    margin-top: 6px;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: #eee;
+    overflow: hidden;
+}
+
+.inline-survey-bar-fill {
+    height: 100%;
+    background: #111;
+}
+
+/* 질문/옵션 */
+.inline-survey-body {
+    margin-top: 20px;
+}
+
+.inline-survey-section {
+    font-size: 13px;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.inline-survey-question {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.inline-survey-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inline-survey-option {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #fff;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.inline-survey-option--active {
+    border-color: #111;
+    background: #111;
+    color: #fff;
+}
+
+/* 하단 버튼 */
+.inline-survey-footer {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.inline-survey-nav {
+    min-width: 72px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}
+
+.inline-survey-nav-prev:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.inline-survey-nav-cancel {
+    background: #f5f5f5;
+}
