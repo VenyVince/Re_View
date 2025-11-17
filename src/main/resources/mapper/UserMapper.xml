@@ -10,7 +10,7 @@
     </insert>
 
     <!-- UserInfoDto findUserById(String id) - USER_ID 포함  -->
-    <select id="findUserById" resultType="com.review.shop.dto.login.UserInfoDto">
+    <select id="findUserById" resultType="com.review.shop.dto.user.UserInfoDTO">
         SELECT
         USER_ID,ID,PASSWORD,NAME,EMAIL,NICKNAME,PHONE_NUMBER,BAUMANN_ID,ROLE
         FROM

@@ -1,4 +1,4 @@
-package com.review.shop.dto.login;
+package com.review.shop.dto.user;
 
 //사용자의 정보에 대한 DTO
 
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserInfoDto {
+public class UserInfoDTO {
     private int user_id;
     private String id;
     private String password;

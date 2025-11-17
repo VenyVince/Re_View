@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService {
         // 컨트롤러 부터 받은 dto 비밀번호를 암호화
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
-        UserInfoDto encodedUser = new UserInfoDto(
+        UserInfoDTO encodedUser = new UserInfoDTO(
                 0,
                 userDTO.getId(),
                 encodedPassword,
@@ -54,10 +54,10 @@ public class UserService implements UserDetailsService {
 
 
     // ID로 사용자 정보 조회(user_id포함)
-    public UserInfoDto getUserByLoginId(String id) {
+    public UserInfoDTO getUserByLoginId(String id) {
         log.debug("getUserByLoginId 호출 - id: {}", id);
 
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
