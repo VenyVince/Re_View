@@ -6,8 +6,6 @@ import com.review.shop.dto.userinfo.UpdateUserInfoDTO;
 import com.review.shop.service.userinfo.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,15 +20,14 @@ public class UserInfoController {
 
 
     @GetMapping
-    public ResponseEntity<?> getInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getInfo() {
         int user_id = securityUtil.getCurrentUserId();   // 사용자 id를 기반으로 유저 아이디 반환(String값(id) 기반으로 Int값(user_id) 반환)
         GetUserInfoResponseDTO userInfo = userInfoService.getUserInfo(user_id); // 유저아이디를 통해서 인포 반환
         return ResponseEntity.ok(userInfo);
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateInfo(@AuthenticationPrincipal UserDetails userDetails,
-                                        @RequestBody UpdateUserInfoDTO updateDTO) {
+    public ResponseEntity<?> updateInfo(@RequestBody UpdateUserInfoDTO updateDTO) {
         int user_id = securityUtil.getCurrentUserId(); // 재사용
         userInfoService.updateUserInfo(user_id, updateDTO);
         return ResponseEntity.ok("정보가 수정되었습니다.");
