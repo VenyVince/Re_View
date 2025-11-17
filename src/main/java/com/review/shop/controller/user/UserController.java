@@ -35,7 +35,8 @@ public class UserController  {
     @PostMapping("/api/auth/register")
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
-        userService.registerUser(userDTO);
+        userService.registerUser
+                (userDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
@@ -77,6 +78,13 @@ public class UserController  {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
+
+        //user_id 조회
+        UserInfoDTO user = userService.getUserByLoginId(loginDto.getId());
+
+        //user_id를 세션에 저장
+        session.setAttribute("userId", user.getUser_id());
+
         return ResponseEntity.ok("로그인 성공");
     }
 
