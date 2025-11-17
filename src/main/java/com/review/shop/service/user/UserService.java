@@ -52,7 +52,6 @@ public class UserService implements UserDetailsService {
     }
 
 
-
     // ID로 사용자 정보 조회(user_id포함)
     public UserInfoDTO getUserByLoginId(String id) {
         log.debug("getUserByLoginId 호출 - id: {}", id);
