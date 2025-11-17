@@ -11,4 +11,9 @@ public interface UserMapper {
     int insertUser(UserInfoDTO userDTO);
     // 사용자 검색 메서드
     UserInfoDTO findUserById(String id);
+<<<<<<< HEAD
+=======
+
+    int updatePassword(String id, String newEncodedPassword);
+>>>>>>> 6cfed288910a7fccad084736107f1a69663cd697
 }

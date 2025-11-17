@@ -1,8 +1,9 @@
 package com.review.shop.service.user;
 
+import com.review.shop.dto.user.PasswordUpdateDTO;
+import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
-import com.review.shop.dto.user.UserInfoDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,6 +48,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
+
+
     // AuthenticationManager가 UserDetails을 받기위한 메소드
     // 로그인 데이터와 UserDetails의 데이터를 비교하여 인증 처리
     @Override
@@ -69,6 +72,25 @@ public class UserService implements UserDetailsService {
     public boolean isDuplicateId(String id) {
         UserInfoDTO user = userMapper.findUserById(id);
         return user != null;
+
+    }
+
+    // 비밀번호 재설정 메서드
+    public void resetPassword(PasswordUpdateDTO passwordUpdateDto, UserDetails userDetails) {
+
+        String currentId = userDetails.getUsername();
+        UserInfoDTO user = userMapper.findUserById(currentId);
+        if(user == null) throw new WrongRequestException("사용자를 찾을 수 없습니다.");
+
+        String currentPassword = user.getPassword();
+
+        boolean is_matched = passwordEncoder.matches(passwordUpdateDto.getCurrentPassword(), currentPassword);
+        if(!is_matched) throw new WrongRequestException("현재 비밀번호가 일치하지 않습니다.");
+
+        String newEncodedPassword = passwordEncoder.encode(passwordUpdateDto.getNewPassword());
+        int affected = userMapper.updatePassword(currentId, newEncodedPassword);
+        if(affected != 1) throw new WrongRequestException("비밀번호 재설정에 실패했습니다.");
+
 
     }
 }
