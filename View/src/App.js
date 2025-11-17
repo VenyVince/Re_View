@@ -34,9 +34,14 @@ import AdminLayout from "./pages/mypage/admin/AdminLayout";
 import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
 import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
 import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
+import AdminReviewPage from "./pages/mypage/admin/AdminReviewPage";
+import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
+import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
+import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
+import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
+
 
 import TestProduct from "./TestProduct";
-
 
 
 export default function App() {
@@ -68,21 +73,27 @@ export default function App() {
                     <Route path="/survey/result" element={<SurveyResult/>}/>
                     <Route path="/mypage" element={<MyPage />} />
 
-
-                    {/* 관리자 전용 영역 */}
-                    <Route element={<ProtectedRoute requireAdmin />}>
-                        <Route path="/admin" element={<AdminLayout />}>
-                            <Route path="products" element={<AdminProductPage />} />
-                            <Route path="products/new" element={<AdminProductNew />} />
-                            <Route path="products/:id/edit" element={<AdminProductEdit />} />
-                            <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
-                        </Route>
+                {/* 관리자 전용 영역 */}
+                <Route element={<ProtectedRoute requireAdmin />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route path="allproducts" element={<AdminProductPage />} />
+                        <Route path="products/new" element={<AdminProductNew />} />
+                        <Route path="products/:id/edit" element={<AdminProductEdit />} />
+                        <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
+                        <Route path="reviews" element={<AdminReviewPage />} />
+                        <Route path="qna" element={<AdminQnaPage />} />
+                        <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
+                        <Route path="users" element={<AdminUserPage />} />
+                        <Route path="users/:id" element={<AdminUserDetailPage />} />
                     </Route>
-                </Routes>
-                </main>
-                <Footer />
-            </div>
-        </AuthProvider>
+                </Route>
 
+                {/*API 커넥트 예시용*/}
+                <Route path="/test-products" element={<TestProduct />} />
+            </Routes>
+            </main>
+            <Footer />
+        </div>
+        </AuthProvider>
     );
 }
