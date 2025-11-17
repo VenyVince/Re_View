@@ -31,6 +31,11 @@ public class AdminController {
     // =================================================================================
 
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @GetMapping("/allproducts")
     public ResponseEntity<?> getAllProducts() {
         return ResponseEntity.ok(adminService.getAllProducts());
@@ -130,6 +135,10 @@ public class AdminController {
     // =================================================================================
 
     @Operation(summary = "QnA 답변 등록/수정", description = "QnA 게시글에 관리자 답변을 등록하거나 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "답변 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    })
     @PatchMapping("/qna/{qnaId}/answer")
     public ResponseEntity<String> updateQnaAnswer(
             @Parameter(description = "답변할 QnA의 ID") @PathVariable int qnaId,
@@ -139,6 +148,12 @@ public class AdminController {
     }
 
     @Operation(summary = "회원 포인트 조회", description = "특정 회원의 보유 포인트를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "포인트 조회 성공",
+                    content = @Content(schema = @Schema(example = "{\"points\": 1500}"))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @GetMapping("/users/{userId}/points")
     public ResponseEntity<Map<String, Integer>> getMemberPoints(
             @Parameter(description = "조회할 회원의 ID") @PathVariable int userId) {
