@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.UserIdMapper">
+
+    <!-- 로그인 아이디(id)를 통해 user_id(PK) 조회 -->
+    <select id="getUser_id" resultType="int">
+        SELECT user_id
+        FROM USER_TABLE
+        WHERE id = #{id}
+    </select>
+
+</mapper>

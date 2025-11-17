@@ -1,4 +1,11 @@
 {
+  "name": "Re:View_root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix View start",
+    "View": "npm --prefix view start"
+  },
   "dependencies": {
     "axios": "^1.13.1",
     "lucide-react": "^0.552.0",

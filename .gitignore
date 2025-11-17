@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Node modules ###
+node_modules/
+View/node_modules
+frontend/node_modules
+
+
+
+### etc ###
+.env

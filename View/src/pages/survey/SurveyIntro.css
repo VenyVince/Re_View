@@ -1,0 +1,14 @@
+/* src/pages/survey/SurveyIntro.css */
+.sv-intro {
+    min-height: 60vh;
+    display: flex; align-items: center; justify-content: center;
+}
+.sv-intro__inner {
+    width: 100%; max-width: 1060px; padding: 0 24px; text-align: center;
+}
+.sv-intro__title { font-size: 40px; font-weight: 900; margin: 0 0 12px; }
+.sv-intro__desc { color: #444; margin: 0 0 20px; }
+.sv-intro__cta {
+    padding: 12px 28px; border: none; border-radius: 999px;
+    background: #111; color: #fff; font-weight: 800; cursor: pointer;
+}

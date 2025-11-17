@@ -1,0 +1,92 @@
+.container {
+    max-width: 1024px;
+    margin: 60px auto;
+    padding: 0 24px;
+    text-align: center;
+}
+
+.title {
+    font-size: 36px;
+    font-weight: 900;
+}
+
+.desc {
+    color: #666;
+    margin-top: 8px;
+}
+
+.card {
+    margin: 24px auto 0;
+    max-width: 520px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.badgeImg {
+    border-radius: 16px;
+    object-fit: cover;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.badgeBox {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: #f4f4f4;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+.typeInfo {
+    text-align: left;
+}
+
+.typeCode {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.tags {
+    color: #666;
+    margin-top: 4px;
+}
+
+.button {
+    margin-top: 24px;
+    padding: 12px 24px;
+    border: none;
+    background: #111;
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: #222;
+}
+
+.emptyBox {
+    max-width: 1024px;
+    margin: 60px auto;
+    text-align: center;
+}
+
+.emptyBtn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.emptyBtn:hover {
+    background: #f6f6f6;
+}
