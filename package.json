@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "start": "npm --prefix View start",
     "View": "npm --prefix view start"
   },
   "dependencies": {
