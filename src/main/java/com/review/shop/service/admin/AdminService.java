@@ -2,6 +2,7 @@ package com.review.shop.service.admin;
 
 
 import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.dto.qna.QnADTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.repository.admin.AdminMapper;
 import lombok.AllArgsConstructor;
@@ -84,6 +85,11 @@ public class AdminService {
         if (affected == 0) {
             throw new DatabaseException("운영자 픽에 설정 실패했습니다.", null);
         }
+    }
+
+    //getAllQna 구현 - 전체 QnA 목록 조회, repository 실행
+    public List<QnADTO> getAllQna() {
+        return adminMapper.getAllQna();
     }
 
 }

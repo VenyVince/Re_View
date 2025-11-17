@@ -105,4 +105,35 @@
         SET IS_SELECTED = #{isSelected}
         WHERE REVIEW_ID = #{reviewId}
     </update>
+
+
+    <resultMap id="QnaResultMap" type="com.review.shop.dto.qna.QnADTO">
+        <id property="qnaId"       column="QNA_ID" />
+
+        <result property="productId"  column="PRODUCT_ID" />
+        <result property="userId"     column="USER_ID" />
+        <result property="title"      column="TITLE" />
+        <result property="content"    column="CONTENT" />      <result property="answer"     column="ANSWER" />       <result property="createdAt"  column="CREATED_AT" />
+        <result property="deletedAt"  column="DELETED_AT" />
+        <result property="answeredAt" column="ANSWERED_AT" />
+    </resultMap>
+
+    <select id="getAllQna" resultMap="QnaResultMap">
+        SELECT
+            QNA_ID,
+            PRODUCT_ID,
+            USER_ID,
+            TITLE,
+            CONTENT,
+            ANSWER,
+            CREATED_AT,
+            DELETED_AT,
+            ANSWERED_AT
+        FROM QNA
+        WHERE DELETED_AT IS NULL
+        ORDER BY CREATED_AT DESC
+    </select>
+
+
+
 </mapper>

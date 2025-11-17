@@ -1,10 +1,12 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.dto.qna.QnADTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +34,12 @@ public class AdminController {
 
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ProductDetailDTO.class))
+                    )
+            ),
             @ApiResponse(responseCode = "400", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -133,6 +140,23 @@ public class AdminController {
     // =================================================================================
     // SECTION: 고객 지원 및 회원 관리 (CS & Member)
     // =================================================================================
+
+    @Operation(summary = "전체 QnA 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 QnA 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "QnA 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = QnADTO.class))
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/allqna")
+    public ResponseEntity<?> getAllQna() {
+        return ResponseEntity.ok(adminService.getAllQna());
+
+    }
 
     @Operation(summary = "QnA 답변 등록/수정", description = "QnA 게시글에 관리자 답변을 등록하거나 수정합니다.")
     @ApiResponses(value = {
