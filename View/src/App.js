@@ -32,6 +32,12 @@ import AdminLayout from "./pages/mypage/admin/AdminLayout";
 import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
 import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
 import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
+import AdminReviewPage from "./pages/mypage/admin/AdminReviewPage";
+import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
+import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
+import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
+import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
+
 
 import TestProduct from "./TestProduct";
 
@@ -71,6 +77,11 @@ export default function App() {
                         <Route path="products/new" element={<AdminProductNew />} />
                         <Route path="products/:id/edit" element={<AdminProductEdit />} />
                         <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
+                        <Route path="reviews" element={<AdminReviewPage/>}/>
+                        <Route path="qna" element={<AdminQnaPage />} />
+                        <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
+                        <Route path="users" element={<AdminUserPage/>}/>
+                        <Route path="users/:id" element={<AdminUserDetailPage/>}/>
                     </Route>
                 </Route>
 

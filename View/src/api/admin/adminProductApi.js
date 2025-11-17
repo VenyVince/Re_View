@@ -1,5 +1,11 @@
 import axiosClient from "../axiosClient";
 
+// 상품 불러오기
+export const fetchAdminProducts = async () => {
+    const res = await axiosClient.get("/api/admin/allproducts");
+    return res.data;
+};
+
 // 상품 등록
 export const createProduct = (data) =>
     axiosClient.post("/api/admin/products", data);
