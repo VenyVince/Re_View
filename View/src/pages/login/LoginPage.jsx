@@ -19,7 +19,7 @@ export default function LoginPage() {
             // 🔹 API 요청
             const response = await axios.post(
                 "/api/auth/login",
-                { id, password },
+                { id, password},
                 {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true, // ✅ 쿠키를 포함해야 할 때 필수
