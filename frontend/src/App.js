@@ -35,46 +35,50 @@ import FindPasswordDone from './pages/login/find/FindPasswordDone';
 import RegisterPage from './pages/register/RegisterPage'; // 회원가입 페이지
 import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가입 성공 페이지
 
+import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
+
 export default function App() {
     return (
-        <div className="App">
-            <Header />
-            <main className="page-content"> {/* 푸터를 항상 하단에 고정하기 위해 라우터들 감쌈*/}
-            <Routes>
-                <Route path="/" element={<MainPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/find" element={<FindSelect />} />
-                <Route path="/find/id" element={<FindIdPage/>} />
-                <Route path="/find/id/result" element={<FindIdResult />} />
-                <Route path="/find/password" element={<FindPasswordPage />} />
-                <Route path="/find/password/reset" element={<FindPasswordReset />} />
-                <Route path="/find/password/done" element={<FindPasswordDone />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/register/complete" element={<RegisterComplete />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/notice" element={<NoticePage/>} />
-                <Route path="/notice/:id" element={<NoticeDetail />} />
-                <Route path="/faq" element={<FaqPage/>} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/ads" element={<AdsPage/>}/>
-                <Route path="/survey/intro" element={<SurveyIntro/>}/>
-                <Route path="/survey/baumann" element={<SurveyPage/>}/>
-                <Route path="/survey/result" element={<SurveyResult/>}/>
-                <Route path="/mypage" element={<MyPage />} />
+        <AuthProvider>
+            <div className="App">
+                <Header />
+                <main className="page-content"> {/* 푸터를 항상 하단에 고정하기 위해 라우터들 감쌈*/}
+                <Routes>
+                    <Route path="/" element={<MainPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/find" element={<FindSelect />} />
+                    <Route path="/find/id" element={<FindIdPage/>} />
+                    <Route path="/find/id/result" element={<FindIdResult />} />
+                    <Route path="/find/password" element={<FindPasswordPage />} />
+                    <Route path="/find/password/reset" element={<FindPasswordReset />} />
+                    <Route path="/find/password/done" element={<FindPasswordDone />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/register/complete" element={<RegisterComplete />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/notice" element={<NoticePage/>} />
+                    <Route path="/notice/:id" element={<NoticeDetail />} />
+                    <Route path="/faq" element={<FaqPage/>} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/ads" element={<AdsPage/>}/>
+                    <Route path="/survey/intro" element={<SurveyIntro/>}/>
+                    <Route path="/survey/baumann" element={<SurveyPage/>}/>
+                    <Route path="/survey/result" element={<SurveyResult/>}/>
+                    <Route path="/mypage" element={<MyPage />} />
 
-                {/* 관리자 전용 영역 */}
-                <Route element={<ProtectedRoute requireAdmin />}>
-                    <Route path="/admin" element={<AdminLayout />}>
-                        <Route path="products" element={<AdminProductPage />} />
-                        <Route path="products/new" element={<AdminProductNew />} />
-                        <Route path="products/:id/edit" element={<AdminProductEdit />} />
-                        <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
+                    {/* 관리자 전용 영역 */}
+                    <Route element={<ProtectedRoute requireAdmin />}>
+                        <Route path="/admin" element={<AdminLayout />}>
+                            <Route path="products" element={<AdminProductPage />} />
+                            <Route path="products/new" element={<AdminProductNew />} />
+                            <Route path="products/:id/edit" element={<AdminProductEdit />} />
+                            <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
+                        </Route>
                     </Route>
-                </Route>
-            </Routes>
-            </main>
-            <Footer />
-        </div>
+                </Routes>
+                </main>
+                <Footer />
+            </div>
+        </AuthProvider>
     );
 }
