@@ -37,4 +37,7 @@ public interface AdminMapper {
 
     //리뷰 소프트 삭제
     int deleteReview(int reviewId);
+
+    //운영자 리뷰 선택 여부 설정, isSelected는 can null
+    int setReviewSelection(int reviewId, Integer isSelected);
 }

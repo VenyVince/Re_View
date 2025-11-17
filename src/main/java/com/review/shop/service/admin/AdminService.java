@@ -78,4 +78,12 @@ public class AdminService {
         }
     }
 
+    //  setReviewSelection 구현 - 운영자 픽 설정 (테스트 완료)
+    public void setReviewSelection(int reviewId, Integer isSelected) {
+        int affected = adminMapper.setReviewSelection(reviewId, isSelected);
+        if (affected == 0) {
+            throw new DatabaseException("운영자 픽에 설정 실패했습니다.", null);
+        }
+    }
+
 }

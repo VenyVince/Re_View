@@ -100,4 +100,9 @@
         WHERE REVIEW_ID = #{reviewId}
     </update>
 
+    <update id="setReviewSelection">
+        UPDATE REVIEW
+        SET IS_SELECTED = #{isSelected}
+        WHERE REVIEW_ID = #{reviewId}
+    </update>
 </mapper>
