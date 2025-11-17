@@ -77,11 +77,11 @@ export default function App() {
                         <Route path="products/new" element={<AdminProductNew />} />
                         <Route path="products/:id/edit" element={<AdminProductEdit />} />
                         <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
-                        <Route path="reviews" element={<AdminReviewPage/>}/>
+                        <Route path="reviews" element={<AdminReviewPage />} />
                         <Route path="qna" element={<AdminQnaPage />} />
                         <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
-                        <Route path="users" element={<AdminUserPage/>}/>
-                        <Route path="users/:id" element={<AdminUserDetailPage/>}/>
+                        <Route path="users" element={<AdminUserPage />} />
+                        <Route path="users/:id" element={<AdminUserDetailPage />} />
                     </Route>
                 </Route>
 

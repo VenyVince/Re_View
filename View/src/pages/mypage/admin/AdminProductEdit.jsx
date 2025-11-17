@@ -4,6 +4,7 @@ import {
     Wrap, Inner, Title, Panel, Row, Label, Input,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper
 } from "./adminProductEdit.style";
+import { updateProduct} from "../../../api/admin/adminProductApi";
 
 export default function AdminProductEdit() {
     const { id } = useParams();
@@ -19,11 +20,7 @@ export default function AdminProductEdit() {
     });
 
     useEffect(() => {
-        // TODO: 실제 API 연결 시 fetch(`/api/admin/products/${id}`)
-        setForm({
-            name: "수분 크림",
-            desc: "촉촉하고 산뜻한 크림입니다.",
-        });
+        // TODO: 단일 상품 조회 API 생기면 여기서 불러오기
     }, [id]);
 
     const onChange = (e) => {
@@ -38,10 +35,23 @@ export default function AdminProductEdit() {
         setForm((p) => ({ ...p, [key]: file, [previewKey]: url }));
     };
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        alert("상품이 수정되었습니다!");
-        navigate("/admin/products");
+
+        try {
+            // 1차 버전: 이름/설명만 수정한다고 가정
+            await updateProduct(id, {
+                prdName: form.name,
+                description: form.desc,
+                // 나머지 필드는 백엔드에서 기존 값 유지하거나 기본값 처리한다고 가정
+            });
+
+            alert("상품이 수정되었습니다!");
+            navigate("/mypage/admin/allproducts");
+        } catch (error) {
+            console.error(error);
+            alert("상품 수정에 실패했습니다.");
+        }
     };
 
     return (

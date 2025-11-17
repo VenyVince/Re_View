@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../../api/admin/adminProductApi";
 import {
@@ -16,6 +16,7 @@ export default function AdminProductNew() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
+
         const payload = {
             prdName: form.prdName.trim(),
             prdBrand: form.prdBrand.trim(),
@@ -24,9 +25,15 @@ export default function AdminProductNew() {
             category: form.category.trim(),
             stock: Number(form.stock || 0),
         };
-        await createProduct(payload);
-        alert("상품이 등록되었습니다.");
-        nav("/admin/products");
+
+        try {
+            await createProduct(payload);
+            alert("상품이 등록되었습니다.");
+            nav("/mypage/admin/allproducts"); // 관리자 상품 목록으로 이동
+        } catch (error) {
+            console.error(error);
+            alert("상품 등록에 실패했습니다.");
+        }
     };
 
     // 파일 업로드 상태/참조 추가
