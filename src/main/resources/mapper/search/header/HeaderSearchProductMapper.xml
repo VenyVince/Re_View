@@ -14,8 +14,11 @@
            OR p.prd_brand LIKE '%' || #{keyword} || '%'
            OR p.ingredient LIKE '%' || #{keyword} || '%'
            OR b.type LIKE '%' || #{keyword} || '%') <!--바우만 타입 관련 연산 추후에 재작성 -->
-        <if test="filter_rating != null">
-            AND p.rating &gt;= #{filter_rating}
+        <if test="filter_brand != null and filter_brand != ''">
+            AND p.prd_brand = #{filter_brand}
+        </if>
+        <if test="filter_category != null and filter_category != ''">
+            AND p.category = #{filter_category}
         </if>
         <choose>
             <when test="sort == 'latest'"> <!-- 신상품 순 -->

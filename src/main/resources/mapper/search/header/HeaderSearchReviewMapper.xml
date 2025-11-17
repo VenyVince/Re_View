@@ -16,8 +16,11 @@
         JOIN baumann b ON u.baumann_id = b.baumann_id
         WHERE (r.content LIKE '%' || #{keyword} || '%'
         OR u.nickname LIKE '%' || #{keyword} || '%')
-        <if test="filter_rating != null">
-            AND r.rating &gt;= #{filter_rating}
+        <if test="filter_brand != null and filter_brand != ''">
+            AND p.prd_brand = #{filter_brand}
+        </if>
+        <if test="filter_category != null and filter_category != ''">
+            AND p.category = #{filter_category}
         </if>
         <choose>
             <when test="sort == 'latest'">
