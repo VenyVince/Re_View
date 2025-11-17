@@ -6,9 +6,19 @@
 <mapper namespace="com.review.shop.repository.userinfo.other.Payment_MethodMapper">
 
     <!-- 결제 수단 조회 -->
-    <select id="getPayments" resultType="com.review.shop.dto.userinfo.others.Payment_MethodDTO">
-        SELECT * FROM payment_methods
-        WHERE user_id = #{user_id}
+    <select id="findAllByUser" resultType="com.review.shop.dto.userinfo.others.Payment_MethodDTO">
+        SELECT payment_id, user_id, card_company, card_number
+        FROM payment_methods
+        WHERE USER_ID = #{user_id}
+        ORDER BY PAYMENT_ID
+
+    </select>
+
+    <!-- 단일 결제 수단 조회 -->
+    <select id="findById" resultType="com.review.shop.dto.userinfo.others.Payment_MethodDTO">
+        SELECT payment_id, user_id, card_company, card_number
+        FROM payment_methods
+        WHERE PAYMENT_ID = #{payment_id}
     </select>
 
     <!-- 결제 수단 존재 여부 -->
@@ -20,26 +30,15 @@
     </select>
 
     <!-- 결제 수단 추가 -->
-    <insert id="addPayment">
-        INSERT INTO payment_methods (user_id, card_company, card_number)
-        VALUES (#{user_id}, #{card_company}, #{card_number})
+    <insert id="insert">
+        INSERT INTO PAYMENT_METHODS(USER_ID, CARD_COMPANY, CARD_NUMBER)
+        VALUES(#{user_id}, #{card_company}, #{card_number})
     </insert>
 
-    <!-- 기본 결제 수단 설정 -->
-    <update id="checkDefaultPayment">
-        UPDATE payment_methods
-        SET is_default = CASE
-                             WHEN payment_id = #{payment_id} THEN 1
-                             ELSE 0
-            END
-        WHERE user_id = #{user_id}
-    </update>
-
     <!-- 결제 수단 삭제 -->
-    <delete id="deletePayments">
-        DELETE FROM payment_methods
-        WHERE user_id = #{user_id}
-          AND payment_id = #{payment_id}
+    <delete id="delete">
+        DELETE FROM PAYMENT_METHODS
+        WHERE PAYMENT_ID = #{payment_id} AND USER_ID = #{user_id}
     </delete>
 
 </mapper>
