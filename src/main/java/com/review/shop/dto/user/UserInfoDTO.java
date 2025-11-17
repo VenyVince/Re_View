@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserInfoDTO {
+public class UserInfoDto {
     private String id;
     private String password;
     private String name;

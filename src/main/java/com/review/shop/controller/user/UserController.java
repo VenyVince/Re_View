@@ -2,12 +2,17 @@ package com.review.shop.controller.user;
 
 //회원가입, 로그인, 로그아웃 등의 기능을 담당하는 컨트롤러
 
+<<<<<<< HEAD
 import com.review.shop.dto.user.LoginRequestDTO;
 <<<<<<< HEAD
 =======
 import com.review.shop.dto.user.PasswordUpdateDTO;
 >>>>>>> 6cfed288910a7fccad084736107f1a69663cd697
 import com.review.shop.dto.user.UserInfoDTO;
+=======
+import com.review.shop.dto.user.LoginRequestDto;
+import com.review.shop.dto.user.UserInfoDto;
+>>>>>>> parent of 814e773e (refactor: 로그인 성공 후 마이페이지 연결 구현)
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +41,7 @@ public class UserController  {
 
     // 회원가입 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
+    public ResponseEntity<String> registerUser(@RequestBody UserInfoDto userDTO) {
 
         userService.registerUser(userDTO);
         return ResponseEntity
@@ -61,7 +66,7 @@ public class UserController  {
     // 로그인 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/login")
     public ResponseEntity<String> login(
-            @RequestBody LoginRequestDTO loginDto,
+            @RequestBody LoginRequestDto loginDto,
             HttpServletRequest request
     ) {
 
