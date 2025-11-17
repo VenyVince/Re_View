@@ -131,6 +131,21 @@ public class UserController  {
     }
 
 
+    @Operation (summary = "아이디 찾기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "아이디 찾기 성공 (메시지 문자열 반환)"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이름 또는 핸드폰번호 오류)",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/api/auth/find-id")
+    public ResponseEntity<String> findId(@RequestBody Map<String, String> payload) {
+        String name = payload.get("name");
+        String phoneNumber = payload.get("phone_number");
+        String foundId = userService.findIdByNameAndPhoneNumber(name, phoneNumber);
+        return ResponseEntity.ok("찾으신 아이디는: " + foundId + " 입니다.");
+    }
+
+
 
     @Operation(summary = "내 세션 정보 조회 (인증 필요)")
     @ApiResponses(value = {
@@ -159,6 +174,8 @@ public class UserController  {
         }
     }
 
+
+
     @Hidden // Swagger 문서에서 예외 핸들러는 숨김
     @ExceptionHandler(WrongRequestException.class)
     public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
@@ -166,5 +183,7 @@ public class UserController  {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+
 
 }

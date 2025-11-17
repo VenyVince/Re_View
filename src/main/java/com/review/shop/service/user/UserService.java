@@ -108,4 +108,14 @@ public class UserService implements UserDetailsService {
 
 
     }
+
+
+    //findIdByNameAndPhoneNumber 구현 하기
+    public String findIdByNameAndPhoneNumber(String name, String phoneNumber) {
+        String user_id = userMapper.findUserIdByNameAndPhoneNumber(name, phoneNumber);
+        if (user_id == null) {
+            throw new WrongRequestException("일치하는 사용자가 없습니다.");
+        }
+        return user_id;
+    }
 }
