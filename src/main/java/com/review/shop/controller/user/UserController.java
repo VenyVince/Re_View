@@ -131,8 +131,14 @@ public class UserController  {
     }
 
 
-    //디버깅용, 추후에 삭제 예정
-    @Hidden // Swagger 문서에서 이 API를 숨깁니다.
+
+    @Operation(summary = "내 세션 정보 조회 (인증 필요)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "내 정보 조회 성공 (JSON 객체 반환)",
+                    content = @Content(schema = @Schema(type = "object", example = "{\"id\": \"testuser123\", \"role\": \"ROLE_USER\"}"))),
+            @ApiResponse(responseCode = "401", description = "인증 정보 없음",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @GetMapping("/api/auth/me")
     public ResponseEntity<?> getMyInfo(
             @AuthenticationPrincipal UserDetails userDetails
@@ -146,7 +152,6 @@ public class UserController  {
             Map<String, String> userInfo = new HashMap<>();
             userInfo.put("id", id);
             userInfo.put("role", role);
-            userInfo.put("password", password);
 
             return ResponseEntity.ok(userInfo);
         } else {
