@@ -34,4 +34,7 @@ public interface AdminMapper {
     Integer getMemberPoints(int memberId);
 
     List<ProductDetailDTO> getAllProducts();
+
+    //리뷰 소프트 삭제
+    int deleteReview(int reviewId);
 }

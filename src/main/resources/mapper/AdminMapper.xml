@@ -94,4 +94,10 @@
             DELETED_AT IS NULL
     </select>
 
+    <update id="deleteReview" parameterType="int">
+        UPDATE REVIEW
+        SET DELETED_AT = SYSDATE
+        WHERE REVIEW_ID = #{reviewId}
+    </update>
+
 </mapper>

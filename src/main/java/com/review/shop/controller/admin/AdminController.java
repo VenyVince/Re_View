@@ -129,7 +129,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAllProducts());
     }
 
-    //리뷰 삭제 기능
+    //리뷰 삭제 기능 (테스트 완료)
     @Operation(summary = "리뷰 삭제", description = "특정 상품 리뷰를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),

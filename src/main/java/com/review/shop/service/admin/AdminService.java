@@ -70,4 +70,12 @@ public class AdminService {
         return adminMapper.getAllProducts();
     }
 
+    //리뷰 삭제, 실제로 삭제 안하고 DELETED_DATE 플래그 설정
+    public void deleteReview(int reviewId) {
+        int affected = adminMapper.deleteReview(reviewId);
+        if (affected == 0) {
+            throw new DatabaseException("리뷰 삭제에 실패했습니다.", null);
+        }
+    }
+
 }
