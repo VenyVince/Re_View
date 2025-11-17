@@ -1,16 +1,13 @@
 package com.review.shop.dto.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class PasswordUpdateDTO {
-
-    private String currentPassword;
-
-    private String newPassword;
-
+    String currentPassword;
+    String newPassword;
 }

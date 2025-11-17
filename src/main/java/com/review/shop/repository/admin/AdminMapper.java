@@ -1,8 +1,10 @@
 package com.review.shop.repository.admin;
 
 import com.review.shop.dto.ProductDetailDTO;
-import org.apache.ibatis.annotations.Mapper; // 👈 추가
-import org.apache.ibatis.annotations.Param; // 👈 추가
+import com.review.shop.dto.qna.QnADTO;
+import com.review.shop.dto.qna.QnAListDTO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -34,4 +36,17 @@ public interface AdminMapper {
     Integer getMemberPoints(int memberId);
 
     List<ProductDetailDTO> getAllProducts();
+
+    //리뷰 소프트 삭제
+    int deleteReview(int reviewId);
+
+    //운영자 리뷰 선택 여부 설정, isSelected는 can null
+    int setReviewSelection(int reviewId, Integer isSelected);
+
+    // QnA 전체 조회
+    List<QnAListDTO> getAllQna();
+
+    // QnA  상세보기
+    QnADTO getQnaDetail(int qnaId);
+
 }

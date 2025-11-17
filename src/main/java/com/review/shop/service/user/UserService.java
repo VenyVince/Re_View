@@ -4,11 +4,8 @@ import com.review.shop.dto.user.PasswordUpdateDTO;
 import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
-<<<<<<< HEAD
-=======
-import com.review.shop.dto.user.UserInfoDto;
->>>>>>> parent of 814e773e (refactor: 로그인 성공 후 마이페이지 연결 구현)
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
@@ -24,7 +22,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입 로직 구현, DB 결과에 따른 예외 처리
-    public void registerUser(UserInfoDto userDTO) {
+    public void registerUser(UserInfoDTO userDTO) {
 
         // 중복 ID 체크 추가
         if (userMapper.findUserById(userDTO.getId()) != null) {
@@ -34,7 +32,8 @@ public class UserService implements UserDetailsService {
         // 컨트롤러 부터 받은 dto 비밀번호를 암호화
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
-        UserInfoDto encodedUser = new UserInfoDto(
+        UserInfoDTO encodedUser = new UserInfoDTO(
+                0,
                 userDTO.getId(),
                 encodedPassword,
                 userDTO.getName(),
@@ -53,13 +52,25 @@ public class UserService implements UserDetailsService {
     }
 
 
+    // ID로 사용자 정보 조회(user_id포함)
+    public UserInfoDTO getUserByLoginId(String id) {
+        log.debug("getUserByLoginId 호출 - id: {}", id);
+
+        UserInfoDTO user = userMapper.findUserById(id);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
+        }
+
+        return user;
+    }
 
     // AuthenticationManager가 UserDetails을 받기위한 메소드
     // 로그인 데이터와 UserDetails의 데이터를 비교하여 인증 처리
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
@@ -74,7 +85,7 @@ public class UserService implements UserDetailsService {
 
     // 아이디 중복 확인 메서드
     public boolean isDuplicateId(String id) {
-        UserInfoDto user = userMapper.findUserById(id);
+        UserInfoDTO user = userMapper.findUserById(id);
         return user != null;
 
     }

@@ -94,4 +94,46 @@
             DELETED_AT IS NULL
     </select>
 
+    <update id="deleteReview" parameterType="int">
+        UPDATE REVIEW
+        SET DELETED_AT = SYSDATE
+        WHERE REVIEW_ID = #{reviewId}
+    </update>
+
+    <update id="setReviewSelection">
+        UPDATE REVIEW
+        SET IS_SELECTED = #{isSelected}
+        WHERE REVIEW_ID = #{reviewId}
+    </update>
+
+    <select id="getAllQna" resultType="com.review.shop.dto.qna.QnAListDTO">
+        SELECT
+            q.QNA_ID    AS qnaId,
+            q.TITLE     AS title,
+            u.NAME      AS userName  FROM QNA q
+                                              JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+        WHERE q.DELETED_AT IS NULL
+        ORDER BY q.QNA_ID DESC
+    </select>
+
+    <select id="getQnaDetail" parameterType="int" resultType="com.review.shop.dto.qna.QnADTO">
+        SELECT
+            q.QNA_ID      AS qnaId,
+            q.PRODUCT_ID  AS productId,
+
+            p.PRD_NAME    AS productName,
+            q.USER_ID     AS userId,
+            u.NAME        AS userName,
+            q.TITLE       AS title,
+            q.CONTENT     AS content,
+            q.ANSWER      AS answer,
+            q.CREATED_AT  AS createdAt,
+            q.ANSWERED_AT AS answeredAt
+        FROM QNA q
+                 LEFT JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+                 LEFT JOIN PRODUCT p ON q.PRODUCT_ID = p.PRODUCT_ID
+        WHERE q.QNA_ID = #{qnaId}
+    </select>
+
+
 </mapper>
