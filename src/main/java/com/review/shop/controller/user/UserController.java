@@ -35,7 +35,8 @@ public class UserController  {
     @PostMapping("/api/auth/register")
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
-        userService.registerUser(userDTO);
+        userService.registerUser
+                (userDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
