@@ -2,8 +2,6 @@ package com.review.shop.service.userinfo.other;
 
 
 import com.review.shop.dto.userinfo.others.Payment_MethodDTO;
-import com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO;
-import com.review.shop.repository.UserIdMapper;
 import com.review.shop.repository.userinfo.other.Payment_MethodMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,33 +11,33 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class Payment_MethodService {
-    private final UserIdMapper userIdMapper;
-    private final Payment_MethodMapper payment_MethodMapper;
 
-    public int getUser_id(String id){return userIdMapper.getUser_id(id);}
+    private final Payment_MethodMapper mapper;
 
-    public Payment_MethodResponseDTO getPayment_Method(int user_id){
-        List<Payment_MethodDTO> payments = payment_MethodMapper.getPayments(user_id);
-        Payment_MethodResponseDTO response = new Payment_MethodResponseDTO();
-        response.setPayment_methods(payments);
-        return response;
+
+    public List<Payment_MethodDTO> getAll(int user_id) {
+        return mapper.findAllByUser(user_id);
     }
 
-    public void addPayment_Method(int user_id, String card_company, String card_number){
-        boolean exists = payment_MethodMapper.existsPayment(user_id, card_number);
-        if (exists){
-            throw new IllegalStateException("이미 등록된 카드입니다. 중복 등록은 혀용되지 않습니다.");
+    public void create(Payment_MethodDTO dto) {
+        // 중복 결제 수단 체크
+        int exists = mapper.existsPayment(dto.getUser_id(), dto.getCard_number());
+        if (exists > 0) {
+            throw new IllegalArgumentException("이미 등록된 결제 수단입니다.");
         }
-        payment_MethodMapper.addPayment(user_id, card_company, card_number);
+        mapper.insert(dto);
     }
 
-    public void deletePayment_Method(int user_id, String card_company, String card_number, int payment_id){
-        boolean exists = payment_MethodMapper.existsPayment(user_id, card_number);
-        payment_MethodMapper.deletePayment(user_id, payment_id);
-    }
-
-    public void checkDefaultPayment(int user_id, int payment_id) {
-        payment_MethodMapper.checkDefaultPayment(user_id, payment_id);
+    public void delete(int payment_id, int user_id) {
+        // 삭제 전 해당 결제 수단이 user_id 소유인지 체크
+        Payment_MethodDTO payment = mapper.findById(payment_id);
+        if (payment == null) {
+            throw new IllegalArgumentException("삭제할 결제 수단이 존재하지 않습니다.");
+        }
+        if (payment.getUser_id() != user_id) {
+            throw new IllegalArgumentException("권한이 없는 결제 수단입니다.");
+        }
+        mapper.delete(payment_id, user_id);
     }
 
 }

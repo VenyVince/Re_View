@@ -1,55 +1,227 @@
-/* 컨테이너 */
-body{
-    font-family: 'Inter',sans-serif;
-}
+/* ============================
+   전체 헤더
+============================ */
 .rv-header {
-    height: 73px;                       /* 규격: 73 */
+    width: 100%;
+    height: 70px;
+    background-color: #ffffff;
     border-bottom: 1px solid #e5e5e5;
     display: flex;
-    justify-content: center;             /* 가운데 정렬 */
     align-items: center;
-    background: #fff;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .rv-header__inner {
-    width: 100%;
-    max-width: 1200px;                   /* 필요시 조절 */
+    width: 1200px;
+    max-width: 96%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
-    box-sizing: border-box;
 }
 
-/* 로고 */
+/* ============================
+   로고
+============================ */
 .rv-header__logo {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0;
     cursor: pointer;
 }
 
-/* 네비게이션 */
+/* ============================
+   네비게이션 메뉴
+============================ */
 .rv-nav {
-    margin-left: 100px;
     display: flex;
-    gap: 40px;
+    gap: 32px;
 }
 
-.rv-nav__item {
-    font-size: 16px;                     /* 규격: 16 */
-    color: #111;
+.rv-nav a {
     text-decoration: none;
-    line-height: 1;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
 }
 
-.rv-nav__item:hover {
-    opacity: 0.7;
+.rv-nav a:hover {
+    color: #000;
 }
 
-/* 우측 영역 (검색 + 아바타) */
+/* ============================
+   오른쪽 영역
+============================ */
 .rv-right {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+/* ============================
+   인증 영역 (로그인/마이페이지)
+============================ */
+.rv-auth-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rv-user-label {
+    font-size: 14px;
+    color: #444;
+}
+
+/* ADMIN 뱃지 */
+.rv-admin-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    margin-left: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    background-color: #333;
+    color: white;
+    border-radius: 4px;
+}
+
+/* ============================
+   버튼 스타일 (무채색 버전)
+============================ */
+.rv-btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+/* 진한 검정 버튼 (로그인 같은 주요 버튼) */
+.rv-btn-primary {
+    background-color: #222;
+    color: white;
+    border: none;
+}
+.rv-btn-primary:hover {
+    background-color: #000;
+}
+
+/* 회색 테두리 버튼 (마이페이지 등) */
+.rv-btn-outline {
+    background-color: transparent;
+    color: #444;
+    border: 1px solid #888;
+}
+.rv-btn-outline:hover {
+    background-color: #f0f0f0;
+    border-color: #555;
+    color: #000;
+}
+
+/* 고스트 버튼 (로그아웃) */
+.rv-btn-ghost {
+    background-color: transparent;
+    color: #555;
+    border: none;
+}
+.rv-btn-ghost:hover {
+    color: #111;
+}
+
+/* 회원가입 텍스트 링크 */
+.rv-link {
+    color: #666;
+    font-size: 14px;
+    text-decoration: none;
+}
+.rv-link:hover {
+    color: #000;
+}
+
+/* ============================
+    로그인 / 회원가입 버튼 (비로그인 상태)
+============================ */
+.rv-auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rv-btn-login,
+.rv-btn-register {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* 로그인 버튼: 무채색 톤 */
+.rv-btn-login {
+    background-color: #f2f2f2;
+    border: 1px solid #d3d3d3;
+    color: #333;
+}
+
+.rv-btn-login:hover {
+    background-color: #e6e6e6;
+}
+
+/* 회원가입 버튼: 조금 더 강조 */
+.rv-btn-register {
+    background-color: #ffffff;
+    border: 1px solid #bdbdbd;
+    color: #333;
+}
+
+.rv-btn-register:hover {
+    background-color: #f7f7f7;
+}
+
+
+/* ============================
+    유저 메뉴 (로그인 상태)
+============================ */
+.rv-user-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rv-user-nickname {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* 마이페이지 버튼 */
+.rv-btn-mypage {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.rv-btn-mypage:hover {
+    background-color: #f0f0f0;
+}
+
+/* 로그아웃 버튼 */
+.rv-btn-logout {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #555;
+    background-color: transparent;
+    border: 1px solid #c2c2c2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rv-btn-logout:hover {
+    background-color: #e6e6e6;
 }

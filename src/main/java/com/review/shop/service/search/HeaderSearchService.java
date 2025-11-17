@@ -20,10 +20,10 @@ public class HeaderSearchService {
 
     private final HeaderSearchProductMapper productMapper;
 
-    public HeaderSearchDTO search(String keyword, String sort, float filter_rating) {
+    public HeaderSearchDTO search(String keyword, String sort, String filter_brand, String filter_category) {
         try {
-            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_rating);
-            List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword, sort, filter_rating);
+            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_brand, filter_category);
+            List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword, sort, filter_brand, filter_category);
 
             if (products.isEmpty() && reviews.isEmpty()) {
                 throw new ResourceNotFountException("검색 결과가 존재하지 않습니다");
@@ -31,7 +31,6 @@ public class HeaderSearchService {
 
             HeaderSearchDTO response = new HeaderSearchDTO();
             response.setReviews(reviews);
-            response.setProducts(products);
 
             return response;
         } catch (DataAccessException e) {

@@ -3,25 +3,27 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--sort: 생성일, 별점, 추천-->
-<mapper namespace="com.review.shop.repository.search.header.HeaderSearchReviewMapper">
+<mapper namespace="com.review.shop.repository.review.MyPageReviewMapper">
 
-    <select id="searchReviews" resultType="com.review.shop.dto.search.HeaderSearchReviewDTO">
-        SELECT r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at,
-               p.prd_name, p.prd_brand,
-               u.nickname,
-               b.type as user_baumann_type
+    <select id="SearchMyReviews" resultType="com.review.shop.dto.review.MyPageReviewDTO">
+        SELECT
+        p.prd_name,
+        r.content, r.created_at, r.rating
+        u.baumann_id
         FROM review r
-        JOIN product p on r.product_id = p.product_id
+        JOIN product p ON r.product_id = p.product_id
         JOIN user_table u on r.user_id = u.user_id
-        JOIN baumann b ON u.baumann_id = b.baumann_id
-        WHERE (r.content LIKE '%' || #{keyword} || '%'
-        OR u.nickname LIKE '%' || #{keyword} || '%')
-        <if test="filter_brand != null and filter_brand != ''">
-            AND p.prd_brand = #{filter_brand}
+        WHERE r.user_id = #{user_id}
+
+        <if test="keyword != null and keyword != ''">
+        AND (p.prd_name LIKE '%', #{keyword}, '%'
+            OR r.content LIKE '%', #{keyword}, '%')
         </if>
-        <if test="filter_category != null and filter_category != ''">
-            AND p.category = #{filter_category}
+
+        <if test="filter_rating > 0">
+            AND r.rating &gt;= #{filter_rating}
         </if>
+
         <choose>
             <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
@@ -36,13 +38,12 @@
                 ORDER BY r.rating ASC
             </when>
             <when test="sort == 'likes'">
-                order by r.like_count DESC
+                ORDER BY r.like_count DESC
             </when>
             <otherwise>
                 ORDER BY r.created_at DESC
             </otherwise>
         </choose>
-
     </select>
 
 </mapper>

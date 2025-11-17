@@ -8,5 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface HeaderSearchProductMapper {
-    List<HeaderSearchProductDTO> searchProducts(@Param("keyword") String keyword, @Param("sort") String sort, @Param("filter_rating") float filter_rating);
+    List<HeaderSearchProductDTO> searchProducts(@Param("keyword") String keyword,
+                                                @Param("sort") String sort,
+                                                @Param("filter_category") String filter_category,
+                                                @Param("filter_brand") String filter_brand);
 }

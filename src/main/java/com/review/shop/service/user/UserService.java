@@ -5,6 +5,7 @@ import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
@@ -31,6 +33,7 @@ public class UserService implements UserDetailsService {
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
 
         UserInfoDTO encodedUser = new UserInfoDTO(
+                0,
                 userDTO.getId(),
                 encodedPassword,
                 userDTO.getName(),
@@ -49,6 +52,18 @@ public class UserService implements UserDetailsService {
     }
 
 
+    // ID로 사용자 정보 조회(user_id포함)
+    public UserInfoDTO getUserByLoginId(String id) {
+        log.debug("getUserByLoginId 호출 - id: {}", id);
+
+        UserInfoDTO user = userMapper.findUserById(id);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
+        }
+
+        return user;
+    }
 
     // AuthenticationManager가 UserDetails을 받기위한 메소드
     // 로그인 데이터와 UserDetails의 데이터를 비교하여 인증 처리

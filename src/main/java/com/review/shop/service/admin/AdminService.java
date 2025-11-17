@@ -2,6 +2,8 @@ package com.review.shop.service.admin;
 
 
 import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.dto.qna.QnADTO;
+import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.repository.admin.AdminMapper;
 import lombok.AllArgsConstructor;
@@ -69,5 +71,32 @@ public class AdminService {
     public List<ProductDetailDTO> getAllProducts() {
         return adminMapper.getAllProducts();
     }
+
+    //리뷰 삭제, 실제로 삭제 안하고 DELETED_DATE 플래그 설정
+    public void deleteReview(int reviewId) {
+        int affected = adminMapper.deleteReview(reviewId);
+        if (affected == 0) {
+            throw new DatabaseException("리뷰 삭제에 실패했습니다.", null);
+        }
+    }
+
+    //  setReviewSelection 구현 - 운영자 픽 설정 (테스트 완료)
+    public void setReviewSelection(int reviewId, Integer isSelected) {
+        int affected = adminMapper.setReviewSelection(reviewId, isSelected);
+        if (affected == 0) {
+            throw new DatabaseException("운영자 픽에 설정 실패했습니다.", null);
+        }
+    }
+
+    //getAllQna 구현 - 전체 QnA 목록 조회, repository 실행
+    public List<QnAListDTO> getAllQna() {
+        return adminMapper.getAllQna();
+    }
+
+    //getQnaDetail 구현 - QnA 상세 조회, repository 실행
+    public QnADTO getQnaDetail(int qnaId) {
+        return adminMapper.getQnaDetail(qnaId);
+    }
+
 
 }
