@@ -57,7 +57,7 @@ public class UserController  {
 
     // 로그인 로직 구현 (테스트 완료)
     @PostMapping("/api/auth/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<Map<String, Object>> login(
             @RequestBody LoginRequestDTO loginDto,
             HttpServletRequest request
     ) {
@@ -71,13 +71,19 @@ public class UserController  {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+
+
         //세션 저장, JessionID 자동 생성
         HttpSession session = request.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
-        return ResponseEntity.ok("로그인 성공");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "로그인 성공");
+        response.put("userId", loginDto.getId());
+        return ResponseEntity.ok(response);
     }
 
     // 비밀번호 재설정 로직 구현 (테스트 완료)
@@ -111,7 +117,7 @@ public class UserController  {
         }
     }
 
-    //회원가입 예외처리 핸들러
+    //회원가입 예외처리 핸들러 400으로 통일
     @ExceptionHandler(WrongRequestException.class)
     public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
         return ResponseEntity

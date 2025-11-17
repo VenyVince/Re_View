@@ -80,7 +80,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAllProducts());
     }
 
-    //어드민 관련 예외 처리 핸들러
+    //어드민 관련 예외 처리 핸들러 400으로 통일
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<String> handleWrongRequest(DatabaseException ex) {
         return ResponseEntity
