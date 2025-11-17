@@ -7,6 +7,16 @@ import com.review.shop.dto.user.PasswordUpdateDTO;
 import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
+// --- Swagger 어노테이션 Import ---
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+// ---------------------------------
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -24,14 +34,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Tag(name = "User Authentication", description = "회원 인증 API")
 @RestController
 @AllArgsConstructor
-
 public class UserController  {
     UserService userService;
     private final AuthenticationManager authenticationManager;
 
-    // 회원가입 로직 구현 (테스트 완료)
+    @Operation(summary = "회원 가입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원가입 성공 (메시지 문자열 반환)"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (입력값 오류, ID 중복 등)",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/api/auth/register")
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
@@ -40,7 +55,16 @@ public class UserController  {
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
 
-    //아이디 중복 확인 (테스트 완료)
+    @Operation(summary = "아이디 중복 확인")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "확인할 아이디", required = true,
+            content = @Content(schema = @Schema(type = "object", example = "{\"id\": \"testuser123\"}"))
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용 가능한 아이디 (메시지 문자열 반환)"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이미 사용 중인 아이디)",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/api/auth/check-id")
     public ResponseEntity<String> checkDuplicateId(@RequestBody Map<String, String> payload) {
         boolean isDuplicate = userService.isDuplicateId(payload.get("id"));
@@ -48,6 +72,7 @@ public class UserController  {
         if (isDuplicate) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
+
                     .body("이미 사용 중인 아이디입니다.");
         } else {
             return ResponseEntity
@@ -55,25 +80,27 @@ public class UserController  {
         }
     }
 
-    // 로그인 로직 구현 (테스트 완료)
+    @Operation(summary = "로그인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공 (JSON 객체 반환)",
+                    content = @Content(schema = @Schema(type = "object", example = "{\"message\": \"로그인 성공\", \"userId\": \"testuser123\"}"))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 비밀번호 오류)",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(
             @RequestBody LoginRequestDTO loginDto,
+            @Parameter(hidden = true)
             HttpServletRequest request
     ) {
 
-        // ID/PW로 인증 토큰 생성
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(loginDto.getId(), loginDto.getPassword());
 
-        // 해당 토큰을 활용하여 authentication 수행
         Authentication authentication = authenticationManager.authenticate(token);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-
-
-        //세션 저장, JessionID 자동 생성
         HttpSession session = request.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
@@ -86,10 +113,18 @@ public class UserController  {
         return ResponseEntity.ok(response);
     }
 
-    // 비밀번호 재설정 로직 구현 (테스트 완료)
-    //passwordUpdateDto는 기존 비밀번호, 새 비밀번호를 포함
+    @Operation(summary = "비밀번호 재설정 (인증 필요)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "비밀번호 재설정 성공 (메시지 문자열 반환)"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (현재 비밀번호 불일치, 인증 정보 없음 등)",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/api/auth/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody PasswordUpdateDTO passwordUpdateDto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<String> resetPassword(
+            @RequestBody PasswordUpdateDTO passwordUpdateDto,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         userService.resetPassword(passwordUpdateDto, userDetails);
 
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
@@ -97,8 +132,11 @@ public class UserController  {
 
 
     //디버깅용, 추후에 삭제 예정
+    @Hidden // Swagger 문서에서 이 API를 숨깁니다.
     @GetMapping("/api/auth/me")
-    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getMyInfo(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
 
         if (userDetails != null) {
             String id = userDetails.getUsername();
@@ -108,7 +146,6 @@ public class UserController  {
             Map<String, String> userInfo = new HashMap<>();
             userInfo.put("id", id);
             userInfo.put("role", role);
-            //userDetails에서 password를 가져오면 null로 지워버림 (보안상 이유)
             userInfo.put("password", password);
 
             return ResponseEntity.ok(userInfo);
@@ -117,7 +154,7 @@ public class UserController  {
         }
     }
 
-    //회원가입 예외처리 핸들러 400으로 통일
+    @Hidden // Swagger 문서에서 예외 핸들러는 숨김
     @ExceptionHandler(WrongRequestException.class)
     public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
         return ResponseEntity
