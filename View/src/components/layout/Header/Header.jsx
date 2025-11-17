@@ -15,7 +15,7 @@ export default function Header() {
 
     const handleSearch = () => {
         if (keyword.trim() !== '') {
-            navigate(`/search?query=${encodeURIComponent(keyword)}`);
+            navigate(`/search?keyword=${encodeURIComponent(keyword)}`);
         }
     };
 
