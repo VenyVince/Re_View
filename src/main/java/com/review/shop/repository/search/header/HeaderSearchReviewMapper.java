@@ -8,5 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface HeaderSearchReviewMapper {
-    List<HeaderSearchReviewDTO> searchReviews(@Param("keyword") String keyword, @Param("sort") String sort, @Param("filter_rating") float filter_rating);
+    List<HeaderSearchReviewDTO> searchReviews(
+            @Param("keyword") String keyword,
+            @Param("sort") String sort,
+            @Param("filter_rating") float filter_rating);
 }
