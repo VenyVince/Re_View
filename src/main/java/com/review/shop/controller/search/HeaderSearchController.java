@@ -18,8 +18,8 @@ public class HeaderSearchController {
     public ResponseEntity<HeaderSearchDTO> search(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "latest") String sort,
-            @RequestParam(required = false, defaultValue = "0") String filter_brand,
-            @RequestParam(required = false, defaultValue = "0") String filter_category
+            @RequestParam(required = false, defaultValue = "") String filter_brand,
+            @RequestParam(required = false, defaultValue = "") String filter_category
     ) throws BadRequestException {
         if(keyword.length()<2){
             throw new BadRequestException("검색어는 2글자 이상부터입니다.");
