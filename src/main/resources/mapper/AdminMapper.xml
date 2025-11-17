@@ -106,34 +106,34 @@
         WHERE REVIEW_ID = #{reviewId}
     </update>
 
-
-    <resultMap id="QnaResultMap" type="com.review.shop.dto.qna.QnADTO">
-        <id property="qnaId"       column="QNA_ID" />
-
-        <result property="productId"  column="PRODUCT_ID" />
-        <result property="userId"     column="USER_ID" />
-        <result property="title"      column="TITLE" />
-        <result property="content"    column="CONTENT" />      <result property="answer"     column="ANSWER" />       <result property="createdAt"  column="CREATED_AT" />
-        <result property="deletedAt"  column="DELETED_AT" />
-        <result property="answeredAt" column="ANSWERED_AT" />
-    </resultMap>
-
-    <select id="getAllQna" resultMap="QnaResultMap">
+    <select id="getAllQna" resultType="com.review.shop.dto.qna.QnAListDTO">
         SELECT
-            QNA_ID,
-            PRODUCT_ID,
-            USER_ID,
-            TITLE,
-            CONTENT,
-            ANSWER,
-            CREATED_AT,
-            DELETED_AT,
-            ANSWERED_AT
-        FROM QNA
-        WHERE DELETED_AT IS NULL
-        ORDER BY CREATED_AT DESC
+            q.QNA_ID    AS qnaId,
+            q.TITLE     AS title,
+            u.NAME      AS userName  FROM QNA q
+                                              JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+        WHERE q.DELETED_AT IS NULL
+        ORDER BY q.QNA_ID DESC
     </select>
 
+    <select id="getQnaDetail" parameterType="int" resultType="com.review.shop.dto.qna.QnADTO">
+        SELECT
+            q.QNA_ID      AS qnaId,
+            q.PRODUCT_ID  AS productId,
+
+            p.PRD_NAME    AS productName,
+            q.USER_ID     AS userId,
+            u.NAME        AS userName,
+            q.TITLE       AS title,
+            q.CONTENT     AS content,
+            q.ANSWER      AS answer,
+            q.CREATED_AT  AS createdAt,
+            q.ANSWERED_AT AS answeredAt
+        FROM QNA q
+                 LEFT JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+                 LEFT JOIN PRODUCT p ON q.PRODUCT_ID = p.PRODUCT_ID
+        WHERE q.QNA_ID = #{qnaId}
+    </select>
 
 
 </mapper>

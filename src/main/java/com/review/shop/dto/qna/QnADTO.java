@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QnADTO {
     private Long qnaId;
-    private Long productId;
-    private Long userId;
+    private String productName;
+    private String userName;
     private String title;
     private String content;
     private String answer;

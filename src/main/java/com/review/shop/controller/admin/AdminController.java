@@ -1,7 +1,7 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.ProductDetailDTO;
-import com.review.shop.dto.qna.QnADTO;
+import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -146,17 +146,33 @@ public class AdminController {
             @ApiResponse(responseCode = "200", description = "QnA 목록 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = QnADTO.class))
+                            array = @ArraySchema(schema = @Schema(implementation = QnAListDTO.class))
                     )
             ),
             @ApiResponse(responseCode = "400", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @GetMapping("/allqna")
+    @GetMapping("/qna")
     public ResponseEntity<?> getAllQna() {
         return ResponseEntity.ok(adminService.getAllQna());
 
     }
+
+    @Operation(summary = "QnA 상세 조회", description = "특정 QnA 게시글의 상세 내용을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "QnA 상세 조회 성공",
+                    content = @Content(schema = @Schema(implementation = com.review.shop.dto.qna.QnADTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/qna/{qnaId}")
+    public ResponseEntity<?> getQnaDetail(
+            @Parameter(description = "조회할 QnA의 ID") @PathVariable int qnaId) {
+        return ResponseEntity.ok(adminService.getQnaDetail(qnaId));
+    }
+
+
 
     @Operation(summary = "QnA 답변 등록/수정", description = "QnA 게시글에 관리자 답변을 등록하거나 수정합니다.")
     @ApiResponses(value = {

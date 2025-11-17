@@ -3,6 +3,7 @@ package com.review.shop.service.admin;
 
 import com.review.shop.dto.ProductDetailDTO;
 import com.review.shop.dto.qna.QnADTO;
+import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.repository.admin.AdminMapper;
 import lombok.AllArgsConstructor;
@@ -88,8 +89,14 @@ public class AdminService {
     }
 
     //getAllQna 구현 - 전체 QnA 목록 조회, repository 실행
-    public List<QnADTO> getAllQna() {
+    public List<QnAListDTO> getAllQna() {
         return adminMapper.getAllQna();
     }
+
+    //getQnaDetail 구현 - QnA 상세 조회, repository 실행
+    public QnADTO getQnaDetail(int qnaId) {
+        return adminMapper.getQnaDetail(qnaId);
+    }
+
 
 }
