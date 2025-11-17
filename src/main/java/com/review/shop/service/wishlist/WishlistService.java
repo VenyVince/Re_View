@@ -15,10 +15,6 @@ public class WishlistService {
     private final UserIdMapper userIdMapper;
     private final WishlistMapper wishlistMapper;
 
-    public int getUser_id(String id){
-        return userIdMapper.getUser_id(id);
-    }
-
     public WishlistResponseDTO getWishlist(int user_id){
         List<WishlistDTO> wishlist =  wishlistMapper.getWishlist(user_id);
         WishlistResponseDTO response = new WishlistResponseDTO();

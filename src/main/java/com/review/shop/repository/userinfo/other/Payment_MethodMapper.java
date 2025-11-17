@@ -8,18 +8,18 @@ import java.util.List;
 
 @Mapper
 public interface Payment_MethodMapper {
-    List<Payment_MethodDTO> getPayments(@Param("user_id") int user_id);
 
-    boolean existsPayment(@Param("user_id") int user_id,
-                          @Param("card_number") String card_number);
+    // 전체 조회
+    List<Payment_MethodDTO> findAllByUser(int user_id);
 
-    void addPayment(@Param("user_id") int user_id,
-                    @Param("card_company") String card_company,
-                    @Param("card_number") String card_number);
+    // 추가
+    void insert(Payment_MethodDTO dto);
 
-    void checkDefaultPayment(@Param("user_id") int user_id,
-                             @Param("payment_id") int payment_id);
+    // 삭제
+    void delete(int payment_id, int user_id);
 
-    void deletePayment(@Param("user_id") int user_id,
-                       @Param("payment_id") int payment_id);
+
+    // 중복 체크용
+    Payment_MethodDTO findById(@Param("payment_id") int payment_id);
+    int existsPayment(@Param("user_id") int user_id, @Param("card_number") String card_number);
 }
