@@ -78,6 +78,13 @@ public class UserController  {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
+
+        //user_id 조회
+        UserInfoDTO user = userService.getUserByLoginId(loginDto.getId());
+
+        //user_id를 세션에 저장
+        session.setAttribute("userId", user.getUser_id());
+
         return ResponseEntity.ok("로그인 성공");
     }
 
