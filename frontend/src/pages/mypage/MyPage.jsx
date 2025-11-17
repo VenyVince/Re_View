@@ -1,11 +1,16 @@
+import { useAuth } from "../../context/AuthContext";
 import AdminProductPage from "./admin/AdminProductPage";
-// 일반 사용자 마이페이지 컴포넌트도 나중에 연결
-const UserMyPage = () => <div style={{padding:24}}>일반 사용자 마이페이지</div>;
 
 export default function MyPage() {
-    // 로그인 시 저장한 값 사용 { loggedIn:true, role:'ADMIN'|'USER' }
-    const auth = JSON.parse(localStorage.getItem("auth") || "{}");
+    const { auth } = useAuth();
 
-    if (auth?.role === "ADMIN") return <AdminProductPage />;
-    return <UserMyPage />;
+    if (!auth.loggedIn) return <div>로그인 해주세요</div>;
+
+    // 관리자면 관리자 페이지로
+    if (auth.role === "ROLE_ADMIN") {
+        return <AdminProductPage />;
+    }
+
+    // 일반 유저 페이지
+    return <div>일반 사용자 마이페이지</div>;
 }

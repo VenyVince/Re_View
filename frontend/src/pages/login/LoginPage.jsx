@@ -1,5 +1,5 @@
 // src/pages/login/LoginPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import logo from '../../assets/logo.png';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,19 +7,25 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
+    //로그인 폼
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [saveId, setSaveId] = useState(false);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
-    const { login } = useAuth();   // 전역 로그인 상태 업데이트
+
+
+    const { login } = useAuth();   // 전역 로그인 상태 업데이트용
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
         try {
-            const res = await axios.post(
+            const response = await axios.post(
                 '/api/auth/login',
                 { id, password },
                 {
@@ -28,50 +34,46 @@ export default function LoginPage() {
                 }
             );
 
-            console.log('✅ 로그인 응답 원본:', res.data);
-
-            // 1) HTTP 상태코드 200 이면 일단 "로그인 성공"으로 처리
-            if (res.status === 200) {
-                let userId = null;
-                let nickname = null;
-
-                // 2-a) 스펙대로 { status, message, data: { user_id, nickname } } 를 보낸 경우
-                if (typeof res.data === 'object' && res.data !== null && res.data.data) {
-                    const { user_id, nickname: nickFromServer } = res.data.data;
-                    userId = user_id;
-                    nickname = nickFromServer;
-                }
-                // 2-b) 현재 컨트롤러처럼 "로그인 성공" 문자열만 보내는 경우
-                else {
-                    userId = id;        // 일단 입력한 id로 세션 표시
-                    nickname = id;      // 헤더에 보여줄 이름도 일단 id 사용
+            if (response.status === 200 && response.data === "로그인 성공") {
+                // 아이디 저장 체크된 경우에만 localStorage에 저장
+                if (saveId) {
+                    localStorage.setItem('savedId', id);
+                } else {
+                    localStorage.removeItem('savedId');
                 }
 
-                // 전역 auth 상태 반영
+
+                // 로그인 아이디를 userId로 사용
                 login({
-                    userId,
-                    nickname,
-                    role: 'USER',   // 나중에 서버에서 role 내려주면 그 값 사용
+                    userId: id,
+                    role: 'ROLE',   // 나중에 role 내려주면 이 값 교체
                 });
-
-                alert(`${nickname}님 환영합니다!`);
+                login(id);
                 navigate('/');
                 return;
             }
 
-            // 여기까지 왔다는 건 200이 아닌데 에러도 안 던져진 특이 케이스
             setError('로그인 응답 형식이 올바르지 않습니다.');
         } catch (err) {
-            console.error('로그인 에러:', err);
+            console.error('❌ 로그인 실패:', err);
 
-            if (err.response?.status === 401) {
-                setError(
-                    err.response.data?.message ||
-                    '아이디 또는 비밀번호가 올바르지 않습니다.'
-                );
+            if (err.response) {
+                switch (err.response.status) {
+                    case 400:
+                    case 401:
+                        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+                        break;
+                    default:
+                        setError('서버에서 오류가 발생했습니다.');
+                        break;
+                }
+            } else if (err.request) {
+                setError('서버와 연결할 수 없습니다. 네트워크를 확인해주세요.');
             } else {
-                setError('서버와의 통신 중 오류가 발생했습니다.');
+                setError('로그인 요청 중 오류가 발생했습니다.');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -86,6 +88,7 @@ export default function LoginPage() {
                     value={id}
                     onChange={(e) => setId(e.target.value)}
                     required
+                    disabled={loading}
                 />
                 <input
                     type="password"
@@ -93,11 +96,14 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading}
                 />
 
                 {error && <p className="error-message">{error}</p>}
 
-                <button type="submit">로그인</button>
+                <button type="submit" disabled={loading}>
+                    {loading ? '로그인 중...' : '로그인'}
+                </button>
             </form>
 
             <div className="login-options">

@@ -52,4 +52,49 @@ body{
     display: flex;
     align-items: center;
     gap: 16px;
+}/* 로그인 버튼 */
+.rv-login-btn {
+    margin-left: 12px;
+    padding: 8px 16px;
+    border: 1px solid #444;
+    background: white;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* 로그인 후 닉네임 + 버튼 */
+.rv-user-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 12px;
+}
+
+.rv-user-nickname {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.rv-mypage-btn {
+    padding: 8px 12px;
+    background: #333;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.rv-logout-btn {
+    padding: 8px 12px;
+    border: 1px solid #e14c4c;
+    background: white;
+    color: #e14c4c;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.rv-logout-btn:hover {
+    background: #ffe7e7;
 }
