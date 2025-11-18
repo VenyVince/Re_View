@@ -1,6 +1,7 @@
 package com.review.shop.repository.userinfo.other;
 
 import com.review.shop.dto.userinfo.others.Payment_MethodDTO;
+import com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public interface Payment_MethodMapper {
 
     // 전체 조회
-    List<Payment_MethodDTO> findAllByUser(int user_id);
+    List<Payment_MethodResponseDTO> findAllByUser(int user_id);
 
     // 추가
     void insert(Payment_MethodDTO dto);

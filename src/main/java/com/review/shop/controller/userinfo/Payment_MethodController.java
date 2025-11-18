@@ -3,6 +3,7 @@ package com.review.shop.controller.userinfo;
 
 import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.userinfo.others.Payment_MethodDTO;
+import com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO;
 import com.review.shop.service.userinfo.other.Payment_MethodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class Payment_MethodController {
 
 
     @GetMapping
-    public List<Payment_MethodDTO> getAll() {
+    public List<Payment_MethodResponseDTO> getAll() {
         int user_id = securityUtil.getCurrentUserId();
         return service.getAll(user_id);
     }

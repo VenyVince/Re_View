@@ -1,11 +1,15 @@
 package com.review.shop.dto.userinfo.others;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
-
+import lombok.NoArgsConstructor;
 
 @Data
-public class Payment_MethodResponseDTO {
-    List<Payment_MethodDTO> payment_methods;
+@AllArgsConstructor
+@NoArgsConstructor
+public class Payment_MethodResponseDTO
+{
+    private int payment_id;
+    private String card_company;
+    private String card_number;
 }
