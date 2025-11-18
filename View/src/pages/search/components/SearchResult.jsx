@@ -20,13 +20,26 @@ export default function SearchResult({
         );
     }
 
-    // ⭐ 상품 모드
+    // 카테고리 매핑
+    const categoryMap = {
+        "스킨 / 토너": ["스킨", "토너"],
+        "에센스 / 세럼 / 앰플": ["에센스", "세럼", "앰플"],
+        "크림": ["크림"],
+        "로션": ["로션"],
+        "미스트 / 오일": ["미스트", "오일"],
+    };
+
+    const matchedCategories = categoryMap[selectedCategory] || [];
+
+    // 상품 모드
     if (mode === "product") {
         const filteredProducts = safeResults.filter((p) => {
-            // 🔥 prd_category가 백엔드에서 안 오는 상태 → 비교하면 무조건 false
-            // if (selectedCategory && p.prd_category !== selectedCategory) return false;
-
             if (selectedBrand && p.prd_brand !== selectedBrand) return false;
+
+            if (selectedCategory) {
+                if (!matchedCategories.includes(p.category)) return false;
+            }
+
             return true;
         });
 
@@ -34,21 +47,21 @@ export default function SearchResult({
             <div className="product-list">
                 {filteredProducts.map((p, idx) => (
                     <div key={idx} className="product-card">
-                        <p className="product-name">{p.prd_name}</p>
                         <p className="product-brand">{p.prd_brand}</p>
+                        <p className="product-name">{p.prd_name}</p>
                         <p className="product-price">
                             {p.price?.toLocaleString()}원
                         </p>
+                        <p className="product-rating">⭐ {p.rating}</p>
                     </div>
                 ))}
             </div>
         );
     }
 
-    // ⭐ 리뷰 모드
+    // 리뷰 모드
     const filteredReviews = safeResults.filter((r) => {
         if (selectedBrand && r.prd_brand !== selectedBrand) return false;
-        // 리뷰에서는 category 필드가 있을 수도 있고 없을 수도 있음 → 그대로 둠
         return true;
     });
 

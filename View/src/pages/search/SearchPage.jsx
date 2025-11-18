@@ -15,7 +15,7 @@ export default function SearchPage() {
     const keyword = queryParams.get("keyword") || "";
     const categoryParam = queryParams.get("category") || "";
 
-    const [mode, setMode] = useState("review");
+    const [mode, setMode] = useState("product"); // 상품 먼저 표시
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedBrand, setSelectedBrand] = useState("");
     const [products, setProducts] = useState([]);
@@ -23,17 +23,45 @@ export default function SearchPage() {
     const [brands, setBrands] = useState([]);
     const [error, setError] = useState("");
 
+    // 카테고리 자동 감지용 매핑
+    const categoryKeywords = {
+        "스킨": "스킨 / 토너",
+        "토너": "스킨 / 토너",
+        "에센스": "에센스 / 세럼 / 앰플",
+        "세럼": "에센스 / 세럼 / 앰플",
+        "앰플": "에센스 / 세럼 / 앰플",
+        "크림": "크림",
+        "로션": "로션",
+        "미스트": "미스트 / 오일",
+        "오일": "미스트 / 오일",
+    };
+
+    // URL categoryParam 적용
     useEffect(() => {
         if (categoryParam) {
             setSelectedCategory(categoryParam);
         }
     }, [categoryParam]);
 
+    // keyword 기반 카테고리 자동 선택
+    useEffect(() => {
+        if (!keyword) return;
+
+        for (const [key, value] of Object.entries(categoryKeywords)) {
+            if (keyword.includes(key)) {
+                setSelectedCategory(value);
+                break;
+            }
+        }
+    }, [keyword]);
+
+    // 검색 API
     useEffect(() => {
         const fetchSearch = async () => {
             if (!keyword || keyword.length < 2) {
                 setProducts([]);
                 setReviews([]);
+                setError("");
                 return;
             }
 
@@ -42,10 +70,7 @@ export default function SearchPage() {
                     params: {
                         keyword,
                         sort: "latest",
-                        filter_rating: 0,
-                        filter_brand: selectedBrand,
-                        filter_category: selectedCategory
-                    }
+                    },
                 });
 
                 const responseProducts = res.data.products || [];
@@ -55,8 +80,8 @@ export default function SearchPage() {
                 setReviews(responseReviews);
 
                 const brandCountMap = {};
-                responseReviews.forEach(r => {
-                    const brand = r.prd_brand || "기타";
+                responseProducts.forEach((p) => {
+                    const brand = p.prd_brand || "";
                     brandCountMap[brand] = (brandCountMap[brand] || 0) + 1;
                 });
 
@@ -65,8 +90,13 @@ export default function SearchPage() {
                     .sort((a, b) => b.count - a.count);
 
                 setBrands(sortedBrands);
-
                 setError("");
+
+                // keyword가 브랜드라면 자동 active
+                const brandNames = sortedBrands.map((b) => b.name);
+                if (brandNames.includes(keyword)) {
+                    setSelectedBrand(keyword);
+                }
 
             } catch (err) {
                 setError("검색 결과를 불러오지 못했습니다.");
@@ -76,10 +106,7 @@ export default function SearchPage() {
         };
 
         fetchSearch();
-    }, [keyword, selectedBrand, selectedCategory]);
-
-    // ⭐ 카테고리 값 확인용 (문제 해결 전 필요한 최소 변경)
-    console.log("🔥 category check:", products[0]?.prd_category);
+    }, [keyword]);
 
     return (
         <section className="search-page">
