@@ -1,6 +1,6 @@
 package com.review.shop.controller.admin;
 
-import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.service.admin.AdminService;

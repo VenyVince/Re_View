@@ -4,7 +4,7 @@
 
 <mapper namespace="com.review.shop.repository.admin.AdminMapper">
 
-    <insert id="insertProduct" parameterType="com.review.shop.dto.ProductDetailDTO"
+    <insert id="insertProduct" parameterType="com.review.shop.dto.product.ProductDetailDTO"
             useGeneratedKeys="true">
         INSERT INTO PRODUCT (
             PRD_NAME,
@@ -75,7 +75,7 @@
         SELECT POINT FROM USER_TABLE WHERE USER_ID = #{memberId}
     </select>
 
-    <select id="getAllProducts" resultType="com.review.shop.dto.ProductDetailDTO">
+    <select id="getAllProducts" resultType="com.review.shop.dto.product.ProductDetailDTO">
         SELECT
             PRD_NAME        AS prdName,
             PRD_BRAND       AS prdBrand,
