@@ -46,9 +46,8 @@ export default function AdminQnaPage() {
 
     const handleClickRow = (item) => {
         // 🔹 질문 클릭 시 답변 페이지로 이동 + 상태 전달
-        // 백엔드 응답 필드: qnaId, username, title ...
         const qnaId = item.qnaId ?? item.id;
-        navigate(`/mypage/admin/qna/${qnaId}`, { state: item });
+        navigate(`/admin/qna/${qnaId}`, { state: item });
     };
 
     return (

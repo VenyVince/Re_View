@@ -19,9 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// TEST
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import java.util.Map;
 
 @Tag(name = "Admin API", description = "관리자 기능 API")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true") //
 @RestController
 @RequestMapping("/api/admin")
 @AllArgsConstructor
