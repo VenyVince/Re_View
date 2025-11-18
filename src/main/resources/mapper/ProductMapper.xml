@@ -4,7 +4,6 @@
 
 <mapper namespace="com.review.shop.repository.product.ProductMapper">
 
-    <!-- 상품 목록 조회 -->
     <select id="selectProductList" resultType="com.review.shop.dto.product.ProductDTO">
         SELECT
         product_id,
@@ -31,7 +30,6 @@
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
 
-    <!-- 상품 전체 개수 -->
     <select id="selectProductCount" resultType="int">
         SELECT COUNT(*)
         FROM product
@@ -39,5 +37,29 @@
         AND is_sold_out = '0'
     </select>
 
-</mapper>
+    <select id="selectProductDetail" resultType="com.review.shop.dto.product.ProductDetailDTO">
+        SELECT
+        product_id,
+        prd_name,
+        prd_brand,
+        price,
+        category,
+        rating,
+        ingredient,
+        description,
+        stock,
+        review_count,
+        is_sold_out,
+        baumann_id
+        FROM product
+        WHERE product_id = #{productId}
+        AND deleted_at IS NULL
+    </select>
 
+    <select id="selectProductImages" resultType="string">
+        SELECT image_url
+        FROM product_image
+        WHERE product_id = #{productId}
+    </select>
+
+</mapper>

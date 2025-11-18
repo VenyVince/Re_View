@@ -1,6 +1,6 @@
 package com.review.shop.repository.admin;
 
-import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnADTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import org.apache.ibatis.annotations.Mapper;
