@@ -77,21 +77,25 @@
 
     <select id="getAllProducts" resultType="com.review.shop.dto.product.ProductDetailDTO">
         SELECT
-            PRD_NAME        AS prdName,
-            PRD_BRAND       AS prdBrand,
-            INGREDIENT      AS ingredient,
-            PRICE           AS price,
-            CATEGORY        AS category,
-            STOCK           AS stock,
-            RATING          AS rating,
-            DESCRIPTION     AS description,
-            REVIEW_COUNT    AS reviewCount,
-            BAUMANN_ID      AS baumannId,
-            IS_SOLD_OUT     AS isSoldOut
+            P.PRODUCT_ID      AS product_id,   P.PRD_NAME        AS prd_name,
+            P.PRD_BRAND       AS prd_brand,
+            P.INGREDIENT      AS ingredient,
+            P.PRICE           AS price,
+            P.CATEGORY        AS category,
+            P.STOCK           AS stock,
+            P.RATING          AS rating,
+            P.DESCRIPTION     AS description,
+            P.REVIEW_COUNT    AS review_count,
+            P.BAUMANN_ID      AS baumann_id,
+            P.IS_SOLD_OUT     AS is_sold_out,
+            (
+                SELECT LISTAGG(PI.IMAGE_URL, ',') WITHIN GROUP (ORDER BY PI.PRD_IMG_ID)
+        FROM PRODUCT_IMAGE PI
+        WHERE PI.PRODUCT_ID = P.PRODUCT_ID  ) AS product_image  -- 모든 이미지 URL을 콤마로 구분하여 합침
         FROM
-            PRODUCT
+            PRODUCT P
         WHERE
-            DELETED_AT IS NULL
+            P.DELETED_AT IS NULL
     </select>
 
     <update id="deleteReview" parameterType="int">
