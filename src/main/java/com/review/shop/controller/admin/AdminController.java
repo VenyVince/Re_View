@@ -1,7 +1,8 @@
 package com.review.shop.controller.admin;
 
-import com.review.shop.dto.ProductDetailDTO;
+import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnAListDTO;
+import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -165,7 +166,7 @@ public class AdminController {
     @Operation(summary = "QnA 상세 조회", description = "특정 QnA 게시글의 상세 내용을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "QnA 상세 조회 성공",
-                    content = @Content(schema = @Schema(implementation = com.review.shop.dto.qna.QnADTO.class))
+                    content = @Content(schema = @Schema(implementation = QnaDTO.class))
             ),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))

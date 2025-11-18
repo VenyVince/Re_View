@@ -1,8 +1,8 @@
 package com.review.shop.service.admin;
 
 
-import com.review.shop.dto.ProductDetailDTO;
-import com.review.shop.dto.qna.QnADTO;
+import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.repository.admin.AdminMapper;
@@ -94,7 +94,7 @@ public class AdminService {
     }
 
     //getQnaDetail 구현 - QnA 상세 조회, repository 실행
-    public QnADTO getQnaDetail(int qnaId) {
+    public QnaDTO getQnaDetail(int qnaId) {
         return adminMapper.getQnaDetail(qnaId);
     }
 

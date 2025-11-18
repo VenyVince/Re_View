@@ -2,6 +2,7 @@ package com.review.shop.service.userinfo.other;
 
 
 import com.review.shop.dto.userinfo.others.Payment_MethodDTO;
+import com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO;
 import com.review.shop.repository.userinfo.other.Payment_MethodMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class Payment_MethodService {
     private final Payment_MethodMapper mapper;
 
 
-    public List<Payment_MethodDTO> getAll(int user_id) {
+    public List<Payment_MethodResponseDTO> getAll(int user_id) {
         return mapper.findAllByUser(user_id);
     }
 

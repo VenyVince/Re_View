@@ -6,7 +6,7 @@
 <mapper namespace="com.review.shop.repository.userinfo.other.Payment_MethodMapper">
 
     <!-- 결제 수단 조회 -->
-    <select id="findAllByUser" resultType="com.review.shop.dto.userinfo.others.Payment_MethodDTO">
+    <select id="findAllByUser" resultType="com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO">
         SELECT payment_id, user_id, card_company, card_number
         FROM payment_methods
         WHERE USER_ID = #{user_id}
