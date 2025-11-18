@@ -116,7 +116,7 @@
         ORDER BY q.QNA_ID DESC
     </select>
 
-    <select id="getQnaDetail" parameterType="int" resultType="com.review.shop.dto.qna.QnADTO">
+    <select id="getQnaDetail" parameterType="int" resultType="com.review.shop.dto.qna.QnaDTO">
         SELECT
             q.QNA_ID      AS qnaId,
             q.PRODUCT_ID  AS productId,
