@@ -34,7 +34,7 @@ public class UserInfoService {
 
         // null이면 기존값 유지
         if(updateDTO.getNickname() == null) updateDTO.setNickname(existingUser.getNickname());
-        if(updateDTO.getPhoneNumber() == null) updateDTO.setPhoneNumber(existingUser.getPhoneNumber());
+        if(updateDTO.getPhone_number() == null) updateDTO.setPhone_number(existingUser.getPhone_number());
         if(updateDTO.getBaumann_id()==null) updateDTO.setBaumann_id(existingUser.getBaumann_id());
 
         // Mapper 호출
