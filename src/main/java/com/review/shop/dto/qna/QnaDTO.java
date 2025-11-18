@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @AllArgsConstructor
-public class QnADTO {
+public class QnaDTO {
     private Long qnaId;
     private String productName;
     private String userName;
