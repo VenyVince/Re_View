@@ -35,7 +35,9 @@ import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
 import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
 import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
 
-import TestProduct from "./TestProduct";
+import UserSidebarMenu from "./pages/mypage/user/UserSidebarMenu";
+import UserDashboard from "./pages/mypage/user/UserDashboard";
+import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 
 
 
@@ -66,7 +68,7 @@ export default function App() {
                     <Route path="/survey/intro" element={<SurveyIntro/>}/>
                     <Route path="/survey/baumann" element={<SurveyPage/>}/>
                     <Route path="/survey/result" element={<SurveyResult/>}/>
-                    <Route path="/mypage" element={<MyPage />} />
+                    {/*<Route path="/mypage" element={<MyPage />} />*/}
 
 
                     {/* 관리자 전용 영역 */}
@@ -78,6 +80,14 @@ export default function App() {
                             <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
                         </Route>
                     </Route>
+
+                    {/* 사용자 전용 영역 */}
+                    <Route path="/mypage" element={<UserDashboard />} />
+                    <Route path="/mypage/profile" element={<UserProfileEdit />} />
+
+                    {/*<Route element={<ProtectedRoute requireUser />}>*/}
+                    {/*</Route>*/}
+
                 </Routes>
                 </main>
                 <Footer />
