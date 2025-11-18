@@ -3,8 +3,9 @@ import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchAdminProducts } from "../../../api/admin/adminProductApi";
 import {
-    Wrap, Inner, Content, TitleRow, Title, AddButton, Grid, Card, Badge, Thumb,
-    CardBody, Name, Price, Actions, Pagination, PagerBtn, PageInfo, EmptyState,
+    Wrap, Inner, Content, TitleRow, Title, AddButton,
+    Grid, Card, Badge, Thumb, CardBody, Name,
+    Price, Actions, Pagination, PagerBtn, PageInfo, EmptyState,
 } from "./adminProductPage.style";
 
 export default function AdminProductPage() {
@@ -18,7 +19,7 @@ export default function AdminProductPage() {
         const load = async () => {
             try {
                 console.log("[ADMIN] 상품 목록 호출 시작");
-                const data = await fetchAdminProducts();
+                const data = await fetchAdminProducts(); // res.data가 그대로 들어옴
                 console.log("[ADMIN] 원본 응답 data:", data);
 
                 const items = Array.isArray(data)
@@ -52,7 +53,11 @@ export default function AdminProductPage() {
                 <Content>
                     <TitleRow>
                         <Title>등록된 상품</Title>
-                        <AddButton onClick={() => navigate("/admin/products/new")}>
+                        <AddButton
+                            onClick={() =>
+                                navigate("/mypage/admin/allproducts/new")
+                            }
+                        >
                             상품 등록
                         </AddButton>
                     </TitleRow>
@@ -87,7 +92,9 @@ export default function AdminProductPage() {
                                                     type="button"
                                                     title="수정"
                                                     onClick={() =>
-                                                        navigate(`/admin/products/${p.productId}/edit`)
+                                                        navigate(
+                                                            `/mypage/admin/allproducts/${p.productId}/edit`
+                                                        )
                                                     }
                                                 >
                                                     ✏️
@@ -96,7 +103,9 @@ export default function AdminProductPage() {
                                                     type="button"
                                                     title="삭제"
                                                     onClick={() =>
-                                                        navigate(`/admin/products/${p.productId}/delete`)
+                                                        navigate(
+                                                            `/mypage/admin/allproducts/${p.productId}/delete`
+                                                        )
                                                     }
                                                 >
                                                     🗑️
