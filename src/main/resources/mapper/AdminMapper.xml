@@ -5,7 +5,9 @@
 <mapper namespace="com.review.shop.repository.admin.AdminMapper">
 
     <insert id="insertProduct" parameterType="com.review.shop.dto.product.ProductDetailDTO"
-            useGeneratedKeys="true">
+            useGeneratedKeys="true"
+            keyProperty="product_id"
+            keyColumn="PRODUCT_ID">
         INSERT INTO PRODUCT (
             PRD_NAME,
             PRD_BRAND,
@@ -19,16 +21,16 @@
             BAUMANN_ID
         )
         VALUES (
-                   #{prdName},
-                   #{prdBrand},
+                   #{prd_name},
+                   #{prd_brand},
                    #{ingredient},
                    #{price},
                    #{category},
                    #{stock},
                    #{rating},
                    #{description},
-                   #{reviewCount},
-                   #{baumannId}
+                   #{review_count},
+                   #{baumann_id}
                )
     </insert>
 
