@@ -31,6 +31,7 @@ public class HeaderSearchService {
 
             HeaderSearchDTO response = new HeaderSearchDTO();
             response.setReviews(reviews);
+            response.setProducts(products);
 
             return response;
         } catch (DataAccessException e) {
