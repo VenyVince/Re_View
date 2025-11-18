@@ -1,59 +1,40 @@
-import React, { useMemo, useState } from "react";
+// src/pages/mypage/admin/AdminQnaPage.jsx
+import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    Wrap,
-    Inner,
-    Title,
-    SectionTitle,
-    List,
-    Row,
-    IconCircle,
-    TextBlock,
-    QuestionText,
-    Meta,
-    Pagination,
-    PagerBtn,
-    PageInfo,
-} from "./adminQnaPage.style";
-
-const dummyQna = [
-    {
-        id: 1,
-        question: "수분 크림 언제 재입고되나요?",
-        customer: "이연수",
-    },
-    {
-        id: 2,
-        question: "선크림 사용법은 어떤가요?",
-        customer: "김철수",
-    },
-    {
-        id: 3,
-        question: "수분 크림 언제 재입고되나요?",
-        customer: "이연수",
-    },
-    {
-        id: 4,
-        question: "선크림 사용법은 어떤가요?",
-        customer: "김철수",
-    },
-    {
-        id: 5,
-        question: "지성 피부에 맞는 토너 추천해주세요.",
-        customer: "박민지",
-    },
-    {
-        id: 6,
-        question: "트러블 피부도 사용 가능할까요?",
-        customer: "정가영",
-    },
-];
+    Wrap, Inner, Title, SectionTitle,
+    List, Row, IconCircle, TextBlock,
+    QuestionText, Meta, Pagination, PagerBtn, PageInfo,} from "./adminQnaPage.style";
+import { fetchQnaList } from "../../../api/admin/adminQnaApi";
 
 export default function AdminQnaPage() {
-    const [list] = useState(dummyQna);
+    const [list, setList] = useState([]);      // 🔹 서버에서 온 QnA 리스트
     const [page, setPage] = useState(1);
     const pageSize = 4;
     const navigate = useNavigate();
+
+    // QnA 목록 API 연동
+    useEffect(() => {
+        const load = async () => {
+            try {
+                console.log("[ADMIN] QnA 목록 호출 시작");
+                const data = await fetchQnaList();   // fetchQnaList가 data만 돌려주든, 응답 통째로 돌려주든 대비
+                console.log("[ADMIN] 원본 응답 data:", data);
+
+                const items = Array.isArray(data)
+                    ? data
+                    : data?.data || data?.content || data?.result || [];
+
+                console.log("[ADMIN] 파싱된 QnA items:", items);
+                setList(items);
+            } catch (error) {
+                console.error("[ADMIN] QnA 목록 불러오기 실패:", error);
+                setList([]);
+            }
+        };
+
+        load();
+    }, []);
 
     const total = list.length;
     const maxPage = Math.max(1, Math.ceil(total / pageSize));
@@ -64,8 +45,10 @@ export default function AdminQnaPage() {
     }, [list, page]);
 
     const handleClickRow = (item) => {
-        // 질문 클릭 시 답변 페이지로 이동 + 상태 전달
-        navigate(`/admin/qna/${item.id}`, { state: item });
+        // 🔹 질문 클릭 시 답변 페이지로 이동 + 상태 전달
+        // 백엔드 응답 필드: qnaId, username, title ...
+        const qnaId = item.qnaId ?? item.id;
+        navigate(`/mypage/admin/qna/${qnaId}`, { state: item });
     };
 
     return (
@@ -76,11 +59,14 @@ export default function AdminQnaPage() {
 
                 <List>
                     {pageList.map((q) => (
-                        <Row key={q.id} onClick={() => handleClickRow(q)}>
+                        <Row key={q.qnaId ?? q.id} onClick={() => handleClickRow(q)}>
                             <IconCircle>?</IconCircle>
                             <TextBlock>
-                                <QuestionText>{q.question}</QuestionText>
-                                <Meta>고객: {q.customer}</Meta>
+                                {/* 스웨거 기준 title, username 사용 */}
+                                <QuestionText>{q.title ?? q.question}</QuestionText>
+                                { (q.username || q.customer) && (
+                                    <Meta>고객: {q.username ?? q.customer}</Meta>
+                                )}
                             </TextBlock>
                         </Row>
                     ))}
