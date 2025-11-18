@@ -43,6 +43,7 @@ function AdminLayout() {
     return (
         <LayoutWrap>
             <Sidebar>
+                {/* ✅ /admin 기준 상대경로 (App.js 라우트랑 맞춤) */}
                 <SideLink to="allproducts">상품 등록/수정/삭제</SideLink>
                 <SideLink to="reviews">리뷰 관리</SideLink>
                 <SideLink to="qna">Q&A 관리</SideLink>
@@ -50,7 +51,7 @@ function AdminLayout() {
             </Sidebar>
 
             <ContentArea>
-                {/* 여기에 각 관리자 페이지가 렌더링됨 */}
+                {/* ✅ 중첩 라우트가 여기 렌더됨 */}
                 <Outlet />
             </ContentArea>
         </LayoutWrap>
