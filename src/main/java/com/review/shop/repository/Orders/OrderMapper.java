@@ -9,12 +9,6 @@ import java.util.List;
 
 @Mapper
 public interface OrderMapper {
-
-    OrderCheckoutProductInfoDTO getOrderCheckoutProductInfo(
-            @Param("prdId") int prdId,
-            @Param("quantity") int quantity
-    );
-
     List<OrderCheckoutProductInfoDTO> getProductsByIds(@Param("productIds") List<Integer> productIds);
 
     Integer getUserPoint(@Param("userId") int userId);

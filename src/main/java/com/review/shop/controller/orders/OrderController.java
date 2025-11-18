@@ -23,8 +23,8 @@ import java.util.Map;
 public class OrderController {
     private final OrderService orderService;
     private final Security_Util security_util;
-
-    @PostMapping("/api/orders/checkout")  // chekout → checkout 오타 수정
+    //배송지 관리는 추후에 추가 예정
+    @PostMapping("/api/orders/checkout")
     public ResponseEntity<?> checkout(@RequestBody List<OrderDTO> orderList) {
 
         // 상품 정보와 총 가격 조회
@@ -32,15 +32,12 @@ public class OrderController {
 
         int userId = security_util.getCurrentUserId();
 
-        // 회원의 포인트 조회
         Integer userPoint = orderService.getUserPoint(userId);
 
-        // 최종 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
         response.put("products", checkoutResponse.getProducts());  // 상품 리스트
         response.put("totalPrice", checkoutResponse.getTotalPrice());  // 총 가격
         response.put("userPoint", userPoint);  // 사용자 포인트
-        response.put("finalPrice", checkoutResponse.getTotalPrice());  // 최종 결제 금액 (나중에 배송비, 할인 등 추가 가능)
 
         return ResponseEntity.ok().body(response);
     }
