@@ -3,7 +3,7 @@ package com.review.shop.service.review;
 import com.review.shop.dto.review.MyPageReviewDTO;
 import com.review.shop.dto.review.MyPageReviewResponseDTO;
 import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFountException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.UserIdMapper;
 import com.review.shop.repository.review.MyPageReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class MyPageReviewService {
             List<MyPageReviewDTO> myreviews = myPageReviewMapper.SearchMyReviews(user_id, keyword, sort, filter_rating);
 
             if (myreviews.isEmpty()) {
-                throw new ResourceNotFountException("리뷰를 작성한 적이 없습니다!");
+                throw new ResourceNotFoundException("리뷰를 작성한 적이 없습니다!");
             }
 
             // ResponseDTO에 담아서 반환

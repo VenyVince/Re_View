@@ -4,6 +4,7 @@ import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -131,7 +132,7 @@ public class AdminController {
 
         Integer isSelected = payload.get("is_selected");
         if (isSelected == null || (isSelected != 0 && isSelected != 1)) {
-            return ResponseEntity.badRequest().body("is_selected 값은 0 또는 1이어야 합니다.");
+            throw new WrongRequestException("is_selected는 0, 1중 하나여야 합니다.");
         }
 
         adminService.setReviewSelection(reviewId, isSelected);
@@ -206,7 +207,7 @@ public class AdminController {
     // =================================================================================
 
     @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleWrongRequest(DatabaseException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 }
