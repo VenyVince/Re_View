@@ -6,10 +6,23 @@ import {
     UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost
 } from "./AdminProductNew.style";
 
+const BAUMANN_ID_MAP = {
+    DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
+    DRPW: 10, DRPT: 11, DRP_: 12, DRNW: 13, DRNT: 14, DRN_: 15, DR_W: 16, DR_T: 17, DR__: 18,
+    D_PW: 19, D_PT: 20, D_P_: 21, D_NW: 22, D_NT: 23, D_N_: 24, D__W: 25, D__T: 26, D___: 27,
+    OSPW: 28, OSPT: 29, OSP_: 30, OSNW: 31, OSNT: 32, OSN_: 33, OS_W: 34, OS_T: 35, OS__: 36,
+    ORPW: 37, ORPT: 38, ORP_: 39, ORNW: 40, ORNT: 41, ORN_: 42, OR_W: 43, OR_T: 44, OR__: 45,
+    O_PW: 46, O_PT: 47, O_P_: 48, O_NW: 49, O_NT: 50, O_N_: 51, O__W: 52, O__T: 53, O___: 54,
+    _SPW: 55, _SPT: 56, _SP_: 57, _SNW: 58, _SNT: 59, _SN_: 60, _S_W: 61, _S_T: 62, _S__: 63,
+    _RPW: 64, _RPT: 65, _RP_: 66, _RNW: 67, _RNT: 68, _RN_: 69, _R_W: 70, _R_T: 71, _R__: 72,
+    __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
+};
+
+
 export default function AdminProductNew() {
     const [form, setForm] = useState({
-        prdName: "", prdBrand: "", ingredient: "",
-        price: "", category: "", stock: ""
+        prdName: "", prdBrand: "", ingredient: "", description: "",
+        price: "", category: "", stock: "", baumannType: "",
     });
     const nav = useNavigate();
     const onChange = k => e => setForm(s => ({ ...s, [k]: e.target.value }));
@@ -17,19 +30,34 @@ export default function AdminProductNew() {
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        const type = form.baumannType.trim().toUpperCase(); // 소문자로 써도 처리 됨
+
+        let baumannId = null;
+        if (type) {
+            baumannId = BAUMANN_ID_MAP[type];
+            if (!baumannId) {
+                alert(`'${type}' 은(는) 유효한 Baumann 타입이 아닙니다. 다시 확인해 주세요.`);
+                return;
+            }
+        }
+
         const payload = {
-            prdName: form.prdName.trim(),
-            prdBrand: form.prdBrand.trim(),
+            prd_name: form.prdName.trim(),
+            prd_brand: form.prdBrand.trim(),
             ingredient: form.ingredient.trim(),
+            description: form.description.trim(),
             price: Number(form.price || 0),
             category: form.category.trim(),
             stock: Number(form.stock || 0),
+            baumann_id: baumannId ?? null,
         };
+
+        console.log("[CREATE PAYLOAD]", payload);
 
         try {
             await createProduct(payload);
             alert("상품이 등록되었습니다.");
-            nav("/mypage/admin/allproducts"); // 관리자 상품 목록으로 이동
+            nav("/admin/allproducts");
         } catch (error) {
             console.error(error);
             alert("상품 등록에 실패했습니다.");
@@ -103,11 +131,27 @@ export default function AdminProductNew() {
                         </Cell>
                     </Row>
 
+                    {/* 성분 */}
                     <Row>
                         <Cell>
                             <Label>성분</Label>
-                            <Textarea placeholder="성분을 입력해주세요."
-                                      value={form.ingredient} onChange={onChange("ingredient")} />
+                            <Textarea
+                                placeholder="성분을 입력해주세요."
+                                value={form.ingredient}
+                                onChange={onChange("ingredient")}
+                            />
+                        </Cell>
+                    </Row>
+
+                    {/* ✅ 상세 설명 */}
+                    <Row>
+                        <Cell>
+                            <Label>상세 설명</Label>
+                            <Textarea
+                                placeholder="상세 설명을 입력해주세요."
+                                value={form.description}
+                                onChange={onChange("description")}
+                            />
                         </Cell>
                     </Row>
 
@@ -231,6 +275,28 @@ export default function AdminProductNew() {
                                    value={form.stock} onChange={onChange("stock")} />
                         </Cell>
                     </Row>
+
+                    {/* ✅ Baumann 타입 */}
+                    <Row>
+                        <Cell>
+                            <Label>Baumann 타입</Label>
+                            <Input
+                                placeholder="예) DRNT, DSPW, OSNT ..."
+                                value={form.baumannType}
+                                onChange={onChange("baumannType")}
+                            />
+                            <p
+                                style={{
+                                    marginTop: 8,
+                                    fontSize: 12,
+                                    color: "#6b7280",
+                                }}
+                            >
+                                * Baumann 피부 타입 코드 (예: DRNT). 입력하면 자동으로 ID로 변환됩니다.
+                            </p>
+                        </Cell>
+                    </Row>
+
                 </Panel>
 
                 <Actions>

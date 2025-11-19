@@ -70,7 +70,27 @@
         SELECT POINT FROM USER_TABLE WHERE USER_ID = #{memberId}
     </select>
 
-    <select id="getAllProducts" resultType="com.review.shop.dto.product.ProductDetailDTO">
+
+    <resultMap id="productDetailCollectionMap" type="com.review.shop.dto.product.ProductDetailDTO">
+        <id property="product_id" column="PRODUCT_ID"/>
+
+        <result property="prd_name" column="PRD_NAME"/>
+        <result property="prd_brand" column="PRD_BRAND"/>
+        <result property="ingredient" column="INGREDIENT"/>
+        <result property="price" column="PRICE"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="stock" column="STOCK"/>
+        <result property="rating" column="RATING"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="review_count" column="REVIEW_COUNT"/>
+        <result property="baumann_id" column="BAUMANN_ID"/>
+        <result property="is_sold_out" column="IS_SOLD_OUT"/>
+        <collection property="product_images" ofType="String">
+            <result column="IMAGE_URL" />
+        </collection>
+    </resultMap>
+
+    <select id="getAllProducts" resultMap="productDetailCollectionMap">
         SELECT
             P.PRODUCT_ID,
             P.PRD_NAME,
@@ -87,15 +107,14 @@
             P.CREATED_AT,
             P.UPDATED_AT,
             P.DELETED_AT,
-            (
-                SELECT LISTAGG(PI.IMAGE_URL, ',') WITHIN GROUP (ORDER BY PI.PRD_IMG_ID)
-        FROM PRODUCT_IMAGE PI
-        WHERE PI.PRODUCT_ID = P.PRODUCT_ID
-            ) AS product_image
+            PI.IMAGE_URL
         FROM
             PRODUCT P
-        WHERE
+                LEFT JOIN
+            PRODUCT_IMAGE PI ON P.PRODUCT_ID = PI.PRODUCT_ID  WHERE
             P.DELETED_AT IS NULL
+        ORDER BY
+            P.PRODUCT_ID ASC, PI.PRD_IMG_ID ASC
     </select>
 
     <update id="deleteReview" parameterType="int">
@@ -143,4 +162,50 @@
         WHERE q.QNA_ID = #{qnaId}
     </select>
 
+
+    <update id="updateMemberPoints">
+        UPDATE USER_TABLE
+        SET
+            POINT = #{points},
+            UPDATED_AT = SYSDATE
+        WHERE
+            USER_ID = #{userId}
+    </update>
+
+    <select id="readProduct" resultType="com.review.shop.dto.product.ProductDetailDTO">
+        SELECT
+            PRODUCT_ID,
+            PRD_NAME,
+            PRD_BRAND,
+            INGREDIENT,
+            PRICE,
+            CATEGORY,
+            STOCK,
+            RATING,
+            DESCRIPTION,
+            REVIEW_COUNT,
+            BAUMANN_ID,
+            IS_SOLD_OUT
+        FROM PRODUCT
+        WHERE PRODUCT_ID = #{productId}
+    </select>
+
+    <insert id="insertProductImage">
+        INSERT INTO PRODUCT_IMAGE (
+            PRODUCT_ID,
+            IMAGE_URL
+        )
+        VALUES (
+                   #{prdId},    #{image}  )
+    </insert>
+
+    <select id="readImage" parameterType="int" resultType="String">
+        SELECT
+            IMAGE_URL
+        FROM
+            PRODUCT_IMAGE
+        WHERE
+            PRODUCT_ID = #{prdId}
+        ORDER BY
+            PRD_IMG_ID ASC  </select>
 </mapper>

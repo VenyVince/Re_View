@@ -2,9 +2,11 @@ package com.review.shop.service.product;
 
 
 import com.review.shop.dto.product.ProductDTO;
+import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.product.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,8 +34,11 @@ public class ProductService {
 
         // offset 계산 (0부터 시작)
         int offset = (page - 1) * size;
-
-        // DB에서 조회
-        return productMapper.selectProductList(offset, size, sort);
+        try {
+            // DB에서 조회
+            return productMapper.selectProductList(offset, size, sort);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("상품 목록 조회 중 DB 오류가 발생했습니다.", e);
+        }
     }
 }

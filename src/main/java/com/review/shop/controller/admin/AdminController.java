@@ -20,9 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// TEST
-import org.springframework.web.bind.annotation.CrossOrigin;
-
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Admin API", description = "관리자 기능 API")
@@ -62,6 +60,12 @@ public class AdminController {
     @PostMapping("/products")
     public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
         adminService.insertProduct(product);
+        int prd_id = product.getProduct_id();
+        List<String> image_url = product.getProduct_images();
+
+        adminService.putImage(prd_id, image_url);
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
     }
 
@@ -88,6 +92,23 @@ public class AdminController {
             @Parameter(description = "삭제할 상품의 ID") @PathVariable int productId) {
         adminService.deleteProduct(productId);
         return ResponseEntity.ok("상품이 삭제되었습니다");
+    }
+
+    @Operation (summary = "상품 상세 조회", description = "특정 상품의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 상세 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<?> getProductDetail(
+            @Parameter(description = "조회할 상품의 ID") @PathVariable int productId) {
+        ProductDetailDTO detailDTO = adminService.getProductDetail(productId);
+
+        detailDTO.setProduct_images(adminService.readImage(productId));
+        return ResponseEntity.ok(detailDTO);
     }
 
     // =================================================================================
@@ -204,6 +225,25 @@ public class AdminController {
     public ResponseEntity<Map<String, Integer>> getMemberPoints(
             @Parameter(description = "조회할 회원의 ID") @PathVariable int userId) {
         return ResponseEntity.ok(Map.of("points", adminService.getMemberPoints(userId)));
+    }
+
+    //디버깅용 유저 포인트 업데이트
+    @Operation(summary = "회원 포인트 업데이트 (디버깅용)", description = "특정 회원의 포인트를 업데이트합니다. (디버깅용)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "포인트 업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+    })
+    @PatchMapping("/users/{userId}/points")
+    public ResponseEntity<String> updateMemberPoints(
+            @Parameter(description = "포인트를 업데이트할 회원의 ID") @PathVariable int
+            userId,
+            @RequestBody @Schema(example = "{\"points\": 2000}") Map<String, Integer> payload) {
+        Integer points = payload.get("points");
+        if (points == null || points < 0) {
+            throw new WrongRequestException("포인트는 0 이상의 정수여야 합니다.");
+        }
+        adminService.updateMemberPoints(userId, points);
+        return ResponseEntity.ok("회원 포인트가 업데이트되었습니다");
     }
 
     // =================================================================================
