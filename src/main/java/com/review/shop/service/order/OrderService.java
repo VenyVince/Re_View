@@ -25,14 +25,14 @@ public class OrderService {
 
         // 원래는 N+1 문제있었는데, 아이디 모으고 쿼리 한번에 가져옴.
         List<Integer> productIds = orderList.stream()
-                .map(OrderDTO::getProductId)
+                .map(OrderDTO::getProduct_id)
                 .collect(Collectors.toList());
 
         List<OrderCheckoutProductInfoDTO> products = orderMapper.getProductsByIds(productIds);
 
         Map<Integer, OrderCheckoutProductInfoDTO> productMap = products.stream()
                 .collect(Collectors.toMap(
-                        OrderCheckoutProductInfoDTO::getPrdId,
+                        OrderCheckoutProductInfoDTO::getProduct_id,
                         dto -> dto
                 ));
 
@@ -40,8 +40,8 @@ public class OrderService {
         int totalPrice = 0;
 
         for (OrderDTO order : orderList) {
-            int prdId = order.getProductId();
-            int quantity = order.getQuantity();
+            int prdId = order.getProduct_id();
+            int quantity = order.getBuy_quantity();
 
             OrderCheckoutProductInfoDTO product = productMap.get(prdId);
 
@@ -51,14 +51,14 @@ public class OrderService {
 
             // 수량 설정된 새로운 DTO 생성
             OrderCheckoutProductInfoDTO resultDTO = new OrderCheckoutProductInfoDTO(
-                    product.getPrdId(),
-                    product.getPrdImage(),
-                    product.getPrdName(),
-                    product.getPrdPrice(),
+                    product.getProduct_id(),
+                    product.getImage_url(),
+                    product.getPrd_name(),
+                    product.getPrice(),
                     quantity  // 주문 수량 설정
             );
 
-            int price = quantity * product.getPrdPrice();
+            int price = quantity * product.getPrice();
             totalPrice += price;
             finalResultList.add(resultDTO);
         }

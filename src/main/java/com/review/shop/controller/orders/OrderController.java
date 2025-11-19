@@ -36,8 +36,8 @@ public class OrderController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("products", checkoutResponse.getProducts());  // 상품 리스트
-        response.put("totalPrice", checkoutResponse.getTotalPrice());  // 총 가격
-        response.put("userPoint", userPoint);  // 사용자 포인트
+        response.put("total_price", checkoutResponse.getTotalPrice());  // 총 가격
+        response.put("point", userPoint);  // 사용자 포인트
 
         return ResponseEntity.ok().body(response);
     }
