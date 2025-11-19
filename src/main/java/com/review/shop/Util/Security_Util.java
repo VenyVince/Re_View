@@ -22,12 +22,12 @@ public class Security_Util {
         }
 
         String username = authentication.getName();
-        Integer userId = userInfoService.getUser_id(username);
+        Integer user_id = userInfoService.getUser_id(username);
 
-        if (userId == null) {
+        if (user_id == null) {
             throw new ResourceNotFoundException("사용자 정보를 찾을 수 없습니다.");
         }
 
-        return userId;
+        return user_id;
     }
 }

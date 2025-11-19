@@ -18,7 +18,7 @@ public class WishlistService {
     private final UserIdMapper userIdMapper;
     private final WishlistMapper wishlistMapper;
 
-    public WishlistResponseDTO getWishlist(int user_id) {
+    public WishlistResponseDTO getWishlist(Integer user_id) {
         try {
             List<WishlistDTO> wishlist = wishlistMapper.getWishlist(user_id);
             WishlistResponseDTO response = new WishlistResponseDTO();
@@ -29,7 +29,7 @@ public class WishlistService {
         }
     }
 
-    public void addWishlistItem(int user_id, int product_id) {
+    public void addWishlistItem(Integer user_id, int product_id) {
         try {
             boolean exists = wishlistMapper.existsWishlistItem(user_id, product_id);
             if (exists) {
@@ -41,7 +41,7 @@ public class WishlistService {
         }
     }
 
-    public void deleteWishlistItem(int user_id, int product_id) {
+    public void deleteWishlistItem(Integer user_id, int product_id) {
         try {
             boolean exists = wishlistMapper.existsWishlistItem(user_id, product_id);
             if (!exists) {
