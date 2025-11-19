@@ -1,0 +1,109 @@
+/* 전체 래퍼 */
+.mypage-edit-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 64px 0 120px;
+    background-color: #fafafa;
+}
+
+.mypage-edit-shell {
+    width: 960px;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    padding: 32px 40px 40px;
+}
+
+/* 제목 */
+.mypage-edit-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+/* 폼 */
+.mypage-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.mypage-edit-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mypage-edit-group label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mypage-edit-group input {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mypage-edit-group input:focus {
+    border-color: #111;
+    box-shadow: 0 0 0 1px #111;
+}
+
+.mypage-edit-divider {
+    margin: 16px 0 8px;
+    border: none;
+    border-top: 1px solid #eee;
+}
+
+/* 에러 메시지 */
+.mypage-edit-error {
+    margin-top: 4px;
+    color: #e53935;
+    font-size: 13px;
+}
+
+/* 버튼 영역 */
+.mypage-edit-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.mypage-edit-btn {
+    min-width: 96px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.mypage-edit-btn.primary {
+    background-color: #111;
+    color: #fff;
+}
+
+.mypage-edit-btn.primary:hover:not(:disabled) {
+    background-color: #000;
+}
+
+.mypage-edit-btn.secondary {
+    background-color: #fff;
+    color: #333;
+    border-color: #ccc;
+}
+
+.mypage-edit-btn.secondary:hover:not(:disabled) {
+    background-color: #f4f4f4;
+}
+
+.mypage-edit-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}

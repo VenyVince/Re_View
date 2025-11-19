@@ -52,7 +52,7 @@ export default function AdminQnaAnswerPage() {
         try {
             await updateQnaAnswer(qnaId, answerBody);
             alert("답변이 등록되었습니다.");
-            navigate("/mypage/admin/qna"); // QnA 목록으로 이동
+            navigate("/admin/qna"); // QnA 목록으로 이동
         } catch (error) {
             console.error("[ADMIN] QnA 답변 등록 실패:", error);
             alert("답변 등록에 실패했습니다.");

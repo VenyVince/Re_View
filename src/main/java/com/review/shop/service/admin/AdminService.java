@@ -77,7 +77,7 @@ public class AdminService {
     public Integer getMemberPoints(int memberId) {
         Integer points = adminMapper.getMemberPoints(memberId);
         if (points == null) {
-            throw new ResourceNotFoundException("존재하지 않는 회원입니다.");
+            throw new DatabaseException("포인트가 존재하지 않습니다.", null);
         }
         return points;
     }

@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
+import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
@@ -36,6 +36,7 @@ public class SecurityConfig {
 
                 // 주의 !!!! CSRF 비활성화 되어있음
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (개발 기간동안)
+                .cors(withDefaults()) //CORS 설정 적용
 //                .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/**","/api/products","/api/reviews").permitAll()
 //                        .anyRequest().authenticated()

@@ -6,14 +6,14 @@ export default function AdminProductDeleteConfirm() {
     const nav = useNavigate();
 
     const handleCancel = () => {
-        nav("/mypage/admin/allproducts");
+        nav("/admin/allproducts");
     };
 
     const handleConfirm = async () => {
         try {
             await deleteProduct(id);
             alert("상품이 삭제되었습니다.");
-            nav("/mypage/admin/allproducts");
+            nav("/admin/allproducts");
         } catch (e) {
             console.error(e);
             alert("상품 삭제 실패…!");
