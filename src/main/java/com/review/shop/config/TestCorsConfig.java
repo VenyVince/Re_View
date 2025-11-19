@@ -13,9 +13,11 @@ public class TestCorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/test/**")
-                        .allowedOrigins("http://localhost:3000") // React 개발서버 허용
-                        .allowedMethods("*"); // 모든 HTTP 메소드 허용
+                registry.addMapping("/**") // 이부분 수정 - 기존 test였음
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") 
+                        .allowedHeaders("*") 
+                        .allowCredentials(true);
             }
         };
     }
