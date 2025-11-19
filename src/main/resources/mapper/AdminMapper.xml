@@ -170,4 +170,13 @@
         FROM PRODUCT
         WHERE PRODUCT_ID = #{productId}
     </select>
+
+    <insert id="insertProductImage">
+        INSERT INTO PRODUCT_IMAGE (
+            PRODUCT_ID,
+            IMAGE_URL
+        )
+        VALUES (
+                   #{prdId},    #{image}  )
+    </insert>
 </mapper>

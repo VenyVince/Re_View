@@ -20,9 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// TEST
-import org.springframework.web.bind.annotation.CrossOrigin;
-
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Admin API", description = "관리자 기능 API")
@@ -62,6 +60,12 @@ public class AdminController {
     @PostMapping("/products")
     public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
         adminService.insertProduct(product);
+        int prd_id = product.getProduct_id();
+        List<String> image_url = product.getProduct_images();
+
+        adminService.putImage(prd_id, image_url);
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
     }
 

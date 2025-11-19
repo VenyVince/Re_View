@@ -138,4 +138,17 @@ public class AdminService {
         }
         return result;
     }
+
+    public void putImage(int prdId, List<String> imageUrl) {
+        for(String image : imageUrl){
+            //여기에 이미지 삽입 쿼리문 작성
+            int result = adminMapper.insertProductImage(prdId, image);
+            if(result == 0){
+                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
+            }
+        }
+
+
+
+    }
 }

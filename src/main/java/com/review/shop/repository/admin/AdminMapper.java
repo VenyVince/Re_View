@@ -52,4 +52,6 @@ public interface AdminMapper {
     int updateMemberPoints(@Param("userId") int userId, @Param("points") Integer points);
 
     ProductDetailDTO readProduct(int productId);
+
+    int insertProductImage(@Param("prdId") int prdId, @Param("image") String image);
 }
