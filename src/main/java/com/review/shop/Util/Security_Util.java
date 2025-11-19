@@ -1,5 +1,7 @@
 package com.review.shop.Util;
 
+import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.userinfo.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -16,10 +18,16 @@ public class Security_Util {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("인증 정보가 없습니다.");
+            throw new WrongRequestException("로그인이 필요합니다.");
         }
 
-        String id = authentication.getName();
-        return userInfoService.getUser_id(id);
+        String username = authentication.getName();
+        Integer userId = userInfoService.getUser_id(username);
+
+        if (userId == null) {
+            throw new ResourceNotFoundException("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        return userId;
     }
 }
