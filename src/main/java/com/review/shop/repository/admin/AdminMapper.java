@@ -54,4 +54,6 @@ public interface AdminMapper {
     ProductDetailDTO readProduct(int productId);
 
     int insertProductImage(@Param("prdId") int prdId, @Param("image") String image);
+
+    List<String> readImage(int prdId);
 }

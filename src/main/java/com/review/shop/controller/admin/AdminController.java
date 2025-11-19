@@ -94,10 +94,21 @@ public class AdminController {
         return ResponseEntity.ok("상품이 삭제되었습니다");
     }
 
+    @Operation (summary = "상품 상세 조회", description = "특정 상품의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 상세 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @GetMapping("/products/{productId}")
     public ResponseEntity<?> getProductDetail(
             @Parameter(description = "조회할 상품의 ID") @PathVariable int productId) {
-        return ResponseEntity.ok(adminService.getProductDetail(productId));
+        ProductDetailDTO detailDTO = adminService.getProductDetail(productId);
+
+        detailDTO.setProduct_images(adminService.readImage(productId));
+        return ResponseEntity.ok(detailDTO);
     }
 
     // =================================================================================

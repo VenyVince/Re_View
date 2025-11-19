@@ -147,8 +147,13 @@ public class AdminService {
                 throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
             }
         }
+    }
 
-
-
+    public List<String> readImage(int prdId) {
+        List<String> result = adminMapper.readImage(prdId);
+        if(result == null || result.isEmpty()){
+            throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
+        }
+        return result;
     }
 }
