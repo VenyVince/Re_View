@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCheckoutProductInfoDTO {
-    private int prdId;
-    private String prdImage;
-    private String prdName;
-    private int prdPrice;
-    private int buyQuantity;
+    private int product_id;
+    private String image_url;
+    private String prd_name;
+    private int price;
+    private int buy_quantity;
 }
 
 

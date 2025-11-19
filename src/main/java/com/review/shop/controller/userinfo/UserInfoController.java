@@ -28,16 +28,16 @@ public class UserInfoController {
 
     @PatchMapping
     public ResponseEntity<?> updateInfo(@RequestBody UpdateUserInfoDTO updateDTO) {
-        int user_id = securityUtil.getCurrentUserId(); // 재사용
+        int user_id = securityUtil.getCurrentUserId(); // 24번 라인과 깉이 재사용 예시
         userInfoService.updateUserInfo(user_id, updateDTO);
         return ResponseEntity.ok("정보가 수정되었습니다.");
     }
 
-//    @DeleteMapping
-//    public ResponseEntity<?> deleteInfo(@AuthenticationPrincipal UserDetails userDetails) {
-//        int user_id = securityUtil.getCurrentUserId(); // 재사용
-//        userInfoService.deleteUserInfo(user_id);
-//        return ResponseEntity.ok("회원 탈퇴 완료");
-//    }
+    @DeleteMapping
+    public ResponseEntity<?> deleteInfo() {
+        int user_id = securityUtil.getCurrentUserId();
+        userInfoService.deleteUserInfo(user_id);
+        return ResponseEntity.ok("회원 탈퇴 완료");
+    }
 // 회원 정보 수정 및 회원 탈퇴
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 // 이름과 제목만 포함
 public class QnAListDTO {
-    private Long qnaId;
-    private String userName;
+    private Long qna_id;
+    private String user_name;
     private String title;
 }

@@ -19,8 +19,12 @@ public interface Payment_MethodMapper {
     // 삭제
     void delete(int payment_id, int user_id);
 
-
-    // 중복 체크용
+    //delete 중복체크용
     Payment_MethodDTO findById(@Param("payment_id") int payment_id);
-    int existsPayment(@Param("user_id") int user_id, @Param("card_number") String card_number);
+
+    // create 중복 체크용
+    int existsPayment(@Param("user_id") int user_id,
+                      @Param("card_number") String card_number,
+                      @Param("card_company") String card_company);
+
 }
