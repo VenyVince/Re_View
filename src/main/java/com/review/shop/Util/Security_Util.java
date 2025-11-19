@@ -42,8 +42,8 @@ public class Security_Util {
         String id = authentication.getName();
         String role = userInfoService.getUserRole(id); // user_id 대신 role 조회
 
-        if (role == null || (!role.equals("user") && !role.equals("admin"))) {
-            throw new ResourceNotFoundException("사용자 역할 정보를 찾을 수 없습니다.");
+        if (role == null || (!role.equals("USER") && !role.equals("ADMIN"))) {
+            throw new ResourceNotFoundException("사용자 role이 정의된 것과 다르거나 null입니다.");
         }
 
         return role;
