@@ -1,8 +1,8 @@
 package com.review.shop.service.userinfo;
 
-import com.review.shop.dto.userinfo.GetUserInfoDTO;
-import com.review.shop.dto.userinfo.GetUserInfoResponseDTO;
-import com.review.shop.dto.userinfo.UpdateUserInfoDTO;
+import com.review.shop.dto.userinfo.userinfo.GetUserInfoDTO;
+import com.review.shop.dto.userinfo.userinfo.GetUserInfoResponseDTO;
+import com.review.shop.dto.userinfo.userinfo.UpdateUserInfoDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.UserIdMapper;
@@ -20,11 +20,11 @@ public class UserInfoService {
     private final UserIdMapper userIdMapper;
     private final UserInfoMapper userInfoMapper;
 
-    public int getUser_id(String id) {
+    public Integer getUser_id(String id) {
         return userIdMapper.getUser_id(id);
     }
 
-    public GetUserInfoResponseDTO getUserInfo(int user_id) {
+    public GetUserInfoResponseDTO getUserInfo(Integer user_id) {
         try {
             List<GetUserInfoDTO> userinfo = userInfoMapper.getInfo(user_id);
             if (userinfo.isEmpty()) {
@@ -38,10 +38,10 @@ public class UserInfoService {
         }
     }
 
-    public void updateUserInfo(int user_id, UpdateUserInfoDTO updateDTO) {
+    public void updateUserInfo(Integer user_id, UpdateUserInfoDTO updateDTO) {
         try {
             GetUserInfoResponseDTO existingResponse = getUserInfo(user_id);
-            GetUserInfoDTO existingUser = existingResponse.getUserInfos().get(0); // 단일 유저 기준
+            GetUserInfoDTO existingUser = existingResponse.getUserInfos().getFirst(); // 단일 유저 기준 get(0) -> getFirst()
 
             // null이면 기존값 유지
             if(updateDTO.getNickname() == null) updateDTO.setNickname(existingUser.getNickname());
@@ -54,7 +54,7 @@ public class UserInfoService {
         }
     }
 
-    public void deleteUserInfo(int user_id) {
+    public void deleteUserInfo(Integer user_id) {
         try {
             userInfoMapper.deleteInfo(user_id);
         } catch (DataAccessException e) {

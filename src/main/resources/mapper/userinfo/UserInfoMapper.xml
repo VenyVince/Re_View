@@ -6,7 +6,7 @@
 <mapper namespace="com.review.shop.repository.userinfo.UserInfoMapper">
 
 
-    <select id="getInfo" resultType="com.review.shop.dto.userinfo.GetUserInfoDTO">
+    <select id="getInfo" resultType="com.review.shop.dto.userinfo.userinfo.GetUserInfoDTO">
         SELECT
             user_id, name, nickname, phone_number, baumann_id
         FROM user_table

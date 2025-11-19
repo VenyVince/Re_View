@@ -1,8 +1,8 @@
 package com.review.shop.service.search;
 
-import com.review.shop.dto.search.HeaderSearchDTO;
-import com.review.shop.dto.search.HeaderSearchProductDTO;
-import com.review.shop.dto.search.HeaderSearchReviewDTO;
+import com.review.shop.dto.search.header.HeaderSearchDTO;
+import com.review.shop.dto.search.header.HeaderSearchProductDTO;
+import com.review.shop.dto.search.header.HeaderSearchReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.search.header.HeaderSearchProductMapper;

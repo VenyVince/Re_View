@@ -1,10 +1,10 @@
 package com.review.shop.service.search;
 
-import com.review.shop.dto.search.ProductReview_SearchDTO;
-import com.review.shop.dto.search.ProductReview_SearchResponseDTO;
+import com.review.shop.dto.search.MyPagenProductPage.Product.ProductReview_SearchDTO;
+import com.review.shop.dto.search.MyPagenProductPage.Product.ProductReview_SearchResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.repository.search.pages.ProductReview_SearchMapper;
+import com.review.shop.repository.search.MyPagenProductPage.ProductReview_SearchMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
