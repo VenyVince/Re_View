@@ -32,6 +32,15 @@
             id = #{id}
     </update>
 
+
+
+    <select id="findUserIdByNameAndPhoneNumber" resultType="string">
+        SELECT id
+        FROM USER_TABLE
+        WHERE name = #{name}
+          AND phone_number = #{phoneNumber, jdbcType=VARCHAR}
+    </select>
+
 </mapper>
 
 

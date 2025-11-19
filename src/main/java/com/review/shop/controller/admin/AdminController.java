@@ -110,7 +110,7 @@ public class AdminController {
     // SECTION: 리뷰 관리 (Review)
     // =================================================================================
 
-    @Operation(summary = "리뷰 삭제", description = "특정 상품 리뷰를 삭제합니다.")
+    @Operation(summary = "리뷰 삭제 (논리적)", description = "특정 상품 리뷰를 삭제합니다. (DELETED_DATE 설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
