@@ -20,7 +20,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGlobalException(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("알 수 없는 오류가 발생했습니다: " + exception.getMessage());
+                .body(exception.getMessage());
     }
 
     // 데이터 없음
