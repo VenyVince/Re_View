@@ -129,4 +129,13 @@ public class AdminService {
             throw new ResourceNotFoundException("포인트를 수정할 회원을 찾을 수 없습니다.");
         }
     }
+
+    // 상품 상세조회
+    public ProductDetailDTO getProductDetail(int productId) {
+        ProductDetailDTO result = adminMapper.readProduct(productId);
+        if (result == null) {
+            throw new ResourceNotFoundException("조회할 상품을 찾을 수 없습니다.");
+        }
+        return result;
+    }
 }

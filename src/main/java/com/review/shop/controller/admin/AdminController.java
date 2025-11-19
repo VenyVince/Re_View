@@ -90,6 +90,12 @@ public class AdminController {
         return ResponseEntity.ok("상품이 삭제되었습니다");
     }
 
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<?> getProductDetail(
+            @Parameter(description = "조회할 상품의 ID") @PathVariable int productId) {
+        return ResponseEntity.ok(adminService.getProductDetail(productId));
+    }
+
     // =================================================================================
     // SECTION: 주문 관리 (Order)
     // =================================================================================

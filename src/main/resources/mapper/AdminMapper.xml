@@ -152,4 +152,22 @@
         WHERE
             USER_ID = #{userId}
     </update>
+
+    <select id="readProduct" resultType="com.review.shop.dto.product.ProductDetailDTO">
+        SELECT
+            PRODUCT_ID,
+            PRD_NAME,
+            PRD_BRAND,
+            INGREDIENT,
+            PRICE,
+            CATEGORY,
+            STOCK,
+            RATING,
+            DESCRIPTION,
+            REVIEW_COUNT,
+            BAUMANN_ID,
+            IS_SOLD_OUT
+        FROM PRODUCT
+        WHERE PRODUCT_ID = #{productId}
+    </select>
 </mapper>

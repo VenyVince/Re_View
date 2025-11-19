@@ -50,4 +50,6 @@ public interface AdminMapper {
     QnaDTO getQnaDetail(int qnaId);
 
     int updateMemberPoints(@Param("userId") int userId, @Param("points") Integer points);
+
+    ProductDetailDTO readProduct(int productId);
 }
