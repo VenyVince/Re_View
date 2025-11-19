@@ -18,8 +18,8 @@ export default function AdminProductNew() {
         e.preventDefault();
 
         const payload = {
-            prdName: form.prdName.trim(),
-            prdBrand: form.prdBrand.trim(),
+            prd_name: form.prdName.trim(),
+            prd_brand: form.prdBrand.trim(),
             ingredient: form.ingredient.trim(),
             price: Number(form.price || 0),
             category: form.category.trim(),

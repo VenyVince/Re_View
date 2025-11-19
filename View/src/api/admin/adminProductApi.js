@@ -17,3 +17,9 @@ export const updateProduct = (productId, data) =>
 // 상품 삭제
 export const deleteProduct = (productId) =>
     axiosClient.delete(`/api/admin/products/${productId}`);
+
+//수정을 위한 단일 상품 조회
+export const fetchAdminProduct = (productId) =>
+    axiosClient
+        .get(`/api/admin/products/${productId}`)
+        .then((res) => res.data);
