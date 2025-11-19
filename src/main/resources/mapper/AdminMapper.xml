@@ -143,4 +143,13 @@
         WHERE q.QNA_ID = #{qnaId}
     </select>
 
+
+    <update id="updateMemberPoints">
+        UPDATE USER_TABLE
+        SET
+            POINT = #{points},
+            UPDATED_AT = SYSDATE
+        WHERE
+            USER_ID = #{userId}
+    </update>
 </mapper>

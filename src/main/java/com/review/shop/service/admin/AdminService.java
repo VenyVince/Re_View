@@ -120,4 +120,13 @@ public class AdminService {
     }
 
 
+    public void updateMemberPoints(int userId, Integer points) {
+        if (points == null || points < 0) {
+            throw new WrongRequestException("포인트는 0 이상이어야 합니다.");
+        }
+        int affected = adminMapper.updateMemberPoints(userId, points);
+        if (affected == 0) {
+            throw new ResourceNotFoundException("포인트를 수정할 회원을 찾을 수 없습니다.");
+        }
+    }
 }

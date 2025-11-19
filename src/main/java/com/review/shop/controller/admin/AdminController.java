@@ -206,6 +206,25 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("points", adminService.getMemberPoints(userId)));
     }
 
+    //디버깅용 유저 포인트 업데이트
+    @Operation(summary = "회원 포인트 업데이트 (디버깅용)", description = "특정 회원의 포인트를 업데이트합니다. (디버깅용)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "포인트 업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+    })
+    @PatchMapping("/users/{userId}/points")
+    public ResponseEntity<String> updateMemberPoints(
+            @Parameter(description = "포인트를 업데이트할 회원의 ID") @PathVariable int
+            userId,
+            @RequestBody @Schema(example = "{\"points\": 2000}") Map<String, Integer> payload) {
+        Integer points = payload.get("points");
+        if (points == null || points < 0) {
+            throw new WrongRequestException("포인트는 0 이상의 정수여야 합니다.");
+        }
+        adminService.updateMemberPoints(userId, points);
+        return ResponseEntity.ok("회원 포인트가 업데이트되었습니다");
+    }
+
     // =================================================================================
     // SECTION: 예외 처리 (Exception Handler)
     // =================================================================================
