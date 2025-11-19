@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import AdminProductPage from "./admin/AdminProductPage";
 import { Navigate } from "react-router-dom";
-import UserDashboard from "./user/UserDashboard";
+import UserOrderPage from "./user/UserOrderPage";
 
 export default function MyPage() {
     const { auth } = useAuth();
@@ -15,6 +15,6 @@ export default function MyPage() {
 
     // 일반 유저 페이지
     return (
-        <UserDashboard/>
+        <UserOrderPage/>
     );
 }
