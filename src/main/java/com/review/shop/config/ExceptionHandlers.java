@@ -1,6 +1,7 @@
 package com.review.shop.config;
 
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.FileProcessingException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExceptionHandlers {
  
     //exception 패키지 참조
+
+    // 이외 오류
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGlobalException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("알 수 없는 오류가 발생했습니다: " + exception.getMessage());
+    }
 
     // 데이터 없음
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -38,4 +46,12 @@ public class ExceptionHandlers {
     public ResponseEntity<String> handleLoginException(BadCredentialsException exception) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
     }
+
+    // 파일 처리 실패
+    @ExceptionHandler(FileProcessingException.class)
+    public ResponseEntity<String> handleIOException(FileProcessingException exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("파일 처리 중 오류가 발생했습니다: " + exception.getMessage());
+    }
+
 }

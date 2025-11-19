@@ -27,6 +27,7 @@
         FROM payment_methods
         WHERE user_id = #{user_id}
           AND card_number = #{card_number}
+          AND card_company = #{card_company}
     </select>
 
     <!-- 결제 수단 추가 -->
