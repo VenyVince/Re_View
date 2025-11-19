@@ -1,8 +1,8 @@
 package com.review.shop.service.userinfo;
 
-import com.review.shop.dto.userinfo.GetUserInfoDTO;
-import com.review.shop.dto.userinfo.GetUserInfoResponseDTO;
-import com.review.shop.dto.userinfo.UpdateUserInfoDTO;
+import com.review.shop.dto.userinfo.userinfo.GetUserInfoDTO;
+import com.review.shop.dto.userinfo.userinfo.GetUserInfoResponseDTO;
+import com.review.shop.dto.userinfo.userinfo.UpdateUserInfoDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.UserIdMapper;

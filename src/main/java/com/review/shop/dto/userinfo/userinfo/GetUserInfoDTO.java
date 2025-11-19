@@ -1,4 +1,4 @@
-package com.review.shop.dto.userinfo;
+package com.review.shop.dto.userinfo.userinfo;
 
 import lombok.Data;
 

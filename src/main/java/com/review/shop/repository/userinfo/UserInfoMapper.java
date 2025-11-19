@@ -1,7 +1,7 @@
 package com.review.shop.repository.userinfo;
 
-import com.review.shop.dto.userinfo.GetUserInfoDTO;
-import com.review.shop.dto.userinfo.UpdateUserInfoDTO;
+import com.review.shop.dto.userinfo.userinfo.GetUserInfoDTO;
+import com.review.shop.dto.userinfo.userinfo.UpdateUserInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

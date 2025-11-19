@@ -1,4 +1,4 @@
-package com.review.shop.dto.wishlist;
+package com.review.shop.dto.userinfo.others.wishlist;
 
 import lombok.Data;
 

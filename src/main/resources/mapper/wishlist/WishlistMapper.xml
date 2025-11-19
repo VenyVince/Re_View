@@ -5,7 +5,7 @@
 <mapper namespace="com.review.shop.repository.userinfo.other.WishlistMapper">
 
     <!-- 기존 getWishlist 유지 -->
-    <select id="getWishlist" parameterType="int" resultType="com.review.shop.dto.wishlist.WishlistDTO">
+    <select id="getWishlist" parameterType="int" resultType="com.review.shop.dto.userinfo.others.wishlist.WishlistDTO">
         SELECT
         w.WISH_ITEM_ID   AS wish_item_id,
         w.USER_ID        AS user_id,

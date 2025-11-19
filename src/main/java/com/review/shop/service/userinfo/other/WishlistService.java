@@ -1,7 +1,7 @@
 package com.review.shop.service.userinfo.other;
 
-import com.review.shop.dto.wishlist.WishlistDTO;
-import com.review.shop.dto.wishlist.WishlistResponseDTO;
+import com.review.shop.dto.userinfo.others.wishlist.WishlistDTO;
+import com.review.shop.dto.userinfo.others.wishlist.WishlistResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.UserIdMapper;

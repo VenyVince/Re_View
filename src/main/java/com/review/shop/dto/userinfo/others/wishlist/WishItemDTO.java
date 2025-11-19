@@ -1,4 +1,4 @@
-package com.review.shop.dto.userinfo.others;
+package com.review.shop.dto.userinfo.others.wishlist;
 
 public class WishItemDTO {
     private int wishitem_id;

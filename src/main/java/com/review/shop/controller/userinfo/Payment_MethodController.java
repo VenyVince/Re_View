@@ -35,7 +35,7 @@ public class Payment_MethodController {
         service.create(dto);
     }
 
-    // 특정 삭제
+    @Operation(summary = "결제수단 삭제", description = "특정 결제수단을 삭제합니다.")
     @DeleteMapping("/{payment_id}")
     public void delete(@PathVariable int payment_id) {
         int user_id = securityUtil.getCurrentUserId();
