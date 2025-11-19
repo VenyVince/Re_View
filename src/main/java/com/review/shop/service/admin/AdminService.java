@@ -120,4 +120,40 @@ public class AdminService {
     }
 
 
+    public void updateMemberPoints(int userId, Integer points) {
+        if (points == null || points < 0) {
+            throw new WrongRequestException("포인트는 0 이상이어야 합니다.");
+        }
+        int affected = adminMapper.updateMemberPoints(userId, points);
+        if (affected == 0) {
+            throw new ResourceNotFoundException("포인트를 수정할 회원을 찾을 수 없습니다.");
+        }
+    }
+
+    // 상품 상세조회
+    public ProductDetailDTO getProductDetail(int productId) {
+        ProductDetailDTO result = adminMapper.readProduct(productId);
+        if (result == null) {
+            throw new ResourceNotFoundException("조회할 상품을 찾을 수 없습니다.");
+        }
+        return result;
+    }
+
+    public void putImage(int prdId, List<String> imageUrl) {
+        for(String image : imageUrl){
+            //여기에 이미지 삽입 쿼리문 작성
+            int result = adminMapper.insertProductImage(prdId, image);
+            if(result == 0){
+                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
+            }
+        }
+    }
+
+    public List<String> readImage(int prdId) {
+        List<String> result = adminMapper.readImage(prdId);
+        if(result == null || result.isEmpty()){
+            throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
+        }
+        return result;
+    }
 }
