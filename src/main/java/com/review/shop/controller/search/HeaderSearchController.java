@@ -5,6 +5,8 @@ import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.search.HeaderSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,11 @@ public class HeaderSearchController {
     private final HeaderSearchService searchService;
 
     @Operation(summary = "헤더 검색", description = "키워드, 정렬, 브랜드/카테고리 필터로 검색 결과를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "404", description = "검색 결과가 없음 (ResourceNotFoundException)"),
+            @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
+    })
     @GetMapping
     public ResponseEntity<HeaderSearchDTO> search(
             @Parameter(description = "검색 키워드(최소 2글자)", example = "스킨")

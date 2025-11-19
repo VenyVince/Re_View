@@ -5,6 +5,8 @@ import com.review.shop.dto.review.MyPageReviewResponseDTO;
 import com.review.shop.service.review.MyPageReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,11 @@ public class MyPageReviewController {
     private final MyPageReviewService mypagereviewService;
 
     @Operation(summary = "사용자 리뷰 검색", description = "사용자가 작성한 리뷰를 키워드, 정렬, 평점 필터로 검색합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음 (ResourceNotFoundException)"),
+            @ApiResponse(responseCode = "500", description = "데이터베이스 오류 (DatabaseException)")
+    })
     @GetMapping
     public ResponseEntity<MyPageReviewResponseDTO> search(
             @Parameter(description = "검색 키워드", example = "스킨")
