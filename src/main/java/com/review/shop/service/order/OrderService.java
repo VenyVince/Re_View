@@ -3,7 +3,7 @@ package com.review.shop.service.order;
 import com.review.shop.dto.orders.OrderCheckoutProductInfoDTO;
 import com.review.shop.dto.orders.OrderCheckoutResponse;
 import com.review.shop.dto.orders.OrderDTO;
-import com.review.shop.exception.ResourceNotFountException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.Orders.OrderMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class OrderService {
             OrderCheckoutProductInfoDTO product = productMap.get(prdId);
 
             if (product == null) {
-                throw new ResourceNotFountException("상품을 찾을 수 없습니다. ID: " + prdId);
+                throw new ResourceNotFoundException("상품을 찾을 수 없습니다. ID: " + prdId);
             }
 
             // 수량 설정된 새로운 DTO 생성
