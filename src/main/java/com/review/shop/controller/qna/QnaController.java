@@ -3,6 +3,9 @@ package com.review.shop.controller.qna;
 import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.service.qna.QnaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +23,33 @@ public class QnaController {
     private final QnaService qnaService;
     private final Security_Util securityUtil;
 
-    // 목록 조회
+    @Operation(summary = "QnA 목록 조회", description = "특정 상품의 문의 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @GetMapping("/list/{productId}")
     public ResponseEntity<List<QnaDTO>> getQnaList(@PathVariable int productId) {
         return ResponseEntity.ok(qnaService.getQnaList(productId));
     }
 
-    // 상세 조회
+    @Operation(summary = "QnA 상세 조회", description = "문의글 ID로 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @GetMapping("/{qnaId}")
     public ResponseEntity<QnaDTO> getQnaDetail(@PathVariable int qnaId) {
         return ResponseEntity.ok(qnaService.getQnaDetail(qnaId));
     }
 
-    // 등록 (로그인 필수)
+    @Operation(summary = "질문 등록", description = "로그인한 사용자가 새 문의글을 등록합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "등록 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @PostMapping
     public ResponseEntity<String> createQna(
             @RequestBody QnaDTO qnaDTO,
@@ -48,7 +65,13 @@ public class QnaController {
         return ResponseEntity.ok("등록 성공");
     }
 
-    // 수정 (로그인 필수 + 본인 확인)
+    @Operation(summary = "질문 수정", description = "본인이 작성한 문의글을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)"),
+            @ApiResponse(responseCode = "404", description = "수정 권한 없음 또는 글 없음"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @PutMapping
     public ResponseEntity<String> updateQna(
             @RequestBody QnaDTO qnaDTO,
@@ -65,7 +88,13 @@ public class QnaController {
 
     }
 
-    // 삭제 (로그인 필수 + 본인 확인)
+    @Operation(summary = "질문 삭제", description = "본인이 작성한 문의글을 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)"),
+            @ApiResponse(responseCode = "404", description = "삭제 권한 없음 또는 글 없음"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @DeleteMapping("/{qnaId}")
     public ResponseEntity<String> deleteQna(
             @PathVariable int qnaId,
