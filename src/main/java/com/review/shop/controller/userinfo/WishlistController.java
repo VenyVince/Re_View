@@ -22,7 +22,7 @@ public class WishlistController {
         return ResponseEntity.ok(wishlist);
     }
 
-    @PostMapping("/wish_item")
+    @PostMapping
     public ResponseEntity<?> addWishlist(
             @RequestParam("product_id") int product_id ){
 
@@ -31,7 +31,7 @@ public class WishlistController {
         return ResponseEntity.ok("상품이 찜 목록에 추가되었습니다");
     }
 
-    @DeleteMapping("/wish_item")
+    @DeleteMapping
     public ResponseEntity<?> deleteWishlist(
             @RequestParam("product_id") int product_id) {
         int user_id = security_Util.getCurrentUserId();
