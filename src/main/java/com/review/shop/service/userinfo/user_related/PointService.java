@@ -3,6 +3,7 @@ package com.review.shop.service.userinfo.user_related;
 import com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO;
 import com.review.shop.dto.userinfo.user_related.Point.PointResponseDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.userinfo.user_related.PointMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,11 @@ public class PointService {
         try {
             List<PointResponseDTO> history = pointMapper.getPointHistoryByUserId(user_id);
             if (history == null || history.isEmpty()) {
-                throw new WrongRequestException("해당 사용자의 포인트 내역이 존재하지 않습니다.");
+                throw new ResourceNotFoundException("해당 사용자의 포인트 내역이 존재하지 않습니다.");
             }
             return history;
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             throw new DatabaseException("사용자 포인트 내역 조회 중 DB 오류가 발생했습니다.", e);
         }
