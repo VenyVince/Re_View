@@ -48,8 +48,8 @@
 
     <!-- 리뷰 이미지 저장 -->
     <insert id="insertReviewImage">
-        INSERT INTO review_images (review_id, image_url)
-        VALUES (#{review_id}, #{imageUrl})
+        INSERT INTO review_images (review_image_id, review_id, image_url)
+        VALUES (review_images_seq.NEXTVAL, #{review_id}, #{imageUrl})
     </insert>
 
     <!-- 가장 최근 생성된 리뷰 조회 (첫 번째 행만) -->
