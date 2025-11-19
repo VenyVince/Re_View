@@ -1,9 +1,9 @@
-package com.review.shop.service.wishlist;
+package com.review.shop.service.userinfo.other;
 
 import com.review.shop.dto.wishlist.WishlistDTO;
 import com.review.shop.dto.wishlist.WishlistResponseDTO;
 import com.review.shop.repository.UserIdMapper;
-import com.review.shop.repository.wishlist.WishlistMapper;
+import com.review.shop.repository.userinfo.other.WishlistMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

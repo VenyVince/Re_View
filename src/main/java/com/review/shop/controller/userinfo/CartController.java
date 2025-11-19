@@ -3,7 +3,7 @@ package com.review.shop.controller.userinfo;
 import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.cart.CartitemRequestDTO;
 import com.review.shop.dto.cart.CartitemResponseDTO;
-import com.review.shop.service.userinfo.CartService;
+import com.review.shop.service.userinfo.other.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

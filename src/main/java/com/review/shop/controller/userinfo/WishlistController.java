@@ -1,8 +1,8 @@
-package com.review.shop.controller.wishlist;
+package com.review.shop.controller.userinfo;
 
 import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.wishlist.WishlistResponseDTO;
-import com.review.shop.service.wishlist.WishlistService;
+import com.review.shop.service.userinfo.other.WishlistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
