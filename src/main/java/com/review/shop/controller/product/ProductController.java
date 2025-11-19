@@ -15,6 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ProductController {
+    
+    // 예외 서비스에서 모두 받음
 
     // 1. 두 서비스를 모두 주입받습니다.
     private final ProductService productService;
@@ -26,33 +28,14 @@ public class ProductController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "8") int size,
             @RequestParam(value = "sort", defaultValue = "latest") String sort) {
-
-        try {
-            List<ProductDTO> products = productService.getProductList(page, size, sort);
-            return ResponseEntity.ok(products);
-        } catch (Exception e) {
-            e.printStackTrace(); // 에러 로그 출력
-            return ResponseEntity.status(500).build();
-        }
+        List<ProductDTO> products = productService.getProductList(page, size, sort);
+        return ResponseEntity.ok(products);
     }
 
     // [추가됨] 상품 상세 조회 (GET /api/products/{productId})
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDetailDTO> getProductDetail(@PathVariable Integer productId) {
-        try {
-            ProductDetailDTO product = productDetailService.getProductDetail(productId);
-
-            if (product != null) {
-                return ResponseEntity.ok(product);
-            } else {
-                return ResponseEntity.notFound().build(); // 404 Not Found
-            }
-        } catch (IllegalArgumentException e) {
-            // ID가 이상할 때 (서비스에서 던진 예외 처리)
-            return ResponseEntity.badRequest().build(); // 400 Bad Request
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+        ProductDetailDTO product = productDetailService.getProductDetail(productId);
+        return ResponseEntity.ok(product);
     }
 }

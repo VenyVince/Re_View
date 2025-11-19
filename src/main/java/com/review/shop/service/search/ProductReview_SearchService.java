@@ -3,7 +3,7 @@ package com.review.shop.service.search;
 import com.review.shop.dto.search.ProductReview_SearchDTO;
 import com.review.shop.dto.search.ProductReview_SearchResponseDTO;
 import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFountException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.search.pages.ProductReview_SearchMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -22,7 +22,7 @@ public class ProductReview_SearchService {
             List<ProductReview_SearchDTO> reviews = reviewMapper.searchReviews(product_id, keyword, sort,  filter_rating);
 
             if (reviews.isEmpty()) {
-                throw new ResourceNotFountException("검색 결과가 존재하지 않습니다");
+                throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
 
             ProductReview_SearchResponseDTO response = new ProductReview_SearchResponseDTO();

@@ -6,25 +6,22 @@
 
     <select id="getProductsByIds" resultType="com.review.shop.dto.orders.OrderCheckoutProductInfoDTO">
         SELECT
-        p.product_id as prdId,
-        pi.image_url as prdImage,
-        p.prd_name as prdName,
-        p.price as prdPrice
-        FROM product p
-        LEFT JOIN product_image pi ON p.product_id = pi.product_id
-        WHERE p.product_id IN
+        p.PRODUCT_ID   AS product_id,
+        pi.IMAGE_URL   AS image_url,
+        p.PRD_NAME     AS prd_name,
+        p.PRICE        AS price
+        FROM PRODUCT p
+        LEFT JOIN PRODUCT_IMAGE pi ON p.PRODUCT_ID = pi.PRODUCT_ID
+        WHERE p.PRODUCT_ID IN
         <foreach collection="productIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </select>
 
-
     <select id="getUserPoint" resultType="integer">
-        SELECT
-            POINT
-        FROM
-            USER_TABLE  WHERE
-            USER_ID = #{userId}
+        SELECT POINT
+        FROM USER_TABLE
+        WHERE USER_ID = #{userId}
     </select>
 
 </mapper>

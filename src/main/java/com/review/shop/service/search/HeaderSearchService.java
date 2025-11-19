@@ -4,7 +4,7 @@ import com.review.shop.dto.search.HeaderSearchDTO;
 import com.review.shop.dto.search.HeaderSearchProductDTO;
 import com.review.shop.dto.search.HeaderSearchReviewDTO;
 import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFountException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.search.header.HeaderSearchProductMapper;
 import com.review.shop.repository.search.header.HeaderSearchReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class HeaderSearchService {
             List<HeaderSearchProductDTO> products = productMapper.searchProducts(keyword, sort, filter_brand, filter_category);
 
             if (products.isEmpty() && reviews.isEmpty()) {
-                throw new ResourceNotFountException("검색 결과가 존재하지 않습니다");
+                throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
 
             HeaderSearchDTO response = new HeaderSearchDTO();
@@ -35,7 +35,7 @@ public class HeaderSearchService {
 
             return response;
         } catch (DataAccessException e) {
-            throw new DatabaseException("오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
+            throw new DatabaseException("DB오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
         }
     }
 }

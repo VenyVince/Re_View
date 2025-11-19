@@ -3,44 +3,49 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.review.shop.repository.user.UserMapper">
-    <!-- user id는 Oracle 트리거로 자동 생성, created date는 db에서 default sys date로 지정됨. -->
-    <insert id="insertUser" parameterType="UserInfoDto">
-        INSERT INTO USER_TABLE (id, password, name, email, nickname, phone_number, baumann_id, role)
-        VALUES (#{id}, #{password}, #{name}, #{email}, #{nickname}, #{phoneNumber}, #{baumannId}, #{role})
+    <insert id="insertUser" parameterType="com.review.shop.dto.user.UserInfoDTO">
+        INSERT INTO USER_TABLE (
+            ID, PASSWORD, NAME, EMAIL, NICKNAME, PHONE_NUMBER, BAUMANN_ID, ROLE
+        ) VALUES (
+                     #{id}, #{password}, #{name}, #{email}, #{nickname}, #{phone_number}, #{baumann_id}, #{role}
+                 )
     </insert>
 
-    <!-- UserInfoDto findUserById(String id) - USER_ID 포함  -->
     <select id="findUserById" resultType="com.review.shop.dto.user.UserInfoDTO">
         SELECT
-        USER_ID,ID,PASSWORD,NAME,EMAIL,NICKNAME,PHONE_NUMBER,BAUMANN_ID,ROLE
+            USER_ID,
+            ID,
+            PASSWORD,
+            NAME,
+            EMAIL,
+            NICKNAME,
+            PHONE_NUMBER,
+            BAUMANN_ID,
+            ROLE,
+            POINT
         FROM
-        USER_TABLE
+            USER_TABLE
         WHERE ID = #{id}
     </select>
 
-    <!-- id로 user_id 조회 -->
     <select id="findUserIdById" resultType="int">
         SELECT USER_ID FROM USER_TABLE WHERE ID = #{id}
     </select>
 
-<!--    비밀번호 재설정-->
     <update id="updatePassword">
         UPDATE USER_TABLE
         SET
             PASSWORD = #{newEncodedPassword}
         WHERE
-            id = #{id}
+            ID = #{id}
     </update>
 
-
-
     <select id="findUserIdByNameAndPhoneNumber" resultType="string">
-        SELECT id
+        SELECT ID
         FROM USER_TABLE
-        WHERE name = #{name}
-          AND phone_number = #{phoneNumber, jdbcType=VARCHAR}
+        WHERE NAME = #{name}
+          AND PHONE_NUMBER = #{phoneNumber}
     </select>
-
 </mapper>
 
 
