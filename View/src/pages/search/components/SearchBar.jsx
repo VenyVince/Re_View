@@ -1,8 +1,23 @@
+// src/pages/search/components/SearchBar.jsx
 import React, { useState } from "react";
 import "./SearchBar.css";
 
-export default function SearchBar({ mode, setMode }) {
+export default function SearchBar({ mode, setMode, setSortType }) {
     const [sort, setSort] = useState("인기순");
+
+    const handleSortChange = (e) => {
+        const val = e.target.value;
+        setSort(val);
+
+        if (val === "인기순") setSortType("popular");
+        if (val === "최신순") setSortType("latest");
+
+        if (val === "가격 낮은순") setSortType("price_low");
+        if (val === "가격 높은순") setSortType("price_high");
+
+        if (val === "별점 높은순") setSortType("rating_high");
+        if (val === "별점 낮은순") setSortType("rating_low");
+    };
 
     return (
         <div className="search-inline">
@@ -24,20 +39,12 @@ export default function SearchBar({ mode, setMode }) {
             </div>
 
             <div className="right-section">
-                <div className="date-range">
-                    <label>기간</label>
-                    <div className="date-inputs">
-                        <input type="date" defaultValue="2025-11-01" />
-                        <span>~</span>
-                        <input type="date" defaultValue="2025-11-07" />
-                    </div>
-                </div>
-
                 <div className="sort-select">
                     <label>정렬</label>
-                    <select value={sort} onChange={(e) => setSort(e.target.value)}>
+                    <select value={sort} onChange={handleSortChange}>
                         <option>인기순</option>
                         <option>최신순</option>
+
                         {mode === "product" ? (
                             <>
                                 <option>가격 낮은순</option>

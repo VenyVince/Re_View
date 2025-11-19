@@ -13,55 +13,29 @@ export default function SearchPage() {
     const queryParams = new URLSearchParams(location.search);
 
     const keyword = queryParams.get("keyword") || "";
-    const categoryParam = queryParams.get("category") || "";
 
-    const [mode, setMode] = useState("product"); // 상품 먼저 표시
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [mode, setMode] = useState("product");
+    const [selectedCategory, setSelectedCategory] = useState(""); // 단일 카테고리
     const [selectedBrand, setSelectedBrand] = useState("");
     const [products, setProducts] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [brands, setBrands] = useState([]);
     const [error, setError] = useState("");
+    const [sortType, setSortType] = useState("popular");
 
-    // 카테고리 자동 감지용 매핑
-    const categoryKeywords = {
-        "스킨": "스킨 / 토너",
-        "토너": "스킨 / 토너",
-        "에센스": "에센스 / 세럼 / 앰플",
-        "세럼": "에센스 / 세럼 / 앰플",
-        "앰플": "에센스 / 세럼 / 앰플",
-        "크림": "크림",
-        "로션": "로션",
-        "미스트": "미스트 / 오일",
-        "오일": "미스트 / 오일",
+    // 🔥 단일 카테고리 필터에 맞춰 data를 필터링하는 함수
+    const filterByCategory = (list, category) => {
+        if (!category || category === "전체") return list;
+        return list.filter(item => item.category === category);
     };
 
-    // URL categoryParam 적용
-    useEffect(() => {
-        if (categoryParam) {
-            setSelectedCategory(categoryParam);
-        }
-    }, [categoryParam]);
-
-    // keyword 기반 카테고리 자동 선택
-    useEffect(() => {
-        if (!keyword) return;
-
-        for (const [key, value] of Object.entries(categoryKeywords)) {
-            if (keyword.includes(key)) {
-                setSelectedCategory(value);
-                break;
-            }
-        }
-    }, [keyword]);
-
-    // 검색 API
     useEffect(() => {
         const fetchSearch = async () => {
             if (!keyword || keyword.length < 2) {
                 setProducts([]);
                 setReviews([]);
-                setError("");
+                setBrands([]);
+                setMode("product");
                 return;
             }
 
@@ -70,43 +44,53 @@ export default function SearchPage() {
                     params: {
                         keyword,
                         sort: "latest",
-                    },
+                        filter_rating: 0
+                    }
                 });
 
-                const responseProducts = res.data.products || [];
-                const responseReviews = res.data.reviews || [];
+                let dataProducts = res.data.products || [];
+                let dataReviews = res.data.reviews || [];
 
-                setProducts(responseProducts);
-                setReviews(responseReviews);
+                // 🔥 선택된 category 에 따라 필터
+                dataProducts = filterByCategory(dataProducts, selectedCategory);
+                dataReviews = filterByCategory(dataReviews, selectedCategory);
 
-                const brandCountMap = {};
-                responseProducts.forEach((p) => {
-                    const brand = p.prd_brand || "";
-                    brandCountMap[brand] = (brandCountMap[brand] || 0) + 1;
+                setProducts(dataProducts);
+                setReviews(dataReviews);
+
+                // 🔥 브랜드 카운트
+                const brandMap = {};
+                [...dataProducts, ...dataReviews].forEach(item => {
+                    const brand = item.prd_brand || "기타";
+                    brandMap[brand] = (brandMap[brand] || 0) + 1;
                 });
 
-                const sortedBrands = Object.entries(brandCountMap)
+                const sortedBrands = Object.entries(brandMap)
                     .map(([name, count]) => ({ name, count }))
                     .sort((a, b) => b.count - a.count);
 
                 setBrands(sortedBrands);
-                setError("");
 
-                // keyword가 브랜드라면 자동 active
-                const brandNames = sortedBrands.map((b) => b.name);
-                if (brandNames.includes(keyword)) {
-                    setSelectedBrand(keyword);
+                // 🔥 리뷰 자동 전환 (닉네임 검색 등에만)
+                if (dataReviews.length > 0 && dataProducts.length === 0) {
+                    setMode("review");
+                } else {
+                    setMode("product");
                 }
 
-            } catch (err) {
+                setError("");
+
+            } catch {
                 setError("검색 결과를 불러오지 못했습니다.");
                 setProducts([]);
                 setReviews([]);
+                setBrands([]);
+                setMode("product");
             }
         };
 
         fetchSearch();
-    }, [keyword]);
+    }, [keyword, selectedCategory]);
 
     return (
         <section className="search-page">
@@ -119,7 +103,9 @@ export default function SearchPage() {
             <div className="search-filters">
                 <CategoryFilter
                     selectedCategory={selectedCategory}
-                    onSelect={setSelectedCategory}
+                    onSelect={(cat) => {
+                        setSelectedCategory(cat); // 🔥 keyword 변경 없음
+                    }}
                 />
 
                 <hr className="divider-light" />
@@ -134,7 +120,11 @@ export default function SearchPage() {
                 <hr className="divider-strong" />
             </div>
 
-            <SearchBar mode={mode} setMode={setMode} />
+            <SearchBar
+                mode={mode}
+                setMode={setMode}
+                setSortType={setSortType}
+            />
 
             {error ? (
                 <p className="no-result">{error}</p>
@@ -144,6 +134,7 @@ export default function SearchPage() {
                     results={mode === "product" ? products : reviews}
                     selectedCategory={selectedCategory}
                     selectedBrand={selectedBrand}
+                    sortType={sortType}
                 />
             )}
         </section>
