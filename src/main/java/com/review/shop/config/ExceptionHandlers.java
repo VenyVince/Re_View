@@ -1,7 +1,7 @@
 package com.review.shop.config;
 
 import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFountException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionHandlers {
  
     //exception 패키지 참조
-    @ExceptionHandler(ResourceNotFountException.class)
-    public ResponseEntity<String> handleNotFount(ResourceNotFountException exception) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleNotFount(ResourceNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
     
