@@ -2,9 +2,11 @@ package com.review.shop.service.admin;
 
 
 import com.review.shop.dto.product.ProductDetailDTO;
-import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.dto.qna.QnAListDTO;
+import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,17 +21,23 @@ public class AdminService {
 
     // 상품 등록
     public void insertProduct(ProductDetailDTO product) {
+        if (product ==null){
+            throw new WrongRequestException("상품 정보가 전달되지 않았습니다.");
+        }
         int affected = adminMapper.insertProduct(product);
         if (affected == 0) {
-            throw new DatabaseException("상품 등록에 실패했습니다", null);
+            throw new DatabaseException("상품 등록에 실패했습니다.", null);
         }
     }
 
     // 상품 수정
     public void updateProduct(int productId, ProductDetailDTO product) {
+        if(product ==null){
+            throw new WrongRequestException("수정할 상품 정보가 전달되지 않았습니다.");
+        }
         int affected = adminMapper.updateProduct(productId, product);
         if (affected == 0) {
-            throw new DatabaseException("상품 수정에 실패했습니다.", null);
+            throw new ResourceNotFoundException("수정할 상품을 찾을 수 없습니다.");
         }
     }
 
@@ -37,24 +45,31 @@ public class AdminService {
     public void deleteProduct(int productId) {
         int affected = adminMapper.deleteProduct(productId);
         if (affected == 0) {
-            throw new DatabaseException("상품 삭제에 실패했습니다.", null);
+            throw new ResourceNotFoundException("삭제할 상품을 찾을 수 없습니다.");
         }
     }
 
     // 주문 상태 변경
     public void updateOrderStatus(int orderId, String orderStatus) {
+        if(orderStatus ==null||orderStatus.isEmpty()){
+            throw new WrongRequestException("변경할 주문 상태가 null이거나 존재하지 않습니다");
+
+        }
         int affected = adminMapper.updateOrderStatus(orderId, orderStatus);
         if (affected == 0) {
-            throw new DatabaseException("주문 상태 변경에 실패했습니다.", null);
+            throw new ResourceNotFoundException("주문을 찾을 수 없습니다.");
         }
     }
 
 
     // QnA 답변 등록/수정
     public void updateQnaAnswer(int qnaId, String adminAnswer) {
+        if(adminAnswer ==null||adminAnswer.isEmpty()){
+            throw new WrongRequestException("답변 내용이 비어있습니다.");
+        }
         int affected = adminMapper.updateQnaAnswer(qnaId, adminAnswer);
         if (affected == 0) {
-            throw new DatabaseException("QnA 답변 등록/수정에 실패했습니다. ", null);
+            throw new ResourceNotFoundException("답변할 QnA를 찾을 수 없습니다.");
         }
     }
 
@@ -62,7 +77,7 @@ public class AdminService {
     public Integer getMemberPoints(int memberId) {
         Integer points = adminMapper.getMemberPoints(memberId);
         if (points == null) {
-            throw new DatabaseException("존재하지 않는 회원입니다", null);
+            throw new DatabaseException("포인트가 존재하지 않습니다.", null);
         }
         return points;
     }
@@ -76,15 +91,18 @@ public class AdminService {
     public void deleteReview(int reviewId) {
         int affected = adminMapper.deleteReview(reviewId);
         if (affected == 0) {
-            throw new DatabaseException("리뷰 삭제에 실패했습니다.", null);
+            throw new ResourceNotFoundException("삭제할 리뷰를 찾을 수 없습니다.");
         }
     }
 
     //  setReviewSelection 구현 - 운영자 픽 설정 (테스트 완료)
     public void setReviewSelection(int reviewId, Integer isSelected) {
+        if (isSelected == null || (isSelected != 0 && isSelected != 1)) {
+            throw new WrongRequestException("is_selected 값은 0 또는 1이어야 합니다.");
+        }
         int affected = adminMapper.setReviewSelection(reviewId, isSelected);
         if (affected == 0) {
-            throw new DatabaseException("운영자 픽에 설정 실패했습니다.", null);
+            throw new ResourceNotFoundException("설정할 리뷰를 찾을 수 없습니다.");
         }
     }
 
@@ -94,7 +112,10 @@ public class AdminService {
     }
 
     //getQnaDetail 구현 - QnA 상세 조회, repository 실행
-    public QnaDTO getQnaDetail(int qnaId) {
+    public QnaDTO getQnaDetail(Integer qnaId) {
+        if(qnaId==null){
+            throw new ResourceNotFoundException("조회할 QnA를 찾을 수 없습니다.");
+        }
         return adminMapper.getQnaDetail(qnaId);
     }
 

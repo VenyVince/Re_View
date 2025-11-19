@@ -39,8 +39,8 @@ public class UserService implements UserDetailsService {
                 userDTO.getName(),
                 userDTO.getEmail(),
                 userDTO.getNickname(),
-                userDTO.getPhoneNumber(),
-                userDTO.getBaumannId(),
+                userDTO.getPhone_number(),
+                userDTO.getBaumann_id(),
                 userDTO.getRole()
         );
 
@@ -107,5 +107,15 @@ public class UserService implements UserDetailsService {
         if(affected != 1) throw new WrongRequestException("비밀번호 재설정에 실패했습니다.");
 
 
+    }
+
+
+    //findIdByNameAndPhoneNumber 구현 하기
+    public String findIdByNameAndPhoneNumber(String name, String phoneNumber) {
+        String user_id = userMapper.findUserIdByNameAndPhoneNumber(name, phoneNumber);
+        if (user_id == null) {
+            throw new WrongRequestException("일치하는 사용자가 없습니다.");
+        }
+        return user_id;
     }
 }

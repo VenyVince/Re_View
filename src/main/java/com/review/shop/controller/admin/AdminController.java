@@ -4,6 +4,7 @@ import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,9 +20,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// TEST
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import java.util.Map;
 
 @Tag(name = "Admin API", description = "관리자 기능 API")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true") //
 @RestController
 @RequestMapping("/api/admin")
 @AllArgsConstructor
@@ -106,7 +111,7 @@ public class AdminController {
     // SECTION: 리뷰 관리 (Review)
     // =================================================================================
 
-    @Operation(summary = "리뷰 삭제", description = "특정 상품 리뷰를 삭제합니다.")
+    @Operation(summary = "리뷰 삭제 (논리적)", description = "특정 상품 리뷰를 삭제합니다. (DELETED_DATE 설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
@@ -131,7 +136,7 @@ public class AdminController {
 
         Integer isSelected = payload.get("is_selected");
         if (isSelected == null || (isSelected != 0 && isSelected != 1)) {
-            return ResponseEntity.badRequest().body("is_selected 값은 0 또는 1이어야 합니다.");
+            throw new WrongRequestException("is_selected는 0, 1중 하나여야 합니다.");
         }
 
         adminService.setReviewSelection(reviewId, isSelected);
@@ -206,7 +211,7 @@ public class AdminController {
     // =================================================================================
 
     @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleWrongRequest(DatabaseException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 }

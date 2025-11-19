@@ -35,7 +35,7 @@ public class HeaderSearchService {
 
             return response;
         } catch (DataAccessException e) {
-            throw new DatabaseException("오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
+            throw new DatabaseException("DB오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
         }
     }
 }

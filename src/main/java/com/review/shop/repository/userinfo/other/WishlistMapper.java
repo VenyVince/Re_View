@@ -1,4 +1,4 @@
-package com.review.shop.repository.wishlist;
+package com.review.shop.repository.userinfo.other;
 
 import com.review.shop.dto.wishlist.WishlistDTO;
 import org.apache.ibatis.annotations.Mapper;

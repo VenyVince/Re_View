@@ -1,5 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import AdminProductPage from "./admin/AdminProductPage";
+import { Navigate } from "react-router-dom";
+import UserDashboard from "./user/UserDashboard";
 
 export default function MyPage() {
     const { auth } = useAuth();
@@ -8,9 +10,11 @@ export default function MyPage() {
 
     // 관리자면 관리자 페이지로
     if (auth.role === "ROLE_ADMIN") {
-        return <AdminProductPage />;
+        return <Navigate to="/admin/allproducts" replace />;
     }
 
     // 일반 유저 페이지
-    return <div>일반 사용자 마이페이지</div>;
+    return (
+        <UserDashboard/>
+    );
 }
