@@ -40,7 +40,7 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
 
-import UserOrderPage from "./pages/mypage/user/UserOrderPage";
+import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
@@ -94,7 +94,7 @@ export default function App() {
                 <Route path="/test-products" element={<TestProduct />} />
 
                 {/* 사용자 전용 영역 */}
-                    <Route path="/mypage" element={<UserOrderPage />} />
+                    <Route path="/mypage" element={<UserDeliveryPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
             </Routes>
