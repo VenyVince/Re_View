@@ -1,11 +1,11 @@
-package com.review.shop.service.userinfo.other;
+package com.review.shop.service.userinfo.user_related;
 
-import com.review.shop.dto.userinfo.others.wishlist.WishlistDTO;
-import com.review.shop.dto.userinfo.others.wishlist.WishlistResponseDTO;
+import com.review.shop.dto.userinfo.user_related.wishlist.WishlistDTO;
+import com.review.shop.dto.userinfo.user_related.wishlist.WishlistResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.UserIdMapper;
-import com.review.shop.repository.userinfo.other.WishlistMapper;
+import com.review.shop.repository.userinfo.user_related.WishlistMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.review.shop.controller.search;
 
-import com.review.shop.dto.search.HeaderSearchDTO;
+import com.review.shop.dto.search.header.HeaderSearchDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.search.HeaderSearchService;
 import io.swagger.v3.oas.annotations.Operation;

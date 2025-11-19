@@ -1,10 +1,10 @@
-package com.review.shop.service.userinfo.other;
+package com.review.shop.service.userinfo.user_related;
 
 import com.review.shop.dto.cart.CartitemRequestDTO;
 import com.review.shop.dto.cart.CartitemResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.repository.userinfo.other.CartMapper;
+import com.review.shop.repository.userinfo.user_related.CartMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;

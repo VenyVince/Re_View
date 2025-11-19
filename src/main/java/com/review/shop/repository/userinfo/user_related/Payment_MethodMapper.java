@@ -1,7 +1,7 @@
-package com.review.shop.repository.userinfo.other;
+package com.review.shop.repository.userinfo.user_related;
 
-import com.review.shop.dto.userinfo.others.Payment_MethodDTO;
-import com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO;
+import com.review.shop.dto.userinfo.user_related.payments.Payment_MethodDTO;
+import com.review.shop.dto.userinfo.user_related.payments.Payment_MethodResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

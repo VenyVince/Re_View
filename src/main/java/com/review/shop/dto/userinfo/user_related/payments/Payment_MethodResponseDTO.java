@@ -1,4 +1,4 @@
-package com.review.shop.dto.userinfo.others;
+package com.review.shop.dto.userinfo.user_related.payments;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

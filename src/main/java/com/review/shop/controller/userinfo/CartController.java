@@ -3,7 +3,7 @@ package com.review.shop.controller.userinfo;
 import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.cart.CartitemRequestDTO;
 import com.review.shop.dto.cart.CartitemResponseDTO;
-import com.review.shop.service.userinfo.other.CartService;
+import com.review.shop.service.userinfo.user_related.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -1,4 +1,4 @@
-package com.review.shop.repository.userinfo.other;
+package com.review.shop.repository.userinfo.user_related;
 
 import com.review.shop.dto.cart.CartitemResponseDTO;
 import org.apache.ibatis.annotations.Mapper;

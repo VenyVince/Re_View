@@ -1,8 +1,7 @@
-package com.review.shop.dto.search;
+package com.review.shop.dto.search.header;
 
 import lombok.Data;
 
-import java.sql.Date;
 import java.util.List;
 
 @Data

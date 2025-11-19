@@ -1,6 +1,6 @@
-package com.review.shop.repository.userinfo.other;
+package com.review.shop.repository.userinfo.user_related;
 
-import com.review.shop.dto.userinfo.others.wishlist.WishlistDTO;
+import com.review.shop.dto.userinfo.user_related.wishlist.WishlistDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

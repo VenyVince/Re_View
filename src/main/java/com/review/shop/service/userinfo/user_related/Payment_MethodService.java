@@ -1,11 +1,11 @@
-package com.review.shop.service.userinfo.other;
+package com.review.shop.service.userinfo.user_related;
 
 
-import com.review.shop.dto.userinfo.others.Payment_MethodDTO;
-import com.review.shop.dto.userinfo.others.Payment_MethodResponseDTO;
+import com.review.shop.dto.userinfo.user_related.payments.Payment_MethodDTO;
+import com.review.shop.dto.userinfo.user_related.payments.Payment_MethodResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
-import com.review.shop.repository.userinfo.other.Payment_MethodMapper;
+import com.review.shop.repository.userinfo.user_related.Payment_MethodMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;

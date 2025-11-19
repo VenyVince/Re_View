@@ -1,4 +1,4 @@
-package com.review.shop.dto.userinfo.others;
+package com.review.shop.dto.userinfo.user_related;
 
 public class AddressDTO {
     private int address_id;

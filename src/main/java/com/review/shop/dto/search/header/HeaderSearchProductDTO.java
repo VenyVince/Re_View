@@ -1,4 +1,4 @@
-package com.review.shop.dto.search;
+package com.review.shop.dto.search.header;
 
 import lombok.Data;
 

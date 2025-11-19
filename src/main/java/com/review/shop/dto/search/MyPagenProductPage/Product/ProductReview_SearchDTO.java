@@ -1,4 +1,4 @@
-package com.review.shop.dto.search;
+package com.review.shop.dto.search.MyPagenProductPage.Product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
