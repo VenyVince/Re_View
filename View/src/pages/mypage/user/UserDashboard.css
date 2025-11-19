@@ -1,207 +1,176 @@
-/* ================================
-    전체 레이아웃
-================================ */
-.mypage-wrapper {
+/* src/pages/mypage/user/UserDeliveryPage.css */
+
+/* 전체 레이아웃 */
+.mypage-container {
+    max-width: 1200px;
+    margin: 40px auto 80px;
     display: flex;
-    justify-content: center;
-    background: #fafafa;
-    padding: 40px 0;
-    min-height: 100vh;
+    gap: 32px;
 }
 
-.mypage-shell {
-    display: flex;
-    width: 100%;
-    max-width: 1280px;
-    gap: 40px;
-}
-
-
-/* ================================
-    사이드바
-================================ */
+/* 왼쪽 사이드바 */
 .mypage-sidebar {
     width: 220px;
+    flex-shrink: 0;
 }
 
 .mypage-title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 30px;
+    margin-bottom: 16px;
 }
 
 .mypage-menu {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
 .mypage-menu-item {
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 15px;
-    background: transparent;
-    border: none;
+    width: 100%;
     text-align: left;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    font-size: 14px;
     cursor: pointer;
-    color: #444;
-    transition: all 0.2s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .mypage-menu-item:hover {
-    background: #f1f1f1;
+    background-color: #f3f3f3;
 }
 
 .mypage-menu-item.active {
-    background: #000;
+    background-color: #111;
     color: #fff;
-    font-weight: 600;
 }
 
-
-/* ================================
-    메인
-================================ */
+/* 오른쪽 메인 영역 */
 .mypage-main {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
 }
 
-
-/* ================================
-    상단 프로필 박스
-================================ */
+/* 상단 프로필 블랙 박스 */
 .mypage-profile {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #111;
-    color: white;
-    padding: 30px 40px;
+    background-color: #111;
+    color: #fff;
     border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .mypage-profile-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
-.mypage-avatar {
-    width: 54px;
-    height: 54px;
-    background: #d1d1d1;
+.mypage-profile-avatar {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
+    background-color: #333;
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
+    justify-content: center;
+    font-size: 24px;
 }
 
-.mypage-profile-text {
-    display: flex;
-    flex-direction: column;
+.avatar-emoji {
+    line-height: 1;
 }
 
 .mypage-profile-name {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
 }
 
-.mypage-profile-edit {
-    text-align: left;
-    margin-top: 4px;
-    font-size: 14px;
-    color: #bbb;
-    background: none;
-    border: none;
+.mypage-profile-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.mypage-profile-point .label {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.mypage-profile-point .value {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.mypage-profile-point .unit {
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+.mypage-profile-edit-btn {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #fff;
+    background-color: transparent;
+    color: #fff;
+    font-size: 12px;
     cursor: pointer;
 }
 
-.mypage-profile-edit:hover {
-    text-decoration: underline;
+/* 프로필 아래 공통 본문 래퍼 */
+.mypage-main-body {
+    margin-top: 24px;
 }
 
-
-/* ================================
-    포인트 박스
-================================ */
-.mypage-point-box {
-    text-align: right;
-}
-
-.mypage-point-label {
-    font-size: 14px;
-    color: #bbb;
-}
-
-.mypage-point-value {
-    font-size: 18px;
-    font-weight: 700;
-    margin-left: 10px;
-}
-
-
-/* ================================
-    주문 배송 요약 (3개 박스)
-================================ */
-.mypage-summary {
-    display: flex;
-    gap: 20px;
-}
-
-.mypage-summary-card {
-    flex: 1;
-    background: white;
+/* 섹션 공통 */
+.mypage-section {
+    background-color: #fff;
     border-radius: 12px;
-    padding: 26px 0;
-    text-align: center;
-    border: 1px solid #ececec;
+    padding: 24px 24px 28px;
+    box-shadow: 0 0 0 1px #f1f1f1;
 }
 
-.mypage-summary-number {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.mypage-summary-label {
-    font-size: 14px;
-    color: #777;
-}
-
-
-/* ================================
-    주문 내역 헤더
-================================ */
-.mypage-orders-header h3 {
+.mypage-section-title {
     font-size: 18px;
     font-weight: 600;
+    margin-bottom: 16px;
 }
 
+/* 주문 요약 카드 (대시보드용) */
+.order-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
 
-/* ================================
-    주문 내역 없음
-================================ */
-.mypage-orders-empty {
+.order-summary-card {
+    padding: 14px 12px;
+    border-radius: 10px;
+    background-color: #fafafa;
+    text-align: center;
+}
+
+.order-summary-card .label {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.order-summary-card .value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* 장바구니 비어 있을 때 */
+.cart-empty-box {
+    border-radius: 12px;
     border: 1px dashed #ddd;
-    border-radius: 12px;
-    padding: 80px 0;
+    padding: 40px 16px;
     text-align: center;
-    background: #fff;
-}
-
-.mypage-orders-empty-title {
-    font-size: 17px;
-    font-weight: 600;
-}
-
-.mypage-orders-empty-desc {
-    font-size: 14px;
     color: #777;
-    margin-top: 6px;
+    font-size: 14px;
 }

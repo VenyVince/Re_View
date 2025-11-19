@@ -6,25 +6,71 @@
 
     <select id="getProductsByIds" resultType="com.review.shop.dto.orders.OrderCheckoutProductInfoDTO">
         SELECT
-        p.product_id as prdId,
-        pi.image_url as prdImage,
-        p.prd_name as prdName,
-        p.price as prdPrice
-        FROM product p
-        LEFT JOIN product_image pi ON p.product_id = pi.product_id
-        WHERE p.product_id IN
+        p.PRODUCT_ID   AS product_id,
+        pi.IMAGE_URL   AS image_url,
+        p.PRD_NAME     AS prd_name,
+        p.PRICE        AS price
+        FROM PRODUCT p
+        LEFT JOIN PRODUCT_IMAGE pi ON p.PRODUCT_ID = pi.PRODUCT_ID
+        WHERE p.PRODUCT_ID IN
         <foreach collection="productIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </select>
 
-
     <select id="getUserPoint" resultType="integer">
-        SELECT
-            POINT
-        FROM
-            USER_TABLE  WHERE
-            USER_ID = #{userId}
+        SELECT POINT
+        FROM USER_TABLE
+        WHERE USER_ID = #{userId}
     </select>
+
+    <update id="deductPoints">
+        UPDATE USER_TABLE
+        SET
+            point = point - #{pointsToDeduct}
+        WHERE
+            user_id = #{userId}
+    </update>
+
+    <insert id="addPointHistory">
+        INSERT INTO POINT_HISTORY (
+            USER_ID,
+            AMOUNT,
+            TYPE,
+            CREATED_AT,
+            DESCRIPTION
+        )
+        VALUES (
+                   #{userId},
+                   #{pointsChanged},
+                   'USE',
+                   SYSDATE,
+                   #{description}
+               )
+    </insert>
+
+    <select id="getProductStocks" resultType="com.review.shop.dto.product.ProductStockDTO">
+        SELECT
+        product_id,
+        stock,
+        prd_name,
+        price
+        FROM
+        PRODUCT
+        WHERE
+        product_id IN
+        <foreach collection="productIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="deductStock">
+        UPDATE PRODUCT SET
+            stock = stock - #{quantity}
+        WHERE
+            product_id = #{productId}
+          AND stock >= #{quantity}
+    </update>
+
 
 </mapper>

@@ -39,8 +39,8 @@ public class UserService implements UserDetailsService {
                 userDTO.getName(),
                 userDTO.getEmail(),
                 userDTO.getNickname(),
-                userDTO.getPhoneNumber(),
-                userDTO.getBaumannId(),
+                userDTO.getPhone_number(),
+                userDTO.getBaumann_id(),
                 userDTO.getRole()
         );
 

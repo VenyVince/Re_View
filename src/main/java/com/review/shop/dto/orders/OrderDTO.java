@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 public class OrderDTO {
-    private int productId;
-    private int quantity;
+    private int product_id;
+
+    private int buy_quantity;
 }

@@ -4,6 +4,9 @@ import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.service.product.ProductDetailService;
 import com.review.shop.service.product.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,43 +19,33 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ProductController {
 
-    // 1. 두 서비스를 모두 주입받습니다.
     private final ProductService productService;
     private final ProductDetailService productDetailService;
 
-    // [기존] 상품 목록 조회 (GET /api/products?page=1&size=8...)
+    @Operation(summary = "상품 목록 조회", description = "상품 목록을 페이징 및 정렬 조건에 따라 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터 (페이지 번호, 사이즈, 정렬 옵션 오류)"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getProducts(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "8") int size,
             @RequestParam(value = "sort", defaultValue = "latest") String sort) {
-
-        try {
-            List<ProductDTO> products = productService.getProductList(page, size, sort);
-            return ResponseEntity.ok(products);
-        } catch (Exception e) {
-            e.printStackTrace(); // 에러 로그 출력
-            return ResponseEntity.status(500).build();
-        }
+        List<ProductDTO> products = productService.getProductList(page, size, sort);
+        return ResponseEntity.ok(products);
     }
 
-    // [추가됨] 상품 상세 조회 (GET /api/products/{productId})
+    @Operation(summary = "상품 상세 조회", description = "상품 ID로 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDetailDTO> getProductDetail(@PathVariable Integer productId) {
-        try {
-            ProductDetailDTO product = productDetailService.getProductDetail(productId);
-
-            if (product != null) {
-                return ResponseEntity.ok(product);
-            } else {
-                return ResponseEntity.notFound().build(); // 404 Not Found
-            }
-        } catch (IllegalArgumentException e) {
-            // ID가 이상할 때 (서비스에서 던진 예외 처리)
-            return ResponseEntity.badRequest().build(); // 400 Bad Request
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+        ProductDetailDTO product = productDetailService.getProductDetail(productId);
+        return ResponseEntity.ok(product);
     }
 }

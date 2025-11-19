@@ -1,6 +1,6 @@
 package com.review.shop.repository.search.header;
 
-import com.review.shop.dto.search.HeaderSearchReviewDTO;
+import com.review.shop.dto.search.header.HeaderSearchReviewDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
