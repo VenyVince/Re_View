@@ -199,8 +199,6 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getQnaDetail(qnaId));
     }
 
-
-
     @Operation(summary = "QnA 답변 등록/수정", description = "QnA 게시글에 관리자 답변을 등록하거나 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답변 등록 성공"),
