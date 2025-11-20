@@ -1,6 +1,8 @@
 package com.review.shop.repository.Orders;
 
 import com.review.shop.dto.orders.OrderCheckoutProductInfoDTO;
+import com.review.shop.dto.orders.OrderItemDTO;
+import com.review.shop.dto.orders.OrderSaveDTO;
 import com.review.shop.dto.product.ProductStockDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -37,6 +39,12 @@ import java.util.List;
                 @Param("productId") int productId,
                 @Param("quantity") int quantity
         );
+
+        // Order Table 삽입
+        void insertOrders(OrderSaveDTO orderSaveDTO);
+
+        // OrderItems 삽입
+        void insertOrderItems(List<OrderItemDTO> orderItems);
 
 
     }

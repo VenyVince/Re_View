@@ -160,7 +160,6 @@ public class UserController  {
     }
 
 
-
     @Operation(summary = "내 세션 정보 조회 (인증 필요)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "내 정보 조회 성공 (JSON 객체 반환)",

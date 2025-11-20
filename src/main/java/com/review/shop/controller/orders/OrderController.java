@@ -62,19 +62,11 @@ public class OrderController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (포인트 부족, 재고 부족 등)"),
     })
     public ResponseEntity<String> orders(@RequestBody OrderCreateDTO orderCreateDTO) {
-        //주문번호 생성
-        String orderNo = orderService.createOrderNum();
 
-        // 포인트 검사 및 차감, 기록
-        orderService.checkAndDeductPoints(orderCreateDTO.getUser_id(), orderCreateDTO.getUsing_point(),orderNo);
+        // 트랜잭션을 포함한 모든 서비스 호출하기
+        orderService.processOrder(orderCreateDTO);
 
-        //재고 차감, 관리
-        orderService.checkAndDeductStock(orderCreateDTO.getOrder_list());
-
-        //orderCreatedDTO를 OrderItem 테이블과 Order 테이블에 반영
-
-
-        return ResponseEntity.ok("포인트 차감 성공: " );
+        return ResponseEntity.ok("주문 성공");
     }
 
 

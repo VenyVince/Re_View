@@ -73,4 +73,44 @@
     </update>
 
 
+    <insert id="insertOrders" parameterType="com.review.shop.dto.orders.OrderSaveDTO"
+            useGeneratedKeys="true" keyProperty="order_id" keyColumn="ORDER_ID">
+
+        INSERT INTO ORDERS (
+            ORDER_NO,
+            USER_ID,
+            ADDRESS_ID,
+            PAYMENT_ID,
+            TOTAL_PRICE,
+            ORDER_STATUS,
+            CREATED_AT
+        ) VALUES (
+                     #{order_no},
+                     #{user_id},
+                     #{address_id},
+                     #{payment_id},
+                     #{total_price},
+                     DEFAULT,
+                     DEFAULT
+                 )
+    </insert>
+
+    <insert id="insertOrderItems" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="item">
+            INTO ORDER_ITEM (
+            ORDER_ID,
+            PRODUCT_ID,
+            PRODUCT_NAME,  PRODUCT_PRICE, QUANTITY
+            ) VALUES (
+            #{item.order_id},
+            #{item.product_id},
+            #{item.prd_name},
+            #{item.product_price},
+            #{item.quantity}
+            )
+        </foreach>
+        SELECT * FROM DUAL
+    </insert>
+
 </mapper>
