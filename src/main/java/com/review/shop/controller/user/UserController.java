@@ -180,7 +180,7 @@ public class UserController  {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "내 정보 조회 성공 (JSON 객체 반환)",
                     content = @Content(schema = @Schema(type = "object", example = "{\"id\": \"testuser123\", \"role\": \"ROLE_USER\"}"))),
-            @ApiResponse(responseCode = "401", description = "인증 정보 없음",
+            @ApiResponse(responseCode = "400", description = "인증 정보 없음",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/api/auth/me")
