@@ -88,7 +88,7 @@ public class UserController  {
                     content = @Content(schema = @Schema(implementation = String.class))),
 
             @ApiResponse (responseCode = "401", description = "밴 당한 사용자 로그인 시도",
-                    content = @Content(schema = @Schema(implementation = String.class)))
+                    content = @Content(schema = @Schema(type = "object", example = "{\"message\": \"밴 당한 사용자입니다. 관리자에게 문의하세요.\"}")))
     })
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(
