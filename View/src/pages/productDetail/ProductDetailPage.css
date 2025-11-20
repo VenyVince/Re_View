@@ -1,0 +1,267 @@
+/* ===============================
+   전체 wrapper
+================================ */
+.pd-detail-wrapper {
+    width: 100%;
+    position: relative;
+}
+
+/* ===============================
+   상세 페이지 메인
+================================ */
+.pd-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 상단 상품 wrap */
+.pd-wrap {
+    width: 100%;
+    max-width: 1150px;
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* 왼쪽 이미지 */
+.pd-left {
+    width: 45%;
+}
+
+.pd-image-placeholder {
+    width: 100%;
+    height: 380px;
+    border: 2px dashed #aaa;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:10px;
+    color:#444;
+}
+
+.pd-image {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* 오른쪽 상품 정보 */
+.pd-right {
+    width: 55%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+}
+
+/* 기본 텍스트 */
+.pd-brand {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pd-name {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.pd-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #d32f2f;
+}
+
+/* 필드 박스 */
+.pd-field-box {
+    position: relative;
+    border: 1.5px solid #ddd;
+    padding: 14px 12px;
+    width: 220px;
+    border-radius: 8px;
+}
+
+.pd-field-label {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: #fff;
+    padding: 0 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+}
+
+.pd-field-value {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 성분 표시 */
+.pd-ingredient-toggle {
+    cursor: pointer;
+    font-size: 14px;
+    color: #1a73e8;
+    font-weight: 600;
+}
+
+.pd-ingredient-balloon {
+    width: 300px;
+    padding: 12px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    position: relative;
+}
+
+/* ===============================
+   하단 고정 바
+================================ */
+.pd-bottom-bar {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    border-top: 1px solid #ddd;
+    z-index: 1000;
+}
+
+/* 버튼 공통 */
+.pd-btm-btn {
+    height: 42px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+/* 찜 버튼 (하트) */
+.pd-btm-btn.wish {
+    flex: 0 0 20%;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+    font-size: 24px; /* ♡ 기본 크기 살짝 키움 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: font-size 0.15s ease;
+}
+
+/* ♥ 눌렸을 때 조금 더 크도록 */
+.pd-btm-btn.wish.active {
+    font-size: 30px; /* ♥ 더 커져서 착시 방지 */
+}
+
+/* 🛒 장바구니 — 40% (흰 + 검정) */
+.pd-btm-btn.cart {
+    flex: 0 0 40%;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+}
+
+/* ⚡ 바로구매 — 40% (검정 + 흰색) */
+.pd-btm-btn.buy {
+    flex: 0 0 40%;
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+}
+
+
+
+/* ===============================
+   하단 탭
+================================ */
+.pd-bottom-section {
+    width: 100%;
+    max-width: 1150px;
+}
+
+.pd-tabs-row {
+    width: 100%;
+    display: flex;
+    border-bottom: 2px solid #eee;
+}
+
+.pd-tabs-row button {
+    width: 50%;
+    padding: 12px 0;
+    background: none;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #666;
+}
+
+.pd-tabs-row button.active {
+    color: #111;
+    border-bottom: 2px solid #111;
+}
+
+/* 콘텐츠 영역 */
+.pd-content-area {
+    margin-top: 20px;
+}
+
+/* ===============================
+   TOP 버튼
+================================ */
+.pd-top-btn {
+    position: fixed;
+    right: 60px;        /* 화면 오른쪽에서 30px */
+    bottom: 120px;      /* 화면 아래에서 120px (하단바와 footer와 안 겹치게) */
+
+    width: 52px;
+    height: 52px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+
+    cursor: pointer;
+    z-index: 4000;
+
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+
+    transition: all 0.2s ease;
+}
+
+.pd-top-btn:hover {
+    background: #f8f8f8;
+    border-color: #aaa;
+}
+.top-arrow {
+    font-size: 14px;
+    margin-bottom: 4px;   /* 🔥 여백 여기! */
+    color: #666;
+}
+
+.top-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+

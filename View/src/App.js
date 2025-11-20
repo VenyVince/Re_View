@@ -24,6 +24,8 @@ import RegisterPage from './pages/register/RegisterPage'; // 회원가입 페이
 import QnaPage from "./pages/qna/QnaPage";
 import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가입 성공 페이지
 
+import ProductDetailPage from "./pages/productDetail/ProductDetailPage"; //상품 상세 페이지
+
 import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
 
 import SearchPage from './pages/search/SearchPage';
@@ -76,6 +78,8 @@ export default function App() {
                     <Route path="/survey/result" element={<SurveyResult/>}/>
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/qna" element={<QnaPage />} />
+
+                    <Route path="/product/detail" element={<ProductDetailPage />} />
 
                 {/* 관리자 전용 영역 */}
                 <Route element={<ProtectedRoute requireAdmin />}>
