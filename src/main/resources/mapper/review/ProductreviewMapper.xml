@@ -4,26 +4,28 @@
 
 <mapper namespace="com.review.shop.repository.product.ProductReviewMapper">
 
+    <!-- 상품 존재 여부 확인 : 널값 포함하게될 수도 있어서 Integer로 처리-->
+    <select id="selectProductById" parameterType="int" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM product
+        WHERE product_id = #{product_id}
+          AND deleted_at IS NULL
+    </select>
+
     <!-- 특정 상품의 리뷰 목록 조회 (이미지 포함, 평탄한 구조) -->
     <select id="selectReviewsByProduct" resultType="com.review.shop.dto.product.ProductReviewDTO">
         SELECT
-        r.review_id,
-        r.content,
-        r.rating,
-        r.like_count,
-        r.dislike_count,
+        r.review_id, r.content, r.rating, r.like_count, r.dislike_count,
         TO_CHAR(r.created_at, 'YYYY-MM-DD') AS created_at,
         COALESCE(r.is_selected, '0') AS is_selected,
-        u.user_id,
-        u.nickname,
-        u.baumann_id,
+        u.user_id, u.nickname,u.baumann_id,
         b.type AS baumann_type,
         ri.image_url
         FROM review r
         JOIN USER_TABLE u ON r.user_id = u.user_id
         LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
         LEFT JOIN review_images ri ON r.review_id = ri.review_id
-        WHERE r.product_id = #{productId}
+        WHERE r.product_id = #{product_id}
         AND r.deleted_at IS NULL
         <choose>
             <when test="sort == 'latest'">
@@ -41,13 +43,13 @@
     <!-- 리뷰 생성 -->
     <insert id="insertReview">
         INSERT INTO review (product_id, user_id, content, rating, created_at)
-        VALUES (#{productId}, #{userId}, #{content}, #{rating}, SYSDATE)
+        VALUES (#{product_id}, #{user_id}, #{content}, #{rating}, SYSDATE)
     </insert>
 
     <!-- 리뷰 이미지 저장 -->
     <insert id="insertReviewImage">
-        INSERT INTO review_images (review_id, image_url)
-        VALUES (#{reviewId}, #{imageUrl})
+        INSERT INTO review_images (review_image_id, review_id, image_url)
+        VALUES (review_images_seq.NEXTVAL, #{review_id}, #{imageUrl})
     </insert>
 
     <!-- 가장 최근 생성된 리뷰 조회 (첫 번째 행만) -->
@@ -67,8 +69,8 @@
         FROM review r
         JOIN USER_TABLE u ON r.user_id = u.user_id
         LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
-        WHERE r.product_id = #{productId}
-        AND r.user_id = #{userId}
+        WHERE r.product_id = #{product_id}
+        AND r.user_id = #{user_id}
         AND r.deleted_at IS NULL
         ORDER BY r.review_id DESC
         FETCH FIRST 1 ROWS ONLY
@@ -90,13 +92,13 @@
         TO_CHAR(r.updated_at, 'YYYY-MM-DD') AS updated_at,
         r.deleted_at
         FROM review r
-        WHERE r.review_id = #{reviewId}
+        WHERE r.review_id = #{review_id}
     </select>
 
     <!-- 리뷰 삭제 (Soft Delete) -->
     <update id="deleteReview" parameterType="int">
         UPDATE review
         SET deleted_at = SYSDATE
-        WHERE review_id = #{reviewId}
+        WHERE review_id = #{review_id}
     </update>
 </mapper>

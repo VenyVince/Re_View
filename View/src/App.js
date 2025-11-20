@@ -21,7 +21,10 @@ import FindPasswordPage from './pages/login/find/FindPasswordPage'; // 비밀번
 import FindPasswordReset from './pages/login/find/FindPasswordReset';
 import FindPasswordDone from './pages/login/find/FindPasswordDone';
 import RegisterPage from './pages/register/RegisterPage'; // 회원가입 페이지
+import QnaPage from "./pages/qna/QnaPage";
 import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가입 성공 페이지
+
+import ProductDetailPage from "./pages/productDetail/ProductDetailPage"; //상품 상세 페이지
 
 import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
 
@@ -40,9 +43,11 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
 
+import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
+import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
-
+import UserCartPage from "./pages/mypage/user/UserCartPage";
 
 export default function App() {
     return (
@@ -72,6 +77,9 @@ export default function App() {
                     <Route path="/survey/baumann" element={<SurveyPage/>}/>
                     <Route path="/survey/result" element={<SurveyResult/>}/>
                     <Route path="/mypage" element={<MyPage />} />
+                    <Route path="/qna" element={<QnaPage />} />
+
+                    <Route path="/product/detail" element={<ProductDetailPage />} />
 
                 {/* 관리자 전용 영역 */}
                 <Route element={<ProtectedRoute requireAdmin />}>
@@ -90,10 +98,16 @@ export default function App() {
 
                 {/*API 커넥트 예시용*/}
                 <Route path="/test-products" element={<TestProduct />} />
+
+                {/* 사용자 전용 영역 */}
+                    <Route path="/mypage" element={<UserDeliveryPage />} />
+                    <Route path="/mypage/profile" element={<UserProfileEdit />} />
+                    <Route path="/mypage/cart" element={<UserCartPage />} />
             </Routes>
             </main>
             <Footer />
         </div>
         </AuthProvider>
+
     );
 }

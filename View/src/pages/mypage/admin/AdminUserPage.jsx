@@ -1,33 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    Wrap,
-    Inner,
-    Title,
-    UserList,
-    UserRow,
-    Avatar,
-    UserInfo,
-    UserName,
-    UserRole,
-    UserRight,
-    IconButton,
-    WarningText,
-    Pagination,
-    PagerBtn,
-    PageInfo,
-    ModalOverlay,
-    ModalBox,
-    ModalTitle,
-    ModalTextarea,
-    ModalButtons,
-    WarnWrap,
-    WarnCard,
-    MainButtonWrap,
-    MainButton,
-} from "./adminUserPage.style";
+    Wrap, Inner, Title, UserList, UserRow, Avatar, UserInfo,
+    UserName, UserRole, UserRight, IconButton, WarningText, Pagination,
+    PagerBtn, PageInfo, ModalOverlay, ModalBox, ModalTitle,
+    ModalTextarea, ModalButtons, WarnWrap, WarnCard, MainButtonWrap, MainButton,} from "./adminUserPage.style";
 
-// 더미 유저 데이터
+// 더미 유저 데이터 (내일 api 받으면 수정할 거임)
 const initialUsers = [
     { id: 1, name: "홍길동", role: "회원", warnings: 0, coupons: 2, points: 12000 },
     { id: 2, name: "유저2", role: "회원", warnings: 0, coupons: 0, points: 3000 },
