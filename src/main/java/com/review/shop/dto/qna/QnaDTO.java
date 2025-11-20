@@ -14,6 +14,7 @@ public class QnaDTO {
     private Date created_at;
     private Date update_at;
     private Date deleted_at;
+    private String prd_name; // 상품 이름 (JOIN)
 
     private String user_name;   // 작성자 이름 (JOIN)
     private String status;      // '답변대기' or '답변완료'

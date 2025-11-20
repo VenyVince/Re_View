@@ -1,6 +1,7 @@
 package com.review.shop.service.qna;
 
 import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.qna.QnaListResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.qna.QnaMapper;
@@ -17,11 +18,19 @@ public class QnaService {
 
     private final QnaMapper qnaMapper;
 
-    public List<QnaDTO> getQnaList(int productId) {
+    public List<QnaListResponseDTO> getQnaList(int productId) {
         try {
             return qnaMapper.selectQnaListByProductId(productId);
         } catch (DataAccessException e) {
             throw new DatabaseException("QnA 목록 조회 중 DB 오류가 발생했습니다.", e);
+        }
+    }
+
+    public List<QnaListResponseDTO> getMyQnaList(int userId) {
+        try {
+            return qnaMapper.selectQnaListByUserId(userId);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("내 문의 내역 조회 중 DB 오류가 발생했습니다.", e);
         }
     }
 

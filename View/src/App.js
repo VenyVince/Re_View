@@ -24,6 +24,9 @@ import RegisterPage from './pages/register/RegisterPage'; // 회원가입 페이
 import QnaPage from "./pages/qna/QnaPage";
 import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가입 성공 페이지
 
+import ProductDetailPage from "./pages/productDetail/ProductDetailPage"; //상품 상세 페이지
+import ReviewWrite from "./pages/review/ReviewWrite"; // 리뷰 작성 페이지
+
 import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
 
 import SearchPage from './pages/search/SearchPage';
@@ -41,11 +44,12 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
 
-import UserSidebarMenu from "./pages/mypage/user/UserSidebarMenu";
-import UserDashboard from "./pages/mypage/user/UserDashboard";
+import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
+import UserCartPage from "./pages/mypage/user/UserCartPage";
+import UserAddressPage from "./pages/mypage/user/UserAddressPage";
 
 export default function App() {
     return (
@@ -77,6 +81,11 @@ export default function App() {
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/qna" element={<QnaPage />} />
 
+                    <Route path="/product/detail" element={<ProductDetailPage />} />
+
+                    {/* 리뷰 */}
+                    <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
+
                 {/* 관리자 전용 영역 */}
                 <Route element={<ProtectedRoute requireAdmin />}>
                     <Route path="/admin" element={<AdminLayout />}>
@@ -96,8 +105,10 @@ export default function App() {
                 <Route path="/test-products" element={<TestProduct />} />
 
                 {/* 사용자 전용 영역 */}
-                    <Route path="/mypage" element={<UserDashboard />} />
+                    <Route path="/mypage" element={<UserDeliveryPage />} />
+                    <Route path="/mypage/address" element={<UserAddressPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
+                    <Route path="/mypage/cart" element={<UserCartPage />} />
             </Routes>
             </main>
             <Footer />
