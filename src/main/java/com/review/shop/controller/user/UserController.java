@@ -7,7 +7,6 @@ import com.review.shop.dto.user.PasswordUpdateDTO;
 import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
-// --- Swagger 어노테이션 Import ---
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-// ---------------------------------
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -40,6 +38,7 @@ import java.util.Map;
 public class UserController  {
     UserService userService;
     private final AuthenticationManager authenticationManager;
+
 
     @Operation(summary = "회원 가입")
     @ApiResponses({
@@ -86,6 +85,9 @@ public class UserController  {
             @ApiResponse(responseCode = "200", description = "로그인 성공 (JSON 객체 반환)",
                     content = @Content(schema = @Schema(type = "object", example = "{\"message\": \"로그인 성공\", \"userId\": \"testuser123\"}"))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 비밀번호 오류)",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+
+            @ApiResponse (responseCode = "401", description = "밴 당한 사용자 로그인 시도",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/api/auth/login")
@@ -94,6 +96,16 @@ public class UserController  {
             @Parameter(hidden = true)
             HttpServletRequest request
     ) {
+
+        int user_id = userService.getUserByLoginId(loginDto.getId()).getUser_id();
+        
+        // true면 밴리스트에 존재
+        boolean isBanned = userService.isUserBanned(user_id);
+        if (isBanned) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "밴 당한 사용자입니다. 관리자에게 문의하세요."));
+        }
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(loginDto.getId(), loginDto.getPassword());
@@ -112,6 +124,8 @@ public class UserController  {
         response.put("userId", loginDto.getId());
         return ResponseEntity.ok(response);
     }
+
+
 
     @Operation(summary = "비밀번호 재설정 (인증 필요)")
     @ApiResponses({

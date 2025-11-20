@@ -118,4 +118,10 @@ public class UserService implements UserDetailsService {
         }
         return user_id;
     }
+
+    // 반영된 사항이 있다면 강퇴된 사용자
+    public boolean isUserBanned(int id) {
+        return userMapper.findBannedByUserId(id) > 0;
+    }
+
 }

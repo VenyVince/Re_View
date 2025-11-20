@@ -28,15 +28,14 @@ import java.util.Map;
 public class OrderController {
     private final OrderPreviewService orderPreviewService;
     private final OrderService orderService;
-    private final Security_Util security_util
-            ;
+    private final Security_Util security_util;
     //배송지 관리는 추후에 추가 예정
     // 주문 미리보기 엔드포인트
     @Operation (summary = "주문 미리보기", description = "주문할 상품들의 정보와 총 가격, 사용자의 포인트를 조회합니다.")
     @PostMapping("/api/orders/checkout")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "주문 미리보기 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청 (ResourceAccessException 등)"),
+            @ApiResponse(responseCode = "200", description = "주문 미리보기 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (ResourceAccessException 등)"),
     })
     public ResponseEntity<?> checkout(@RequestBody List<OrderDTO> orderList) {
 
