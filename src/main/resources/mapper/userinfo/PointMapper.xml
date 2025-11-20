@@ -44,7 +44,7 @@
 
     <!-- 4. 리뷰 작성 포인트 중복 체크 -->
     <select id="existsReviewPoint" resultType="boolean">
-        SELECT COUNT(1) > 0
+        SELECT COUNT(1) as cnt
         FROM review_point_reference
         WHERE review_id = #{review_id}
     </select>

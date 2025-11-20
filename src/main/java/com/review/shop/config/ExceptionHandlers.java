@@ -37,8 +37,18 @@ public class ExceptionHandlers {
 
     // DB 관련(Mapper.xml 오류 등)
     @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleDatabase(DatabaseException exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+    public ResponseEntity<?> handleDatabase(DatabaseException e) {
+        // 전체 스택을 콘솔에 출력
+        e.printStackTrace();
+
+        // cause 까지 로깅
+        if (e.getCause() != null) {
+            System.err.println("CAUSE: " + e.getCause().getMessage());
+            e.getCause().printStackTrace();
+        }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(e.getMessage());
     }
 
     // 로그인 실패

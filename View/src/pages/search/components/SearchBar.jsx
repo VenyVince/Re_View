@@ -1,46 +1,64 @@
-import React from "react";
+// src/pages/search/components/SearchBar.jsx
+import React, { useState } from "react";
 import "./SearchBar.css";
 
-export default function SearchBar({ keyword, setKeyword }) {
-    const handleChange = (e) => {
-        setKeyword(e.target.value);
-    };
+export default function SearchBar({ mode, setMode, setSortType }) {
+    const [sort, setSort] = useState("인기순");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSortChange = (e) => {
+        const val = e.target.value;
+        setSort(val);
+
+        if (val === "인기순") setSortType("popular");
+        if (val === "최신순") setSortType("latest");
+
+        if (val === "가격 낮은순") setSortType("price_low");
+        if (val === "가격 높은순") setSortType("price_high");
+
+        if (val === "별점 높은순") setSortType("rating_high");
+        if (val === "별점 낮은순") setSortType("rating_low");
     };
 
     return (
-        <form className="search-bar" onSubmit={handleSubmit}>
-            <label>
-                상품명
-                <input
-                    type="text"
-                    value={keyword}
-                    onChange={handleChange}
-                    placeholder="검색어를 입력하세요"
-                />
-            </label>
+        <div className="search-inline">
+            <div className="button-wrap">
+                <button
+                    type="button"
+                    className={`mode-btn ${mode === "product" ? "active" : ""}`}
+                    onClick={() => setMode("product")}
+                >
+                    상품
+                </button>
+                <button
+                    type="button"
+                    className={`mode-btn ${mode === "review" ? "active" : ""}`}
+                    onClick={() => setMode("review")}
+                >
+                    리뷰
+                </button>
+            </div>
 
-            <label>
-                기간
-                <input type="date" defaultValue="2025-11-01" /> ~{" "}
-                <input type="date" defaultValue="2025-11-07" />
-            </label>
+            <div className="right-section">
+                <div className="sort-select">
+                    <label>정렬</label>
+                    <select value={sort} onChange={handleSortChange}>
+                        <option>인기순</option>
+                        <option>최신순</option>
 
-            <label>
-                정렬
-                <select>
-                    <option>인기순</option>
-                    <option>최신순</option>
-                    <option>가격 낮은순</option>
-                    <option>가격 높은순</option>
-                </select>
-            </label>
-
-            <button type="submit" className="search-btn">
-                검색
-            </button>
-        </form>
+                        {mode === "product" ? (
+                            <>
+                                <option>가격 낮은순</option>
+                                <option>가격 높은순</option>
+                            </>
+                        ) : (
+                            <>
+                                <option>별점 낮은순</option>
+                                <option>별점 높은순</option>
+                            </>
+                        )}
+                    </select>
+                </div>
+            </div>
+        </div>
     );
 }

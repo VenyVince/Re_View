@@ -1,31 +1,29 @@
 import React from "react";
 import "../components/Filter.css";
 
-export default function BrandFilter() {
-    const brands = [
-        "닥터지",
-        "피지오겔",
-        "라운드랩",
-        "더랩",
-        "유세린",
-        "닥터자르트",
-        "에스트라",
-        "더샘",
-        "비오템",
-        "한율",
-    ];
-
+export default function BrandFilter({ selectedBrand, onSelect, brands = [] }) {
     return (
-        <div className="filter-line">
+        <div className="filter-line brand-line">
             <strong className="filter-title">브랜드</strong>
             <ul className="filter-items">
-                {brands.map((item, idx) => (
-                    <li key={idx} className="filter-item">
-                        {item}
+                {/* 전체는 항상 존재하지만 active X */}
+                <li className="filter-item" onClick={() => onSelect("")}>
+                    전체
+                </li>
+
+                {/* 브랜드 리스트 (상위 9개만 표시) */}
+                {brands.map((b, idx) => (
+                    <li
+                        key={idx}
+                        className={`filter-item ${
+                            selectedBrand === b.name ? "active" : ""
+                        }`}
+                        onClick={() => onSelect(b.name)}
+                    >
+                        {b.name}
                     </li>
                 ))}
             </ul>
-
         </div>
     );
 }

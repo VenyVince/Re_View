@@ -2,6 +2,7 @@ package com.review.shop.controller.qna;
 
 import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.qna.QnaListResponseDTO;
 import com.review.shop.service.qna.QnaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,8 +30,23 @@ public class QnaController {
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping("/list/{productId}")
-    public ResponseEntity<List<QnaDTO>> getQnaList(@PathVariable int productId) {
+    public ResponseEntity<List<QnaListResponseDTO>> getQnaList(@PathVariable int productId) {
         return ResponseEntity.ok(qnaService.getQnaList(productId));
+    }
+
+    @Operation(summary = "내 문의 내역 조회", description = "로그인한 사용자가 작성한 QnA 목록을 최신순으로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)"),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
+    })
+    @GetMapping("/my")
+    public ResponseEntity<List<QnaListResponseDTO>> getMyQnaList() {
+        int userId = securityUtil.getCurrentUserId();
+
+        List<QnaListResponseDTO> myQnaList = qnaService.getMyQnaList(userId);
+        return ResponseEntity.ok(myQnaList);
+
     }
 
     @Operation(summary = "QnA 상세 조회", description = "문의글 ID로 상세 정보를 조회합니다.")
