@@ -3,6 +3,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.review.shop.repository.product.ProductReviewMapper">
+    <!--분기점 반환 용 -->
+    <select id="selectReviewsByProductAndUser" resultType="com.review.shop.dto.product.ProductReviewDTO">
+        SELECT *
+        FROM review
+        WHERE product_id = #{product_id}
+          AND user_id = #{user_id}
+          AND deleted_at IS NULL
+    </select>
 
     <!-- 상품 존재 여부 확인 : 널값 포함하게될 수도 있어서 Integer로 처리-->
     <select id="selectProductById" parameterType="int" resultType="java.lang.Integer">
@@ -94,6 +102,23 @@
         FROM review r
         WHERE r.review_id = #{review_id}
     </select>
+
+    <!-- 리뷰 수정 -->
+    <update id="updateReview">
+        UPDATE review
+        SET content = #{content},
+            rating = #{rating},
+            updated_at = SYSDATE
+        WHERE review_id = #{review_id}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 기존 리뷰 이미지 삭제 (수정 시 기존 이미지 교체용) -->
+    <delete id="deleteReviewImagesByReviewId">
+        DELETE FROM review_images
+        WHERE review_id = #{review_id}
+    </delete>
+
 
     <!-- 리뷰 삭제 (Soft Delete) -->
     <update id="deleteReview" parameterType="int">
