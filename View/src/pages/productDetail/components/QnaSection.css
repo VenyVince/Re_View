@@ -1,0 +1,89 @@
+.pd-qna-wrapper {
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* 작성 영역 */
+.pd-qna-write-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.pd-qna-title-input {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.pd-qna-write-submit {
+    width: 10%;
+    padding: 10px;
+    margin-left: 10px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 헤더 */
+.pd-qna-header-row {
+    display: flex;
+    padding: 12px 8px;
+    border-bottom: 2px solid #ddd;
+    background-color: #f8f8f8;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.col-title { width: 60%; }
+.col-writer { width: 15%; text-align: center; }
+.col-date { width: 25%; text-align: right; }
+
+/* 리스트 */
+.pd-qna-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pd-qna-item {
+    padding: 16px 8px;
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+}
+
+.pd-qna-title-area {
+    display: flex;
+    align-items: center;
+}
+
+.pd-qna-title { width: 60%; }
+.pd-qna-writer-inline { width: 15%; text-align: center; }
+.pd-qna-date { width: 25%; text-align: right; }
+
+/* 펼침 영역 */
+.pd-qna-content-area {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 6px;
+}
+
+.pd-qna-answer {
+    margin-top: 10px;
+    background: #fff6f6;
+    border-left: 3px solid #ff4d4d;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* 비었을 때 */
+.pd-qna-empty {
+    padding: 16px;
+    color: #777;
+    text-align: center;
+}

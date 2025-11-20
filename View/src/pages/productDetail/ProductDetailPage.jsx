@@ -1,25 +1,64 @@
 import React, { useState, useEffect } from "react";
 import "./ProductDetailPage.css";
 
-import DetailTabs from "./components/DetailTabs";
 import ProductInfoSection from "./components/ProductInfoSection";
 import ProductReviewSection from "./components/ProductReviewSection";
+import QnaSection from "./components/QnaSection";
 
 export default function ProductDetailPage() {
-    const [showIngredient, setShowIngredient] = useState(false);
     const [activeTab, setActiveTab] = useState("info");
     const [wish, setWish] = useState(false);
     const [showTopBtn, setShowTopBtn] = useState(false);
+    const [qty, setQty] = useState(1);
 
+    // 🔥 Q&A 데이터 (카테고리 제거된 버전)
+    const [qnaList, setQnaList] = useState([
+        {
+            qna_id: 1,
+            title: "이 제품의 사용기한은 언제까지인가요?",
+            content: "개봉 전·후 사용기한이 어떻게 되는지 궁금합니다.",
+            answer: "",
+            user_nickname: "user01",
+            created_at: "2025-02-01",
+        },
+        {
+            qna_id: 2,
+            title: "비슷한 제품에서 발암물질이 검출되었다는데 안전한가요?",
+            content: "뉴스에서 본 내용이 걱정돼 문의드립니다.",
+            answer: "",
+            user_nickname: "user02",
+            created_at: "2025-02-01",
+        },
+    ]);
+
+    // 🔥 Q&A 등록 기능
+    const handleWriteQna = (newQna) => {
+        const today = new Date().toISOString().slice(0, 10);
+
+        const data = {
+            qna_id: qnaList.length + 1,
+            title: newQna.title,
+            content: newQna.content,
+            user_nickname: "user99",
+            created_at: today,
+            answer: "",
+        };
+
+        setQnaList([data, ...qnaList]);
+    };
+
+    // 🔥 상품 샘플 데이터
     const product = {
+        product_id: 1,
         prd_name: "바이오더마 하이드라비오 토너",
         prd_brand: "바이오더마",
         price: 38000,
         image_url: "",
         category: "토너",
         rating: 4.5,
-        ingredient: "정제수, 글리세린, 폴리솔베이트20...",
-        description: "건조한 피부를 위한 진정 토너"
+        ingredient:
+            "정제수, 글리세린, 폴리솔베이트20, 다이소듐이디티에이, 세트리모늄브로마이드, 향료, 나이아신아마이드, 자일리톨, 알란토인, 프룩토올리고사카라이드, 만니톨, 헥실데칸올, 소듐하이드록사이드, 시트릭애씨드, 람노오스, 사과씨추출물, 유채스테롤, 토코페롤",
+        description: "건조한 피부를 위한 진정 토너",
     };
 
     const reviews = [
@@ -31,42 +70,16 @@ export default function ProductDetailPage() {
             like_count: 12,
             dislike_count: 1,
             title: "인생 토너 찾았어요",
-            content: "촉촉하고 피부가 편안해져요. 재구매 확정입니다!",
+            content: "촉촉하고 피부가 편안해져요. 재구매 확정!",
             created_at: "2025-02-01",
-            images: ["https://picsum.photos/150?1"]
+            images: ["https://picsum.photos/150?1"],
         },
-        {
-            review_id: 2,
-            nickname: "건성이불편해",
-            baumann_type: "OSPW",
-            rating: 3,
-            like_count: 2,
-            dislike_count: 0,
-            title: "그냥 무난",
-            content: "저한테는 조금 무난했어요. 가성비는 괜찮아요.",
-            created_at: "2025-01-28",
-            images: []
-        },
-        {
-            review_id: 3,
-            nickname: "촉촉맨",
-            baumann_type: "DSNW",
-            rating: 4,
-            like_count: 6,
-            dislike_count: 0,
-            title: "수분감은 좋음",
-            content: "냄새도 좋고 수분감 최고! 건성에게 찰떡임.",
-            created_at: "2025-01-21",
-            images: ["https://picsum.photos/150?2"]
-        }
     ];
 
-
-    // 스크롤 감지 (TOP 버튼 표시/숨기기)
+    // 🔥 TOP 버튼 표시
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 300) setShowTopBtn(true);
-            else setShowTopBtn(false);
+            setShowTopBtn(window.scrollY > 300);
         };
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
@@ -74,12 +87,9 @@ export default function ProductDetailPage() {
 
     return (
         <div className="pd-detail-wrapper">
-
             <div className="pd-page">
-
                 {/* 상단 상품 영역 */}
                 <div className="pd-wrap">
-
                     <div className="pd-left">
                         {product.image_url ? (
                             <img
@@ -106,28 +116,37 @@ export default function ProductDetailPage() {
 
                         <div className="pd-field-box">
                             <span className="pd-field-label">평균 별점</span>
-                            <div className="pd-field-value">{product.rating} / 5.0</div>
-                        </div>
-
-                        <div
-                            className="pd-ingredient-toggle"
-                            onClick={() => setShowIngredient(!showIngredient)}
-                        >
-                            성분표시
-                        </div>
-
-                        {showIngredient && (
-                            <div className="pd-ingredient-balloon">
-                                {product.ingredient}
+                            <div className="pd-field-value">
+                                {product.rating} / 5.0
                             </div>
-                        )}
-                    </div>
+                        </div>
 
+                        {/* 항상 보이는 성분표시 */}
+                        <div className="pd-ingredient-toggle">성분표시</div>
+                        <div className="pd-ingredient-balloon">{product.ingredient}</div>
+
+                        {/* 구매 수량 */}
+                        <div className="pd-qty-box">
+                            <span className="pd-qty-label">구매 수량</span>
+                            <div className="pd-qty-control">
+                                <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)}>
+                                    -
+                                </button>
+                                <span>{qty}</span>
+                                <button onClick={() => setQty(qty + 1)}>+</button>
+                            </div>
+                        </div>
+
+                        {/* 총 상품 금액 */}
+                        <div className="pd-total-price">
+                            총 상품금액:{" "}
+                            <span>{(product.price * qty).toLocaleString()}원</span>
+                        </div>
+                    </div>
                 </div>
 
-                {/* 탭 영역 */}
+                {/* 탭 */}
                 <div className="pd-bottom-section">
-
                     <div className="pd-tabs-row">
                         <button
                             className={activeTab === "info" ? "active" : ""}
@@ -142,18 +161,34 @@ export default function ProductDetailPage() {
                         >
                             상품 후기
                         </button>
+
+                        <button
+                            className={activeTab === "qna" ? "active" : ""}
+                            onClick={() => setActiveTab("qna")}
+                        >
+                            Q&A
+                        </button>
                     </div>
 
+                    {/* 탭 내용 */}
                     <div className="pd-content-area">
                         {activeTab === "info" && (
                             <ProductInfoSection product={product} />
                         )}
+
                         {activeTab === "review" && (
                             <ProductReviewSection reviews={reviews} />
                         )}
+
+                        {activeTab === "qna" && (
+                            <QnaSection
+                                qnaList={qnaList}
+                                onWrite={handleWriteQna}
+                            />
+                        )}
                     </div>
 
-                    {/* 하단바 */}
+                    {/* 하단 바 */}
                     <div className="pd-bottom-bar">
                         <button
                             className={`pd-btm-btn wish ${wish ? "active" : ""}`}
@@ -161,29 +196,24 @@ export default function ProductDetailPage() {
                         >
                             {wish ? "♥" : "♡"}
                         </button>
-
                         <button className="pd-btm-btn cart">장바구니</button>
                         <button className="pd-btm-btn buy">바로구매</button>
                     </div>
-
                 </div>
 
-                {/* TOP 버튼: sticky */}
+                {/* TOP 버튼 */}
                 {showTopBtn && (
                     <button
                         className="pd-top-btn"
-                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        onClick={() =>
+                            window.scrollTo({ top: 0, behavior: "smooth" })
+                        }
                     >
                         <span className="top-arrow">∧</span>
                         <span className="top-text">TOP</span>
                     </button>
-
-
                 )}
-
-
             </div>
-
         </div>
     );
 }
