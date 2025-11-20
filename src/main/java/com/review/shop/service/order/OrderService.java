@@ -130,7 +130,7 @@ public class OrderService {
             OrderCheckoutProductInfoDTO productInfo = productMap.get(requestItem.getProduct_id());
 
             if (productInfo == null) {
-                throw new RuntimeException("상품 정보를 찾을 수 없습니다. ID: " + requestItem.getProduct_id());
+                throw new WrongRequestException("상품 정보를 찾을 수 없습니다. ID: " + requestItem.getProduct_id());
             }
 
             int quantity = requestItem.getBuy_quantity();

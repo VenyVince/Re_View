@@ -5,9 +5,9 @@ package com.review.shop.controller.user;
 import com.review.shop.dto.user.LoginRequestDTO;
 import com.review.shop.dto.user.PasswordUpdateDTO;
 import com.review.shop.dto.user.UserInfoDTO;
+import com.review.shop.dto.user.TemPasswordDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -144,6 +144,16 @@ public class UserController  {
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
     }
 
+    //재설정 임시 비밀번호 발급
+    @PostMapping("/api/auth/send-temp-password")
+    public ResponseEntity<String> sendTemporaryPassword(@RequestBody TemPasswordDTO temPasswordDTO) {
+        String id = temPasswordDTO.getId();
+        String email = temPasswordDTO.getEmail();
+
+        userService.processTempPasswordEmail(id, email);
+        return ResponseEntity.ok("임시 비밀번호가 이메일로 발송되었습니다.");
+    }
+
 
     @Operation (summary = "아이디 찾기")
     @ApiResponses({
@@ -188,15 +198,11 @@ public class UserController  {
     }
 
 
-
-    @Hidden // Swagger 문서에서 예외 핸들러는 숨김
     @ExceptionHandler(WrongRequestException.class)
     public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
-
-
 
 }

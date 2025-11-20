@@ -53,6 +53,17 @@
         WHERE user_id = #{id}
     </select>
 
+    <select id="findEmailById" resultType="string">
+
+        SELECT
+            EMAIL
+        FROM
+            USER_TABLE
+        WHERE
+            id = #{id}
+
+    </select>
+
 </mapper>
 
 
