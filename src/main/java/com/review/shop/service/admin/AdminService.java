@@ -4,12 +4,14 @@ package com.review.shop.service.admin;
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.user.UserSummaryDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -155,5 +157,39 @@ public class AdminService {
             throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
         }
         return result;
+    }
+
+    public List<UserSummaryDTO> getAllusers() {
+        if(adminMapper.getAllusers() == null){
+            throw new ResourceNotFoundException( "사용자 정보를 찾을 수 없습니다.");
+        }
+
+        return adminMapper.getAllusers();
+    }
+
+    // 밴 기록 추가
+    public void setBan(int userId, String reason) {
+
+        int result = adminMapper.setBlacklist(userId, reason);
+
+        if(result == 0){
+            throw new ResourceNotFoundException("밴 기록에 실패했습니다. 해당 사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    // 유저 탈퇴처리
+    public void deleteUser(int userId) {
+        int result = adminMapper.deleteUser(userId);
+
+        if(result == 0){
+            throw new ResourceNotFoundException("사용자 삭제에 실패했습니다. 해당 사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    // 유저의 밴 처리, 밴 기록 처리 트랜잭션
+    @Transactional
+    public void blockAndExpelUser(int userId, String reason) {
+        setBan(userId, reason);
+        deleteUser(userId);
     }
 }

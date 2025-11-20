@@ -3,7 +3,9 @@ package com.review.shop.controller.admin;
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.user.UserSummaryDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,8 +46,11 @@ public class AdminController {
                             array = @ArraySchema(schema = @Schema(implementation = ProductDetailDTO.class))
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+
     })
     @GetMapping("/allproducts")
     public ResponseEntity<?> getAllProducts() {
@@ -55,7 +60,9 @@ public class AdminController {
     @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "상품 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/products")
     public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
@@ -73,6 +80,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/products/{productId}")
     public ResponseEntity<String> updateProduct(
@@ -86,6 +96,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<String> deleteProduct(
@@ -100,6 +113,8 @@ public class AdminController {
                     content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
             ),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/products/{productId}")
@@ -119,6 +134,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "주문 상태 변경 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/orders/{orderId}/status")
     public ResponseEntity<String> updateOrderStatus(
@@ -136,6 +154,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<String> deleteReview(
@@ -148,6 +169,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/reviews/{reviewId}/select")
     public ResponseEntity<String> selectReview(
@@ -178,6 +202,9 @@ public class AdminController {
             ),
             @ApiResponse(responseCode = "400", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/qna")
     public ResponseEntity<?> getAllQna() {
@@ -192,6 +219,9 @@ public class AdminController {
             ),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/qna/{qnaId}")
     public ResponseEntity<?> getQnaDetail(
@@ -199,12 +229,13 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getQnaDetail(qnaId));
     }
 
-
-
     @Operation(summary = "QnA 답변 등록/수정", description = "QnA 게시글에 관리자 답변을 등록하거나 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답변 등록 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/qna/{qnaId}/answer")
     public ResponseEntity<String> updateQnaAnswer(
@@ -220,6 +251,9 @@ public class AdminController {
                     content = @Content(schema = @Schema(example = "{\"points\": 1500}"))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/users/{userId}/points")
     public ResponseEntity<Map<String, Integer>> getMemberPoints(
@@ -232,6 +266,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "포인트 업데이트 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/users/{userId}/points")
     public ResponseEntity<String> updateMemberPoints(
@@ -245,6 +282,67 @@ public class AdminController {
         adminService.updateMemberPoints(userId, points);
         return ResponseEntity.ok("회원 포인트가 업데이트되었습니다");
     }
+    // =================================================================================
+    // SECTION: 회원 조회 및 블랙 리스트 관리 (Member & Blacklist)
+    // =================================================================================
+
+    // 모든 회원 조회
+    @Operation(summary = "전체 회원 목록 조회", description = "모든 회원의 요약 정보를 조회합니다.")
+    @GetMapping("/users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserSummaryDTO.class))
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    public ResponseEntity<List<UserSummaryDTO>> getAllMembers() {
+        List<UserSummaryDTO> userList = adminService.getAllusers();
+
+        return ResponseEntity.ok(userList);
+    }
+
+    // 회원 밴 및 기록
+    @Operation(summary = "회원 밴", description = "특정 회원을 밴 및 밴기록을 설정합니다.")
+    @PostMapping("/users/{userId}/ban")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "밴 설정 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    public ResponseEntity<String> setBlacklist(
+            @Parameter(description = "밴할 회원 ID", required = true)
+            @PathVariable int userId,
+
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "밴 사유 정보",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    example = "{\"reason\": \"악성 유저 / 욕설 사용\"}"
+                            )
+                    )
+            )
+            @RequestBody Map<String, String> payload) {
+
+        String reason = payload.get("reason");
+        if (reason == null || reason.isEmpty()) {
+            throw new WrongRequestException("reason 값이 필요합니다.");
+        }
+
+        adminService.blockAndExpelUser(userId, reason);
+
+        return ResponseEntity.ok("회원이 강퇴되었습니다.");
+    }
 
     // =================================================================================
     // SECTION: 예외 처리 (Exception Handler)
@@ -254,4 +352,16 @@ public class AdminController {
     public ResponseEntity<String> handleDatabase(DatabaseException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(WrongRequestException.class)
+    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+
 }
