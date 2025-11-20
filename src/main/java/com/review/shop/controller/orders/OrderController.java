@@ -4,6 +4,8 @@ import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.orders.OrderCheckoutResponse;
 import com.review.shop.dto.orders.OrderCreateDTO;
 import com.review.shop.dto.orders.OrderDTO;
+import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.order.OrderPreviewService;
 import com.review.shop.service.order.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,14 +87,14 @@ public class OrderController {
 
     // WrongRequestException 처리
     @ExceptionHandler(com.review.shop.exception.WrongRequestException.class)
-    public ResponseEntity<String> handleWrongRequest(com.review.shop.exception.WrongRequestException ex) {
+    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
 
     @ExceptionHandler(com.review.shop.exception.DatabaseException.class)
-    public ResponseEntity<String> handleDatabaseException(com.review.shop.exception.DatabaseException ex) {
+    public ResponseEntity<String> handleDatabaseException(DatabaseException ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ex.getMessage());

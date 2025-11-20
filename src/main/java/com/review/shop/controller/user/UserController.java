@@ -144,7 +144,12 @@ public class UserController  {
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
     }
 
-    //재설정 임시 비밀번호 발급
+    @Operation (summary = "임시 비밀번호 발송")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "임시 비밀번호 발송 성공 (메시지 문자열 반환)"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 이메일 오류)",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/api/auth/send-temp-password")
     public ResponseEntity<String> sendTemporaryPassword(@RequestBody TemPasswordDTO temPasswordDTO) {
         String id = temPasswordDTO.getId();
