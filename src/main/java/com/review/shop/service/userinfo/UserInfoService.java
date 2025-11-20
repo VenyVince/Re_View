@@ -23,6 +23,7 @@ public class UserInfoService {
     public Integer getUser_id(String id) {
         return userIdMapper.getUser_id(id);
     }
+    public String getUserRole(String id) {return userIdMapper.getUser_role(id);    }
 
     public GetUserInfoResponseDTO getUserInfo(Integer user_id) {
         try {
@@ -61,4 +62,6 @@ public class UserInfoService {
             throw new DatabaseException("회원 탈퇴 중 DB 오류가 발생했습니다.", e);
         }
     }
+
+
 }
