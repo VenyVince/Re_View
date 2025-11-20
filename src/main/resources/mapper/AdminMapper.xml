@@ -196,7 +196,9 @@
             IMAGE_URL
         )
         VALUES (
-                   #{prdId},    #{image}  )
+                #{prdId},
+                #{image}
+               )
     </insert>
 
     <select id="readImage" parameterType="int" resultType="String">
@@ -208,4 +210,35 @@
             PRODUCT_ID = #{prdId}
         ORDER BY
             PRD_IMG_ID ASC  </select>
+
+
+    <resultMap id="userSummaryDTOMap" type="com.review.shop.dto.user.UserSummaryDTO">
+        <result property="user_id" column="USER_ID"/>
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="nickname" column="NICKNAME"/>
+    </resultMap>
+
+    <select id="getAllusers" resultMap="userSummaryDTOMap">
+        SELECT
+            USER_ID,
+            ID,
+            NAME,
+            NICKNAME
+        FROM
+            USER_TABLE
+        WHERE
+            DELETED_AT IS NULL</select>
+
+    <insert id="setBlacklist" parameterType="map">
+        INSERT INTO BAN_LIST (USER_ID, REASON)
+        VALUES (#{userId}, #{reason})
+    </insert>
+
+    <update id="deleteUser" parameterType="map">
+        UPDATE USER_TABLE
+        SET DELETED_AT = SYSDATE
+        WHERE USER_ID =  #{userId}
+    </update>
+
 </mapper>
