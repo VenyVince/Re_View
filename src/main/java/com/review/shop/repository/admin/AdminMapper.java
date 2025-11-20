@@ -3,6 +3,7 @@ package com.review.shop.repository.admin;
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.dto.qna.QnAListDTO;
+import com.review.shop.dto.user.UserSummaryDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -56,4 +57,10 @@ public interface AdminMapper {
     int insertProductImage(@Param("prdId") int prdId, @Param("image") String image);
 
     List<String> readImage(int prdId);
+
+    List<UserSummaryDTO> getAllusers();
+
+    int setBlacklist(@Param("userId") int userId, @Param("reason") String reason);
+
+    int deleteUser(@Param("userId") int userId);
 }

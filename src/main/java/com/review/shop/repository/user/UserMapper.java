@@ -17,4 +17,8 @@ public interface UserMapper {
 
     String findUserIdByNameAndPhoneNumber(@Param("name") String name,
                                           @Param("phoneNumber") String phoneNumber);
+
+    int findBannedByUserId(@Param("id") int id);
+
+    String findEmailById(@Param("id") String id);
 }
