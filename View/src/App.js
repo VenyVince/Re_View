@@ -49,6 +49,8 @@ import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 import TestProduct from "./TestProduct";
 import UserCartPage from "./pages/mypage/user/UserCartPage";
 
+import AboutPage from "./pages/about/AboutPage";
+
 export default function App() {
     return (
         <AuthProvider>
@@ -78,6 +80,7 @@ export default function App() {
                     <Route path="/survey/result" element={<SurveyResult/>}/>
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/qna" element={<QnaPage />} />
+                    <Route path="/about" element={<AboutPage />} />
 
                     <Route path="/product/detail" element={<ProductDetailPage />} />
 
