@@ -31,7 +31,7 @@ import java.util.UUID;
 @Tag(name = "Image Upload", description = "이미지 업로드 API")
 public class ImageUploadController {
     //review이미지 및 product이미지 처리
-    // C:\review\reviews
+    // C:\review\하위 폴더에 저장
     private final FileUploadProperties fileUploadProperties;
     private final Security_Util security_util;
 
