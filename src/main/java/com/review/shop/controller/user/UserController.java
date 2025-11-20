@@ -4,8 +4,8 @@ package com.review.shop.controller.user;
 
 import com.review.shop.dto.user.LoginRequestDTO;
 import com.review.shop.dto.user.PasswordUpdateDTO;
-import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.dto.user.TemPasswordDTO;
+import com.review.shop.dto.user.UserInfoDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -208,6 +209,13 @@ public class UserController  {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
 }
