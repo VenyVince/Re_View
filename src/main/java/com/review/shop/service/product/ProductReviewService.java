@@ -18,6 +18,13 @@ public class ProductReviewService {
 
     private final ProductReviewMapper productReviewMapper;
 
+    
+    // 분기점 확인
+    public boolean hasUserReviewed(int product_id, int user_id) {
+        List<ProductReviewDTO> reviews = productReviewMapper.selectReviewsByProductAndUser(product_id, user_id);
+        return reviews != null && !reviews.isEmpty();
+    }
+
     /**
      * 특정 상품의 리뷰 목록 조회
      */
@@ -82,6 +89,51 @@ public class ProductReviewService {
 
         return createdReview;
     }
+
+    // 리부수정
+    public ProductReviewDTO updateReview(
+            int review_id,
+            int user_id,
+            String content,
+            double rating,
+            List<String> imageUrls
+    ) {
+        // 리뷰 존재 여부 확인
+        ProductReviewDTO review = productReviewMapper.selectReviewById(review_id);
+        if (review == null) {
+            throw new WrongRequestException("존재하지 않거나 삭제된 리뷰입니다");
+        }
+
+        // 작성자 확인
+        if (review.getUser_id() != user_id) {
+            throw new WrongRequestException("본인의 리뷰만 수정할 수 있습니다");
+        }
+
+        // 유효성 검사
+        if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
+        if (content.length() > 1000) throw new WrongRequestException("리뷰 내용은 1000자 이하여야 합니다");
+        if (rating < 1 || rating > 5) throw new WrongRequestException("평점은 1~5 사이여야 합니다");
+
+        // 리뷰 수정
+        int updatedRows = productReviewMapper.updateReview(review_id, content, rating);
+        if (updatedRows != 1) throw new DatabaseException("리뷰 수정 실패");
+
+        // 기존 이미지 삭제 후 새로운 이미지 삽입
+        productReviewMapper.deleteReviewImagesByReviewId(review_id);
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            for (String imageUrl : imageUrls) {
+                productReviewMapper.insertReviewImage(review_id, imageUrl);
+            }
+        }
+
+        // 수정된 리뷰 조회
+        ProductReviewDTO updatedReview = productReviewMapper.selectReviewById(review_id);
+        updatedReview.setImages(imageUrls != null ? imageUrls : new ArrayList<>());
+
+        return updatedReview;
+    }
+
+    
     /**
      * 리뷰 삭제 (Soft Delete)
      */

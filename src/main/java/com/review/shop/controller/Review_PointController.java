@@ -1,8 +1,8 @@
 package com.review.shop.controller;
 
 import com.review.shop.Util.Security_Util;
-import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
-import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
+import com.review.shop.dto.product.review_create.CreateReviewRequestDTO;
+import com.review.shop.dto.product.review_create.CreateReviewResponseDTO;
 import com.review.shop.service.Review_PointService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Review Point API", description = "리뷰 관련 API")
 public class Review_PointController {
 
-    private final Review_PointService integrationService;
+    private final Review_PointService review_pointService;
     private final Security_Util security_Util;
 
 
@@ -36,7 +36,7 @@ public class Review_PointController {
     ) {
         int user_id = security_Util.getCurrentUserId();
 
-        CreateReviewResponseDTO result = integrationService.createReviewWithReward(
+        CreateReviewResponseDTO result = review_pointService.createReviewWithReward(
                 product_id,
                 user_id,
                 request

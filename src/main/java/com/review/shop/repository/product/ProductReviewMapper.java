@@ -11,6 +11,12 @@ public interface ProductReviewMapper {
 
     Integer selectProductById(@Param("product_id") int product_id);
 
+    // 첫리뷰 작성인지 분기
+    List<ProductReviewDTO> selectReviewsByProductAndUser(
+            @Param("product_id") int product_id,
+            @Param("user_id") int user_id
+    );
+
     /**
      * 특정 상품의 리뷰 목록 조회 (이미지 포함)
      */
@@ -48,6 +54,15 @@ public interface ProductReviewMapper {
      * 리뷰 ID로 조회
      */
     ProductReviewDTO selectReviewById(@Param("review_id")int review_id);
+
+
+    // 리뷰 수정
+    int updateReview(@Param("review_id") int review_id,
+                     @Param("content") String content,
+                     @Param("rating") double rating);
+
+    // 기존 리뷰 이미지 삭제
+    int deleteReviewImagesByReviewId(@Param("review_id") int review_id);
 
     /**
      * 리뷰 삭제 (Soft Delete)
