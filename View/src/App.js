@@ -47,6 +47,7 @@ import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 import TestProduct from "./TestProduct";
 import UserCartPage from "./pages/mypage/user/UserCartPage";
 import UserAddressPage from "./pages/mypage/user/UserAddressPage";
+import UserWishPage from "./pages/mypage/user/UserWishPage";
 
 export default function App() {
     return (
@@ -101,6 +102,7 @@ export default function App() {
                     <Route path="/mypage/address" element={<UserAddressPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
+                    <Route path="/mypage/wish" element={<UserWishPage />} />
             </Routes>
             </main>
             <Footer />
