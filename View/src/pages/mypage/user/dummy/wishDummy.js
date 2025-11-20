@@ -10,7 +10,6 @@ const wishDummy = [
         price: 10000,
         category: "클렌저 / 폼",
         is_sold_out: false,
-        is_best: true,
         thumbnail_url: null,
     },
     {
@@ -21,7 +20,6 @@ const wishDummy = [
         price: 28000,
         category: "수분크림",
         is_sold_out: false,
-        is_best: false,
         thumbnail_url: null,
     },
     {
@@ -32,7 +30,6 @@ const wishDummy = [
         price: 22000,
         category: "토너 / 미스트",
         is_sold_out: true,
-        is_best: false,
         thumbnail_url: null,
     },
 ];

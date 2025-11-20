@@ -56,9 +56,7 @@ export default function UserWishPage() {
                                             <span className="wish-thumb-placeholder">이미지</span>
                                         )}
 
-                                        {item.is_best && (
-                                            <span className="wish-badge wish-badge-best">best</span>
-                                        )}
+
                                         {item.is_sold_out && (
                                             <span className="wish-badge wish-badge-soldout">
                         품절
