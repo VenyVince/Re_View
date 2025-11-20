@@ -46,8 +46,11 @@ public class AdminController {
                             array = @ArraySchema(schema = @Schema(implementation = ProductDetailDTO.class))
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+
     })
     @GetMapping("/allproducts")
     public ResponseEntity<?> getAllProducts() {
@@ -57,7 +60,9 @@ public class AdminController {
     @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "상품 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/products")
     public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
@@ -75,6 +80,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/products/{productId}")
     public ResponseEntity<String> updateProduct(
@@ -88,6 +96,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<String> deleteProduct(
@@ -102,6 +113,8 @@ public class AdminController {
                     content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
             ),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/products/{productId}")
@@ -121,6 +134,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "주문 상태 변경 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/orders/{orderId}/status")
     public ResponseEntity<String> updateOrderStatus(
@@ -138,6 +154,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<String> deleteReview(
@@ -150,6 +169,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/reviews/{reviewId}/select")
     public ResponseEntity<String> selectReview(
@@ -180,6 +202,9 @@ public class AdminController {
             ),
             @ApiResponse(responseCode = "400", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/qna")
     public ResponseEntity<?> getAllQna() {
@@ -194,6 +219,9 @@ public class AdminController {
             ),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/qna/{qnaId}")
     public ResponseEntity<?> getQnaDetail(
@@ -205,6 +233,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답변 등록 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/qna/{qnaId}/answer")
     public ResponseEntity<String> updateQnaAnswer(
@@ -220,6 +251,9 @@ public class AdminController {
                     content = @Content(schema = @Schema(example = "{\"points\": 1500}"))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/users/{userId}/points")
     public ResponseEntity<Map<String, Integer>> getMemberPoints(
@@ -232,6 +266,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "포인트 업데이트 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/users/{userId}/points")
     public ResponseEntity<String> updateMemberPoints(
@@ -261,6 +298,9 @@ public class AdminController {
             ),
             @ApiResponse(responseCode = "400", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<List<UserSummaryDTO>> getAllMembers() {
         List<UserSummaryDTO> userList = adminService.getAllusers();
@@ -274,6 +314,9 @@ public class AdminController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "밴 설정 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            ,
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<String> setBlacklist(
             @Parameter(description = "밴할 회원 ID", required = true)

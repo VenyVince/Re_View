@@ -6,8 +6,9 @@ import com.review.shop.dto.orders.OrderCreateDTO;
 import com.review.shop.dto.orders.OrderDTO;
 import com.review.shop.service.order.OrderPreviewService;
 import com.review.shop.service.order.OrderService;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,8 @@ public class OrderController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 미리보기 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (ResourceAccessException 등)"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<?> checkout(@RequestBody List<OrderDTO> orderList) {
 
@@ -60,6 +63,8 @@ public class OrderController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 처리 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (포인트 부족, 재고 부족 등)"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<String> orders(@RequestBody OrderCreateDTO orderCreateDTO) {
 
@@ -71,7 +76,6 @@ public class OrderController {
 
 
     // ResourceAccessException 처리
-    @Hidden // Swagger 문서에서 예외 핸들러는 숨김
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<String> handleResourceAccessException(ResourceAccessException ex) {
         return ResponseEntity
@@ -80,11 +84,17 @@ public class OrderController {
     }
 
     // WrongRequestException 처리
-    @Hidden // Swagger 문서에서 예외 핸들러는 숨김
     @ExceptionHandler(com.review.shop.exception.WrongRequestException.class)
     public ResponseEntity<String> handleWrongRequest(com.review.shop.exception.WrongRequestException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(com.review.shop.exception.DatabaseException.class)
+    public ResponseEntity<String> handleDatabaseException(com.review.shop.exception.DatabaseException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ex.getMessage());
     }
 }
