@@ -42,19 +42,19 @@
             IS_SOLD_OUT   = #{product.is_sold_out},
             UPDATED_AT    = SYSDATE
         WHERE
-            PRODUCT_ID    = #{productId}
+            PRODUCT_ID    = #{product_id}
     </update>
 
     <update id="deleteProduct">
         UPDATE PRODUCT
         SET DELETED_AT = SYSDATE
-        WHERE PRODUCT_ID = #{productId}
+        WHERE PRODUCT_ID = #{product_id}
     </update>
 
     <update id="updateOrderStatus">
         UPDATE ORDERS
         SET ORDER_STATUS = #{orderStatus}
-        WHERE ORDER_ID = #{orderId}
+        WHERE ORDER_ID = #{order_id}
     </update>
 
     <update id="updateQnaAnswer">
@@ -63,11 +63,11 @@
             ANSWER = #{adminAnswer},
             ANSWERED_AT = SYSDATE
         WHERE
-            QNA_ID = #{qnaId}
+            QNA_ID = #{qna_id}
     </update>
 
     <select id="getMemberPoints" resultType="java.lang.Integer">
-        SELECT POINT FROM USER_TABLE WHERE USER_ID = #{memberId}
+        SELECT POINT FROM USER_TABLE WHERE USER_ID = #{menber_id}
     </select>
 
 
@@ -120,13 +120,13 @@
     <update id="deleteReview" parameterType="int">
         UPDATE REVIEW
         SET DELETED_AT = SYSDATE
-        WHERE REVIEW_ID = #{reviewId}
+        WHERE REVIEW_ID = #{review_id}
     </update>
 
     <update id="setReviewSelection">
         UPDATE REVIEW
         SET IS_SELECTED = #{isSelected}
-        WHERE REVIEW_ID = #{reviewId}
+        WHERE REVIEW_ID = #{review_id}
     </update>
 
     <select id="getAllQna" resultType="com.review.shop.dto.qna.QnAListDTO">
@@ -159,7 +159,7 @@
         FROM QNA q
                  LEFT JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
                  LEFT JOIN PRODUCT p ON q.PRODUCT_ID = p.PRODUCT_ID
-        WHERE q.QNA_ID = #{qnaId}
+        WHERE q.QNA_ID = #{qna_id}
     </select>
 
 
@@ -169,7 +169,7 @@
             POINT = #{points},
             UPDATED_AT = SYSDATE
         WHERE
-            USER_ID = #{userId}
+            USER_ID = #{user_id}
     </update>
 
     <select id="readProduct" resultType="com.review.shop.dto.product.ProductDetailDTO">
@@ -187,7 +187,7 @@
             BAUMANN_ID,
             IS_SOLD_OUT
         FROM PRODUCT
-        WHERE PRODUCT_ID = #{productId}
+        WHERE PRODUCT_ID = #{product_id}
     </select>
 
     <insert id="insertProductImage">
@@ -196,7 +196,7 @@
             IMAGE_URL
         )
         VALUES (
-                #{prdId},
+                #{product_id},
                 #{image}
                )
     </insert>
@@ -207,7 +207,7 @@
         FROM
             PRODUCT_IMAGE
         WHERE
-            PRODUCT_ID = #{prdId}
+            PRODUCT_ID = #{product_id}
         ORDER BY
             PRD_IMG_ID ASC  </select>
 
@@ -232,13 +232,13 @@
 
     <insert id="setBlacklist" parameterType="map">
         INSERT INTO BAN_LIST (USER_ID, REASON)
-        VALUES (#{userId}, #{reason})
+        VALUES (#{user_id}, #{reason})
     </insert>
 
     <update id="deleteUser" parameterType="map">
         UPDATE USER_TABLE
         SET DELETED_AT = SYSDATE
-        WHERE USER_ID =  #{userId}
+        WHERE USER_ID =  #{user_id}
     </update>
 
 </mapper>

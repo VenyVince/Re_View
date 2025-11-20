@@ -14,29 +14,29 @@ import java.util.List;
 
         // 1. 포인트 차감
         int deductPoints(
-                @Param("userId") int userId,
+                @Param("user_id") int user_id,
                 @Param("pointsToDeduct") int pointsToDeduct
         );
 
         // 2. 상품 정보 조회
-        List<OrderCheckoutProductInfoDTO> getProductsByIds(@Param("productIds") List<Integer> productIds);
+        List<OrderCheckoutProductInfoDTO> getProductsByIds(@Param("product_ids") List<Integer> product_ids);
 
         // 3. 유저 현재 포인트 조회
-        Integer getUserPoint(@Param("userId") int userId);
+        Integer getUserPoint(@Param("user_id") int user_id);
 
         // 4. 포인트 이력 기록
         int addPointHistory(
-                @Param("userId") int userId,
+                @Param("user_id") int user_id,
                 @Param("pointsChanged") int pointsChanged,
                 @Param("description") String description
         );
 
         // 5. 재고 확인용 조회
-        List<ProductStockDTO> getProductStocks(@Param("productIds") List<Integer> productIds);
+        List<ProductStockDTO> getProductStocks(@Param("product_ids") List<Integer> product_ids);
 
         // 6. 재고 차감
         int deductStock(
-                @Param("productId") int productId,
+                @Param("product_id") int product_id,
                 @Param("quantity") int quantity
         );
 

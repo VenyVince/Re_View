@@ -1,6 +1,6 @@
-package com.review.shop.service.product;
+package com.review.shop.service.review;
 
-import com.review.shop.dto.product.ProductReviewDTO;
+import com.review.shop.dto.review.ProductReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.product.ProductReviewMapper;

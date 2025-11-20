@@ -11,7 +11,7 @@
         recipient AS recipient_name,
         phone AS phone_number
         FROM address
-        WHERE user_id = #{userId}
+        WHERE user_id = #{user_id}
         ORDER BY is_default DESC, address_id DESC
     </select>
 
@@ -21,7 +21,7 @@
         address_name, is_default,
         recipient AS recipient_name,
         phone AS phone_number
-        FROM address WHERE address_id = #{addressId}
+        FROM address WHERE address_id = #{address_id}
     </select>
 
     <insert id="insertAddress" parameterType="com.review.shop.dto.address.AddressDTO">
@@ -49,11 +49,11 @@
     </update>
 
     <delete id="deleteAddress">
-        DELETE FROM address WHERE address_id = #{addressId} AND user_id = #{userId}
+        DELETE FROM address WHERE address_id = #{address_id} AND user_id = #{user_id}
     </delete>
 
     <update id="resetDefaultAddress">
-        UPDATE address SET is_default = '0' WHERE user_id = #{userId}
+        UPDATE address SET is_default = '0' WHERE user_id = #{user_id}
     </update>
 
 </mapper>

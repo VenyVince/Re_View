@@ -1,4 +1,4 @@
-package com.review.shop.dto.product;
+package com.review.shop.dto.review;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;

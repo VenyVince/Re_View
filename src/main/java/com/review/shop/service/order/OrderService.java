@@ -32,7 +32,7 @@ public class OrderService {
     // 포인트 검사 및 차감
     public void checkAndDeductPoints(OrderCreateDTO orderCreateDTO) {
 
-        int userId = orderCreateDTO.getUser_id();
+        int user_id = orderCreateDTO.getUser_id();
         int pointsToDeduct = orderCreateDTO.getUsing_point();
 
         if (pointsToDeduct == 0) {
@@ -43,17 +43,17 @@ public class OrderService {
         }
 
         // 포인트 검사 로직
-        int currentUserPoint = orderPreviewService.getUserPoint(userId);
+        int currentUserPoint = orderPreviewService.getUserPoint(user_id);
 
         if(currentUserPoint < pointsToDeduct) {
             throw new WrongRequestException ("포인트가 부족합니다.");
         }
 
         // 회원의 포인트를 차감
-        Integer result = deductUserPoints(userId, pointsToDeduct);
+        Integer result = deductUserPoints(user_id, pointsToDeduct);
 
         // 회원의 포인트 기록에 히스토리 추가
-        Integer historyResult = addPointHistory(userId, pointsToDeduct, "사용된 포인트 차감");
+        Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감");
 
         if (historyResult == null || historyResult <= 0) {
             throw new DatabaseException ("포인트 히스토리 기록에 실패했습니다.", null);
@@ -69,12 +69,12 @@ public class OrderService {
 
         List<OrderDTO> orderDTOList = orderCreateDTO.getOrder_list();
         //orderDTO에서 productId 추출 (리스트화)
-        List<Integer> productIds = orderDTOList.stream()
+        List<Integer> product_ids = orderDTOList.stream()
                 .map(OrderDTO::getProduct_id)
                 .toList();
 
         // 쿼리 반복을 피하기 위해 단일 쿼리로 재고 조회
-        List<ProductStockDTO> products = orderMapper.getProductStocks(productIds);
+        List<ProductStockDTO> products = orderMapper.getProductStocks(product_ids);
 
         Map<Integer, Integer> stockMap = products.stream()
                 .collect(Collectors.toMap(ProductStockDTO::getProduct_id, ProductStockDTO::getStock));
@@ -110,10 +110,10 @@ public class OrderService {
         List<OrderDTO> orderDTOList = orderCreateDTO.getOrder_list();
 
         // 요청된 상품 ID 목록 추출
-        List<Integer> productIds = orderDTOList.stream()
+        List<Integer> product_ids = orderDTOList.stream()
                 .map(OrderDTO::getProduct_id)
                 .toList();
-        List<OrderCheckoutProductInfoDTO> dbProductInfoList = orderMapper.getProductsByIds(productIds);
+        List<OrderCheckoutProductInfoDTO> dbProductInfoList = orderMapper.getProductsByIds(product_ids);
 
         // 키밸류 맵으로 변경함
         Map<Integer, OrderCheckoutProductInfoDTO> productMap = dbProductInfoList.stream()
@@ -187,13 +187,13 @@ public class OrderService {
 
 
     //포인트 차감 메소드
-    public Integer deductUserPoints(int userId, int pointsToDeduct) {
-        return orderMapper.deductPoints(userId, pointsToDeduct);
+    public Integer deductUserPoints(int user_id, int pointsToDeduct) {
+        return orderMapper.deductPoints(user_id, pointsToDeduct);
     }
 
     // 차감할때 사용할 포인트 히스토리 기록 반영 메소드
-    public Integer addPointHistory(int userId, int pointsChanged, String reason) {
-        return orderMapper.addPointHistory(userId, pointsChanged, reason);
+    public Integer addPointHistory(int user_id, int pointsChanged, String reason) {
+        return orderMapper.addPointHistory(user_id, pointsChanged, reason);
     }
 
 

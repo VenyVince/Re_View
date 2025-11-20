@@ -1,6 +1,6 @@
 package com.review.shop.repository.product;
 
-import com.review.shop.dto.product.ProductReviewDTO;
+import com.review.shop.dto.review.ProductReviewDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

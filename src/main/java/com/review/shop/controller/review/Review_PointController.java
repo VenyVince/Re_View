@@ -1,9 +1,9 @@
-package com.review.shop.controller;
+package com.review.shop.controller.review;
 
 import com.review.shop.Util.Security_Util;
-import com.review.shop.dto.product.review_create.CreateReviewRequestDTO;
-import com.review.shop.dto.product.review_create.CreateReviewResponseDTO;
-import com.review.shop.service.Review_PointService;
+import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
+import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
+import com.review.shop.service.review.Review_PointService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

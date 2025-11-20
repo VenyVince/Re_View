@@ -33,31 +33,31 @@ public class AdminService {
     }
 
     // 상품 수정
-    public void updateProduct(int productId, ProductDetailDTO product) {
+    public void updateProduct(int product_id, ProductDetailDTO product) {
         if(product ==null){
             throw new WrongRequestException("수정할 상품 정보가 전달되지 않았습니다.");
         }
-        int affected = adminMapper.updateProduct(productId, product);
+        int affected = adminMapper.updateProduct(product_id, product);
         if (affected == 0) {
             throw new ResourceNotFoundException("수정할 상품을 찾을 수 없습니다.");
         }
     }
 
     // 상품 삭제
-    public void deleteProduct(int productId) {
-        int affected = adminMapper.deleteProduct(productId);
+    public void deleteProduct(int product_id) {
+        int affected = adminMapper.deleteProduct(product_id);
         if (affected == 0) {
             throw new ResourceNotFoundException("삭제할 상품을 찾을 수 없습니다.");
         }
     }
 
     // 주문 상태 변경
-    public void updateOrderStatus(int orderId, String orderStatus) {
+    public void updateOrderStatus(int order_id, String orderStatus) {
         if(orderStatus ==null||orderStatus.isEmpty()){
             throw new WrongRequestException("변경할 주문 상태가 null이거나 존재하지 않습니다");
 
         }
-        int affected = adminMapper.updateOrderStatus(orderId, orderStatus);
+        int affected = adminMapper.updateOrderStatus(order_id, orderStatus);
         if (affected == 0) {
             throw new ResourceNotFoundException("주문을 찾을 수 없습니다.");
         }
@@ -65,19 +65,19 @@ public class AdminService {
 
 
     // QnA 답변 등록/수정
-    public void updateQnaAnswer(int qnaId, String adminAnswer) {
+    public void updateQnaAnswer(int qna_id, String adminAnswer) {
         if(adminAnswer ==null||adminAnswer.isEmpty()){
             throw new WrongRequestException("답변 내용이 비어있습니다.");
         }
-        int affected = adminMapper.updateQnaAnswer(qnaId, adminAnswer);
+        int affected = adminMapper.updateQnaAnswer(qna_id, adminAnswer);
         if (affected == 0) {
             throw new ResourceNotFoundException("답변할 QnA를 찾을 수 없습니다.");
         }
     }
 
     // 포인트 조회
-    public Integer getMemberPoints(int memberId) {
-        Integer points = adminMapper.getMemberPoints(memberId);
+    public Integer getMemberPoints(int user_id) {
+        Integer points = adminMapper.getMemberPoints(user_id);
         if (points == null) {
             throw new DatabaseException("포인트가 존재하지 않습니다.", null);
         }
@@ -90,19 +90,19 @@ public class AdminService {
     }
 
     //리뷰 삭제, 실제로 삭제 안하고 DELETED_DATE 플래그 설정
-    public void deleteReview(int reviewId) {
-        int affected = adminMapper.deleteReview(reviewId);
+    public void deleteReview(int review_id) {
+        int affected = adminMapper.deleteReview(review_id);
         if (affected == 0) {
             throw new ResourceNotFoundException("삭제할 리뷰를 찾을 수 없습니다.");
         }
     }
 
     //  setReviewSelection 구현 - 운영자 픽 설정 (테스트 완료)
-    public void setReviewSelection(int reviewId, Integer isSelected) {
+    public void setReviewSelection(int review_id, Integer isSelected) {
         if (isSelected == null || (isSelected != 0 && isSelected != 1)) {
             throw new WrongRequestException("is_selected 값은 0 또는 1이어야 합니다.");
         }
-        int affected = adminMapper.setReviewSelection(reviewId, isSelected);
+        int affected = adminMapper.setReviewSelection(review_id, isSelected);
         if (affected == 0) {
             throw new ResourceNotFoundException("설정할 리뷰를 찾을 수 없습니다.");
         }
@@ -114,45 +114,45 @@ public class AdminService {
     }
 
     //getQnaDetail 구현 - QnA 상세 조회, repository 실행
-    public QnaDTO getQnaDetail(Integer qnaId) {
-        if(qnaId==null){
+    public QnaDTO getQnaDetail(Integer qna_id) {
+        if(qna_id==null){
             throw new ResourceNotFoundException("조회할 QnA를 찾을 수 없습니다.");
         }
-        return adminMapper.getQnaDetail(qnaId);
+        return adminMapper.getQnaDetail(qna_id);
     }
 
 
-    public void updateMemberPoints(int userId, Integer points) {
+    public void updateMemberPoints(int user_id, Integer points) {
         if (points == null || points < 0) {
             throw new WrongRequestException("포인트는 0 이상이어야 합니다.");
         }
-        int affected = adminMapper.updateMemberPoints(userId, points);
+        int affected = adminMapper.updateMemberPoints(user_id, points);
         if (affected == 0) {
             throw new ResourceNotFoundException("포인트를 수정할 회원을 찾을 수 없습니다.");
         }
     }
 
     // 상품 상세조회
-    public ProductDetailDTO getProductDetail(int productId) {
-        ProductDetailDTO result = adminMapper.readProduct(productId);
+    public ProductDetailDTO getProductDetail(int product_id) {
+        ProductDetailDTO result = adminMapper.readProduct(product_id);
         if (result == null) {
             throw new ResourceNotFoundException("조회할 상품을 찾을 수 없습니다.");
         }
         return result;
     }
 
-    public void putImage(int prdId, List<String> imageUrl) {
+    public void putImage(int product_id, List<String> imageUrl) {
         for(String image : imageUrl){
             //여기에 이미지 삽입 쿼리문 작성
-            int result = adminMapper.insertProductImage(prdId, image);
+            int result = adminMapper.insertProductImage(product_id, image);
             if(result == 0){
                 throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
             }
         }
     }
 
-    public List<String> readImage(int prdId) {
-        List<String> result = adminMapper.readImage(prdId);
+    public List<String> readImage(int product_id) {
+        List<String> result = adminMapper.readImage(product_id);
         if(result == null || result.isEmpty()){
             throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
         }
@@ -168,9 +168,9 @@ public class AdminService {
     }
 
     // 밴 기록 추가
-    public void setBan(int userId, String reason) {
+    public void setBan(int user_id, String reason) {
 
-        int result = adminMapper.setBlacklist(userId, reason);
+        int result = adminMapper.setBlacklist(user_id, reason);
 
         if(result == 0){
             throw new ResourceNotFoundException("밴 기록에 실패했습니다. 해당 사용자를 찾을 수 없습니다.");
@@ -178,8 +178,8 @@ public class AdminService {
     }
 
     // 유저 탈퇴처리
-    public void deleteUser(int userId) {
-        int result = adminMapper.deleteUser(userId);
+    public void deleteUser(int user_id) {
+        int result = adminMapper.deleteUser(user_id);
 
         if(result == 0){
             throw new ResourceNotFoundException("사용자 삭제에 실패했습니다. 해당 사용자를 찾을 수 없습니다.");
@@ -188,8 +188,8 @@ public class AdminService {
 
     // 유저의 밴 처리, 밴 기록 처리 트랜잭션
     @Transactional
-    public void blockAndExpelUser(int userId, String reason) {
-        setBan(userId, reason);
-        deleteUser(userId);
+    public void blockAndExpelUser(int user_id, String reason) {
+        setBan(user_id, reason);
+        deleteUser(user_id);
     }
 }
