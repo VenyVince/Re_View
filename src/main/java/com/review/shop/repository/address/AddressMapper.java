@@ -7,13 +7,13 @@ import java.util.List;
 
 @Mapper
 public interface AddressMapper {
-    List<AddressDTO> selectAddressList(int userId);
-    AddressDTO selectAddressDetail(@Param("addressId") int addressId);
+    List<AddressDTO> selectAddressList(int user_id);
+    AddressDTO selectAddressDetail(@Param("address_id") int address_id);
 
     int insertAddress(AddressDTO addressDTO);
     int updateAddress(AddressDTO addressDTO);
-    int deleteAddress(@Param("addressId") int addressId, @Param("userId") int userId);
+    int deleteAddress(@Param("address_id") int address_id, @Param("user_id") int user_id);
 
     // 특정 유저의 모든 배송지를 '일반'으로 초기화
-    int resetDefaultAddress(int userId);
+    int resetDefaultAddress(int user_id);
 }

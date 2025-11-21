@@ -17,9 +17,9 @@ public class AddressService {
 
     private final AddressMapper addressMapper;
 
-    public List<AddressDTO> getMyAddresses(int userId) {
+    public List<AddressDTO> getMyAddresses(int user_id) {
         try {
-            return addressMapper.selectAddressList(userId);
+            return addressMapper.selectAddressList(user_id);
         } catch (DataAccessException e) {
             throw new DatabaseException("배송지 목록 조회 실패", e);
         }
@@ -60,9 +60,9 @@ public class AddressService {
     }
 
     @Transactional
-    public void removeAddress(int addressId, int userId) {
+    public void removeAddress(int address_id, int user_id) {
         try {
-            int result = addressMapper.deleteAddress(addressId, userId);
+            int result = addressMapper.deleteAddress(address_id, user_id);
             if (result == 0) {
                 throw new ResourceNotFoundException("삭제할 배송지가 없습니다. (권한 없음 또는 이미 삭제됨)");
             }

@@ -1,0 +1,124 @@
+/* 기본 세션 카드 (이미 있으면 건너뛰어도 됨) */
+.mypage-section {
+    background-color: #fff;
+    border-radius: 16px;
+    border: 1px solid #eee;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+/* ===== 기본 배송지 카드 ===== */
+
+.delivery-summary-section {
+    border: none;          /* 바깥 테두리 제거 */
+    box-shadow: none;      /* 그림자 제거 */
+    background: transparent;
+    padding: 0 0 24px 0;  /* 위아래 여백만 남기기 */
+    margin-bottom: 0;      /* 아래쪽 카드와 간격은 필요하면 조절 */
+}
+
+/* 기본 배송지 카드 자체를 하나의 박스로 보이게 */
+.delivery-default-card {
+    border-radius: 24px;
+    background-color: #f7f7f7;
+    border: none;                 /* 여기서도 테두리 제거 */
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 왼쪽 텍스트 영역 */
+.delivery-default-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.delivery-default-label {
+    font-size: 14px;
+    color: #777;
+}
+
+.delivery-default-main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.delivery-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.delivery-recipient {
+    font-weight: 600;
+}
+
+.delivery-phone {
+    color: #555;
+}
+
+.delivery-default-sub {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 오른쪽 버튼 – 프로필 박스랑 톤 맞춤 */
+.delivery-manage-btn {
+    min-width: 130px;
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 999px;
+    background-color: #111;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.delivery-manage-btn:hover {
+    background-color: #000;
+}
+
+/* ===== 주문 배송 현황 카드 (프로필 카드처럼) ===== */
+
+.delivery-status-section {
+    /* 프로필 박스처럼 넓은 카드 느낌만 유지,
+       안쪽에서 다시 작은 카드 3개 배치 */
+}
+
+.delivery-status-card-wrapper {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.delivery-status-card {
+    flex: 1;
+    background-color: #fafafa;
+    border-radius: 12px;
+    padding: 22px 0;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.delivery-status-label {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.delivery-status-value {
+    font-size: 22px;
+    font-weight: 600;
+}

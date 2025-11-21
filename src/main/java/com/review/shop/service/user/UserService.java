@@ -6,12 +6,17 @@ import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -20,6 +25,7 @@ public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mailSender;
 
     // 회원가입 로직 구현, DB 결과에 따른 예외 처리
     public void registerUser(UserInfoDTO userDTO) {
@@ -110,6 +116,61 @@ public class UserService implements UserDetailsService {
     }
 
 
+    //임시 비밀번호 전송 메서드
+    public void sendTempPassword(String userEmail, String temPassWord) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        
+        message.setTo(userEmail);
+        message.setSubject("임시 비밀번호가 발급되었습니다.");
+
+        String mailContent = "안녕하세요.\n"
+                + "귀하의 임시 비밀번호는 **[" + temPassWord + "]** 입니다.\n"
+                + "보안을 위해 로그인 후 반드시 새 비밀번호로 변경해 주세요.";
+
+        message.setText(mailContent);
+
+        mailSender.send(message);
+
+    }
+
+    //임시비밀번호로 유저 비밀번호 변경
+    public void updatePasswordWithTempPassword(String id, String temPassWord) {
+        String newEncodedPassword = passwordEncoder.encode(temPassWord);
+        int affected = userMapper.updatePassword(id, newEncodedPassword);
+        if(affected != 1) throw new WrongRequestException("임시 비밀번호로 변경에 실패했습니다.");
+    }
+
+    // 메일 전송과 비밀번호 변경 트랜잭션
+
+    @Transactional
+    public void processTempPasswordEmail(String id, String userEmail) {
+        if(!userEmail.equals(userMapper.findEmailById(id))) {
+            throw new WrongRequestException("이메일이 일치하지 않습니다.");
+        }
+
+        String tempPassword = generateTempPassword();
+
+        updatePasswordWithTempPassword(id, tempPassword);
+
+        sendTempPassword(userEmail, tempPassword);
+    }
+
+
+
+
+    //임시비밀번호 만들기
+    public String generateTempPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder tempPassword = new StringBuilder();
+        Random random = new Random();
+
+        for (int i = 0; i < 8; i++) {
+            tempPassword.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        return tempPassword.toString();
+    }
+
     //findIdByNameAndPhoneNumber 구현 하기
     public String findIdByNameAndPhoneNumber(String name, String phoneNumber) {
         String user_id = userMapper.findUserIdByNameAndPhoneNumber(name, phoneNumber);
@@ -118,4 +179,10 @@ public class UserService implements UserDetailsService {
         }
         return user_id;
     }
+
+    // 반영된 사항이 있다면 강퇴된 사용자
+    public boolean isUserBanned(int id) {
+        return userMapper.findBannedByUserId(id) > 0;
+    }
+
 }
