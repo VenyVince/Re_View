@@ -1,4 +1,4 @@
-package com.review.shop.dto.product.review_create;
+package com.review.shop.dto.review.review_create;
 
 import lombok.Data;
 

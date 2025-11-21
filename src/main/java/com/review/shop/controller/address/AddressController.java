@@ -26,8 +26,8 @@ public class AddressController {
     })
     @GetMapping
     public ResponseEntity<?> getMyAddresses() {
-            int userId = securityUtil.getCurrentUserId();
-            return ResponseEntity.ok(addressService.getMyAddresses(userId));
+            int user_id = securityUtil.getCurrentUserId();
+            return ResponseEntity.ok(addressService.getMyAddresses(user_id));
     }
 
     @Operation(summary = "새 배송지 추가", description = "새로운 배송지를 등록합니다.")
@@ -39,8 +39,8 @@ public class AddressController {
     })
     @PostMapping
     public ResponseEntity<String> createAddress(@RequestBody AddressDTO addressDTO) {
-            int userId = securityUtil.getCurrentUserId();
-            addressDTO.setUser_id(userId);
+            int user_id = securityUtil.getCurrentUserId();
+            addressDTO.setUser_id(user_id);
 
             // 기본값 설정 (프론트에서 안 보내줬을 경우)
             if (addressDTO.getIs_default() == null || addressDTO.getIs_default().isEmpty()) {
@@ -60,15 +60,15 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "배송지 없음 또는 권한 없음"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @PatchMapping("/{addressId}")
+    @PatchMapping("/{address_id}")
     public ResponseEntity<String> updateAddress(
-            @PathVariable int addressId,
+            @PathVariable int address_id,
             @RequestBody AddressDTO addressDTO
     ) {
-            int userId = securityUtil.getCurrentUserId();
+            int user_id = securityUtil.getCurrentUserId();
 
-            addressDTO.setAddress_id(addressId);
-            addressDTO.setUser_id(userId);
+            addressDTO.setAddress_id(address_id);
+            addressDTO.setUser_id(user_id);
 
             addressService.modifyAddress(addressDTO);
             return ResponseEntity.ok("배송지 수정 성공");
@@ -81,11 +81,11 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "배송지 없음 또는 권한 없음"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @DeleteMapping("/{addressId}")
-    public ResponseEntity<String> deleteAddress(@PathVariable int addressId) {
-            int userId = securityUtil.getCurrentUserId();
+    @DeleteMapping("/{address_id}")
+    public ResponseEntity<String> deleteAddress(@PathVariable int address_id) {
+            int user_id = securityUtil.getCurrentUserId();
 
-            addressService.removeAddress(addressId, userId);
+            addressService.removeAddress(address_id, user_id);
             return ResponseEntity.ok("배송지 삭제 성공");
     }
 }

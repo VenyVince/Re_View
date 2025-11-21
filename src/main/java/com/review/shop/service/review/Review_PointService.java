@@ -1,9 +1,8 @@
-package com.review.shop.service;
+package com.review.shop.service.review;
 
-import com.review.shop.dto.product.ProductReviewDTO;
-import com.review.shop.dto.product.review_create.CreateReviewRequestDTO;
-import com.review.shop.dto.product.review_create.CreateReviewResponseDTO;
-import com.review.shop.service.product.ProductReviewService;
+import com.review.shop.dto.review.ProductReviewDTO;
+import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
+import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
 import com.review.shop.service.userinfo.user_related.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

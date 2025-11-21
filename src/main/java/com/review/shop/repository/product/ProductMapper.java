@@ -18,9 +18,9 @@ public interface ProductMapper {
     );
 
     // 상품 정보만 가져오는 메서드 (기존)
-    ProductDetailDTO selectProductDetail(Integer productId);
+    ProductDetailDTO selectProductDetail(Integer product_id);
 
     // 해당 상품의 이미지 URL 리스트만 가져오는 메서드
-    List<String> selectProductImages(Integer productId);
+    List<String> selectProductImages(Integer product_id);
 }
 

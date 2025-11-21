@@ -47,9 +47,9 @@ public class OrderController {
         // 상품 정보와 총 가격 조회
         OrderCheckoutResponse checkoutResponse = orderPreviewService.getPrdInfoList(orderList);
 
-        int userId = security_util.getCurrentUserId();
+        int user_id = security_util.getCurrentUserId();
 
-        Integer userPoint = orderPreviewService.getUserPoint(userId);
+        Integer userPoint = orderPreviewService.getUserPoint(user_id);
 
         Map<String, Object> response = new HashMap<>();
         response.put("products", checkoutResponse.getProducts());  // 상품 리스트

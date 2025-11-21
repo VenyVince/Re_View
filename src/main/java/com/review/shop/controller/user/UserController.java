@@ -84,7 +84,7 @@ public class UserController  {
     @Operation(summary = "로그인")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공 (JSON 객체 반환)",
-                    content = @Content(schema = @Schema(type = "object", example = "{\"message\": \"로그인 성공\", \"userId\": \"testuser123\"}"))),
+                    content = @Content(schema = @Schema(type = "object", example = "{\"message\": \"로그인 성공\", \"user_id\": \"testuser123\"}"))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 비밀번호 오류)",
                     content = @Content(schema = @Schema(implementation = String.class))),
 
@@ -122,7 +122,7 @@ public class UserController  {
         );
         Map<String, Object> response = new HashMap<>();
         response.put("message", "로그인 성공");
-        response.put("userId", loginDto.getId());
+        response.put("user_id", loginDto.getId());
         return ResponseEntity.ok(response);
     }
 
