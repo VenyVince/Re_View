@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/api/send-temp-password",
+                                "/api/auth/send-temp-password",
                                 "/api/auth/check-id",
                                 "/api/search/**",
                                 "/api/products",

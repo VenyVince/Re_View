@@ -50,14 +50,13 @@ public class UserUtilController {
         }
     }
 
-    // api/auth가 붙지 않은 이유는 인증 없이도 접근 가능해야 하기 때문
     @Operation (summary = "임시 비밀번호 발송")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 발송 성공 (메시지 문자열 반환)"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @PostMapping("/api/send-temp-password")
+    @PostMapping("/api/auth/send-temp-password")
     public ResponseEntity<String> sendTemporaryPassword(@RequestBody TemPasswordDTO temPasswordDTO) {
         String id = temPasswordDTO.getId();
         String email = temPasswordDTO.getEmail();
