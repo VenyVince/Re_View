@@ -38,7 +38,7 @@ public class OrderController {
     @PostMapping("/api/orders/checkout")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 미리보기 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (ResourceNotFoundException 등)"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -64,7 +64,7 @@ public class OrderController {
     @PostMapping("/api/orders")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 처리 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (포인트 부족, 재고 부족 등)"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })

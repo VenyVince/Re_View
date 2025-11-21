@@ -35,7 +35,7 @@ public class UserUtilController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "사용 가능한 아이디 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이미 사용 중인 아이디)",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/api/auth/check-id")
@@ -54,7 +54,7 @@ public class UserUtilController {
     @Operation (summary = "임시 비밀번호 발송")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 발송 성공 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 이메일 오류)",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/api/send-temp-password")
@@ -70,7 +70,7 @@ public class UserUtilController {
     @Operation (summary = "아이디 찾기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "아이디 찾기 성공 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이름 또는 핸드폰번호 오류)",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/api/auth/find-id")

@@ -45,7 +45,7 @@ public class UserController  {
     @Operation(summary = "회원 가입")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "회원가입 성공 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (입력값 오류, ID 중복 등)",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/api/auth/register")
@@ -62,7 +62,7 @@ public class UserController  {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공 (JSON 객체 반환)",
                     content = @Content(schema = @Schema(type = "object", example = "{\"message\": \"로그인 성공\", \"user_id\": \"testuser123\"}"))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 비밀번호 오류)",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
 
             @ApiResponse (responseCode = "401", description = "밴 당한 사용자 로그인 시도",
@@ -108,7 +108,7 @@ public class UserController  {
     @Operation(summary = "비밀번호 재설정 (인증 필요)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "비밀번호 재설정 성공 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (현재 비밀번호 불일치, 인증 정보 없음 등)",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/api/auth/reset-password")
@@ -127,7 +127,7 @@ public class UserController  {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "내 정보 조회 성공 (JSON 객체 반환)",
                     content = @Content(schema = @Schema(type = "object", example = "{\"id\": \"testuser123\", \"role\": \"ROLE_USER\"}"))),
-            @ApiResponse(responseCode = "400", description = "인증 정보 없음",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/api/auth/me")

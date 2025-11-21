@@ -36,7 +36,7 @@ public class AdminProductController {
                             array = @ArraySchema(schema = @Schema(implementation = ProductDetailDTO.class))
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -50,7 +50,7 @@ public class AdminProductController {
     @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "상품 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -69,7 +69,7 @@ public class AdminProductController {
     @Operation(summary = "상품 수정", description = "기존 상품의 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -85,7 +85,7 @@ public class AdminProductController {
     @Operation(summary = "상품 삭제 (논리적)", description = "상품을 논리적으로 삭제합니다. (DELETED_DATE 설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -102,7 +102,7 @@ public class AdminProductController {
             @ApiResponse(responseCode = "200", description = "상품 상세 조회 성공",
                     content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))

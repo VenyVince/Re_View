@@ -40,7 +40,7 @@ public class AdminMemberCotroller {
                             array = @ArraySchema(schema = @Schema(implementation = QnAListDTO.class))
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
@@ -57,7 +57,7 @@ public class AdminMemberCotroller {
             @ApiResponse(responseCode = "200", description = "QnA 상세 조회 성공",
                     content = @Content(schema = @Schema(implementation = QnaDTO.class))
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
@@ -72,7 +72,7 @@ public class AdminMemberCotroller {
     @Operation(summary = "QnA 답변 등록/수정", description = "QnA 게시글에 관리자 답변을 등록하거나 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답변 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -89,7 +89,7 @@ public class AdminMemberCotroller {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "포인트 조회 성공",
                     content = @Content(schema = @Schema(example = "{\"points\": 1500}"))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
@@ -105,7 +105,7 @@ public class AdminMemberCotroller {
     @Operation(summary = "회원 포인트 업데이트 (디버깅용)", description = "특정 회원의 포인트를 업데이트합니다. (디버깅용)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "포인트 업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -132,7 +132,7 @@ public class AdminMemberCotroller {
                             array = @ArraySchema(schema = @Schema(implementation = UserSummaryDTO.class))
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "DB 조회 오류",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
@@ -149,7 +149,7 @@ public class AdminMemberCotroller {
     @PostMapping("/users/{user_id}/ban")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "밴 설정 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))

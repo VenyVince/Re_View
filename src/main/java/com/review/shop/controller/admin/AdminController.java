@@ -35,7 +35,7 @@ public class AdminController {
     @Operation(summary = "주문 상태 변경", description = "특정 주문의 상태를 변경합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "주문 상태 변경 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -55,7 +55,7 @@ public class AdminController {
     @Operation(summary = "리뷰 삭제 (논리적)", description = "특정 상품 리뷰를 삭제합니다. (DELETED_DATE 설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -70,7 +70,7 @@ public class AdminController {
     @Operation(summary = "운영자 픽 업데이트", description = "특정 리뷰의 선택 상태(is_selected 0 or 1)를 업데이트합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
