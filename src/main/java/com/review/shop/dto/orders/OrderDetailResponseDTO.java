@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class OrderDetailResponseDto {
+public class OrderDetailResponseDTO {
     private int order_id;
     private Date created_at;
     private String order_status;
@@ -26,5 +26,5 @@ public class OrderDetailResponseDto {
     private String card_number;
 
     // 주문 상품 리스트
-    private List<OrderItemDto> order_items;
+    private List<OrderItemDTO> order_items;
 }

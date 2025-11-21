@@ -1,8 +1,8 @@
 package com.review.shop.controller.orders;
 
 import com.review.shop.Util.Security_Util;
-import com.review.shop.dto.orders.OrderDetailResponseDto;
-import com.review.shop.dto.orders.OrderListResponseDto;
+import com.review.shop.dto.orders.OrderDetailResponseDTO;
+import com.review.shop.dto.orders.OrderListResponseDTO;
 import com.review.shop.service.order.OrderListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +28,7 @@ public class OrderListController {
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping
-    public ResponseEntity<List<OrderListResponseDto>> getMyOrders(
+    public ResponseEntity<List<OrderListResponseDTO>> getMyOrders(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -46,7 +46,7 @@ public class OrderListController {
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDetailResponseDto> getOrderDetail(@PathVariable int orderId) {
+    public ResponseEntity<OrderDetailResponseDTO> getOrderDetail(@PathVariable int orderId) {
         int user_id = securityUtil.getCurrentUserId();
         return ResponseEntity.ok(orderListService.getOrderDetail(orderId, user_id));
     }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class OrderListResponseDto {
+public class OrderListResponseDTO {
     private int order_id;
     private Date created_at;
     private String order_status;

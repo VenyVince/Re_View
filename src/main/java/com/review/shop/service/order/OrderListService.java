@@ -1,8 +1,8 @@
 package com.review.shop.service.order;
 
-import com.review.shop.dto.orders.OrderDetailResponseDto;
-import com.review.shop.dto.orders.OrderItemDto;
-import com.review.shop.dto.orders.OrderListResponseDto;
+import com.review.shop.dto.orders.OrderDetailResponseDTO;
+import com.review.shop.dto.orders.OrderItemDTO;
+import com.review.shop.dto.orders.OrderListResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.Orders.OrderListMapper;
@@ -21,7 +21,7 @@ public class OrderListService {
 
     // 내 주문 내역 조회
     @Transactional(readOnly = true)
-    public List<OrderListResponseDto> getMyOrderList(int userId, int page, int size) {
+    public List<OrderListResponseDTO> getMyOrderList(int userId, int page, int size) {
         try {
             int offset = (page - 1) * size;
             return orderListMapper.findOrderListByUserId(userId, offset, size);
@@ -32,14 +32,14 @@ public class OrderListService {
 
     // 주문 상세 조회
     @Transactional(readOnly = true)
-    public OrderDetailResponseDto getOrderDetail(int orderId, int userId) {
+    public OrderDetailResponseDTO getOrderDetail(int orderId, int userId) {
         try {
             // 기본 정보 조회
-            OrderDetailResponseDto orderDetail = orderListMapper.findOrderDetailById(orderId, userId)
+            OrderDetailResponseDTO orderDetail = orderListMapper.findOrderDetailById(orderId, userId)
                     .orElseThrow(() -> new ResourceNotFoundException("주문 정보를 찾을 수 없거나 접근 권한이 없습니다."));
 
             // 상품 목록 조회
-            List<OrderItemDto> items = orderListMapper.findOrderItemsByOrderId(orderId);
+            List<OrderItemDTO> items = orderListMapper.findOrderItemsByOrderId(orderId);
 
             // DTO 결합
             orderDetail.setOrder_items(items);
