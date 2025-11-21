@@ -1,14 +1,14 @@
 package com.review.shop.dto.orders;
 
 import lombok.Data;
-import java.math.BigDecimal;
+
 
 @Data
-public class OrderItemDto {
+public class OrderItemDTO {
     private int order_item_id;
+    private int order_id;      // ORDERS insert 후 받아온 ID
     private int product_id;
-    private String product_name;
+    private String prd_name;
+    private int product_price;
     private int quantity;
-    private BigDecimal product_price;
-    private BigDecimal total_amount; // quantity * price
 }
