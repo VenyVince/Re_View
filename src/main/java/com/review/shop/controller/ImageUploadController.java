@@ -26,7 +26,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/api/images")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "Image Upload", description = "이미지 업로드 API")
 public class ImageUploadController {
@@ -35,7 +35,7 @@ public class ImageUploadController {
     private final FileUploadProperties fileUploadProperties;
     private final Security_Util security_util;
 
-    @PostMapping("/reviews")
+    @PostMapping("/images/reviews")
     @Operation(summary = "리뷰 이미지 업로드", description = "리뷰 이미지를 최대 5개까지 업로드합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "이미지 업로드 성공"),
@@ -67,7 +67,7 @@ public class ImageUploadController {
         return ResponseEntity.status(HttpStatus.CREATED).body(imageUrls);
     }
 
-    @PostMapping("/products")
+    @PostMapping("/admin/images/upload")
     @Operation(summary = "상품 이미지 업로드", description = "상품 이미지를 업로드합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "이미지 업로드 성공"),
