@@ -1,6 +1,9 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Admin API", description = "상품 관련 관리자 기능 API")
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
@@ -109,5 +114,20 @@ public class AdminProductController {
 
         detailDTO.setProduct_images(adminService.readImage(product_id));
         return ResponseEntity.ok(detailDTO);
+    }
+
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(WrongRequestException.class)
+    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

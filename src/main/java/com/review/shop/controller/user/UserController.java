@@ -1,11 +1,11 @@
 package com.review.shop.controller.user;
 
-//회원가입, 로그인, 로그아웃 등의 기능을 담당하는 컨트롤러
+//회원가입, 로그인, 로그아웃 등의 핵심 인증 기능을 담당하는 컨트롤러
 
 import com.review.shop.dto.user.LoginRequestDTO;
 import com.review.shop.dto.user.PasswordUpdateDTO;
-import com.review.shop.dto.user.TemPasswordDTO;
 import com.review.shop.dto.user.UserInfoDTO;
+import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,30 +57,6 @@ public class UserController  {
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
 
-    @Operation(summary = "아이디 중복 확인")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "확인할 아이디", required = true,
-            content = @Content(schema = @Schema(type = "object", example = "{\"id\": \"testuser123\"}"))
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용 가능한 아이디 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이미 사용 중인 아이디)",
-                    content = @Content(schema = @Schema(implementation = String.class)))
-    })
-    @PostMapping("/api/auth/check-id")
-    public ResponseEntity<String> checkDuplicateId(@RequestBody Map<String, String> payload) {
-        boolean isDuplicate = userService.isDuplicateId(payload.get("id"));
-
-        if (isDuplicate) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-
-                    .body("이미 사용 중인 아이디입니다.");
-        } else {
-            return ResponseEntity
-                    .ok("사용 가능한 아이디입니다.");
-        }
-    }
 
     @Operation(summary = "로그인")
     @ApiResponses({
@@ -99,7 +76,7 @@ public class UserController  {
     ) {
 
         int user_id = userService.getUserByLoginId(loginDto.getId()).getUser_id();
-        
+
         // true면 밴리스트에 존재
         boolean isBanned = userService.isUserBanned(user_id);
         if (isBanned) {
@@ -145,36 +122,6 @@ public class UserController  {
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");
     }
 
-    @Operation (summary = "임시 비밀번호 발송")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "임시 비밀번호 발송 성공 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (아이디 또는 이메일 오류)",
-                    content = @Content(schema = @Schema(implementation = String.class)))
-    })
-    @PostMapping("/api/auth/send-temp-password")
-    public ResponseEntity<String> sendTemporaryPassword(@RequestBody TemPasswordDTO temPasswordDTO) {
-        String id = temPasswordDTO.getId();
-        String email = temPasswordDTO.getEmail();
-
-        userService.processTempPasswordEmail(id, email);
-        return ResponseEntity.ok("임시 비밀번호가 이메일로 발송되었습니다.");
-    }
-
-
-    @Operation (summary = "아이디 찾기")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "아이디 찾기 성공 (메시지 문자열 반환)"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이름 또는 핸드폰번호 오류)",
-                    content = @Content(schema = @Schema(implementation = String.class)))
-    })
-    @GetMapping("/api/auth/find-id")
-    public ResponseEntity<String> findId(@RequestBody Map<String, String> payload) {
-        String name = payload.get("name");
-        String phoneNumber = payload.get("phone_number");
-        String foundId = userService.findIdByNameAndPhoneNumber(name, phoneNumber);
-        return ResponseEntity.ok("찾으신 아이디는: " + foundId + " 입니다.");
-    }
-
 
     @Operation(summary = "내 세션 정보 조회 (인증 필요)")
     @ApiResponses(value = {
@@ -217,5 +164,21 @@ public class UserController  {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
+
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<String> handleDatabaseException(DatabaseException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<String> handleResourceAccessException(ResourceAccessException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+
 
 }

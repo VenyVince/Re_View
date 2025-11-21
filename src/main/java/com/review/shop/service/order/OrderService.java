@@ -52,6 +52,8 @@ public class OrderService {
         // 회원의 포인트를 차감
         Integer result = deductUserPoints(user_id, pointsToDeduct);
 
+
+
         // 회원의 포인트 기록에 히스토리 추가
         Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감");
 
@@ -176,12 +178,12 @@ public class OrderService {
     //트랜잭션용 최종 오더
     @Transactional
     public void processOrder(OrderCreateDTO orderCreateDTO) {
-        //DB에 주문 정보 저장
-        saveOrderToDatabase(orderCreateDTO);
         //포인트 차감 검사 및 반영
         checkAndDeductPoints(orderCreateDTO);
         //재고 차감 검사 및 반영
         checkAndDeductStock(orderCreateDTO);
+        //DB에 주문 정보 저장
+        saveOrderToDatabase(orderCreateDTO);
     }
 
 

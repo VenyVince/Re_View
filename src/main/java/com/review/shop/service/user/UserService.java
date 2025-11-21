@@ -2,6 +2,8 @@ package com.review.shop.service.user;
 
 import com.review.shop.dto.user.PasswordUpdateDTO;
 import com.review.shop.dto.user.UserInfoDTO;
+import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
 import lombok.AllArgsConstructor;
@@ -11,7 +13,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +54,7 @@ public class UserService implements UserDetailsService {
         int affected = userMapper.insertUser(encodedUser);
 
         if (affected != 1) {
-            throw new WrongRequestException("회원가입에 실패했습니다.");
+            throw new DatabaseException("회원가입에 실패했습니다.");
         }
     }
 
@@ -65,7 +66,7 @@ public class UserService implements UserDetailsService {
         UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
+            throw new ResourceNotFoundException("사용자를 찾을 수 없습니다: " + id);
         }
 
         return user;
@@ -74,12 +75,12 @@ public class UserService implements UserDetailsService {
     // AuthenticationManager가 UserDetails을 받기위한 메소드
     // 로그인 데이터와 UserDetails의 데이터를 비교하여 인증 처리
     @Override
-    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String id) {
 
         UserInfoDTO user = userMapper.findUserById(id);
 
         if (user == null) {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
+            throw new WrongRequestException("사용자를 찾을 수 없습니다: " + id);
         }
 
         return User.builder()
@@ -101,7 +102,7 @@ public class UserService implements UserDetailsService {
 
         String currentId = userDetails.getUsername();
         UserInfoDTO user = userMapper.findUserById(currentId);
-        if(user == null) throw new WrongRequestException("사용자를 찾을 수 없습니다.");
+        if(user == null) throw new ResourceNotFoundException("사용자를 찾을 수 없습니다.");
 
         String currentPassword = user.getPassword();
 
@@ -110,7 +111,7 @@ public class UserService implements UserDetailsService {
 
         String newEncodedPassword = passwordEncoder.encode(passwordUpdateDto.getNewPassword());
         int affected = userMapper.updatePassword(currentId, newEncodedPassword);
-        if(affected != 1) throw new WrongRequestException("비밀번호 재설정에 실패했습니다.");
+        if(affected != 1) throw new DatabaseException("비밀번호 재설정에 실패했습니다.");
 
 
     }
@@ -119,7 +120,7 @@ public class UserService implements UserDetailsService {
     //임시 비밀번호 전송 메서드
     public void sendTempPassword(String userEmail, String temPassWord) {
         SimpleMailMessage message = new SimpleMailMessage();
-        
+
         message.setTo(userEmail);
         message.setSubject("임시 비밀번호가 발급되었습니다.");
 
@@ -137,7 +138,7 @@ public class UserService implements UserDetailsService {
     public void updatePasswordWithTempPassword(String id, String temPassWord) {
         String newEncodedPassword = passwordEncoder.encode(temPassWord);
         int affected = userMapper.updatePassword(id, newEncodedPassword);
-        if(affected != 1) throw new WrongRequestException("임시 비밀번호로 변경에 실패했습니다.");
+        if(affected != 1) throw new DatabaseException("임시 비밀번호로 변경에 실패했습니다.");
     }
 
     // 메일 전송과 비밀번호 변경 트랜잭션
@@ -175,7 +176,7 @@ public class UserService implements UserDetailsService {
     public String findIdByNameAndPhoneNumber(String name, String phoneNumber) {
         String user_id = userMapper.findUserIdByNameAndPhoneNumber(name, phoneNumber);
         if (user_id == null) {
-            throw new WrongRequestException("일치하는 사용자가 없습니다.");
+            throw new ResourceNotFoundException("일치하는 사용자가 없습니다.");
         }
         return user_id;
     }
