@@ -44,8 +44,8 @@ public class QnaController {
     public ResponseEntity<List<QnaListResponseDTO>> getMyQnaList() {
         int user_id = securityUtil.getCurrentUserId();
 
-        List<QnaListResponseDTO> myQnaList = qnaService.getMyQnaList(user_id);
-        return ResponseEntity.ok(myQnaList);
+        List<QnaListResponseDTO> my_qna_list = qnaService.getMyQnaList(user_id);
+        return ResponseEntity.ok(my_qna_list);
 
     }
 
