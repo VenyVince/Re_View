@@ -15,16 +15,14 @@ export default function ProductDetailPage() {
     const [qnaList, setQnaList] = useState([
         {
             qna_id: 1,
-            title: "이 제품의 사용기한은 언제까지인가요?",
-            content: "개봉 전·후 사용기한이 어떻게 되는지 궁금합니다.",
-            answer: "",
+            title: "이 제품의 개봉 전·후 사용기한은 언제까지인가요?",
+            answer: "이 제품은 개봉 후 사용기한은 6개월입니다.",
             user_nickname: "user01",
             created_at: "2025-02-01",
         },
         {
             qna_id: 2,
             title: "비슷한 제품에서 발암물질이 검출되었다는데 안전한가요?",
-            content: "뉴스에서 본 내용이 걱정돼 문의드립니다.",
             answer: "",
             user_nickname: "user02",
             created_at: "2025-02-01",
@@ -74,7 +72,33 @@ export default function ProductDetailPage() {
             created_at: "2025-02-01",
             images: ["https://picsum.photos/150?1"],
         },
+        {
+            review_id: 2,
+            nickname: "글로우러버",
+            baumann_type: "OSPW",
+            rating: 4,
+            like_count: 5,
+            dislike_count: 0,
+            title: "보습감 굿",
+            content: "확실히 수분감이 좋아요. 다만 향이 조금 강해요.",
+            created_at: "2025-02-03",
+            images: ["https://picsum.photos/150?2"],
+        },
+        {
+            review_id: 3,
+            nickname: "민감한피부",
+            baumann_type: "DSNW",
+            rating: 3,
+            like_count: 2,
+            dislike_count: 1,
+            title: "저는 그냥 그랬어요",
+            content:
+                "자극은 없었는데 특별히 좋은 느낌도 없었어요. 그래도 무난합니다.",
+            created_at: "2025-02-05",
+            images: ["https://picsum.photos/150?3"],
+        },
     ];
+
 
     // 🔥 TOP 버튼 표시
     useEffect(() => {
@@ -166,7 +190,7 @@ export default function ProductDetailPage() {
                             className={activeTab === "qna" ? "active" : ""}
                             onClick={() => setActiveTab("qna")}
                         >
-                            Q&A
+                            상품 문의
                         </button>
                     </div>
 

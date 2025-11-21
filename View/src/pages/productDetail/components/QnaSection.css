@@ -73,13 +73,23 @@
     border-radius: 6px;
 }
 
+/* 공통 */
 .pd-qna-answer {
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    color: #333;           /* 기본 글씨색 */
+}
+
+/* 🔥 답변이 있을 때만 빨간색 강조 */
+.pd-qna-answer.has-answer {
     margin-top: 10px;
     background: #fff6f6;
     border-left: 3px solid #ff4d4d;
     padding: 10px;
     border-radius: 4px;
 }
+
 
 /* 비었을 때 */
 .pd-qna-empty {

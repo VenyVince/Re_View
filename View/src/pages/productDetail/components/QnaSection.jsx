@@ -12,7 +12,7 @@ export default function QnaSection({ qnaList, onWrite }) {
 
     const handleSubmit = () => {
         if (!writeTitle.trim()) {
-            alert("제목을 입력해주세요.");
+            alert("문의할 내용을 입력해주세요.");
             return;
         }
 
@@ -32,7 +32,7 @@ export default function QnaSection({ qnaList, onWrite }) {
                 <input
                     type="text"
                     className="pd-qna-title-input"
-                    placeholder="제목을 입력하세요"
+                    placeholder="문의할 내용을 입력하세요"
                     value={writeTitle}
                     onChange={(e) => setWriteTitle(e.target.value)}
                 />
@@ -67,15 +67,26 @@ export default function QnaSection({ qnaList, onWrite }) {
 
                         {openId === q.qna_id && (
                             <div className="pd-qna-content-area">
-                                <p>{q.title}</p>
 
-                                {q.answer && (
-                                    <div className="pd-qna-answer">
+                                <p>{q.content}</p>
+
+                                {q.answer ? (
+                                    // 🔥 답변이 있을 때
+                                    <div className="pd-qna-answer has-answer">
                                         <strong>답변:</strong> {q.answer}
                                     </div>
+                                ) : (
+                                    // 🔥 답변이 없을 때
+                                    <div className="pd-qna-answer no-answer">
+                                        답변 준비 중입니다
+                                    </div>
                                 )}
+
                             </div>
                         )}
+
+
+
                     </li>
                 ))}
             </ul>
