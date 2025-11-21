@@ -45,9 +45,9 @@ public class OrderListController {
             @ApiResponse(responseCode = "404", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDetailResponseDTO> getOrderDetail(@PathVariable int orderId) {
+    @GetMapping("/{order_id}")
+    public ResponseEntity<OrderDetailResponseDTO> getOrderDetail(@PathVariable int order_id) {
         int user_id = securityUtil.getCurrentUserId();
-        return ResponseEntity.ok(orderListService.getOrderDetail(orderId, user_id));
+        return ResponseEntity.ok(orderListService.getOrderDetail(order_id, user_id));
     }
 }
