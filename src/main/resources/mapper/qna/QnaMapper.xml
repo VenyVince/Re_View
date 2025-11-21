@@ -4,14 +4,19 @@
 
 <mapper namespace="com.review.shop.repository.qna.QnaMapper">
 
-    <select id="selectQnaListByProductId" resultType="com.review.shop.dto.qna.QnaDTO">
+    <select id="selectQnaListByProductId" resultType="com.review.shop.dto.qna.QnaListResponseDTO">
         SELECT
-        q.qna_id, q.product_id, q.user_id, q.title, q.content, q.answer, q.created_at,
-        u.name AS user_name,
-        CASE WHEN q.answer IS NOT NULL THEN '답변완료' ELSE '답변대기' END AS status
+        q.qna_id,
+        p.prd_name,
+        q.title,
+        q.created_at,
+        CASE
+        WHEN q.answer IS NOT NULL THEN '답변완료'
+        ELSE '답변대기'
+        END AS status
         FROM qna q
-        JOIN USER_TABLE u ON q.user_id = u.user_id
-        WHERE q.product_id = #{productId}
+        JOIN PRODUCT p ON q.product_id = p.product_id
+        WHERE q.product_id = #{product_id}
         AND q.deleted_at IS NULL
         ORDER BY q.created_at DESC
     </select>
@@ -20,7 +25,7 @@
         SELECT q.*, u.name AS user_name
         FROM qna q
         JOIN USER_TABLE u ON q.user_id = u.user_id
-        WHERE q.qna_id = #{qnaId}
+        WHERE q.qna_id = #{qna_id}
     </select>
 
     <insert id="insertQna" parameterType="com.review.shop.dto.qna.QnaDTO">
@@ -42,8 +47,25 @@
     <update id="deleteQna">
         UPDATE qna
         SET deleted_at = SYSDATE
-        WHERE qna_id = #{qnaId}
-        AND user_id = #{userId}
+        WHERE qna_id = #{qna_id}
+        AND user_id = #{user_id}
     </update>
+
+
+    <select id="selectQnaListByUserId" parameterType="int" resultType="com.review.shop.dto.qna.QnaListResponseDTO">
+        SELECT
+        q.qna_id,
+        p.prd_name,
+        q.title,
+        q.created_at,
+        CASE
+        WHEN q.answer IS NOT NULL THEN '답변완료'
+        ELSE '답변대기'
+        END AS status
+        FROM qna q
+        JOIN product p ON q.product_id = p.product_id
+        WHERE q.user_id = #{user_id}
+        ORDER BY q.created_at DESC
+    </select>
 
 </mapper>

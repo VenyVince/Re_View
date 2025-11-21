@@ -1,6 +1,7 @@
 package com.review.shop.service.qna;
 
 import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.qna.QnaListResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.qna.QnaMapper;
@@ -17,17 +18,25 @@ public class QnaService {
 
     private final QnaMapper qnaMapper;
 
-    public List<QnaDTO> getQnaList(int productId) {
+    public List<QnaListResponseDTO> getQnaList(int product_id) {
         try {
-            return qnaMapper.selectQnaListByProductId(productId);
+            return qnaMapper.selectQnaListByProductId(product_id);
         } catch (DataAccessException e) {
             throw new DatabaseException("QnA 목록 조회 중 DB 오류가 발생했습니다.", e);
         }
     }
 
-    public QnaDTO getQnaDetail(int qnaId) {
+    public List<QnaListResponseDTO> getMyQnaList(int user_id) {
         try {
-            QnaDTO qna = qnaMapper.selectQnaDetail(qnaId);
+            return qnaMapper.selectQnaListByUserId(user_id);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("내 문의 내역 조회 중 DB 오류가 발생했습니다.", e);
+        }
+    }
+
+    public QnaDTO getQnaDetail(int qna_id) {
+        try {
+            QnaDTO qna = qnaMapper.selectQnaDetail(qna_id);
             if (qna == null) {
                 throw new ResourceNotFoundException("존재하지 않는 게시글입니다.");
             }
@@ -59,9 +68,9 @@ public class QnaService {
     }
 
     @Transactional
-    public void removeQna(int qnaId, int userId) {
+    public void removeQna(int qna_id, int user_id) {
         try {
-            int result = qnaMapper.deleteQna(qnaId, userId);
+            int result = qnaMapper.deleteQna(qna_id, user_id);
             if (result == 0) {
                 throw new RuntimeException("삭제 권한이 없거나 존재하지 않는 글입니다.");
             }

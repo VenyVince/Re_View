@@ -5,7 +5,7 @@
 
 <mapper namespace="com.review.shop.repository.userinfo.user_related.PointMapper">
 
-    <!-- 1. 포인트 히스토리 추가 -->
+    <!-- 포인트 히스토리 추가 -->
     <insert id="aboutPoint" parameterType="com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO">
         INSERT INTO point_history (
             point_history_id,  user_id, amount, type, created_at, description
@@ -20,7 +20,7 @@
                )
     </insert>
 
-    <!-- 2. 특정 사용자 포인트 내역 전체 조회 -->
+    <!-- 특정 사용자 포인트 내역 전체 조회 -->
     <select id="getPointHistoryByUserId" resultType="com.review.shop.dto.userinfo.user_related.Point.PointResponseDTO">
         SELECT
             point_history_id, user_id, amount, type, created_at, description
@@ -29,7 +29,7 @@
         ORDER BY created_at DESC
     </select>
 
-    <!-- 3. 사용자 총 포인트 조회 (EARN - USE) -->
+    <!-- 사용자 총 포인트 조회 (EARN - USE) -->
     <select id="getTotalPoint" resultType="int">
         SELECT NVL(SUM(
                            CASE
@@ -42,30 +42,17 @@
         WHERE user_id = #{user_id}
     </select>
 
-    <!-- 4. 리뷰 작성 포인트 중복 체크 -->
-    <select id="existsReviewPoint" resultType="boolean">
-        SELECT COUNT(1) > 0
-        FROM review_point_reference
-        WHERE review_id = #{review_id}
-    </select>
+<!--    &lt;!&ndash; 베스트 리뷰 포인트 중복 체크 예시&ndash;&gt;-->
+<!--    <select id="existsBestReviewPoint" resultType="boolean">-->
+<!--        SELECT COUNT(1) > 0-->
+<!--        FROM best_review_point_reference-->
+<!--        WHERE review_id = #{review_id}-->
+<!--    </select>-->
 
-    <!-- 5. 리뷰 작성 포인트 reference 추가 -->
-    <insert id="insertReviewPointReference">
-        INSERT INTO review_point_reference (review_id, user_id)
-        VALUES (#{review_id}, #{user_id})
-    </insert>
-
-    <!-- 6. 베스트 리뷰 포인트 중복 체크 -->
-    <select id="existsBestReviewPoint" resultType="boolean">
-        SELECT COUNT(1) > 0
-        FROM best_review_point_reference
-        WHERE review_id = #{review_id}
-    </select>
-
-    <!-- 7. 베스트 리뷰 포인트 reference 추가 -->
-    <insert id="insertBestReviewPointReference">
-        INSERT INTO best_review_point_reference (review_id, user_id)
-        VALUES (#{review_id}, #{user_id})
-    </insert>
+<!--    &lt;!&ndash; 베스트 리뷰 포인트 reference 추가 예시&ndash;&gt;-->
+<!--    <insert id="insertBestReviewPointReference">-->
+<!--        INSERT INTO best_review_point_reference (review_id, user_id)-->
+<!--        VALUES (#{review_id}, #{user_id})-->
+<!--    </insert>-->
 
 </mapper>

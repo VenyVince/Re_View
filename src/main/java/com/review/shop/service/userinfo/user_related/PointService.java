@@ -16,17 +16,17 @@ public class PointService {
 
     private final PointMapper pointMapper;
 
-    // 사용자 포인트 총계
+    // 사용자 총 포인트 조회
     public int getTotalPoint(int user_id) {
         try {
-            Integer totalPoint = pointMapper.getTotalPoint(user_id);
-            return totalPoint != null ? totalPoint : 0;
+            Integer total_point = pointMapper.getTotalPoint(user_id);
+            return total_point != null ? total_point : 0;
         } catch (Exception e) {
             throw new DatabaseException("사용자 총 포인트 조회 중 DB 오류가 발생했습니다.", e);
         }
     }
 
-    // 사용자별 포인트 내역 조회
+    // 사용자 포인트 내역 조회
     public List<PointResponseDTO> getPointHistory(int user_id) {
         try {
             List<PointResponseDTO> history = pointMapper.getPointHistoryByUserId(user_id);
@@ -42,19 +42,9 @@ public class PointService {
     }
 
 
-
-    // 리뷰 작성 보상 적립
-    // review_id 중복 체크(이미 적립된건 무시)
-    // pointMapper.aboutPoint(...) 로 포인트 히스토리/합계 업데이트
-    // pointMapper.insertReviewPointReference(...) 로 리뷰-포인트 레퍼런스 저장
-    // 트랜잭션이 걸린 상위 서비스인 Review_Point에서 호출
-
+    // 리뷰 작성 포인트 적립
     public void addReviewPoint(int user_id, int review_id, int amount) {
         try {
-            // 이미 해당 리뷰에 대해 적립되었는지 체크
-            if (pointMapper.existsReviewPoint(review_id)) {
-                return; // 이미 적립되어 있으면 중복 적립 방지
-            }
 
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
@@ -62,32 +52,10 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("리뷰 작성 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리/합계 반영 (mapper에서 구현되어야 함)
-            pointMapper.insertReviewPointReference(review_id, user_id);
+            pointMapper.aboutPoint(dto); // 포인트 히스토리 및 합계 반영
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
-
-//    // 베스트 리뷰 선정 보상 적립
-//    public void addBestReviewPoint(int user_id, int review_id, int amount, boolean is_selected) {
-//        if (!is_selected) return;
-//
-//        try {
-//            if (pointMapper.existsBestReviewPoint(review_id)) return;
-//
-//            PointHistoryDTO dto = new PointHistoryDTO();
-//            dto.setUser_id(user_id);
-//            dto.setAmount(amount);
-//            dto.setType("EARN");
-//            dto.setDescription("베스트 리뷰 선정 보상");
-//
-//            pointMapper.aboutPoint(dto);
-//            pointMapper.insertBestReviewPointReference(review_id, dto.getUser_id());
-//        } catch (WrongRequestException e) {
-//            throw e;
-//        } catch (Exception e) {
-//            throw new DatabaseException("베스트 리뷰 포인트 적립 중 DB 오류가 발생했습니다.", e);
-//        }
-//    }
+    // 베스트 리뷰 부분 구현해야함
 }
