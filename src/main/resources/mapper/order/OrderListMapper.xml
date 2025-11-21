@@ -40,7 +40,7 @@
         AND o.user_id = #{userId}
     </select>
 
-    <select id="findOrderItemsByOrderId" resultType="com.review.shop.dto.orders.OrderItemDTO">
+    <select id="findOrderItemsByOrderId" resultType="com.review.shop.dto.orders.OrderItemDetailDTO">
         SELECT
         order_item_id,
         product_id,

@@ -1,7 +1,7 @@
 package com.review.shop.repository.Orders;
 
 import com.review.shop.dto.orders.OrderDetailResponseDTO;
-import com.review.shop.dto.orders.OrderItemDTO;
+import com.review.shop.dto.orders.OrderItemDetailDTO;
 import com.review.shop.dto.orders.OrderListResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -26,5 +26,5 @@ public interface OrderListMapper {
     );
 
     // 주문 상세 상품 목록
-    List<OrderItemDTO> findOrderItemsByOrderId(int orderId);
+    List<OrderItemDetailDTO> findOrderItemsByOrderId(int orderId);
 }

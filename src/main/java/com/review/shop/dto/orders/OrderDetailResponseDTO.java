@@ -25,5 +25,5 @@ public class OrderDetailResponseDTO {
     private String card_number;
 
     // 주문 상품 리스트
-    private List<OrderItemDTO> order_items;
+    private List<OrderItemDetailDTO> order_items;
 }
