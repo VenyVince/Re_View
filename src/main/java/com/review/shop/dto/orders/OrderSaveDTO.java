@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class OrderSaveDTO {
-    private long order_id;       // DB 저장 시 생성됨 (SelectKey)
-    private String order_no;     // 로직으로 생성한 주문번호
+    private int order_id;      // long -> int 변경
+    private String order_no;
     private int user_id;
     private int address_id;
     private int payment_id;
-    private long total_price;
+    private int total_price;   // long -> int 변경
 }
