@@ -19,9 +19,6 @@ public class OrderCreateDTO {
     private int user_id;
 
     private int using_point;
-
-    private int final_price;
-
     //address 테이블
     private int address_id;
 

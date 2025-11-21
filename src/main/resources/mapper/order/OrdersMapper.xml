@@ -13,7 +13,7 @@
         FROM PRODUCT p
         LEFT JOIN PRODUCT_IMAGE pi ON p.PRODUCT_ID = pi.PRODUCT_ID
         WHERE p.PRODUCT_ID IN
-        <foreach collection="productIds" item="id" open="(" close=")" separator=",">
+        <foreach collection="product_ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </select>
@@ -21,7 +21,7 @@
     <select id="getUserPoint" resultType="integer">
         SELECT POINT
         FROM USER_TABLE
-        WHERE USER_ID = #{userId}
+        WHERE USER_ID = #{user_id}
     </select>
 
     <update id="deductPoints">
@@ -29,7 +29,7 @@
         SET
             point = point - #{pointsToDeduct}
         WHERE
-            user_id = #{userId}
+            user_id = #{user_id}
     </update>
 
     <insert id="addPointHistory">
@@ -41,7 +41,7 @@
             DESCRIPTION
         )
         VALUES (
-                   #{userId},
+                   #{user_id},
                    #{pointsChanged},
                    'USE',
                    SYSDATE,
@@ -59,7 +59,7 @@
         PRODUCT
         WHERE
         product_id IN
-        <foreach collection="productIds" item="id" open="(" separator="," close=")">
+        <foreach collection="product_ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </select>
@@ -68,9 +68,49 @@
         UPDATE PRODUCT SET
             stock = stock - #{quantity}
         WHERE
-            product_id = #{productId}
+            product_id = #{product_id}
           AND stock >= #{quantity}
     </update>
 
+
+    <insert id="insertOrders" parameterType="com.review.shop.dto.orders.OrderSaveDTO"
+            useGeneratedKeys="true" keyProperty="order_id" keyColumn="ORDER_ID">
+
+        INSERT INTO ORDERS (
+            ORDER_NO,
+            USER_ID,
+            ADDRESS_ID,
+            PAYMENT_ID,
+            TOTAL_PRICE,
+            ORDER_STATUS,
+            CREATED_AT
+        ) VALUES (
+                     #{order_no},
+                     #{user_id},
+                     #{address_id},
+                     #{payment_id},
+                     #{total_price},
+                     DEFAULT,
+                     DEFAULT
+                 )
+    </insert>
+
+    <insert id="insertOrderItems" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="item">
+            INTO ORDER_ITEM (
+            ORDER_ID,
+            PRODUCT_ID,
+            PRODUCT_NAME,  PRODUCT_PRICE, QUANTITY
+            ) VALUES (
+            #{item.order_id},
+            #{item.product_id},
+            #{item.prd_name},
+            #{item.product_price},
+            #{item.quantity}
+            )
+        </foreach>
+        SELECT * FROM DUAL
+    </insert>
 
 </mapper>

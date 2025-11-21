@@ -29,9 +29,9 @@ public class QnaController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @GetMapping("/list/{productId}")
-    public ResponseEntity<List<QnaListResponseDTO>> getQnaList(@PathVariable int productId) {
-        return ResponseEntity.ok(qnaService.getQnaList(productId));
+    @GetMapping("/list/{product_id}")
+    public ResponseEntity<List<QnaListResponseDTO>> getQnaList(@PathVariable int product_id) {
+        return ResponseEntity.ok(qnaService.getQnaList(product_id));
     }
 
     @Operation(summary = "내 문의 내역 조회", description = "로그인한 사용자가 작성한 QnA 목록을 최신순으로 조회합니다.")
@@ -42,9 +42,9 @@ public class QnaController {
     })
     @GetMapping("/my")
     public ResponseEntity<List<QnaListResponseDTO>> getMyQnaList() {
-        int userId = securityUtil.getCurrentUserId();
+        int user_id = securityUtil.getCurrentUserId();
 
-        List<QnaListResponseDTO> myQnaList = qnaService.getMyQnaList(userId);
+        List<QnaListResponseDTO> myQnaList = qnaService.getMyQnaList(user_id);
         return ResponseEntity.ok(myQnaList);
 
     }
@@ -55,9 +55,9 @@ public class QnaController {
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @GetMapping("/{qnaId}")
-    public ResponseEntity<QnaDTO> getQnaDetail(@PathVariable int qnaId) {
-        return ResponseEntity.ok(qnaService.getQnaDetail(qnaId));
+    @GetMapping("/{qna_id}")
+    public ResponseEntity<QnaDTO> getQnaDetail(@PathVariable int qna_id) {
+        return ResponseEntity.ok(qnaService.getQnaDetail(qna_id));
     }
 
     @Operation(summary = "질문 등록", description = "로그인한 사용자가 새 문의글을 등록합니다.")
@@ -111,16 +111,16 @@ public class QnaController {
             @ApiResponse(responseCode = "404", description = "삭제 권한 없음 또는 글 없음"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @DeleteMapping("/{qnaId}")
+    @DeleteMapping("/{qna_id}")
     public ResponseEntity<String> deleteQna(
-            @PathVariable int qnaId,
+            @PathVariable int qna_id,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
 
         int userPk = securityUtil.getCurrentUserId();;
 
-        qnaService.removeQna(qnaId, userPk);
+        qnaService.removeQna(qna_id, userPk);
         return ResponseEntity.ok("삭제 성공");
 
     }

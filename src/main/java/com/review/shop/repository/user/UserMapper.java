@@ -16,5 +16,9 @@ public interface UserMapper {
     int updatePassword(String id, String newEncodedPassword);
 
     String findUserIdByNameAndPhoneNumber(@Param("name") String name,
-                                          @Param("phoneNumber") String phoneNumber);
+                                          @Param("phone_number") String phone_number);
+
+    int findBannedByUserId(@Param("id") int id);
+
+    String findEmailById(@Param("id") String id);
 }

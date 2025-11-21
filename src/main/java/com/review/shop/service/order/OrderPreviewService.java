@@ -25,11 +25,11 @@ public class OrderPreviewService {
 
 
         // 원래는 N+1 문제있었는데, 아이디 모으고 쿼리 한번에 가져옴.
-        List<Integer> productIds = orderList.stream()
+        List<Integer> product_ids = orderList.stream()
                 .map(OrderDTO::getProduct_id)
                 .toList();
 
-        List<OrderCheckoutProductInfoDTO> products = orderMapper.getProductsByIds(productIds);
+        List<OrderCheckoutProductInfoDTO> products = orderMapper.getProductsByIds(product_ids);
 
         Map<Integer, OrderCheckoutProductInfoDTO> productMap = products.stream()
                 .collect(Collectors.toMap(
@@ -41,13 +41,13 @@ public class OrderPreviewService {
         int totalPrice = 0;
 
         for (OrderDTO order : orderList) {
-            int prdId = order.getProduct_id();
+            int product_id = order.getProduct_id();
             int quantity = order.getBuy_quantity();
 
-            OrderCheckoutProductInfoDTO product = productMap.get(prdId);
+            OrderCheckoutProductInfoDTO product = productMap.get(product_id);
 
             if (product == null) {
-                throw new ResourceNotFoundException("상품을 찾을 수 없습니다. ID: " + prdId);
+                throw new ResourceNotFoundException("상품을 찾을 수 없습니다. ID: " + product_id);
             }
 
             // 수량 설정된 새로운 DTO 생성
@@ -67,7 +67,7 @@ public class OrderPreviewService {
         return new OrderCheckoutResponse(finalResultList, totalPrice);
     }
     // 포인트 불러오기
-    public Integer getUserPoint(int userId) {
-        return orderMapper.getUserPoint(userId);
+    public Integer getUserPoint(int user_id) {
+        return orderMapper.getUserPoint(user_id);
     }
 }

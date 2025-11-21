@@ -47,7 +47,22 @@
           AND PHONE_NUMBER = #{phoneNumber}
     </select>
 
+    <select id="findBannedByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM BAN_LIST
+        WHERE user_id = #{id}
+    </select>
 
+    <select id="findEmailById" resultType="string">
+
+        SELECT
+            EMAIL
+        FROM
+            USER_TABLE
+        WHERE
+            id = #{id}
+
+    </select>
 
 </mapper>
 

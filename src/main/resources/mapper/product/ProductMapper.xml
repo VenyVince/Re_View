@@ -52,14 +52,14 @@
         is_sold_out,
         baumann_id
         FROM product
-        WHERE product_id = #{productId}
+        WHERE product_id = #{product_id}
         AND deleted_at IS NULL
     </select>
 
     <select id="selectProductImages" resultType="string">
         SELECT image_url
         FROM product_image
-        WHERE product_id = #{productId}
+        WHERE product_id = #{product_id}
     </select>
 
 </mapper>
