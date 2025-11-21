@@ -19,7 +19,7 @@ public class OrderListService {
 
     private final OrderListMapper orderListMapper;
 
-    // 내 주문 내역 조회 (userId: int)
+    // 내 주문 내역 조회
     @Transactional(readOnly = true)
     public List<OrderListResponseDto> getMyOrderList(int userId, int page, int size) {
         try {
@@ -30,18 +30,18 @@ public class OrderListService {
         }
     }
 
-    // 주문 상세 조회 (orderId: int, userId: int)
+    // 주문 상세 조회
     @Transactional(readOnly = true)
     public OrderDetailResponseDto getOrderDetail(int orderId, int userId) {
         try {
-            // 1. 기본 정보 조회 (SQL에서 AND user_id = #{userId} 로 본인 확인)
+            // 기본 정보 조회
             OrderDetailResponseDto orderDetail = orderListMapper.findOrderDetailById(orderId, userId)
                     .orElseThrow(() -> new ResourceNotFoundException("주문 정보를 찾을 수 없거나 접근 권한이 없습니다."));
 
-            // 2. 상품 목록 조회
+            // 상품 목록 조회
             List<OrderItemDto> items = orderListMapper.findOrderItemsByOrderId(orderId);
 
-            // 3. DTO 결합
+            // DTO 결합
             orderDetail.setOrder_items(items);
 
             return orderDetail;
