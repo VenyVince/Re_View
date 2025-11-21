@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Data
 public class OrderListResponseDTO {
-    private int order_id;
+    private long order_id;
     private Date created_at;
     private String order_status;
     private int total_price;

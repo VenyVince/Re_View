@@ -2,17 +2,16 @@ package com.review.shop.dto.orders;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
 public class OrderDetailResponseDTO {
-    private int order_id;
+    private long order_id;
     private Date created_at;
     private String order_status;
     private String delivery_num;
-    private BigDecimal total_price;
+    private int total_price;
 
     // 배송지 정보 (Address 테이블)
     private String recipient;
