@@ -146,7 +146,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void processTempPasswordEmail(String id, String userEmail) {
         if(!userEmail.equals(userMapper.findEmailById(id))) {
-            throw new WrongRequestException("이메일이 일치하지 않습니다.");
+            throw new WrongRequestException("아이디나 이메일이 틀렸습니다.");
         }
 
         String tempPassword = generateTempPassword();
