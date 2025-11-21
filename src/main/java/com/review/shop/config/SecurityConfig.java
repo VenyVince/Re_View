@@ -45,8 +45,10 @@ public class SecurityConfig {
                 // 어드민 제외 모두 해제
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/**").hasRole("USER")
                         .anyRequest().permitAll()
                 )
+
 
                 // 로그아웃 설정
                 .logout(logout -> logout
