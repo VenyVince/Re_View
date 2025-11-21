@@ -42,7 +42,11 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+
+                        //어드민만 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        //모두 가능
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
@@ -50,8 +54,12 @@ public class SecurityConfig {
                                 "/api/auth/check-id",
                                 "/api/search/**",
                                 "/api/products",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "/api/auth/me"
+
                         ).permitAll()
+
+                        //유저만 가능
                         .anyRequest().hasRole("USER")
                 )
 
