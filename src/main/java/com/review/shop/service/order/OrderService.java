@@ -124,7 +124,7 @@ public class OrderService {
                         Function.identity()
                 ));
 
-        long calculatedTotalPrice = 0; // 서버에서 계산한 실제 총 상품 금액
+        int calculatedTotalPrice = 0; // 서버에서 계산한 실제 총 상품 금액
         List<OrderItemDTO> orderItemsToInsert = new ArrayList<>();
 
         for (OrderDTO requestItem : orderDTOList) {
@@ -139,7 +139,7 @@ public class OrderService {
             int realPrice = productInfo.getPrice();
 
             // 총액 누적 계산
-            calculatedTotalPrice += (long) realPrice * quantity;
+            calculatedTotalPrice += realPrice * quantity;
 
             // ORDER_ITEM 테이블용 DTO 생성
             OrderItemDTO itemDTO = new OrderItemDTO();
@@ -164,7 +164,7 @@ public class OrderService {
         orderMapper.insertOrders(orderSaveDTO);
 
         //ORDERS 생성하고 생성된 PK값 가져오기
-        long generatedOrderId = orderSaveDTO.getOrder_id();
+        int generatedOrderId = orderSaveDTO.getOrder_id();
 
         for(OrderItemDTO item : orderItemsToInsert) {
             item.setOrder_id(generatedOrderId);
