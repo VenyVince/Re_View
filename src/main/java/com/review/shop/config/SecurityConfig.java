@@ -79,7 +79,7 @@ public class SecurityConfig {
                         .logoutSuccessHandler((request, response, authentication) -> {
 
                             response.setStatus(HttpServletResponse.SC_OK);
-                            response.getWriter().write("{\"message\": \"로그아웃 되었습니다.\"}");
+                            response.getWriter().write("로그아웃 되었습니다.");
 
                         })
                 );
