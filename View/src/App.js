@@ -53,6 +53,7 @@ import UserAddressPage from "./pages/mypage/user/UserAddressPage";
 import UserWishPage from "./pages/mypage/user/UserWishPage";
 
 import AboutPage from "./pages/about/AboutPage";
+import UserCustomerPage from "./pages/mypage/user/UserCustomerPage";
 
 export default function App() {
     return (
@@ -114,6 +115,7 @@ export default function App() {
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
                     <Route path="/mypage/wish" element={<UserWishPage />} />
+                    <Route path="/mypage/cs" element={<UserCustomerPage />} />
             </Routes>
             </main>
             <Footer />
