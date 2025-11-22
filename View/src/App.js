@@ -42,7 +42,6 @@ import AdminReviewPage from "./pages/mypage/admin/AdminReviewPage";
 import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
 import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
-import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
 
 import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
@@ -101,7 +100,6 @@ export default function App() {
                         <Route path="qna" element={<AdminQnaPage />} />
                         <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
                         <Route path="users" element={<AdminUserPage />} />
-                        <Route path="users/:id" element={<AdminUserDetailPage />} />
                     </Route>
                 </Route>
 
