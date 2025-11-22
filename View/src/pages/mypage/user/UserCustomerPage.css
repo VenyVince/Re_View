@@ -1,184 +1,237 @@
-/* ===== 공통 ===== */
+/* ===== 공통 섹션 ===== */
+
 .cs-section {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+    width: 100%;
+    font-family: Pretendard, sans-serif;
 }
 
-/* 카드 기본 UI */
-.cs-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 28px 30px;
-    border: 1px solid #e5e7eb;
-}
 
-.cs-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 22px;
-}
 
 .cs-card-title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
-    margin: 0;
+    margin-bottom: 6px;
 }
 
 .cs-card-sub {
     font-size: 14px;
     color: #777;
-    margin-top: 4px;
 }
 
-/* 문의하기 버튼 */
+/* 기본 버튼 */
+
 .cs-primary-btn {
-    padding: 10px 16px;
-    background: #222;
-    color: #fff;
+    padding: 10px 18px;
+    border-radius: 999px;
     border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-.cs-primary-btn:hover {
     background: #111;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-/* 빈 리스트 */
-.cs-empty {
-    padding: 36px 0;
+.cs-primary-btn:hover {
+    background: #222;
+}
+
+/* 리스트 공통 메시지 */
+
+.cs-list-message {
+    padding: 32px 0;
     text-align: center;
-    color: #777;
     font-size: 14px;
+    color: #555;
 }
 
-/* ===== 문의 테이블 ===== */
+.cs-list-error {
+    color: #d32f2f;
+}
+
+/* ===== 1:1 문의 내역 ===== */
+
+.cs-qna-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px 28px;
+    margin-bottom: 32px;
+}
+
+.cs-qna-header {
+    text-align: center;      /* 가운데 정렬 */
+    margin-bottom: 28px;
+}
+
+/* 테이블 헤더/바디 */
+
 .cs-table {
     width: 100%;
-    border-top: 1px solid #eee;
 }
 
 .cs-table-head {
     display: grid;
-    grid-template-columns: 120px 1fr 120px 120px;
-    padding: 14px 0;
-    font-size: 14px;
+    grid-template-columns: 1.2fr 1.6fr 0.9fr 0.7fr;
+    padding: 14px 10px;
+    background: #f9f9f9;
+    border-top: 2px solid #333;
+    border-bottom: 1px solid #ddd;
     font-weight: 600;
-    color: #555;
-    border-bottom: 1px solid #eee;
+    font-size: 15px;
+    text-align: center;
 }
 
-.cs-table-row-button {
-    display: grid;
-    grid-template-columns: 120px 1fr 120px 120px;
-    width: 100%;
-    padding: 14px 0;
-    text-align: left;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-bottom: 1px solid #f4f4f4;
-}
-.cs-table-row-button:hover {
-    background: #fafafa;
-}
-
-/* 컬럼 기본 */
-.cs-col {
+.cs-table-body {
     font-size: 14px;
-    color: #333;
 }
 
-/* 상태 배지 */
+
+.cs-table-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1.6fr 0.9fr 0.7fr;
+    padding: 16px 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.cs-col-title{
+    text-align: left;
+}
+
+.cs-table-row:hover {
+    background: #f6f8ff;
+}
+
+.cs-table-row-open {
+    background: #f7f9ff;
+    border-bottom-color: #e0e6ff;
+}
+
+/* 공통 컬럼(정렬) */
+
+.cs-col {
+    align-items: center;
+    font-size: 14px;
+}
+
+.cs-col-product {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 문의 제목 줄임(...) 처리 */
+.cs-col-title {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cs-col-date {
+    justify-content: flex-end;
+    color: #777;
+    font-size: 13px;
+}
+
+.cs-col-status {
+    justify-content: center;
+}
+
+/* 상태 뱃지 */
+
 .cs-status {
-    display: inline-block;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 12px;
-    font-weight: 600;
+}
+
+.cs-status-ing {
+    background: #ffeccc;
+    color: #d57d00;
 }
 
 .cs-status-done {
-    background: #e5f7ed;
-    color: #1fa96d;
-}
-.cs-status-ing {
-    background: #fff4e0;
-    color: #e27a00;
+    background: #dbf7e7;
+    color: #1da66d;
 }
 
-/* ===== 문의 상세 ===== */
-.cs-inquiry-detail {
+
+/* ===== 상세(문의 내용 / 답변 내용) – 리스트 바로 아래 ===== */
+
+.cs-detail-row {
+    border-bottom: 1px solid #f3f3f3;
+    background: #fdfdfd;
+}
+
+.cs-detail-inner {
+    text-align: left;
+    padding: 18px 24px 20px;
     background: #fafafa;
-    border-left: 3px solid #222;
-    padding: 18px 22px;
-    margin-bottom: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
 }
 
-.cs-inquiry-product {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.cs-detail-loading,
+.cs-detail-error {
+    font-size: 13px;
+    color: #777;
+}
+
+.cs-detail-error {
+    color: #d32f2f;
+}
+
+.cs-detail-block + .cs-detail-block {
+    margin-top: 16px;
+}
+
+.cs-detail-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.cs-detail-text {
+    margin: 0;
     font-size: 14px;
-}
-
-.cs-inquiry-label {
-    font-weight: 700;
-    margin-bottom: 6px;
-    font-size: 14px;
-}
-
-.cs-inquiry-block {
-    display: flex;
-    flex-direction: column;
-}
-
-.cs-inquiry-text {
-    font-size: 14px;
-    color: #444;
-    background: #fff;
-    padding: 12px 14px;
-    border-radius: 6px;
-    border: 1px solid #e2e2e2;
     line-height: 1.6;
+    color: #333;
+    white-space: pre-line;
 }
 
-.cs-inquiry-answer {
-    background: #f8fff7;
-    border-color: #ccecc2;
-    color: #2b6b2b;
+/* ===== FAQ 영역 ===== */
+
+.cs-faq-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px 28px;
+    box-shadow: 0 0 0 1px #f2f2f2;
 }
 
-/* ===== FAQ ===== */
+.cs-faq-header {
+    margin-bottom: 12px;
+}
+
 .cs-faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
+    border-top: 1px solid #eee;
+    margin-top: 8px;
 }
 
 .cs-faq-item {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background: #fff;
+    border-bottom: 1px solid #f3f3f3;
 }
 
 .cs-faq-question {
     width: 100%;
-    background: transparent;
+    padding: 12px 4px;
     border: none;
-    padding: 18px 20px;
+    background: #fff;
     display: flex;
     align-items: center;
     gap: 12px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
 }
 
 .cs-faq-question:hover {
@@ -186,32 +239,35 @@
 }
 
 .cs-faq-category {
+    flex: 0 0 auto;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #f5f5f5;
     font-size: 12px;
-    color: #888;
-    background: #f1f1f1;
-    padding: 4px 8px;
-    border-radius: 4px;
+    color: #666;
 }
 
 .cs-faq-text {
     flex: 1;
     text-align: left;
+    color: #333;
 }
 
 .cs-faq-toggle {
+    flex: 0 0 auto;
     font-size: 18px;
-    opacity: 0.5;
+    line-height: 1;
+    color: #777;
 }
 
 .cs-faq-toggle.open {
-    opacity: 1;
+    color: #111;
 }
 
-/* FAQ 답변 */
 .cs-faq-answer {
-    padding: 18px 20px;
-    font-size: 14px;
-    background: #fafafa;
-    border-top: 1px solid #eee;
+    padding: 0 4px 12px 4px;
+    font-size: 13px;
+    color: #555;
     line-height: 1.6;
+    text-align: left;
 }
