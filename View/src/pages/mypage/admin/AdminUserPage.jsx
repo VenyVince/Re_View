@@ -1,172 +1,241 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    Wrap, Inner, Title, UserList, UserRow, Avatar, UserInfo,
-    UserName, UserRole, UserRight, IconButton, WarningText, Pagination,
-    PagerBtn, PageInfo, ModalOverlay, ModalBox, ModalTitle,
-    ModalTextarea, ModalButtons, WarnWrap, WarnCard, MainButtonWrap, MainButton,} from "./adminUserPage.style";
-
-// 더미 유저 데이터 (내일 api 받으면 수정할 거임)
-const initialUsers = [
-    { id: 1, name: "홍길동", role: "회원", warnings: 0, coupons: 2, points: 12000 },
-    { id: 2, name: "유저2", role: "회원", warnings: 0, coupons: 0, points: 3000 },
-    { id: 3, name: "유저3", role: "회원", warnings: 0, coupons: 0, points: 0 },
-    { id: 4, name: "유저4", role: "회원", warnings: 0, coupons: 1, points: 5000 },
-    { id: 5, name: "유저5", role: "회원", warnings: 0, coupons: 3, points: 8000 },
-    { id: 6, name: "유저6", role: "관리자", warnings: 0, coupons: 0, points: 0 },
-];
+    Wrap, Inner, Title, UserList, UserRow, Avatar, UserInfo, UserName, UserRole, UserRight,
+    IconButton, WarningText, Pagination, PagerBtn, PageInfo, ModalOverlay, ModalBox, ModalTitle,
+    ModalTextarea, ModalButtons, WarnWrap, WarnCard, HeaderRow, SearchInput,
+} from "./adminUserPage.style";
+import { fetchMembers, banMember } from "../../../api/admin/adminUserApi";
 
 export default function AdminUserPage() {
-    const [users, setUsers] = useState(initialUsers);
-    const [page, setPage] = useState(1);
-    const pageSize = 5;
-
-    const [warnModalOpen, setWarnModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [warnReason, setWarnReason] = useState("");
-    const [warnResultUser, setWarnResultUser] = useState(null); // 경고 결과 화면용
-
     const navigate = useNavigate();
 
-    const total = users.length;
-    const maxPage = Math.max(1, Math.ceil(total / pageSize));
+    // 기본 상태
+    const [users, setUsers] = useState([]); // 항상 배열
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const pageList = useMemo(() => {
-        const s = (page - 1) * pageSize;
-        return users.slice(s, s + pageSize);
-    }, [users, page]);
+    const [page, setPage] = useState(1);
+    const pageSize = 20;
 
-    const openWarnModal = (user) => {
+    const [search, setSearch] = useState("");
+
+    // 밴 모달 관련 상태
+    const [banModalOpen, setBanModalOpen] = useState(false);
+    const [banReason, setBanReason] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+
+    // 밴 처리된 유저 표시용
+    const [bannedUserIds, setBannedUserIds] = useState([]);
+    const [banResultUser, setBanResultUser] = useState(null);
+
+    // 회원 목록 API 호출
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                setLoading(true);
+                const res = await fetchMembers();
+                const data = Array.isArray(res.data) ? res.data : [];
+
+                //  UserSummaryDTO -> 화면에서 쓸 형태로 매핑
+                const mapped = data.map((u) => {
+                    // id가 숫자든 문자열이든 무조건 문자열로 통일
+                    const loginId = u.id != null ? String(u.id) : "";
+                    const isAdmin = loginId.toLowerCase().includes("admin");
+
+                    return {
+                        id: u.user_id,              // PK
+                        loginId,                    // 로그인 아이디 (문자열로 통일)
+                        realName: u.name,           // 실명
+                        nickname: u.nickname,       // 닉네임
+                        name: u.nickname || u.name || loginId, // 목록에서 표시할 이름
+                        role: isAdmin ? "관리자" : "회원",
+                    };
+                });
+
+                setUsers(mapped);
+                setError("");
+            } catch (e) {
+                console.error(e);
+                setError("회원 목록을 불러오는 중 오류가 발생했습니다.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadUsers();
+    }, []);
+
+    // 검색어 적용된 목록
+    const filteredUsers = useMemo(() => {
+        if (!search.trim()) return users;
+        const q = search.toLowerCase();
+        return users.filter((u) =>
+            (u.name && u.name.toLowerCase().includes(q)) ||
+            (u.loginId && u.loginId.toLowerCase().includes(q)) ||
+            (u.nickname && u.nickname.toLowerCase().includes(q))
+        );
+    }, [users, search]);
+
+    // 페이지 계산
+    const totalPages = useMemo(() => {
+        if (filteredUsers.length === 0) return 1;
+        return Math.ceil(filteredUsers.length / pageSize);
+    }, [filteredUsers.length, pageSize]);
+
+    const pagedUsers = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        return filteredUsers.slice(start, end);
+    }, [filteredUsers, page, pageSize]);
+
+    const goPrev = () => setPage((p) => (p > 1 ? p - 1 : p));
+    const goNext = () => setPage((p) => (p < totalPages ? p + 1 : p));
+
+    // 밴 모달 열기
+    const openBanModal = (user) => {
         setSelectedUser(user);
-        setWarnReason("");
-        setWarnModalOpen(true);
+        setBanReason("");
+        setBanModalOpen(true);
     };
 
-    const closeWarnModal = () => {
-        setWarnModalOpen(false);
+    const closeBanModal = () => {
+        setBanModalOpen(false);
         setSelectedUser(null);
     };
 
-    const handleConfirmWarn = () => {
+    // 밴 API 호출 + 화면 상태 반영
+    const handleConfirmBan = async () => {
         if (!selectedUser) return;
 
-        const updated = users.map((u) =>
-            u.id === selectedUser.id ? { ...u, warnings: u.warnings + 1 } : u
+        try {
+            await banMember(selectedUser.id, banReason);
+
+            // 이 유저를 밴된 리스트에 추가
+            setBannedUserIds((prev) =>
+                prev.includes(selectedUser.id) ? prev : [...prev, selectedUser.id]
+            );
+            setBanResultUser(selectedUser);
+            setBanModalOpen(false);
+        } catch (e) {
+            console.error(e);
+            alert("회원 밴 처리 중 오류가 발생했습니다.");
+        }
+    };
+
+    // 로딩 / 에러 처리
+    if (loading) {
+        return (
+            <Wrap>
+                <Inner>
+                    <Title>회원 관리</Title>
+                    <div>로딩 중...</div>
+                </Inner>
+            </Wrap>
         );
-        setUsers(updated);
+    }
 
-        const resultUser = updated.find((u) => u.id === selectedUser.id);
-        setWarnResultUser(resultUser);
-
-        setWarnModalOpen(false);
-    };
-
-    const goDetail = (user) => {
-        navigate(`/admin/users/${user.id}`, { state: user });
-    };
-
-    const backToMain = () => {
-        setWarnResultUser(null);
-    };
+    if (error) {
+        return (
+            <Wrap>
+                <Inner>
+                    <Title>회원 관리</Title>
+                    <div>{error}</div>
+                </Inner>
+            </Wrap>
+        );
+    }
 
     return (
         <Wrap>
             <Inner>
-                <Title>유저 관리</Title>
+                <HeaderRow>
+                    <Title>회원 관리</Title>
+                    <SearchInput
+                        type="text"
+                        placeholder="유저 검색"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setPage(1);           // 검색하면 항상 1페이지로
+                        }}
+                    />
+                </HeaderRow>
 
-                {/* 경고 결과 화면 (경고 1회, 메인화면 버튼) */}
-                {warnResultUser ? (
-                    <>
-                        <WarnWrap>
-                            <WarnCard>
-                                <Avatar>👤</Avatar>
-                                <UserInfo>
-                                    <UserName>{warnResultUser.name}</UserName>
-                                    <UserRole>{warnResultUser.role}</UserRole>
-                                </UserInfo>
-                                <WarningText>경고 {warnResultUser.warnings}회</WarningText>
-                            </WarnCard>
-                        </WarnWrap>
-                        <MainButtonWrap>
-                            <MainButton type="button" onClick={backToMain}>
-                                메인화면
-                            </MainButton>
-                        </MainButtonWrap>
-                    </>
-                ) : (
-                    <>
-                        {/* 유저 목록 */}
-                        <UserList>
-                            {pageList.map((u) => (
-                                <UserRow key={u.id}>
-                                    <Avatar>👤</Avatar>
-                                    <UserInfo>
-                                        <UserName>{u.name}</UserName>
-                                        <UserRole>{u.role}</UserRole>
-                                    </UserInfo>
-
-                                    <UserRight>
-                                        {u.warnings > 0 && (
-                                            <WarningText>경고 {u.warnings}회</WarningText>
-                                        )}
-
-                                        {/* 연필 아이콘: 상세 페이지로 이동 */}
-                                        <IconButton
-                                            type="button"
-                                            title="유저 상세"
-                                            onClick={() => goDetail(u)}
-                                        >
-                                            ✏️
-                                        </IconButton>
-
-                                        {/* 경고 아이콘: 경고 모달 */}
-                                        <IconButton
-                                            type="button"
-                                            title="경고 주기"
-                                            onClick={() => openWarnModal(u)}
-                                        >
-                                            🚫
-                                        </IconButton>
-                                    </UserRight>
-                                </UserRow>
-                            ))}
-                        </UserList>
-
-                        <Pagination>
-                            <PagerBtn
-                                disabled={page === 1}
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            >
-                                {"<"}
-                            </PagerBtn>
-                            <PageInfo>
-                                {page} / {maxPage}
-                            </PageInfo>
-                            <PagerBtn
-                                disabled={page === maxPage}
-                                onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
-                            >
-                                {">"}
-                            </PagerBtn>
-                        </Pagination>
-                    </>
+                {/* 상단 요약 영역 – 마지막으로 밴한 유저 안내 */}
+                {banResultUser && (
+                    <WarnWrap>
+                        <WarnCard>
+                            <p>{banResultUser.name} 님이 밴 처리되었습니다.</p>
+                        </WarnCard>
+                    </WarnWrap>
                 )}
 
-                {/* 경고 모달 */}
-                {warnModalOpen && (
+                {/* 회원 리스트 */}
+                <UserList>
+                    {pagedUsers.map((user) => {
+                        const isBanned = bannedUserIds.includes(user.id);
+
+                        return (
+                            <UserRow key={user.id}>
+                                <Avatar>
+                                    {user.name?.[0] ?? "유"}
+                                </Avatar>
+
+                                <UserInfo>
+                                    <UserName>{user.name}</UserName>
+                                    <UserRole>{user.role}</UserRole>
+                                    <WarningText>
+                                        {isBanned ? "밴 처리된 회원" : "정상 회원"}
+                                    </WarningText>
+                                </UserInfo>
+
+                                <UserRight>
+                                    <IconButton
+                                        type="button"
+                                        onClick={() => openBanModal(user)}
+                                        disabled={isBanned}
+                                    >
+                                        {isBanned ? "밴 완료" : "밴"}
+                                    </IconButton>
+                                </UserRight>
+                            </UserRow>
+                        );
+                    })}
+
+                    {users.length === 0 && <div>회원이 없습니다.</div>}
+                </UserList>
+
+                {/* 페이지네이션 */}
+                <Pagination>
+                    <PagerBtn type="button" onClick={goPrev} disabled={page === 1}>
+                        이전
+                    </PagerBtn>
+                    <PageInfo>
+                        {page} / {totalPages}
+                    </PageInfo>
+                    <PagerBtn type="button" onClick={goNext} disabled={page === totalPages}>
+                        다음
+                    </PagerBtn>
+                </Pagination>
+
+                {/* 밴 모달 */}
+                {banModalOpen && selectedUser && (
                     <ModalOverlay>
                         <ModalBox>
-                            <ModalTitle>경고를 주시겠습니까?</ModalTitle>
+                            <ModalTitle>
+                                {selectedUser.name} 님을 밴 처리하시겠습니까?
+                            </ModalTitle>
                             <ModalTextarea
-                                placeholder="경고 사유를 입력하세요."
-                                value={warnReason}
-                                onChange={(e) => setWarnReason(e.target.value)}
+                                placeholder="밴 사유를 입력하세요 (선택)"
+                                value={banReason}
+                                onChange={(e) => setBanReason(e.target.value)}
                             />
                             <ModalButtons>
-                                <button type="button" onClick={closeWarnModal}>
+                                <button type="button" onClick={closeBanModal}>
                                     취소
                                 </button>
-                                <button type="button" onClick={handleConfirmWarn}>
+                                <button type="button" onClick={handleConfirmBan}>
                                     예
                                 </button>
                             </ModalButtons>

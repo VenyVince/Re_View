@@ -13,7 +13,7 @@ export const Inner = styled.div`
 
 /* 공통 제목 */
 export const Title = styled.h1`
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 800;
   margin-bottom: 24px;
 `;
@@ -25,6 +25,10 @@ export const UserList = styled.ul`
   margin: 0;
   padding: 0;
   border-top: 1px solid #e5e7eb;
+    
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;   /* 카드 사이 가로 간격 */
 `;
 
 export const UserRow = styled.li`
@@ -50,6 +54,8 @@ export const Avatar = styled.div`
 export const UserInfo = styled.div`
   display: flex;
   flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 `;
 
 export const UserName = styled.span`
@@ -73,6 +79,7 @@ export const WarningText = styled.span`
   font-size: 14px;
   color: #b91c1c;
   font-weight: 600;
+    text-align: left;
 `;
 
 export const IconButton = styled.button`
@@ -298,5 +305,38 @@ export const DetailRow = styled.div`
 
   &:last-child {
     margin-bottom: 0;
+  }
+`;
+
+/* 상단 헤더 (제목 + 검색) */
+export const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+    h1 {
+        margin: 0;
+    }
+`;
+
+
+
+export const SearchInput = styled.input`
+  width: 260px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 0 14px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: #111827;
   }
 `;

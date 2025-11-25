@@ -23,16 +23,19 @@
     display: flex;
     gap: 20px;
     padding: 20px 0;
+    align-items: stretch;   /* 🔥 좌우 높이 맞춤 */
 }
 
 /* 왼쪽 이미지 */
 .pd-left {
-    width: 45%;
+    width: 48%;     /* 🔥 55% → 48% 로 수정 */
+    margin-right: 10px;
 }
 
+/* 이미지 placeholder */
 .pd-image-placeholder {
     width: 100%;
-    height: 380px;
+    aspect-ratio: 1 / 1;  /* 🔥 고정 height 제거하고 비율로 변경 */
     border: 2px dashed #aaa;
     display:flex;
     justify-content:center;
@@ -41,19 +44,20 @@
     color:#444;
 }
 
+/* 실제 이미지 */
 .pd-image {
     width: 100%;
-    height: 380px;
+    aspect-ratio: 1 / 1;  /* 🔥 height 고정 제거 */
     object-fit: cover;
     border-radius: 10px;
 }
 
 /* 오른쪽 상품 정보 */
 .pd-right {
-    width: 55%;
+    width: 52%;    /* 🔥 55% → 52% 로 수정 */
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
     text-align: left;
 }
 
@@ -72,6 +76,63 @@
     font-size: 20px;
     font-weight: 700;
     color: #d32f2f;
+}
+
+/* ------------------------------
+   수량 선택 박스
+------------------------------ */
+.pd-qty-box {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: right;
+}
+
+.pd-qty-label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-right: 12px;
+    width: 80px;
+    display: inline-block;
+}
+
+.pd-qty-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pd-qty-control button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ccc;
+    background: white;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.pd-qty-control span {
+    font-size: 16px;
+    width: 28px;
+    text-align: center;
+}
+
+/* ------------------------------
+   총 상품금액
+------------------------------ */
+.pd-total-price {
+
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}
+
+.pd-total-price span {
+    color: #e60023;
+    font-weight: 700;
 }
 
 /* 필드 박스 */
@@ -108,7 +169,7 @@
 }
 
 .pd-ingredient-balloon {
-    width: 300px;
+    width: 100%;
     padding: 12px;
     background: #fff;
     border-radius: 10px;
@@ -129,7 +190,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    padding: 0 12px;
+    margin-top:50px;
     border-top: 1px solid #ddd;
     z-index: 1000;
 }
@@ -144,41 +205,38 @@
     border: none;
 }
 
-/* 찜 버튼 (하트) */
+/* 찜(하트) 버튼 */
 .pd-btm-btn.wish {
     flex: 0 0 20%;
     background: #fff;
     color: #000;
     border: 2px solid #000;
-    font-size: 24px; /* ♡ 기본 크기 살짝 키움 */
+    font-size: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: font-size 0.15s ease;
 }
 
-/* ♥ 눌렸을 때 조금 더 크도록 */
+/* 눌렸을 때 */
 .pd-btm-btn.wish.active {
-    font-size: 30px; /* ♥ 더 커져서 착시 방지 */
+    font-size: 30px;
 }
 
-/* 🛒 장바구니 — 40% (흰 + 검정) */
+/* 장바구니 */
 .pd-btm-btn.cart {
-    flex: 0 0 40%;
+    flex: 0 0 38.5%;
     background: #fff;
     color: #000;
     border: 2px solid #000;
 }
 
-/* ⚡ 바로구매 — 40% (검정 + 흰색) */
+/* 바로구매 */
 .pd-btm-btn.buy {
     flex: 0 0 40%;
     background: #000;
     color: #fff;
     border: 2px solid #000;
 }
-
-
 
 /* ===============================
    하단 탭
@@ -221,8 +279,8 @@
 ================================ */
 .pd-top-btn {
     position: fixed;
-    right: 60px;        /* 화면 오른쪽에서 30px */
-    bottom: 120px;      /* 화면 아래에서 120px (하단바와 footer와 안 겹치게) */
+    right: 60px;
+    bottom: 120px;
 
     width: 52px;
     height: 52px;
@@ -234,7 +292,6 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    text-align: center;
 
     font-size: 12px;
     font-weight: 600;
@@ -244,17 +301,16 @@
     z-index: 4000;
 
     box-shadow: 0 4px 8px rgba(0,0,0,0.12);
-
-    transition: all 0.2s ease;
 }
 
 .pd-top-btn:hover {
     background: #f8f8f8;
     border-color: #aaa;
 }
+
 .top-arrow {
     font-size: 14px;
-    margin-bottom: 4px;   /* 🔥 여백 여기! */
+    margin-bottom: 4px;
     color: #666;
 }
 
@@ -263,5 +319,3 @@
     font-weight: 600;
     color: #666;
 }
-
-
