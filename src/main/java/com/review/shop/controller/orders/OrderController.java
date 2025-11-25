@@ -69,7 +69,8 @@ public class OrderController {
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<String> orders(@RequestBody OrderCreateDTO orderCreateDTO) {
-
+        //orderCreateDTO에 현재 로그인한 user_id 설정
+        orderCreateDTO.setUser_id(security_util.getCurrentUserId());
         // 트랜잭션을 포함한 모든 서비스 호출하기
         orderService.processOrder(orderCreateDTO);
 
