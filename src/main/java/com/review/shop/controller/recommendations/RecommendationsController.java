@@ -1,11 +1,17 @@
 package com.review.shop.controller.recommendations;
 
 import com.review.shop.dto.product.RecommendationProductDTO;
+import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.recommendations.RecommendationsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +29,15 @@ public class RecommendationsController {
 
     private final RecommendationsService recommendationsService;
 
+    @Operation(summary = "추천 상품 조회", description = "로그인한 사용자의 바우만 유형을 기반으로 추천 상품을 조회합니다.")
     @PostMapping("/api/recommendations")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "추천 상품 조회 성공",
+                    content = @Content(schema = @Schema(implementation = RecommendationResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+
     public ResponseEntity<Map<String, Object>> getRecommendations() {
 
         //로그인 세션을 참고하여 바우만 아이디 가져오기
