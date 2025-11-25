@@ -42,6 +42,7 @@ import AdminReviewPage from "./pages/mypage/admin/AdminReviewPage";
 import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
 import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
+import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
 
 import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
@@ -98,6 +99,7 @@ export default function App() {
                         <Route path="products/:id/edit" element={<AdminProductEdit />} />
                         <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
                         <Route path="reviews" element={<AdminReviewPage />} />
+                        <Route path="report" element={<AdminReviewReportPage />} />
                         <Route path="qna" element={<AdminQnaPage />} />
                         <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
                         <Route path="users" element={<AdminUserPage />} />
