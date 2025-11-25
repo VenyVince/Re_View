@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NextReviewDTO<T> {
-    private List<T> content;     // 데이터 리스트 (상품 or 리뷰)
-    private boolean hasNext;     // 다음 페이지 여부 (핵심!)
+    private List<T> content;     // 리뷰 리스트
+    private boolean hasNext;     // 다음 페이지 여부
     private int page;            // 현재 페이지
     private int size;            // 요청 사이즈
 }
