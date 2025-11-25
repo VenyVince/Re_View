@@ -15,6 +15,7 @@
         SELECT COUNT(*)
         FROM review
         WHERE order_item_id = #{order_item_id}
+          AND deleted_at is NULL
     </select>
 
 </mapper>

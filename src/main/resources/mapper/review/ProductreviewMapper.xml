@@ -101,6 +101,7 @@
         r.deleted_at
         FROM review r
         WHERE r.review_id = #{review_id}
+        and r.deleted_at is null
     </select>
 
     <!-- 리뷰 수정 -->

@@ -38,6 +38,7 @@ public class ProductReviewService {
         return true;
     }
 
+    // 리뷰에 대한 내용만 검증( 상품은 아래 삭제쪽이나 수정쪽에서 직접 검증)
     public boolean canUpdate(int review_id, int user_id) {
 
         // 1. 리뷰 존재 여부 체크
@@ -110,15 +111,18 @@ public class ProductReviewService {
         if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
         if (content.length() > 1000) throw new WrongRequestException("리뷰 내용은 1000자 이하여야 합니다");
         if (rating < 1 || rating > 5) throw new WrongRequestException("평점은 1~5 사이여야 합니다");
+        else System.out.println(1);
 
         // 리뷰 생성
-        int insertedRows = productReviewMapper.insertReview(product_id, user_id, content, rating);
+        int insertedRows = productReviewMapper.insertReview(product_id, user_id, content, rating, order_item_id);
         if (insertedRows != 1) throw new DatabaseException("리뷰 생성 실패");
 
+        System.out.println(2);
         // 생성된 리뷰 조회
         ProductReviewDTO createdReview = productReviewMapper.selectLastReview(product_id, user_id);
         if (createdReview == null) throw new DatabaseException("생성된 리뷰 조회 실패");
 
+        System.out.println(3);
         // 이미지 저장 (imageUrls는 ImageUploadController(ImageUploadController에서는 multipartfile로 받음.)에서 받은 URL 리스트)
         if (imageUrls != null && !imageUrls.isEmpty()) {
             for (String imageUrl : imageUrls) {
@@ -126,9 +130,11 @@ public class ProductReviewService {
             }
         }
 
+        System.out.println(4);
         // 이미지 배열 설정
         createdReview.setImages(imageUrls != null ? imageUrls : new ArrayList<>());
 
+        System.out.println(5);
         return createdReview;
     }
 
@@ -166,18 +172,5 @@ public class ProductReviewService {
         updatedReview.setImages(imageUrls != null ? imageUrls : new ArrayList<>());
 
         return updatedReview;
-    }
-
-    
-    /**
-     * 리뷰 삭제 (Soft Delete)
-     */
-    public void deleteReview(int product_id, int user_id,  int review_id) {
-        int productExists = productReviewMapper.selectProductById(product_id);
-        if (productExists == 0) {
-            throw new WrongRequestException("더이상 존재하지 않는 상품입니다");
-        }
-        // 삭제 (Soft Delete - deleted_at 업데이트)
-        productReviewMapper.deleteReview(review_id);
     }
 }

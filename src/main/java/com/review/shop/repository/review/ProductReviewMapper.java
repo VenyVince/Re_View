@@ -11,11 +11,6 @@ public interface ProductReviewMapper {
 
     Integer selectProductById(@Param("product_id") int product_id);
 
-    // 첫리뷰 작성인지 분기
-    List<ProductReviewDTO> selectReviewsByProductAndUser(
-            @Param("product_id") int product_id,
-            @Param("user_id") int user_id
-    );
 
     /**
      * 특정 상품의 리뷰 목록 조회 (이미지 포함)
@@ -32,7 +27,8 @@ public interface ProductReviewMapper {
             @Param("product_id") int product_id,
             @Param("user_id") int user_id,
             @Param("content") String content,
-            @Param("rating") double rating
+            @Param("rating") double rating,
+            @Param("order_item_id") int order_item_id
     );
 
     /**
