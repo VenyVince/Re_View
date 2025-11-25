@@ -27,7 +27,7 @@
                 ORDER BY product_id DESC
             </otherwise>
         </choose>
-        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="selectProductCount" resultType="int">
@@ -61,5 +61,21 @@
         FROM product_image
         WHERE product_id = #{product_id}
     </select>
+
+    <select id="selectAllProducts" resultType="com.review.shop.dto.product.ProductDTO">
+        SELECT
+            product_id,
+            prd_name,
+            prd_brand,
+            'https://your-image-url.com/images/' || product_id as image_url,
+            price,
+            category,
+            rating
+        FROM product
+        ORDER BY product_id DESC
+    </select>
+
+
+
 
 </mapper>

@@ -18,6 +18,11 @@ public class ProductService {
 
     private final ProductMapper productMapper;
 
+    public List<ProductDTO> getAllProducts() {
+        return productMapper.selectAllProducts();
+    }
+
+
     public List<ProductDTO> getProductList(int page, int size, String sort) {
         // 유효성 검사
         if (page < 1) throw new WrongRequestException("페이지 값이 올바르지 않습니다.");

@@ -13,9 +13,10 @@ public interface ProductMapper {
     // 페이징 및 정렬된 상품 목록을 가져오는 메서드
     List<ProductDTO> selectProductList(
             @Param("offset") int offset, //offset 시작 위치
-            @Param("pageSize") int pageSize, //pageSize 페이지 당 개수
+            @Param("size") int size, //pageSize 페이지 당 개수
             @Param("sort") String sort //sort 정렬 옵션 (latest, rating, price)
     );
+    List<ProductDTO> selectAllProducts();
 
     // 상품 정보만 가져오는 메서드 (기존)
     ProductDetailDTO selectProductDetail(Integer product_id);

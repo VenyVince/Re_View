@@ -11,7 +11,7 @@ export default function BrandFilter({ selectedBrand, onSelect, brands = [] }) {
                     전체
                 </li>
 
-                {/* 브랜드 리스트 (상위 9개만 표시) */}
+                {/* 브랜드 리스트 */}
                 {brands.map((b, idx) => (
                     <li
                         key={idx}
