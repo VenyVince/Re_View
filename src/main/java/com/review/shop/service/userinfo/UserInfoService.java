@@ -25,7 +25,7 @@ public class UserInfoService {
     }
     public String getUserRole(String id) {return userIdMapper.getUser_role(id);    }
 
-    public GetUserInfoResponseDTO getUserInfo(Integer user_id) {
+    public GetUserInfoResponseDTO getUserInfo(int user_id) {
         try {
             List<GetUserInfoDTO> userinfo = userInfoMapper.getInfo(user_id);
             if (userinfo.isEmpty()) {
@@ -39,7 +39,7 @@ public class UserInfoService {
         }
     }
 
-    public void updateUserInfo(Integer user_id, UpdateUserInfoDTO updateDTO) {
+    public void updateUserInfo(int user_id, UpdateUserInfoDTO updateDTO) {
         try {
             GetUserInfoResponseDTO existingResponse = getUserInfo(user_id);
             GetUserInfoDTO existingUser = existingResponse.getUserInfos().getFirst(); // 단일 유저 기준 get(0) -> getFirst()
@@ -47,15 +47,22 @@ public class UserInfoService {
             // null이면 기존값 유지
             if(updateDTO.getNickname() == null) updateDTO.setNickname(existingUser.getNickname());
             if(updateDTO.getPhone_number() == null) updateDTO.setPhone_number(existingUser.getPhone_number());
-            if(updateDTO.getBaumann_id() == null) updateDTO.setBaumann_id(existingUser.getBaumann_id());
-
             userInfoMapper.updateInfo(user_id, updateDTO);
         } catch (DataAccessException e) {
             throw new DatabaseException("회원 정보 수정 중 DB 오류가 발생했습니다.", e);
         }
     }
 
-    public void deleteUserInfo(Integer user_id) {
+    public void updateBaumann(int user_id, int baumann_id) {
+        try {
+            userInfoMapper.updateBaumann(user_id, baumann_id);
+        }
+        catch (DataAccessException e) {
+            throw new DatabaseException("바우만 타입 수정 중 DB 오류가 발생했습니다.", e);
+        }
+    }
+
+    public void deleteUserInfo(int user_id) {
         try {
             userInfoMapper.deleteInfo(user_id);
         } catch (DataAccessException e) {
