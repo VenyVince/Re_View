@@ -27,7 +27,7 @@
                 ORDER BY product_id DESC
             </otherwise>
         </choose>
-        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
 
     <select id="selectProductCount" resultType="int">
