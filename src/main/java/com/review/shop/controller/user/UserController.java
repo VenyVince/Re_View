@@ -51,8 +51,12 @@ public class UserController  {
     @PostMapping("/api/auth/register")
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
-        userService.registerUser
-                (userDTO);
+        String type = userDTO.getBaumann_id();
+
+        Integer Baumann_int = userService.changeBaumannTypeToInt(type);
+        userDTO.setBaumann_id(String.valueOf(Baumann_int));
+
+        userService.registerUser(userDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }

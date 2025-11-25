@@ -4,10 +4,10 @@ package com.review.shop.dto.user;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
 @AllArgsConstructor
+@Data
 public class UserInfoDTO {
     private int user_id;
     private String id;
@@ -16,7 +16,7 @@ public class UserInfoDTO {
     private String email;
     private String nickname;
     private String phone_number;
-    private int baumann_id;
+    private String baumann_id; // 기존에 int였는데 String으로 변환
     private String role;
 }
 

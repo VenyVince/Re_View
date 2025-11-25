@@ -186,4 +186,13 @@ public class UserService implements UserDetailsService {
         return userMapper.findBannedByUserId(id) > 0;
     }
 
+
+    //바우만 타입에 대한 id를 찾아 리턴
+    public Integer changeBaumannTypeToInt(String type) {
+        Integer baumann_id =  userMapper.convertBaumannTypeToInt(type);
+        if(baumann_id == null) {
+            throw new WrongRequestException("잘못된 바우만 타입입니다.");
+        }
+        return baumann_id;
+    }
 }
