@@ -1,8 +1,6 @@
 package com.review.shop.service.search;
 
-import com.review.shop.dto.search.header.HeaderSearchDTO;
-import com.review.shop.dto.search.header.HeaderSearchProductDTO;
-import com.review.shop.dto.search.header.HeaderSearchReviewDTO;
+import com.review.shop.dto.search.header.*;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.search.header.HeaderSearchProductMapper;
@@ -32,6 +30,38 @@ public class HeaderSearchService {
             HeaderSearchDTO response = new HeaderSearchDTO();
             response.setReviews(reviews);
             response.setProducts(products);
+
+            return response;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("DB오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
+        }
+    }
+
+    public ListHeaderSearchReviewDTO searchReviews(String keyword, String sort, String filter_brand, String filter_category) {
+        try {
+            List<HeaderSearchReviewDTO> reviews = reviewMapper.searchReviews(keyword, sort,  filter_brand, filter_category);
+
+            if (reviews.isEmpty()) {
+                throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
+            }
+            ListHeaderSearchReviewDTO response = new ListHeaderSearchReviewDTO();
+            response.setReviews(reviews);
+
+            return response;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("DB오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
+        }
+    }
+
+    public ListHeaderSearchProductDTO searchProducts(String keyword, String sort, String filter_brand, String filter_category) {
+        try {
+            List<HeaderSearchProductDTO> reviews = productMapper.searchProducts(keyword, sort,  filter_brand, filter_category);
+
+            if (reviews.isEmpty()) {
+                throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
+            }
+            ListHeaderSearchProductDTO response = new ListHeaderSearchProductDTO();
+            response.setProducts(reviews);
 
             return response;
         } catch (DataAccessException e) {

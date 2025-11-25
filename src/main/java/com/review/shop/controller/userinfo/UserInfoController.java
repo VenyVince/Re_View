@@ -52,6 +52,20 @@ public class UserInfoController {
         return ResponseEntity.ok("정보가 수정되었습니다.");
     }
 
+    @Operation(summary = "유저 바우만타입 수정", description = "설문 후 유저 정보 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
+    })
+    @PatchMapping("/baumann")
+    public ResponseEntity<?> updateInfo_Baumann(
+            @Parameter(description = "변경된 사용자의 바우만 타입")
+            @RequestBody int baumann_id) {
+        int user_id = securityUtil.getCurrentUserId(); // 24번 라인과 깉이 재사용 예시
+        userInfoService.updateBaumann(user_id, baumann_id);
+        return ResponseEntity.ok("정보가 수정되었습니다.");
+    }
+
 
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 계정을 삭제합니다.")
     @ApiResponses(value = {
