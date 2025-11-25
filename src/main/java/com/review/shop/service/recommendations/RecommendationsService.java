@@ -41,7 +41,7 @@ public class RecommendationsService {
         //바우만 타입을 꺼내서 상품 추천 리스트 조회
         List<RecommendationProductDTO> recommendedProducts =
         recommendationsMapper.findAllProductsSortedByBaumann(baumannDTO.getFirst(), baumannDTO.getSecond(), baumannDTO.getThird(), baumannDTO.getFourth());
-        if(recommendedProducts==null){
+        if (recommendedProducts == null || recommendedProducts.isEmpty()){
             throw new WrongRequestException("추천 상품이 존재하지 않습니다.");
         }
         return recommendedProducts;

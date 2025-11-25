@@ -25,7 +25,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class UserUtilController {
-    UserService userService;
+    private final UserService userService;
 
 
     @Operation(summary = "아이디 중복 확인")
