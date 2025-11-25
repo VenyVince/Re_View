@@ -10,7 +10,8 @@ public interface ReviewMapper {
 
     List<ReviewDTO> selectReviewList(
             @Param("offset") int offset, // 시작 위치
-            @Param("pageSize") int pageSize, // 페이지 당 개수
-            @Param("sort") String sort // 정렬 옵션 (latest, rating, like_count)
+            @Param("size") int pageSize, // 페이지 당 개수
+            @Param("sort") String sort, // 정렬 옵션 (latest, rating, like_count)
+            @Param("category") String category
     );
 }
