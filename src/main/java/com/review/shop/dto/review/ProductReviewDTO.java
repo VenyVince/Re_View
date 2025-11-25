@@ -15,6 +15,7 @@ public class ProductReviewDTO {
     private int dislike_count;
     private String created_at;
     private int is_selected;
+    private int order_item_id;
 
     @JsonIgnore  // JSON 응답에서 제외
     private String image_url;  // DB에서만 사용

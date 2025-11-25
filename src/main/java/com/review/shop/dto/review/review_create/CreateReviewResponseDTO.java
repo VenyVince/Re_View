@@ -11,4 +11,5 @@ public class CreateReviewResponseDTO {
     private double rating;
     private List<String> imageUrls;
     private int pointsEarned;
+    private int order_item_id;
 }
