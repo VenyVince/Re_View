@@ -1,8 +1,8 @@
 // src/pages/mypage/user/UserProfileBar.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../../context/AuthContext";
-import "./UserDashboard.css";
+import { useAuth } from "../../../../context/AuthContext";
+import "../dashboard/UserDashboard.css";
 
 // 마이페이지 상단 프로필
 

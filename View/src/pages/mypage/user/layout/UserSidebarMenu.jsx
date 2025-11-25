@@ -1,7 +1,7 @@
 // src/pages/mypage/user/UserSidebarMenu.jsx
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./UserDashboard.css";
+import "../dashboard/UserDashboard.css";
 
 export default function UserSidebarMenu() {
     const navigate = useNavigate();

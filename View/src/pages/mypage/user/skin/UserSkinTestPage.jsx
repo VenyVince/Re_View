@@ -1,15 +1,15 @@
 // src/pages/mypage/user/UserSkinTestPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import UserMyPageLayout from "./UserMyPageLayout";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserSkinTestPage.css";
 
-import {BAUMANN_BADGES, BAUMANN_CODE_BY_ID, getBaumannBadge} from "../../../assets/baumann";
+import {BAUMANN_BADGES, BAUMANN_CODE_BY_ID, getBaumannBadge} from "../../../../assets/baumann";
 import {
     SECTIONS,
     QUESTION_COUNT,
     buildTallyFromSelections,
-} from "../../survey/questions";
+} from "../../../survey/questions";
 
 /** 바우만 코드 계산기 (회원가입 설문과 동일 로직) */
 function computeBaumann(tally) {

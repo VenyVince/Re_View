@@ -1,8 +1,8 @@
 // src/pages/mypage/user/UserCartPage.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import "./UserCartPage.css";
-import UserMyPageLayout from "./UserMyPageLayout";
-import cartDummy from "./dummy/cartDummy";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
+import cartDummy from "../dummy/cartDummy";
 
 export default function UserCartPage() {
     //  초기 상태: 아직 장바구니 데이터 없음 (이후 useEffect에서 채움)
