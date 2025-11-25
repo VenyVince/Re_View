@@ -27,7 +27,7 @@ public class ImageUploadController {
     // C:\review\하위 폴더에 저장
     private final ImageService imageService;
 
-    @Operation(summary = "리뷰 이미지 업로드", description = "리뷰 이미지를 최대 5개까지 업로드합니다")
+    @Operation(summary = "리뷰 이미지 업로드", description = "리뷰 이미지를 최대 5개까지 업로드합니다. Json방식 아니고 이미지만 Form Data형식으로 통신입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "이미지 업로드 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (WrongRequestException)"),
@@ -39,7 +39,7 @@ public class ImageUploadController {
                 .body(imageService.uploadReviewImages(images));
     }
 
-    @Operation(summary = "상품 이미지 업로드", description = "상품 이미지를 업로드합니다")
+    @Operation(summary = "상품 이미지 업로드", description = "상품 이미지를 업로드합니다. Json방식 아니고 이미지만 Form Data형식으로 통신입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "이미지 업로드 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (WrongRequestException)"),

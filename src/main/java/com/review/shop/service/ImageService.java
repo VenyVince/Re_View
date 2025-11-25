@@ -23,17 +23,20 @@ public class ImageService {
 
     private static final int MAX_REVIEW_IMAGES = 5;
 
-    public List<String> uploadReviewImages(MultipartFile[] images) {
-        if (images.length > MAX_REVIEW_IMAGES) {
-            throw new WrongRequestException("이미지는 최대 5개까지만 업로드 가능합니다");
-        }
+    // isProduct는 디렉토리를 위해서 넣은 부분 입니다.
 
+    public List<String> uploadReviewImages(MultipartFile[] images) {
         String role = security_util.getCurrentUserRole();
         if ("ADMIN".equalsIgnoreCase(role)) {
             throw new WrongRequestException("관리자는 리뷰를 작성할 수 없습니다.");
         }
 
+        if (images.length > MAX_REVIEW_IMAGES) {
+            throw new WrongRequestException("이미지는 최대 "+MAX_REVIEW_IMAGES+"개까지만 업로드 가능합니다");
+        }
+
         // 리뷰 이미지는 userDir/reviews/
+
         String uploadDir = fileUploadProperties.getUserDir() + "/";
 
         return saveImages(images, uploadDir, false);

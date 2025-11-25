@@ -1,4 +1,4 @@
-package com.review.shop.repository.product;
+package com.review.shop.repository.review;
 
 import com.review.shop.dto.review.ProductReviewDTO;
 import org.apache.ibatis.annotations.Mapper;

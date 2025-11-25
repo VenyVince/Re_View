@@ -30,7 +30,8 @@ public class Review_PointService {
                 user_id,
                 request.getContent(),
                 request.getRating(),
-                request.getImageUrls()
+                request.getImageUrls(),
+                request.getOrder_item_id()
         );
 
         // 포인트 적립
