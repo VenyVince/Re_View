@@ -6,7 +6,7 @@ import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,7 +21,7 @@ import java.util.Random;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
