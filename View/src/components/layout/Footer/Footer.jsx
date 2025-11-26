@@ -15,8 +15,6 @@ export default function Footer() {
                 <Separator aria-hidden="true">|</Separator>
                 <StyledLink to="/privacy">개인정보처리방침</StyledLink>
                 <Separator aria-hidden="true">|</Separator>
-                <StyledLink to="/notice">공지사항</StyledLink>
-                <Separator aria-hidden="true">|</Separator>
                 <StyledLink to="/faq">FAQ·도움말</StyledLink>
                 <Separator aria-hidden="true">|</Separator>
                 <StyledLink to="/ads">광고 제휴 문의</StyledLink>
@@ -37,17 +35,17 @@ const Logo = styled.img`
     width: 140px; height: auto; margin: 0 auto; display: block;
 `;
 const Sub = styled.p`
-    margin: 12px auto 28px; font-size: 14px; color: #8a8a8a;
+    margin: 12px auto 28px; font-size: 15px; color: #8a8a8a;
 `;
 const LinkNav = styled.nav`
     display: flex; justify-content: center; flex-wrap: wrap;
-    gap: 10px 18px; font-size: 14px;
-    a { color: #5a5a5a; text-decoration: none; }
+    gap: 10px 32px; font-size: 14px;
+    a { color: #4a4a4a; text-decoration: none; }
     a:hover { text-decoration: underline; }
 `;
 
 const StyledLink = styled(RouterLink)`
-  color: #5a5a5a;
+  color: #4a4a4a;
   text-decoration: none;
   &:hover { text-decoration: underline; }
 `;

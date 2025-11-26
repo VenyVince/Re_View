@@ -4,7 +4,7 @@ import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
-import com.review.shop.service.admin.AdminService;
+import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminProductController {
 
-    private final AdminService adminService;
+    private final AdminProductService adminProductService;
 
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -44,7 +44,7 @@ public class AdminProductController {
     })
     @GetMapping("/allproducts")
     public ResponseEntity<?> getAllProducts() {
-        return ResponseEntity.ok(adminService.getAllProducts());
+        return ResponseEntity.ok(adminProductService.getAllProducts());
     }
 
     @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
@@ -56,11 +56,11 @@ public class AdminProductController {
     })
     @PostMapping("/products")
     public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
-        adminService.insertProduct(product);
+        adminProductService.insertProduct(product);
         int prd_id = product.getProduct_id();
         List<String> image_url = product.getProduct_images();
 
-        adminService.putImage(prd_id, image_url);
+        adminProductService.putImage(prd_id, image_url);
 
 
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
@@ -78,7 +78,7 @@ public class AdminProductController {
     public ResponseEntity<String> updateProduct(
             @Parameter(description = "수정할 상품의 ID") @PathVariable int product_id,
             @RequestBody ProductDetailDTO product) {
-        adminService.updateProduct(product_id, product);
+        adminProductService.updateProduct(product_id, product);
         return ResponseEntity.ok("상품이 수정되었습니다");
     }
 
@@ -93,7 +93,7 @@ public class AdminProductController {
     @DeleteMapping("/products/{product_id}")
     public ResponseEntity<String> deleteProduct(
             @Parameter(description = "삭제할 상품의 ID") @PathVariable int product_id) {
-        adminService.deleteProduct(product_id);
+        adminProductService.deleteProduct(product_id);
         return ResponseEntity.ok("상품이 삭제되었습니다");
     }
 
@@ -110,9 +110,9 @@ public class AdminProductController {
     @GetMapping("/products/{product_id}")
     public ResponseEntity<?> getProductDetail(
             @Parameter(description = "조회할 상품의 ID") @PathVariable int product_id) {
-        ProductDetailDTO detailDTO = adminService.getProductDetail(product_id);
+        ProductDetailDTO detailDTO = adminProductService.getProductDetail(product_id);
 
-        detailDTO.setProduct_images(adminService.readImage(product_id));
+        detailDTO.setProduct_images(adminProductService.readImage(product_id));
         return ResponseEntity.ok(detailDTO);
     }
 
