@@ -17,6 +17,7 @@ public interface ProductMapper {
             @Param("sort") String sort, //sort 정렬 옵션 (latest, rating, price)
             @Param("category") String category
     );
+    List<ProductDTO> selectAllProducts();
 
     // 상품 정보만 가져오는 메서드 (기존)
     ProductDetailDTO selectProductDetail(Integer product_id);

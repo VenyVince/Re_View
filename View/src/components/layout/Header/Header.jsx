@@ -41,10 +41,10 @@ export default function Header() {
                 {/* 네비 */}
                 <nav className="rv-nav">
 
-                    <NavItem label="Product" to ="/product" />
+                    <NavItem label="Product" to ="/products" />
                     <NavItem label="Review" to ="/review" />
                     <NavItem label="About"  to ="/About" />
-                    <NavItem label="Q&A" to ="/qna"  />
+                    <NavItem label="Notice" to="/notice" />
                 </nav>
 
                 <div className="rv-right">
