@@ -26,7 +26,8 @@ import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가�
 
 import ProductDetailPage from "./pages/productDetail/ProductDetailPage"; //상품 상세 페이지
 import ReviewWrite from "./pages/review/ReviewWrite"; // 리뷰 작성 페이지
-
+import ProductPage from "./pages/products/ProductPage"; // 상품 페이지
+import ReviewPage from "./pages/reviews/ReviewPage"; //리뷰 페이지
 import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
 
 import SearchPage from './pages/search/SearchPage';
@@ -86,9 +87,9 @@ export default function App() {
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/qna" element={<QnaPage />} />
                     <Route path="/about" element={<AboutPage />} />
-
+                    <Route path="/products" element={<ProductPage />} />
                     <Route path="/product/detail" element={<ProductDetailPage />} />
-
+                    <Route path="/reviews" element={<ReviewPage />} />
                     {/* 리뷰 */}
                     <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
 

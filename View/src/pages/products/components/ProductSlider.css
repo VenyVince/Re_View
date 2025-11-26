@@ -1,0 +1,57 @@
+.carousel {
+    position: relative;
+    width: 1200px;
+    background: #fafafa;
+    padding: 26px 0 36px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.slideButton {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.slideButton.left { left: -60px; }
+.slideButton.right { right: -60px; }
+
+.slideButton.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.window {
+    width: 1200px;
+    overflow: hidden;
+}
+
+.track {
+    display: flex;
+    transition: transform 0.45s ease;
+}
+
+.page {
+    width: 1200px;
+    flex-shrink: 0;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    margin: 0 20px 22px;
+}
+
+.empty {
+    padding: 60px;
+    text-align: center;
+    color: #999;
+}
