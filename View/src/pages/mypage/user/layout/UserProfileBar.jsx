@@ -18,7 +18,7 @@ export default function UserProfileBar() {
                     withCredentials: true,
                 });
 
-                console.log("✅ /api/users/me 응답:", res);
+                //console.log("✅ /api/users/me 응답:", res);
 
                 // 응답 구조가 { userInfos: [...] } 라고 했으니까
                 const info = Array.isArray(res.data?.userInfos)

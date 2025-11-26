@@ -21,6 +21,7 @@ import OSNW from "./OSNW.png";
 import OSPT from "./OSPT.png";
 import OSPW from "./OSPW.png";
 
+
 // 매핑 객체로 export
 export const BAUMANN_BADGES = {
     DRNT, DRNW, DRPT, DRPW,

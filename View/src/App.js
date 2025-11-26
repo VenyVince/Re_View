@@ -55,6 +55,7 @@ import UserWishPage from "./pages/mypage/user/wish/UserWishPage";
 import AboutPage from "./pages/about/AboutPage";
 import UserCustomerPage from "./pages/mypage/user/customer/UserCustomerPage";
 import UserSkinTestPage from "./pages/mypage/user/skin/UserSkinTestPage";
+import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
 
 export default function App() {
     return (
@@ -118,6 +119,7 @@ export default function App() {
                     <Route path="/mypage/wish" element={<UserWishPage />} />
                     <Route path="/mypage/cs" element={<UserCustomerPage />} />
                     <Route path="/mypage/skin" element={<UserSkinTestPage />} />
+                    <Route path="/mypage/review" element={<UserReviewPage />} />
             </Routes>
             </main>
             <Footer />
