@@ -8,7 +8,7 @@
 
     <select id="getInfo" resultType="com.review.shop.dto.userinfo.userinfo.GetUserInfoDTO">
         SELECT
-            user_id, name, nickname, phone_number, baumann_id
+            name, nickname, phone_number
         FROM user_table
         WHERE user_id = #{user_id}
           AND deleted_at IS NULL
@@ -19,7 +19,6 @@
         <set>
             <if test="updateDTO.nickname != null">nickname = #{updateDTO.nickname},</if>
             <if test="updateDTO.phone_number != null">phone_number = #{updateDTO.phone_number},</if>
-            <if test="updateDTO.baumann_id != null">baumann_id = #{updateDTO.baumann_id},</if>
             updated_at = SYSDATE
         </set>
         WHERE USER_ID = #{user_id}
@@ -29,6 +28,15 @@
         UPDATE user_table
         SET deleted_at = SYSDATE
         WHERE user_id = #{user_id}
+    </update>
+
+    <update id="updateBaumann">
+        UPDATE user_table
+            <set>
+        <if test="baumann_id != null">baumann_id = #{baumann_id},</if>
+        updated_at =SYSDATE
+            </set>
+        where user_id = #{user_id}
     </update>
 
 

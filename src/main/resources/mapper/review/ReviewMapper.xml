@@ -19,13 +19,16 @@
         r.rating
         FROM review r
         JOIN USER_table u ON r.user_id = u.user_id
-        JOIN product p ON r.product_id = p.product_id
-        LEFT JOIN (
+        JOIN product p ON r.product_id = p.product_id  LEFT JOIN (
         SELECT review_id, image_url,
         ROW_NUMBER() OVER (PARTITION BY review_id ORDER BY review_image_id) AS rn
         FROM review_images
         ) ri ON r.review_id = ri.review_id AND ri.rn = 1
         WHERE r.deleted_at IS NULL
+
+        <if test="category != null and category != ''">
+            AND p.category = #{category}
+        </if>
         <choose>
             <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
@@ -37,6 +40,6 @@
                 ORDER BY r.like_count DESC, r.created_at DESC
             </otherwise>
         </choose>
-        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 </mapper>

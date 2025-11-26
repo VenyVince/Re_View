@@ -6,6 +6,7 @@ import java.util.Date;
 @Data
 public class QnaListResponseDTO {
     private int qna_id;
+    private int product_id;
     private String prd_name;    // 상품명
     private String title;       // 문의 제목
     private Date created_at;    // 작성일

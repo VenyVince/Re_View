@@ -1,0 +1,206 @@
+/* 전체 섹션 */
+.wish-section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 0;
+    font-size: 14px;
+}
+
+/* 상단 헤더 (제목 + 총 개수) */
+.wish-header-row {
+    display: flex;
+    padding: 0 40px;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.wish-count {
+    font-size: 13px;
+    color: #888;
+}
+
+.wish-count strong {
+    font-weight: 600;
+}
+
+/* 비어 있을 때 */
+.wish-empty-box {
+    border-radius: 16px;
+    border: 1px dashed #ddd;
+    padding: 40px 24px;
+    text-align: center;
+    color: #777;
+    background-color: #fafafa;
+}
+
+/* 바깥 카드 (마이페이지 안에서 흰 카드 하나로 감싸기) */
+.wish-card {
+    background-color: #fff;
+    border-radius: 24px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+    padding: 20px 24px;
+}
+
+/* 리스트를 세로형으로 정렬 */
+.wish-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 개별 아이템 – 전체 가로폭 쓰는 리스트형 */
+.wish-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    gap: 20px;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.wish-item:last-child {
+    border-bottom: none;
+}
+
+.wish-item-soldout {
+    opacity: 0.6;
+}
+
+/* 썸네일 */
+.wish-thumb {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 18px;
+    background-color: #f5f5f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.wish-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wish-thumb-placeholder {
+    font-size: 13px;
+    color: #aaa;
+}
+
+/* NEW / 품절 뱃지 */
+.wish-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    color: #fff;
+    line-height: 1;
+}
+
+
+
+.wish-badge-soldout {
+    background-color: #999;
+}
+
+/* 가운데 정보 영역 */
+.wish-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wish-brand {
+    font-size: 13px;
+    color: #777;
+}
+
+.wish-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+}
+
+.wish-category {
+    font-size: 12px;
+    color: #999;
+}
+
+.wish-price-row {
+    margin-top: 6px;
+}
+
+.wish-price {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* 우측 버튼 영역 */
+.wish-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+/* 공통 버튼 스타일 */
+.wish-cart-btn,
+.wish-remove-btn {
+    min-width: 120px;
+    height: 36px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0 16px;
+}
+
+/* 장바구니 버튼 – 검정 */
+.wish-cart-btn {
+    background-color: #111;
+    color: #fff;
+}
+
+.wish-cart-btn:hover:not(:disabled) {
+    background-color: #000;
+}
+
+.wish-cart-btn:disabled {
+    background-color: #e5e5e5;
+    color: #999;
+    cursor: default;
+}
+
+/* 삭제 버튼 – 라인 버튼 */
+.wish-remove-btn {
+    background-color: #fff;
+    border-color: #ddd;
+    color: #444;
+}
+
+.wish-remove-btn:hover {
+    border-color: #bbb;
+}
+
+/* 반응형: 화면 좁아질 때 레이아웃 정리 */
+@media (max-width: 768px) {
+    .wish-item {
+        align-items: flex-start;
+    }
+
+    .wish-actions {
+        margin-left: 0;
+    }
+
+    .wish-cart-btn,
+    .wish-remove-btn {
+        width: 100%;
+    }
+}

@@ -43,7 +43,7 @@ import AdminReviewPage from "./pages/mypage/admin/AdminReviewPage";
 import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
 import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
-import AdminUserDetailPage from "./pages/mypage/admin/AdminUserDetailPage";
+import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
 
 import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
@@ -51,8 +51,11 @@ import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
 import TestProduct from "./TestProduct";
 import UserCartPage from "./pages/mypage/user/UserCartPage";
 import UserAddressPage from "./pages/mypage/user/UserAddressPage";
+import UserWishPage from "./pages/mypage/user/UserWishPage";
 
 import AboutPage from "./pages/about/AboutPage";
+import UserCustomerPage from "./pages/mypage/user/UserCustomerPage";
+import UserSkinTestPage from "./pages/mypage/user/UserSkinTestPage";
 
 export default function App() {
     return (
@@ -98,10 +101,10 @@ export default function App() {
                         <Route path="products/:id/edit" element={<AdminProductEdit />} />
                         <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
                         <Route path="reviews" element={<AdminReviewPage />} />
+                        <Route path="report" element={<AdminReviewReportPage />} />
                         <Route path="qna" element={<AdminQnaPage />} />
                         <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
                         <Route path="users" element={<AdminUserPage />} />
-                        <Route path="users/:id" element={<AdminUserDetailPage />} />
                     </Route>
                 </Route>
 
@@ -113,6 +116,9 @@ export default function App() {
                     <Route path="/mypage/address" element={<UserAddressPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
+                    <Route path="/mypage/wish" element={<UserWishPage />} />
+                    <Route path="/mypage/cs" element={<UserCustomerPage />} />
+                    <Route path="/mypage/skin" element={<UserSkinTestPage />} />
             </Routes>
             </main>
             <Footer />

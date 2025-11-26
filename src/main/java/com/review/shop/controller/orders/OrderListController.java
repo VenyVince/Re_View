@@ -24,7 +24,7 @@ public class OrderListController {
     @Operation(summary = "내 주문 내역 조회", description = "로그인한 사용자의 주문 내역을 최신순으로 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)"),
+            @ApiResponse(responseCode = "401", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping
@@ -42,12 +42,12 @@ public class OrderListController {
     @Operation(summary = "주문 상세 조회", description = "주문 ID로 상세 정보를 조회합니다. (본인 주문만 가능)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "주문 정보를 찾을 수 없음 (또는 권한 없음)"),
+            @ApiResponse(responseCode = "404", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDetailResponseDTO> getOrderDetail(@PathVariable int orderId) {
+    @GetMapping("/{order_id}")
+    public ResponseEntity<OrderDetailResponseDTO> getOrderDetail(@PathVariable int order_id) {
         int user_id = securityUtil.getCurrentUserId();
-        return ResponseEntity.ok(orderListService.getOrderDetail(orderId, user_id));
+        return ResponseEntity.ok(orderListService.getOrderDetail(order_id, user_id));
     }
 }

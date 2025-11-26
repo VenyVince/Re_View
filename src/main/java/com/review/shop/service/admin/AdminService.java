@@ -9,14 +9,14 @@ import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AdminService {
 
     private final AdminMapper adminMapper;
@@ -79,7 +79,7 @@ public class AdminService {
     public Integer getMemberPoints(int user_id) {
         Integer points = adminMapper.getMemberPoints(user_id);
         if (points == null) {
-            throw new DatabaseException("포인트가 존재하지 않습니다.", null);
+            throw new ResourceNotFoundException("포인트 정보를 찾을 수 없습니다.");
         }
         return points;
     }

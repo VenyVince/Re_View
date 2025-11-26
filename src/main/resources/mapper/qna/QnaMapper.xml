@@ -7,6 +7,7 @@
     <select id="selectQnaListByProductId" resultType="com.review.shop.dto.qna.QnaListResponseDTO">
         SELECT
         q.qna_id,
+        p.product_id,
         p.prd_name,
         q.title,
         q.created_at,
@@ -55,6 +56,7 @@
     <select id="selectQnaListByUserId" parameterType="int" resultType="com.review.shop.dto.qna.QnaListResponseDTO">
         SELECT
         q.qna_id,
+        p.product_id,
         p.prd_name,
         q.title,
         q.created_at,

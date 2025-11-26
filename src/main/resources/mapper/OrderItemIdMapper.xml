@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.OrderItemIdMapper">
+    <select id="existsOrderItem" resultType="int">
+        SELECT COUNT(*)
+        FROM order_item oi
+        JOIN orders o ON oi.order_id = o.order_id
+        WHERE oi.order_item_id = #{order_item_id}
+        AND o.user_id = #{user_id}
+    </select>
+
+    <select id="checkReviewByOrderItemId" resultType="int">
+        SELECT COUNT(*)
+        FROM review
+        WHERE order_item_id = #{order_item_id}
+          AND deleted_at is NULL
+    </select>
+
+</mapper>

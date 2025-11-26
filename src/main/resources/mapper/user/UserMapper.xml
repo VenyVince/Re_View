@@ -44,7 +44,7 @@
         SELECT ID
         FROM USER_TABLE
         WHERE NAME = #{name}
-          AND PHONE_NUMBER = #{phoneNumber}
+          AND PHONE_NUMBER = #{phone_number}
     </select>
 
     <select id="findBannedByUserId" resultType="int">
@@ -62,6 +62,14 @@
         WHERE
             id = #{id}
 
+    </select>
+
+    <select id="convertBaumannTypeToInt" parameterType="String" resultType="Integer">
+        SELECT
+            BAUMANN_ID
+        FROM
+            BAUMANN  WHERE
+            TYPE = #{type}
     </select>
 
 </mapper>

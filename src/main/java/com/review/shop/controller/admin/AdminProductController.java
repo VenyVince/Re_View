@@ -1,6 +1,9 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Admin API", description = "상품 관련 관리자 기능 API")
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
@@ -31,7 +36,7 @@ public class AdminProductController {
                             array = @ArraySchema(schema = @Schema(implementation = ProductDetailDTO.class))
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -45,7 +50,7 @@ public class AdminProductController {
     @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "상품 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -64,7 +69,7 @@ public class AdminProductController {
     @Operation(summary = "상품 수정", description = "기존 상품의 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -80,7 +85,7 @@ public class AdminProductController {
     @Operation(summary = "상품 삭제 (논리적)", description = "상품을 논리적으로 삭제합니다. (DELETED_DATE 설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류")
+            @ApiResponse(responseCode = "400", description = "백엔드 오류")
             ,
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -97,7 +102,7 @@ public class AdminProductController {
             @ApiResponse(responseCode = "200", description = "상품 상세 조회 성공",
                     content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 DB 오류",
+            @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
@@ -109,5 +114,20 @@ public class AdminProductController {
 
         detailDTO.setProduct_images(adminService.readImage(product_id));
         return ResponseEntity.ok(detailDTO);
+    }
+
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(WrongRequestException.class)
+    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

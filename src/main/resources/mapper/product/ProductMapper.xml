@@ -16,18 +16,26 @@
         FROM product
         WHERE deleted_at IS NULL
         AND is_sold_out = '0'
-        <choose>
-            <when test="sort == 'rating'">
-                ORDER BY rating DESC, product_id DESC
-            </when>
-            <when test="sort == 'price'">
-                ORDER BY price ASC, product_id DESC
-            </when>
-            <otherwise>
-                ORDER BY product_id DESC
-            </otherwise>
-        </choose>
-        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+
+        <trim prefix="ORDER BY">
+            <choose>
+                <when test="sort == 'rating'">
+                    rating DESC, product_id DESC
+                </when>
+                <when test="sort == 'price'">
+                    price ASC, product_id DESC
+                </when>
+                <otherwise>
+                    product_id DESC
+                </otherwise>
+            </choose>
+        </trim>
+
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="selectProductCount" resultType="int">
@@ -61,21 +69,6 @@
         FROM product_image
         WHERE product_id = #{product_id}
     </select>
-
-    <select id="selectAllProducts" resultType="com.review.shop.dto.product.ProductDTO">
-        SELECT
-            product_id,
-            prd_name,
-            prd_brand,
-            'https://your-image-url.com/images/' || product_id as image_url,
-            price,
-            category,
-            rating
-        FROM product
-        ORDER BY product_id DESC
-    </select>
-
-
 
 
 </mapper>

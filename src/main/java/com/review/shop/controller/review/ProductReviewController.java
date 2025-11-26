@@ -4,7 +4,9 @@ import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.review.ProductReviewDTO;
 import com.review.shop.dto.review.UpdateReviewRequestDTO;
 import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
+import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
 import com.review.shop.service.review.ProductReviewService;
+import com.review.shop.service.review.Review_PointService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,13 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/reviews")
 @RequiredArgsConstructor
 @Tag(name = "Product Review", description = "상품 리뷰 관련 API")
 public class ProductReviewController {
 
     private final ProductReviewService productReviewService;
     private final Security_Util security_Util;
+    private final Review_PointService review_pointService;
 
 
 
@@ -47,50 +50,65 @@ public class ProductReviewController {
     }
 
     // 특정 삼품에 대한 리뷰 작성 히스토리 확인용
-    @GetMapping("/{product_id}/reviews/{user_id}/exists")
+    @GetMapping("/exists/create")
     @Operation(
-            summary = "리뷰 재작성 여부 확인",
-            description = "사용자가 구매 후 처음으로 작성하는 리뷰인지 확인. true이면 이미 리뷰 작성했으니 " +
-                          "ProductReviewController에서 처리, false면 Review_PointController에서 처리"
+            summary = "리뷰 작성 가능 여부 확인",
+            description = "사용자의 리뷰 작성 여부, 리뷰 작성 가능시 주문내역에서 리뷰 작성하라고 띄우면 될 거 같음."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (WrongRequestException)"),
             @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
     })
-    public ResponseEntity<Map<String, Boolean>> hasUserReviewed(
-            @PathVariable int product_id,
-            @PathVariable int user_id) {
-
-        boolean hasReviewed = productReviewService.hasUserReviewed(product_id, user_id);
+    public ResponseEntity<Map<String, Boolean>> canCreate(
+            @RequestBody int order_item_id) {
+        int user_id = security_Util.getCurrentUserId();
+        boolean canCreate = productReviewService.canCreate(order_item_id, user_id);
         Map<String, Boolean> response = new HashMap<>();
-        response.put("hasReview", hasReviewed);
+        response.put("canCreate", canCreate);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 리뷰 생성
-     */
+    // 특정 삼품에 대한 리뷰 작성 히스토리 확인용
+    @GetMapping("/exists/update")
+    @Operation(
+            summary = "리뷰 작성 가능 여부 확인",
+            description = "사용자의 리뷰 작성 여부, 리뷰 작성 가능시 주문내역에서 리뷰 작성하라고 띄우면 될 거 같음."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (WrongRequestException)"),
+            @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
+    })
+    public ResponseEntity<Map<String, Boolean>> canUpdate(
+            @RequestBody int review_id) {
+        int user_id = security_Util.getCurrentUserId();
+        boolean canUpdate = productReviewService.canUpdate(review_id, user_id);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("canUpdate", canUpdate);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/{product_id}")
-    @Operation(summary = "리뷰 생성", description = "상품에 대한 리뷰 생성. 포인트적립 안됨. 포인트 적립은 Review_Point쪽 봐야함")
+    @Operation(summary = "리뷰 작성", description = "리뷰 생성 및 포인트 적립")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 생성 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (WrongRequestException)"),
             @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
     })
-    public ProductReviewDTO createReview(
+    public ResponseEntity<CreateReviewResponseDTO> createReview(
             @PathVariable int product_id,
-            @RequestBody CreateReviewRequestDTO reviewRequest) {
+            @RequestBody CreateReviewRequestDTO request
+    ) {
         int user_id = security_Util.getCurrentUserId();
 
-        // 2. 리뷰 생성
-        return productReviewService.createReview(
+        CreateReviewResponseDTO result = review_pointService.createReviewWithReward(
                 product_id,
                 user_id,
-                reviewRequest.getContent(),
-                reviewRequest.getRating(),
-                reviewRequest.getImageUrls() // URL 배열은 ImageUploadController에서 처리
+                request
         );
+
+        return ResponseEntity.ok(result);
     }
 
 
@@ -134,6 +152,6 @@ public class ProductReviewController {
             @PathVariable int review_id) {
 
         int user_id = security_Util.getCurrentUserId();
-        productReviewService.deleteReview(product_id, user_id, review_id);
+        review_pointService.deleteReviewWithPenalty(product_id, user_id, review_id);
     }
 }

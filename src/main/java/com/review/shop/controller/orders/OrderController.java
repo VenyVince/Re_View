@@ -5,6 +5,7 @@ import com.review.shop.dto.orders.OrderCheckoutResponse;
 import com.review.shop.dto.orders.OrderCreateDTO;
 import com.review.shop.dto.orders.OrderDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.order.OrderPreviewService;
 import com.review.shop.service.order.OrderService;
@@ -13,21 +14,20 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderPreviewService orderPreviewService;
     private final OrderService orderService;
@@ -38,7 +38,7 @@ public class OrderController {
     @PostMapping("/api/orders/checkout")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 미리보기 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (ResourceAccessException 등)"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -64,12 +64,13 @@ public class OrderController {
     @PostMapping("/api/orders")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 처리 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (포인트 부족, 재고 부족 등)"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<String> orders(@RequestBody OrderCreateDTO orderCreateDTO) {
-
+        //orderCreateDTO에 현재 로그인한 user_id 설정
+        orderCreateDTO.setUser_id(security_util.getCurrentUserId());
         // 트랜잭션을 포함한 모든 서비스 호출하기
         orderService.processOrder(orderCreateDTO);
 
@@ -77,9 +78,8 @@ public class OrderController {
     }
 
 
-    // ResourceAccessException 처리
-    @ExceptionHandler(ResourceAccessException.class)
-    public ResponseEntity<String> handleResourceAccessException(ResourceAccessException ex) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());

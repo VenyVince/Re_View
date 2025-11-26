@@ -113,7 +113,10 @@
 .product-card {
     display: flex;
     flex-direction: column;
-    font-size: 13px;
+    justify-content: flex-start;
+
+    min-height: 350px;
+    box-sizing: border-box;
 }
 
 /* 썸네일 박스 (1:1 고정) */
@@ -149,12 +152,15 @@
 
 /* 텍스트 영역 */
 .product-meta {
-    margin-top: 10px;
-    text-align: left;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+
 }
 
 /* 브랜드 / 평점 줄 */
 .product-brand-row {
+    width: 75%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -229,5 +235,5 @@
 }
 
 .page-indicator {
-    font-size: 15px;
+    font-size: 14px;
 }

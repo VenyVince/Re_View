@@ -3,7 +3,8 @@ package com.review.shop.service.review;
 import com.review.shop.dto.review.ProductReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
-import com.review.shop.repository.product.ProductReviewMapper;
+import com.review.shop.repository.OrderItemIdMapper;
+import com.review.shop.repository.review.ProductReviewMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +18,54 @@ import java.util.Map;
 public class ProductReviewService {
 
     private final ProductReviewMapper productReviewMapper;
+    private final OrderItemIdMapper orderItemIdMapper;
 
-    
-    // 분기점 확인
-    public boolean hasUserReviewed(int product_id, int user_id) {
-        List<ProductReviewDTO> reviews = productReviewMapper.selectReviewsByProductAndUser(product_id, user_id);
-        return reviews != null && !reviews.isEmpty();
+    public boolean canCreate(int order_item_id, int user_id) {
+        // 1. order_item_id 실존 여부 체크 (해당 유저의 주문인지도 확인)
+        Integer exists = orderItemIdMapper.existsOrderItem(order_item_id, user_id);
+        if (exists == null || exists == 0) {
+            System.out.println("order_item_id(주문내역)가 존재하지 않습니다.");
+            return false;
+        }
+
+        // 2. 이미 리뷰가 작성되었는지 체크
+        Integer reviewExists = orderItemIdMapper.checkReviewByOrderItemId(order_item_id);
+        if (reviewExists != null && reviewExists > 0) {
+            System.out.println("해당 order_item_id(주문내역)로 작성된 리뷰가 이미 존재합니다.");
+            return false;
+        }
+        // 위 조건을 모두 통과하면 작성 가능
+        return true;
     }
+
+    // 리뷰에 대한 내용만 검증( 상품은 아래 삭제쪽이나 수정쪽에서 직접 검증)
+    public boolean canUpdate(int review_id, int user_id) {
+
+        // 1. 리뷰 존재 여부 체크
+        ProductReviewDTO review = productReviewMapper.selectReviewById(review_id);
+        if (review == null) {
+            System.out.println("존재하지 않는 리뷰입니다.");
+            return false;
+        }
+
+        if (review.getUser_id() != user_id) {
+            System.out.println("본인의 리뷰만 수정할 수 있습니다");
+            return false;
+        }
+
+        if (review.getLike_count() >= 100){
+            System.out.println("리뷰의 추천이 100개 이상입니다.");
+            return false;
+        }
+        if(review.getIs_selected() >=1){
+            System.out.println("운영자 채택 리뷰 입니다.");
+            return false;
+        }
+
+        // 모든 조건을 통과하면 수정 가능
+        return true;
+    }
+
 
     /**
      * 특정 상품의 리뷰 목록 조회
@@ -61,32 +103,38 @@ public class ProductReviewService {
             int user_id,  // ← DB 컬럼명 스타일 유지
             String content,
             double rating,
-            List<String> imageUrls
+            List<String> imageUrls,
+            int order_item_id
     ) {
 
         // 유효성 검사
         if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
         if (content.length() > 1000) throw new WrongRequestException("리뷰 내용은 1000자 이하여야 합니다");
         if (rating < 1 || rating > 5) throw new WrongRequestException("평점은 1~5 사이여야 합니다");
+        else System.out.println(1);
 
         // 리뷰 생성
-        int insertedRows = productReviewMapper.insertReview(product_id, user_id, content, rating);
+        int insertedRows = productReviewMapper.insertReview(product_id, user_id, content, rating, order_item_id);
         if (insertedRows != 1) throw new DatabaseException("리뷰 생성 실패");
 
+        System.out.println(2);
         // 생성된 리뷰 조회
         ProductReviewDTO createdReview = productReviewMapper.selectLastReview(product_id, user_id);
         if (createdReview == null) throw new DatabaseException("생성된 리뷰 조회 실패");
 
-        // 이미지 저장 (imageUrls는 ImageUploadController(ImageUploadController에서는 multipartfile로 받음. 33번 라인 확인)에서 받은 URL 리스트)
+        System.out.println(3);
+        // 이미지 저장 (imageUrls는 ImageUploadController(ImageUploadController에서는 multipartfile로 받음.)에서 받은 URL 리스트)
         if (imageUrls != null && !imageUrls.isEmpty()) {
             for (String imageUrl : imageUrls) {
                 productReviewMapper.insertReviewImage(createdReview.getReview_id(), imageUrl);
             }
         }
 
+        System.out.println(4);
         // 이미지 배열 설정
         createdReview.setImages(imageUrls != null ? imageUrls : new ArrayList<>());
 
+        System.out.println(5);
         return createdReview;
     }
 
@@ -100,14 +148,7 @@ public class ProductReviewService {
     ) {
         // 리뷰 존재 여부 확인
         ProductReviewDTO review = productReviewMapper.selectReviewById(review_id);
-        if (review == null) {
-            throw new WrongRequestException("존재하지 않거나 삭제된 리뷰입니다");
-        }
 
-        // 작성자 확인
-        if (review.getUser_id() != user_id) {
-            throw new WrongRequestException("본인의 리뷰만 수정할 수 있습니다");
-        }
 
         // 유효성 검사
         if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
@@ -131,29 +172,5 @@ public class ProductReviewService {
         updatedReview.setImages(imageUrls != null ? imageUrls : new ArrayList<>());
 
         return updatedReview;
-    }
-
-    
-    /**
-     * 리뷰 삭제 (Soft Delete)
-     */
-    public void deleteReview(int product_id, int user_id,  int review_id) {
-
-        // 상품 존재 여부
-        int productExists = productReviewMapper.selectProductById(product_id);
-        if (productExists == 0) {
-            throw new WrongRequestException("존재하지 않는 상품입니다");
-        }
-        // 리뷰 존재 여부 확인
-        ProductReviewDTO review = productReviewMapper.selectReviewById(review_id);
-
-        if (review == null) throw new WrongRequestException("이미 삭제된 리뷰거나 존재하지 않는 리뷰입니다");
-
-        // 삭제 권한 확인 (본인만 삭제할 수 있게)
-        if (review.getUser_id() != user_id) {
-            throw new WrongRequestException("본인의 리뷰만 삭제할 수 있습니다. 작성자 ID: " + review.getUser_id());
-        }
-        // 삭제 (Soft Delete - deleted_at 업데이트)
-        productReviewMapper.deleteReview(review_id);
     }
 }

@@ -1,5 +1,6 @@
 package com.review.shop.controller.product;
 
+import com.review.shop.dto.product.NextProductDTO;
 import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.service.product.ProductDetailService;
@@ -10,8 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -35,12 +34,14 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getProducts(
+    public ResponseEntity<NextProductDTO<ProductDTO>> getProducts(
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "8") int size,
-            @RequestParam(value = "sort", defaultValue = "latest") String sort) {
-        List<ProductDTO> products = productService.getProductList(page, size, sort);
-        return ResponseEntity.ok(products);
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "sort", defaultValue = "latest") String sort,
+            @RequestParam(value = "category", required = false) String category // 카테고리 추가 (없으면 null)
+    ) {
+        NextProductDTO<ProductDTO> response = productService.getProductList(page, size, sort, category);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "상품 상세 조회", description = "상품 ID로 상세 정보를 조회합니다.")
@@ -54,4 +55,5 @@ public class ProductController {
         ProductDetailDTO product = productDetailService.getProductDetail(product_id);
         return ResponseEntity.ok(product);
     }
+
 }

@@ -8,7 +8,7 @@ import com.review.shop.dto.product.ProductStockDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.Orders.OrderMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class OrderService {
 
@@ -51,6 +51,8 @@ public class OrderService {
 
         // 회원의 포인트를 차감
         Integer result = deductUserPoints(user_id, pointsToDeduct);
+
+
 
         // 회원의 포인트 기록에 히스토리 추가
         Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감");
@@ -122,7 +124,7 @@ public class OrderService {
                         Function.identity()
                 ));
 
-        long calculatedTotalPrice = 0; // 서버에서 계산한 실제 총 상품 금액
+        int calculatedTotalPrice = 0; // 서버에서 계산한 실제 총 상품 금액
         List<OrderItemDTO> orderItemsToInsert = new ArrayList<>();
 
         for (OrderDTO requestItem : orderDTOList) {
@@ -137,7 +139,7 @@ public class OrderService {
             int realPrice = productInfo.getPrice();
 
             // 총액 누적 계산
-            calculatedTotalPrice += (long) realPrice * quantity;
+            calculatedTotalPrice += realPrice * quantity;
 
             // ORDER_ITEM 테이블용 DTO 생성
             OrderItemDTO itemDTO = new OrderItemDTO();
@@ -162,7 +164,7 @@ public class OrderService {
         orderMapper.insertOrders(orderSaveDTO);
 
         //ORDERS 생성하고 생성된 PK값 가져오기
-        long generatedOrderId = orderSaveDTO.getOrder_id();
+        int generatedOrderId = orderSaveDTO.getOrder_id();
 
         for(OrderItemDTO item : orderItemsToInsert) {
             item.setOrder_id(generatedOrderId);
@@ -176,12 +178,12 @@ public class OrderService {
     //트랜잭션용 최종 오더
     @Transactional
     public void processOrder(OrderCreateDTO orderCreateDTO) {
-        //DB에 주문 정보 저장
-        saveOrderToDatabase(orderCreateDTO);
         //포인트 차감 검사 및 반영
         checkAndDeductPoints(orderCreateDTO);
         //재고 차감 검사 및 반영
         checkAndDeductStock(orderCreateDTO);
+        //DB에 주문 정보 저장
+        saveOrderToDatabase(orderCreateDTO);
     }
 
 

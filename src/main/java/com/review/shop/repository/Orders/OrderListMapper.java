@@ -14,17 +14,17 @@ public interface OrderListMapper {
 
     // 주문 목록 조회
     List<OrderListResponseDTO> findOrderListByUserId(
-            @Param("userId") int userId,
+            @Param("user_id") int user_id,
             @Param("offset") int offset,
             @Param("limit") int limit
     );
 
     // 주문 상세 기본 정보 (본인 확인 포함)
     Optional<OrderDetailResponseDTO> findOrderDetailById(
-            @Param("orderId") int orderId,
-            @Param("userId") int userId
+            @Param("order_id") int order_id,
+            @Param("user_id") int user_id
     );
 
     // 주문 상세 상품 목록
-    List<OrderItemDetailDTO> findOrderItemsByOrderId(int orderId);
+    List<OrderItemDetailDTO> findOrderItemsByOrderId(int order_id);
 }

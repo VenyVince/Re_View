@@ -43,9 +43,8 @@ public class PointService {
 
 
     // 리뷰 작성 포인트 적립
-    public void addReviewPoint(int user_id, int review_id, int amount) {
+    public void addReviewPoint(int user_id, int amount) {
         try {
-
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
             dto.setAmount(amount);
@@ -57,5 +56,18 @@ public class PointService {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
-    // 베스트 리뷰 부분 구현해야함
+    public void removeReviewPoint(int user_id, int amount) {
+        try {
+            PointHistoryDTO dto = new PointHistoryDTO();
+            dto.setUser_id(user_id);
+            dto.setAmount(amount);
+            dto.setType("USE");
+            dto.setDescription("리뷰 삭제로 인한 포인트 회수");
+
+            System.out.println("TYPE: [" + dto.getType() + "]");
+            pointMapper.aboutPoint(dto); // 포인트 히스토리 및 합계 반영
+        } catch (Exception e) {
+            throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
+        }
+    }
 }

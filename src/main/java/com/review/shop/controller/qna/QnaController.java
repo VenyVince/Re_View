@@ -44,8 +44,8 @@ public class QnaController {
     public ResponseEntity<List<QnaListResponseDTO>> getMyQnaList() {
         int user_id = securityUtil.getCurrentUserId();
 
-        List<QnaListResponseDTO> myQnaList = qnaService.getMyQnaList(user_id);
-        return ResponseEntity.ok(myQnaList);
+        List<QnaListResponseDTO> my_qna_list = qnaService.getMyQnaList(user_id);
+        return ResponseEntity.ok(my_qna_list);
 
     }
 
@@ -74,8 +74,8 @@ public class QnaController {
         if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
 
         // 로그인 ID -> DB PK(int) 변환
-        int userPk = securityUtil.getCurrentUserId();
-        qnaDTO.setUser_id(userPk);
+        int user_id = securityUtil.getCurrentUserId();
+        qnaDTO.setUser_id(user_id);
 
         qnaService.registerQna(qnaDTO);
         return ResponseEntity.ok("등록 성공");
@@ -95,9 +95,9 @@ public class QnaController {
     ) {
         if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
 
-        int userPk = securityUtil.getCurrentUserId();
+        int user_id = securityUtil.getCurrentUserId();
         // 프론트에서 보낸 user_id를 무시하고, 실제 로그인한 사람의 ID를 덮어씌움 (보안)
-        qnaDTO.setUser_id(userPk);
+        qnaDTO.setUser_id(user_id);
 
         qnaService.modifyQna(qnaDTO);
         return ResponseEntity.ok("수정 성공");
@@ -118,9 +118,9 @@ public class QnaController {
     ) {
         if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
 
-        int userPk = securityUtil.getCurrentUserId();;
+        int user_id = securityUtil.getCurrentUserId();;
 
-        qnaService.removeQna(qna_id, userPk);
+        qnaService.removeQna(qna_id, user_id);
         return ResponseEntity.ok("삭제 성공");
 
     }

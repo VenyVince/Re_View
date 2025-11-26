@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class OrderDetailResponseDTO {
-    private long order_id;
+    private int order_id;
     private Date created_at;
     private String order_status;
     private String delivery_num;
