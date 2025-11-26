@@ -44,7 +44,7 @@ export default function Header() {
                     <NavItem label="Product" to ="/product" />
                     <NavItem label="Review" to ="/review" />
                     <NavItem label="About"  to ="/About" />
-                    <NavItem label="Q&A" to ="/qna"  />
+                    <NavItem label="Notice" to="/notice" />
                 </nav>
 
                 <div className="rv-right">
