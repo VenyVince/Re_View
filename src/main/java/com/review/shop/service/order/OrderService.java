@@ -54,8 +54,8 @@ public class OrderService {
 
 
 
-        // 회원의 포인트 기록에 히스토리 추가
-        Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감");
+        // 회원의 포인트 기록에 히스토리 추가 
+        Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감"); //<- 이 라인에서 지금 포인트 차감 안되고 자꾸 5000만큼 늘어나는 현상 발생중
 
         if (historyResult == null || historyResult <= 0) {
             throw new DatabaseException ("포인트 히스토리 기록에 실패했습니다.", null);

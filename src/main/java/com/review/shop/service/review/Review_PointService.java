@@ -18,7 +18,6 @@ public class Review_PointService {
     private final PointService pointService; //기존 서비스 재활용
     private final ProductReviewMapper productReviewMapper;
 
-    private static final int REVIEW_EARN_POINT = 100;
 
     @Transactional
     public CreateReviewResponseDTO createReviewWithReward(
@@ -40,21 +39,16 @@ public class Review_PointService {
                 request.getImageUrls(),
                 request.getOrder_item_id()
         );
-
-        System.out.println(-1);
+        pointService.addReviewPoint(user_id);
         // 응답 DTO 구성
         CreateReviewResponseDTO response = new CreateReviewResponseDTO();
         response.setReview_id(review.getReview_id());
         response.setContent(review.getContent());
         response.setRating(review.getRating());
         response.setImageUrls(request.getImageUrls());
-        response.setPointsEarned(REVIEW_EARN_POINT);
-
-        System.out.println(-2);
+        response.setPointsEarned(PointService.PointConstants.CreateREVIEW);
         // 포인트 적립
-        pointService.addReviewPoint(user_id, REVIEW_EARN_POINT);
-        System.out.println(-3);
-
+        pointService.addReviewPoint(user_id);
         return response;
     }
 
@@ -86,6 +80,6 @@ public class Review_PointService {
         productReviewMapper.deleteReview(review_id);
 
         // 포인트 회수 (삭제된 리뷰에 대해 적립된 포인트 차감)
-        pointService.removeReviewPoint(user_id, REVIEW_EARN_POINT);
+        pointService.removeReviewPoint(user_id);
     }
 }

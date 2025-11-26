@@ -8,16 +8,14 @@
     <!-- 포인트 히스토리 추가 -->
     <insert id="aboutPoint" parameterType="com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO">
         INSERT INTO point_history (
-            point_history_id,  user_id, amount, type, created_at, description
+            user_id, amount, type, created_at, description
         )
         VALUES (
-                   point_history_seq.NEXTVAL,
-                   #{user_id},
-                   #{amount},
-                   #{type},
-                   SYSDATE,
-                   #{description}
-               )
+                   #{user_id}, #{amount}, #{type}, SYSDATE, #{description}
+               );
+        UPDATE users
+        SET point = point + #{amount}
+        WHERE user_id = #{user_id};
     </insert>
 
     <!-- 특정 사용자 포인트 내역 전체 조회 -->
@@ -31,15 +29,9 @@
 
     <!-- 사용자 총 포인트 조회 (EARN - USE) -->
     <select id="getTotalPoint" resultType="int">
-        SELECT NVL(SUM(
-                           CASE
-                               WHEN type = 'EARN' THEN amount
-                               WHEN type = 'USE' THEN -amount
-                               ELSE 0
-                               END
-                   ), 0) AS total_point
-        FROM point_history
-        WHERE user_id = #{user_id}
+        SELECT POINT
+        FROM USER_TABLE
+        WHERE USER_ID = #{user_id}
     </select>
 
 <!--    &lt;!&ndash; 베스트 리뷰 포인트 중복 체크 예시&ndash;&gt;-->

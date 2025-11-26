@@ -5,6 +5,7 @@ import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminProductMapper;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@RolesAllowed("ADMIN")
 public class AdminProductService {
 
     private final AdminProductMapper adminProductMapper;
