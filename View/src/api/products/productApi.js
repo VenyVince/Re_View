@@ -1,4 +1,8 @@
-import axiosClient from "../axiosClient";
+// src/api/products/productApi.js
+import axios from "axios";
 
-export const fetchAllProducts = () =>
-    axiosClient.get("/api/products/all"); // 전체 상품 조회
+// 단일 category 값으로 요청하는 함수
+export const fetchProductsByCategory = (category) =>
+    axios.get(
+        `/api/products?category=${encodeURIComponent(category)}&page=1&size=100`
+    );

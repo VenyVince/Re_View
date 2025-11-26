@@ -22,10 +22,7 @@ public class ProductController {
     private final ProductService productService;
     private final ProductDetailService productDetailService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
-    }
+
 
     @Operation(summary = "상품 목록 조회", description = "상품 목록을 페이징 및 정렬 조건에 따라 조회합니다.")
     @ApiResponses(value = {

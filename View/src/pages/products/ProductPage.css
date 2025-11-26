@@ -16,3 +16,9 @@
     font-size: 22px;
     font-weight: 700;
 }
+
+.no-product, .loading {
+    padding: 60px;
+    text-align: center;
+    color: #999;
+}
