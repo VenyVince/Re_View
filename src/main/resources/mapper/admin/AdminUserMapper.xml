@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.admin.AdminUserMapper">
+    <resultMap id="userSummaryDTOMap" type="com.review.shop.dto.user.UserSummaryDTO">
+        <result property="user_id" column="USER_ID"/>
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="nickname" column="NICKNAME"/>
+    </resultMap>
+
+    <select id="getMemberPoints" resultType="java.lang.Integer">
+        SELECT POINT FROM USER_TABLE WHERE USER_ID = #{menber_id}
+    </select>
+
+    <update id="updateMemberPoints">
+        UPDATE USER_TABLE
+        SET
+            POINT = #{points},
+            UPDATED_AT = SYSDATE
+        WHERE
+            USER_ID = #{user_id}
+    </update>
+
+    <select id="getAllusers" resultMap="userSummaryDTOMap">
+        SELECT
+            USER_ID,
+            ID,
+            NAME,
+            NICKNAME
+        FROM
+            USER_TABLE
+        WHERE
+            DELETED_AT IS NULL</select>
+
+    <insert id="setBlacklist" parameterType="map">
+        INSERT INTO BAN_LIST (USER_ID, REASON)
+        VALUES (#{user_id}, #{reason})
+    </insert>
+
+    <update id="deleteUser" parameterType="map">
+        UPDATE USER_TABLE
+        SET DELETED_AT = SYSDATE
+        WHERE USER_ID =  #{user_id}
+    </update>
+</mapper>
