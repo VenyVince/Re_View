@@ -89,7 +89,7 @@ export default function App() {
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/products" element={<ProductPage />} />
                     <Route path="/product/detail" element={<ProductDetailPage />} />
-                    <Route path="/reviews" element={<ReviewPage />} />
+                    <Route path="/review" element={<ReviewPage />} />
                     {/* 리뷰 */}
                     <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
 

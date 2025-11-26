@@ -1,0 +1,40 @@
+.pageWrapper {
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 20px 10px;
+}
+
+/* 카테고리 탭과 동일하게 */
+.titleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 0 15px;
+}
+
+.categoryTitle {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* 정렬 select */
+.sort-select {
+    display: flex;
+    align-items: center;
+}
+
+/* 로딩 */
+.loading {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 18px;
+}
+
+/* 상품 없음 → 리뷰 없음 */
+.no-products {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 17px;
+    color: #555;
+}
