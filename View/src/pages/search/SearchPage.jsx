@@ -23,7 +23,7 @@ export default function SearchPage() {
     const [error, setError] = useState("");
     const [sortType, setSortType] = useState("popular");
 
-    // 🔥 단일 카테고리 필터에 맞춰 data를 필터링하는 함수
+    // 단일 카테고리 필터에 맞춰 data를 필터링하는 함수
     const filterByCategory = (list, category) => {
         if (!category || category === "전체") return list;
         return list.filter(item => item.category === category);

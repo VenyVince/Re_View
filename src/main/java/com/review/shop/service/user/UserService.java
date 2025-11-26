@@ -6,7 +6,7 @@ import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.user.UserMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,7 +21,7 @@ import java.util.Random;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
@@ -186,4 +186,13 @@ public class UserService implements UserDetailsService {
         return userMapper.findBannedByUserId(id) > 0;
     }
 
+
+    //바우만 타입에 대한 id를 찾아 리턴
+    public Integer changeBaumannTypeToInt(String type) {
+        Integer baumann_id =  userMapper.convertBaumannTypeToInt(type);
+        if(baumann_id == null) {
+            throw new WrongRequestException("잘못된 바우만 타입입니다.");
+        }
+        return baumann_id;
+    }
 }

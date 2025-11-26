@@ -5,7 +5,7 @@ import com.review.shop.dto.orders.OrderCheckoutResponse;
 import com.review.shop.dto.orders.OrderDTO;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.Orders.OrderMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 // 결제 진행 전 프론트에게 제공할 Preview 서비스
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderPreviewService {
 
     private final OrderMapper orderMapper;

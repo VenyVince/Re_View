@@ -21,4 +21,6 @@ public interface UserMapper {
     int findBannedByUserId(@Param("id") int id);
 
     String findEmailById(@Param("id") String id);
+
+    Integer convertBaumannTypeToInt(String type);
 }

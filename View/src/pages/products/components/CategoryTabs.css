@@ -1,0 +1,21 @@
+.categoryTabs {
+    margin-top:10px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.categoryTab {
+    background: #efefef;
+    border-radius: 999px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.categoryTab.active {
+    background: #111;
+    color: #fff;
+}

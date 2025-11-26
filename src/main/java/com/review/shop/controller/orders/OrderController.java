@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderPreviewService orderPreviewService;
     private final OrderService orderService;
@@ -69,7 +69,8 @@ public class OrderController {
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     public ResponseEntity<String> orders(@RequestBody OrderCreateDTO orderCreateDTO) {
-
+        //orderCreateDTO에 현재 로그인한 user_id 설정
+        orderCreateDTO.setUser_id(security_util.getCurrentUserId());
         // 트랜잭션을 포함한 모든 서비스 호출하기
         orderService.processOrder(orderCreateDTO);
 

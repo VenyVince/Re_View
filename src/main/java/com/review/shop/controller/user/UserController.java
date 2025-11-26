@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,9 +36,9 @@ import java.util.Map;
 
 @Tag(name = "User Authentication", description = "회원 인증 API")
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController  {
-    UserService userService;
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
 
@@ -51,8 +51,12 @@ public class UserController  {
     @PostMapping("/api/auth/register")
     public ResponseEntity<String> registerUser(@RequestBody UserInfoDTO userDTO) {
 
-        userService.registerUser
-                (userDTO);
+        String type = userDTO.getBaumann_id();
+
+        Integer Baumann_int = userService.changeBaumannTypeToInt(type);
+        userDTO.setBaumann_id(String.valueOf(Baumann_int));
+
+        userService.registerUser(userDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }

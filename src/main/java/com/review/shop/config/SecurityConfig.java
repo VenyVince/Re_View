@@ -46,21 +46,23 @@ public class SecurityConfig {
                         //어드민만 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        //모두 가능
-                        .requestMatchers(
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/auth/send-temp-password",
-                                "/api/auth/check-id",
-                                "/api/search/**",
-                                "/api/products",
-                                "/api/auth/logout",
-                                "/api/auth/me"
+//                        //모두 가능, 프론트 테스트 때문에 임시로 admin 제외 모두 허용
+//                        .requestMatchers(
+//                                "/api/auth/register",
+//                                "/api/auth/login",
+//                                "/api/auth/send-temp-password",
+//                                "/api/auth/check-id",
+//                                "/api/search/**",
+//                                "/api/products",
+//                                "/api/auth/logout",
+//                                "/api/auth/me"
+//
+//                        ).permitAll()
 
-                        ).permitAll()
-
-                        //유저만 가능
-                        .anyRequest().hasRole("USER")
+//                        //유저만 가능
+//                        .anyRequest().hasRole("USER")
+//
+                            .anyRequest().permitAll()
                 )
 
 
