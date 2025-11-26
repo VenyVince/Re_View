@@ -46,8 +46,9 @@ export const IconCircle = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  background: #f97373;
-  display: flex;
+  background: ${({ status }) =>
+          status === "답변완료" ? "#22c55e" : "#f87171"};
+    display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
@@ -59,6 +60,8 @@ export const IconCircle = styled.div`
 export const TextBlock = styled.div`
   display: flex;
   flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 `;
 
 export const QuestionText = styled.div`
@@ -103,7 +106,7 @@ export const PageInfo = styled.span`
 
 export const QuestionHeader = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 16px 0 24px;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 24px;
@@ -160,3 +163,14 @@ export const AnswerButton = styled.button`
   font-weight: 600;
   cursor: pointer;
 `;
+
+/* ---------- 질문 본문 내용 ---------- */
+export const QuestionContent = styled.div`
+  white-space: pre-wrap;
+  font-size: 15px;
+  color: #444;
+  margin-top: 16px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+`;
+
