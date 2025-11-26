@@ -16,7 +16,9 @@
         COALESCE(r.like_count, 0) AS like_count,
         p.price,
         r.content,
-        r.rating
+        r.rating,
+        r.is_selected,
+        r.is_checked
         FROM review r
         JOIN USER_table u ON r.user_id = u.user_id
         JOIN product p ON r.product_id = p.product_id  LEFT JOIN (
