@@ -56,6 +56,7 @@ import AboutPage from "./pages/about/AboutPage";
 import UserCustomerPage from "./pages/mypage/user/customer/UserCustomerPage";
 import UserSkinTestPage from "./pages/mypage/user/skin/UserSkinTestPage";
 import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
+import OrderPaymentPage from "./pages/order/OrderPaymentPage";
 
 export default function App() {
     return (
@@ -89,6 +90,8 @@ export default function App() {
                     <Route path="/about" element={<AboutPage />} />
 
                     <Route path="/product/detail" element={<ProductDetailPage />} />
+
+                    <Route path="/order/payment" element={<OrderPaymentPage />} />
 
                     {/* 리뷰 */}
                     <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}

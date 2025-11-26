@@ -3,8 +3,11 @@ import React, { useState, useMemo, useEffect } from "react";
 import "./UserCartPage.css";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import cartDummy from "../dummy/cartDummy";
+import { useNavigate } from "react-router-dom";
 
 export default function UserCartPage() {
+    const navigate = useNavigate();
+
     //  초기 상태: 아직 장바구니 데이터 없음 (이후 useEffect에서 채움)
     const [items, setItems] = useState([]);
 
@@ -94,14 +97,23 @@ export default function UserCartPage() {
         );
     };
 
-    // 주문하기 (나중에 API 연동 예정)
+    // ✅ 주문하기 → 결제 페이지로 선택된 상품 전달
     const handleOrder = () => {
-        if (selectedCount === 0) {
+        const selectedItems = items.filter(
+            (it) => it.checked && !it.is_sold_out
+        );
+
+        if (selectedItems.length === 0) {
             alert("주문할 상품을 선택해주세요.");
             return;
         }
 
-        alert("주문하기는 나중에 백엔드와 연동할 예정입니다.");
+        // 결제 페이지로 이동 + 선택된 상품들을 state로 전달
+        navigate("/order/payment", {
+            state: {
+                items: selectedItems,
+            },
+        });
     };
 
     return (
@@ -189,7 +201,7 @@ export default function UserCartPage() {
                                             {formatPrice(item.price * item.quantity)}원
                                         </div>
 
-                                        {/* 🔽 가격 아래에 배치되는 수량 조절 박스 (110×30, pill 모양) */}
+                                        {/* 수량 조절 박스 */}
                                         <div className="cart-qty-box">
                                             <button
                                                 type="button"
