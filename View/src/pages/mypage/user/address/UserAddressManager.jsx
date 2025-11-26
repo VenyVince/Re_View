@@ -1,7 +1,7 @@
 // src/pages/mypage/user/UserAddressManager.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import addressDummy from "./dummy/addressDummy";
+import addressDummy from "../dummy/addressDummy";
 import "./UserAddress.css";
 
 export default function UserAddressManager() {

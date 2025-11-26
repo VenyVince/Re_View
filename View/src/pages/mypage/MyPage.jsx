@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import AdminProductPage from "./admin/AdminProductPage";
 import { Navigate } from "react-router-dom";
-import UserDeliveryPage from "./user/UserDeliveryPage";
+import UserDeliveryPage from "./user/delivery/UserDeliveryPage";
 
 export default function MyPage() {
     const { auth } = useAuth();

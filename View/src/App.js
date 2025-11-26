@@ -45,17 +45,18 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
 
-import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
-import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
+import UserDeliveryPage from "./pages/mypage/user/delivery/UserDeliveryPage";
+import UserProfileEdit from "./pages/mypage/user/profile/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
-import UserCartPage from "./pages/mypage/user/UserCartPage";
-import UserAddressPage from "./pages/mypage/user/UserAddressPage";
-import UserWishPage from "./pages/mypage/user/UserWishPage";
+import UserCartPage from "./pages/mypage/user/cart/UserCartPage";
+import UserAddressPage from "./pages/mypage/user/address/UserAddressPage";
+import UserWishPage from "./pages/mypage/user/wish/UserWishPage";
 
 import AboutPage from "./pages/about/AboutPage";
-import UserCustomerPage from "./pages/mypage/user/UserCustomerPage";
-import UserSkinTestPage from "./pages/mypage/user/UserSkinTestPage";
+import UserCustomerPage from "./pages/mypage/user/customer/UserCustomerPage";
+import UserSkinTestPage from "./pages/mypage/user/skin/UserSkinTestPage";
+import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
 
 export default function App() {
     return (
@@ -119,6 +120,7 @@ export default function App() {
                     <Route path="/mypage/wish" element={<UserWishPage />} />
                     <Route path="/mypage/cs" element={<UserCustomerPage />} />
                     <Route path="/mypage/skin" element={<UserSkinTestPage />} />
+                    <Route path="/mypage/review" element={<UserReviewPage />} />
             </Routes>
             </main>
             <Footer />
