@@ -30,6 +30,7 @@
             point = point - #{pointsToDeduct}
         WHERE
             user_id = #{user_id}
+            AND point >= #{pointsToDeduct}
     </update>
 
     <insert id="addPointHistory">

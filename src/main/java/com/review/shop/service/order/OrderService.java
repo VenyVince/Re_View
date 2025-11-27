@@ -42,17 +42,11 @@ public class OrderService {
             throw new WrongRequestException ("차감할 포인트는 음수일 수 없습니다.");
         }
 
-        // 포인트 검사 로직
-        int currentUserPoint = orderPreviewService.getUserPoint(user_id);
-
-        if(currentUserPoint < pointsToDeduct) {
-            throw new WrongRequestException ("포인트가 부족합니다.");
-        }
-
-        // 회원의 포인트를 차감
+        // 기존에는 get으로 포인트를 검사하였으나, 동시성 문제로 인해 차감 시도 후 결과로 검사하는 방식으로 변경
         Integer result = deductUserPoints(user_id, pointsToDeduct);
-
-
+        if (result == 0) {
+            throw new WrongRequestException("포인트가 부족합니다.");
+        }
 
         // 회원의 포인트 기록에 히스토리 추가
         Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감");
@@ -81,25 +75,16 @@ public class OrderService {
         Map<Integer, Integer> stockMap = products.stream()
                 .collect(Collectors.toMap(ProductStockDTO::getProduct_id, ProductStockDTO::getStock));
 
-        // 사용자의 구매하려는 수량과 재고 비교하는 로직임
-        for (OrderDTO order : orderDTOList) {
-            Integer currentStock = stockMap.get(order.getProduct_id());
-
-            if (currentStock == null) {
-                throw new WrongRequestException("존재하지 않는 상품입니다. ID: " + order.getProduct_id());
-            }
-
-            if (currentStock < order.getBuy_quantity()) {
-                throw new WrongRequestException("재고가 부족합니다. 상품ID: " + order.getProduct_id());
-            }
-        }
-        
         //재고 차감부분
         for (OrderDTO order : orderDTOList) {
-            orderMapper.deductStock(
+            int affectedRows = orderMapper.deductStock(
                     order.getProduct_id(),
                     order.getBuy_quantity()
             );
+            // 기존에는 get으로 재고를 검사하였으나, 동시성 문제로 인해 차감 시도 후 결과로 검사하는 방식으로 변경
+            if (affectedRows == 0) {
+                throw new WrongRequestException("재고가 부족합니다. 상품ID: " + order.getProduct_id());
+            }
         }
     }
 
