@@ -1,0 +1,135 @@
+/* src/pages/order/OrderCompletePage.css */
+
+.order-complete-page {
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 16px;
+    background: #f7f7f7;
+}
+
+.order-complete-card {
+    width: 100%;
+    max-width: 640px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 32px 28px;
+    box-shadow: 0 0 0 1px #f2f2f2;
+    text-align: center;
+    font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+}
+
+.order-complete-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.order-complete-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-complete-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.order-complete-sub {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 22px;
+}
+
+/* 요약 영역 */
+
+.order-complete-summary {
+    text-align: left;
+    border-radius: 12px;
+    background: #fafafa;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+}
+
+.order-complete-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    padding: 4px 0;
+}
+
+.order-complete-row + .order-complete-row {
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.order-complete-row-address {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.order-complete-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 80px;
+}
+
+.order-complete-value {
+    flex: 1;
+    text-align: right;
+    color: #333;
+}
+
+.order-complete-row-address .order-complete-value {
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.order-complete-amount {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+/* 버튼 영역 */
+
+.order-complete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.order-complete-btn {
+    min-width: 120px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #111;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.order-complete-btn-secondary {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.order-complete-btn:hover {
+    opacity: 0.9;
+}
