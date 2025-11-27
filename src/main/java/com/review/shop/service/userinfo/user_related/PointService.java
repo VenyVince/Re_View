@@ -87,7 +87,7 @@ public class PointService {
 
     // 리뷰 작성 포인트 적립
     @Transactional
-    public void addReviewPoint(int user_id) {
+    public void addReviewPoint(int user_id, int review_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
@@ -95,15 +95,15 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("리뷰 작성 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리
             updateUserPoint(dto);
+            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
     @Transactional
-    public void removeReviewPoint(int user_id) {
+    public void removeReviewPoint(int user_id, int review_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
@@ -111,15 +111,15 @@ public class PointService {
             dto.setType("USE");
             dto.setDescription("리뷰 삭제로 인한 포인트 회수");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리
-            System.out.println("끝");
             updateUserPoint(dto);
+            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
+
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
     @Transactional
-    public void addSelectedReviewPoint(int user_id) {
+    public void addSelectedReviewPoint(int user_id, int review_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
@@ -127,15 +127,15 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("운영자 리뷰 채택 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리
             updateUserPoint(dto);
+            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
     @Transactional
-    public void addBestReviewPoint(int user_id) {
+    public void addBestReviewPoint(int user_id, int review_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
@@ -143,8 +143,8 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("Best 리뷰 선정 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리
             updateUserPoint(dto);
+            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
@@ -160,8 +160,8 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("물품 구매로 인한 차감");
 
-            pointMapper.aboutPoint(dto);
             updateUserPoint(dto);
+            pointMapper.aboutPoint(dto, null);
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
