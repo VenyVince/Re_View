@@ -3,8 +3,6 @@ package com.review.shop.controller.user;
 //아이디 중복 확인, 아이디 찾기, 임시 비밀번호 발송 등의 부가 기능을 담당하는 컨트롤러
 
 import com.review.shop.dto.user.TemPasswordDTO;
-import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -78,33 +77,5 @@ public class UserUtilController {
         String phoneNumber = payload.get("phone_number");
         String foundId = userService.findIdByNameAndPhoneNumber(name, phoneNumber);
         return ResponseEntity.ok("찾으신 아이디는: " + foundId + " 입니다.");
-    }
-
-    @ExceptionHandler(WrongRequestException.class)
-    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("아이디 또는 비밀번호가 올바르지 않습니다.");
-    }
-
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleDatabaseException(DatabaseException ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
     }
 }
