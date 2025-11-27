@@ -102,7 +102,6 @@ public class PointService {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
-
     @Transactional
     public void removeReviewPoint(int user_id) {
         try {
@@ -119,7 +118,6 @@ public class PointService {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
-
     @Transactional
     public void addSelectedReviewPoint(int user_id) {
         try {
@@ -136,7 +134,6 @@ public class PointService {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
-
     @Transactional
     public void addBestReviewPoint(int user_id) {
         try {
