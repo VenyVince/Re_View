@@ -58,6 +58,7 @@ import UserCustomerPage from "./pages/mypage/user/customer/UserCustomerPage";
 import UserSkinTestPage from "./pages/mypage/user/skin/UserSkinTestPage";
 import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
 import OrderPaymentPage from "./pages/order/OrderPaymentPage";
+import OrderCompletePage from "./pages/order/OrderCompletePage";
 
 export default function App() {
     return (
@@ -93,6 +94,7 @@ export default function App() {
                     <Route path="/product/detail" element={<ProductDetailPage />} />
 
                     <Route path="/order/payment" element={<OrderPaymentPage />} />
+                    <Route path="/order/complete" element={<OrderCompletePage />} />
 
 
                     <Route path="/reviews" element={<ReviewPage />} />

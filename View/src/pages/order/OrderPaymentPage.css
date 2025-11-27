@@ -12,7 +12,7 @@
     margin: 32px auto 80px;
     display: grid;
     grid-template-columns: minmax(0, 2.3fr) minmax(320px, 1fr);
-    gap: 24px;
+    gap: 16px;
 }
 
 /* ===========================
@@ -135,6 +135,7 @@
 
 .order-address-line {
     font-size: 13px;
+    text-align: left;
     color: #555;
 }
 
@@ -160,7 +161,6 @@
 .order-sidebar {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 }
 
 /* 포인트 */
@@ -214,6 +214,164 @@
     color: #888;
 }
 
+/* ============================
+   결제 수단 (카드)
+============================ */
+
+.pay-mode-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.pay-mode-btn {
+    flex: 1;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.pay-mode-btn--active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+.pay-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pay-card-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    background: #fcfcfc;
+    cursor: pointer;
+}
+
+.pay-card-item--active {
+    border-color: #111;
+    background: #f5f5f5;
+}
+
+.pay-card-radio {
+    margin-top: 4px;
+}
+
+.pay-card-main {
+    flex: 1;
+}
+
+.pay-card-line1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.pay-card-nickname {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pay-card-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+}
+
+.pay-card-line2 {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #777;
+}
+
+.pay-card-mask {
+    letter-spacing: 0.03em;
+}
+
+.pay-card-expiry {
+    white-space: nowrap;
+}
+
+.pay-empty-text {
+    font-size: 12px;
+    color: #999;
+}
+
+.pay-new-card {
+    margin-top: 4px;
+}
+
+.pay-field-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.pay-label {
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.pay-card-number {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.pay-input,
+.pay-select {
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.pay-card-num-input {
+    width: 60px;
+    text-align: center;
+}
+
+.pay-field-row {
+    display: flex;
+    gap: 8px;
+}
+
+.pay-field-row .pay-field-group {
+    flex: 1;
+}
+
+.pay-save-card {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #555;
+}
+
+.pay-help {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #888;
+    line-height: 1.5;
+}
+
 /* 결제 요약 */
 
 .order-summary {
@@ -257,4 +415,174 @@
 
 .order-submit-btn:hover {
     background: #222;
+}
+
+
+/* ============================
+   배송지 변경 패널
+============================ */
+
+.order-address-panel-wrapper {
+    margin-top: 12px;
+}
+
+.order-address-panel {
+    padding: 16px 18px 20px;
+    background: #fafafa;
+    border-radius: 14px;
+}
+
+.order-address-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.order-address-panel-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.order-address-count {
+    font-size: 12px;
+    color: #777;
+}
+
+.order-address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-address-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e2e2;
+    background: #fff;
+}
+
+.order-address-item--active {
+    border-color: #111;
+}
+
+.order-address-radio {
+    display: flex;
+    gap: 10px;
+}
+
+.order-address-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-address-line-top {
+    display: flex;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.order-addr-label {
+    font-weight: 600;
+}
+
+.order-addr-recipient {
+    color: #555;
+}
+
+.order-addr-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f5f5f5;
+}
+
+.order-address-line-bottom {
+    font-size: 12px;
+    color: #777;
+}
+
+.order-address-actions {
+    display: flex;
+    align-items: flex-start;
+}
+
+.order-addr-action-btn {
+    border: none;
+    background: none;
+    font-size: 12px;
+    cursor: pointer;
+    color: #666;
+}
+
+.order-addr-delete {
+    color: #d32f2f;
+}
+
+/* 패널 버튼들 공통 */
+
+.order-address-panel-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.order-address-btn {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: none;
+    font-size: 13px;
+    background: #111;
+    color: #fff;
+    cursor: pointer;
+}
+
+.order-address-btn-ghost {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+/* 새 배송지 추가 */
+
+.order-address-add {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #ececec;
+}
+
+.order-address-add h4 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.order-address-form-grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+}
+
+.order-address-input {
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.order-address-input-full {
+    grid-column: 1 / 3;
+}
+
+.order-address-default-check {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
 }

@@ -2,8 +2,11 @@
 import React, { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./OrderPaymentPage.css";
+import OrderCardPaymentSection from "./OrderCardPaymentSection";
+import OrderAddressSelectPanel from "./OrderAddressSelectPanel";
 
 const MOCK_DEFAULT_ADDRESS = {
+    address_name: "집",
     recipient: "홍길동",
     phone: "010-1234-5678",
     postal_code: "04524",
@@ -12,19 +15,39 @@ const MOCK_DEFAULT_ADDRESS = {
     is_default: true,
 };
 
+const MOCK_SAVED_CARDS = [
+    {
+        id: 1,
+        brand: "신한카드",
+        nickname: "신한(개인)",
+        masked_number: "1234-56**-****-7890",
+        expiry: "08/27",
+        is_default: true,
+    },
+    {
+        id: 2,
+        brand: "국민카드",
+        nickname: "KB FAMILY",
+        masked_number: "5432-21**-****-0001",
+        expiry: "01/28",
+        is_default: false,
+    },
+];
+
 export default function OrderPaymentPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
 
-
-    // 🧡 장바구니에서 넘어온 선택 상품들 (cartDummy 스키마)
+    // 장바구니에서 넘어온 선택 상품들 (cartDummy 스키마)
     const cartItems = location.state?.items || [];
 
     const [items] = useState(cartItems);
-    const [address] = useState(MOCK_DEFAULT_ADDRESS);
+    const [address, setAddress] = useState(MOCK_DEFAULT_ADDRESS); // ✅ setAddress 추가
     const [availablePoint] = useState(15000);
     const [usePoint, setUsePoint] = useState(0);
+    const [showAddressPanel, setShowAddressPanel] = useState(false); // ✅ 패널 토글
+    const [cardValid, setCardValid] = useState(false);
 
     const formatPrice = (v) =>
         v.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
@@ -65,8 +88,9 @@ export default function OrderPaymentPage() {
         setUsePoint(max);
     };
 
+    // 기존: 주소 페이지로 이동 → 이제는 패널 토글
     const handleClickChangeAddress = () => {
-        navigate("/mypage/address");
+        setShowAddressPanel((prev) => !prev);
     };
 
     const handleSubmitOrder = () => {
@@ -76,12 +100,26 @@ export default function OrderPaymentPage() {
             return;
         }
 
-        // TODO: 실제 주문 API 호출
-        alert(
-            `결제 요청\n\n총 결제 금액: ${formatPrice(
-                totalPayAmount
-            )}원\n(실제 결제 연동은 나중에 구현)`
-        );
+        if (!cardValid) {
+            alert("결제할 카드를 선택하거나 카드 정보를 정확히 입력해 주세요.");
+            return;
+        }
+
+        //    실제로는 여기서 주문 생성 + 결제 승인 API를 호출하고
+        //    응답으로 받은 orderId 등을 함께 넘기게 될 것.
+        const orderSummary = {
+            amount: totalPayAmount,
+            itemCount: items.length,
+            firstItemName: items[0]?.prd_name,
+            address,
+        };
+
+        navigate("/order/complete", {
+            state: {
+                orderSummary,
+                items,
+            },
+        });
     };
 
     // 장바구니에서 안 거치고 바로 들어온 경우 방어
@@ -162,16 +200,19 @@ export default function OrderPaymentPage() {
 
                         <div className="order-address-box">
                             <div className="order-address-recipient">
-                <span className="order-address-name">
-                  {address.recipient}
-                </span>
+                                <span className="order-address-name">
+                                  {address.address_name}
+                                </span>
+                                <span className="order-name">
+                                  {address.recipient}
+                                </span>
                                 <span className="order-address-phone">
-                  {address.phone}
-                </span>
+                                  {address.phone}
+                                </span>
                                 {address.is_default && (
                                     <span className="order-address-badge">
-                    기본 배송지
-                  </span>
+                                        기본 배송지
+                                    </span>
                                 )}
                             </div>
                             <div className="order-address-line">
@@ -182,6 +223,20 @@ export default function OrderPaymentPage() {
                             </div>
                         </div>
                     </section>
+
+                    {/* 배송지 변경 패널: 배송지 카드 바로 아래에 표시 */}
+                    {showAddressPanel && (
+                        <section className="order-card order-address-panel-wrapper">
+                            <OrderAddressSelectPanel
+                                currentAddress={address}
+                                onChangeAddress={(next) => {
+                                    setAddress(next);
+                                    setShowAddressPanel(false);
+                                }}
+                                onClose={() => setShowAddressPanel(false)}
+                            />
+                        </section>
+                    )}
                 </div>
 
                 {/* 오른쪽: 포인트 + 결제 요약 */}
@@ -192,8 +247,8 @@ export default function OrderPaymentPage() {
                         <div className="order-point-row">
                             <span className="order-point-label">보유 포인트</span>
                             <span className="order-point-value">
-                {formatPrice(availablePoint)}P
-              </span>
+                                {formatPrice(availablePoint)}P
+                            </span>
                         </div>
 
                         <div className="order-point-input-row">
@@ -217,6 +272,12 @@ export default function OrderPaymentPage() {
                         </p>
                     </section>
 
+                    <OrderCardPaymentSection
+                        amount={totalPayAmount}
+                        savedCards={MOCK_SAVED_CARDS}
+                        onValidityChange={setCardValid}
+                    />
+
                     <section className="order-card">
                         <h2 className="order-card-title">결제 금액</h2>
 
@@ -236,10 +297,10 @@ export default function OrderPaymentPage() {
                             <div className="order-summary-row">
                                 <span>배송비</span>
                                 <span>
-                  {shippingFee === 0
-                      ? "무료"
-                      : `${formatPrice(shippingFee)}원`}
-                </span>
+                                    {shippingFee === 0
+                                        ? "무료"
+                                        : `${formatPrice(shippingFee)}원`}
+                                </span>
                             </div>
 
                             <div className="order-summary-divider" />
@@ -247,8 +308,8 @@ export default function OrderPaymentPage() {
                             <div className="order-summary-row order-summary-total">
                                 <span>총 결제 금액</span>
                                 <span className="order-summary-total-amount">
-                  {formatPrice(totalPayAmount)}원
-                </span>
+                                    {formatPrice(totalPayAmount)}원
+                                </span>
                             </div>
                         </div>
 
