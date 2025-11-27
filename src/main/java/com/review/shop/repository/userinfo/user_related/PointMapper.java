@@ -11,7 +11,8 @@ import java.util.List;
 public interface PointMapper {
 
     // 포인트 적립/사용 내역 추가
-    void aboutPoint(PointHistoryDTO pointHistoryDTO);
+    void aboutPoint(@Param("dto")PointHistoryDTO dto);
+    void updateUserPoint(@Param("dto")PointHistoryDTO dto);
 
     // 사용자 포인트 내역 조회
     List<PointResponseDTO> getPointHistoryByUserId(@Param("user_id") int user_id);
