@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Collections;
 
 @Service
 @AllArgsConstructor
@@ -72,10 +73,8 @@ public class AdminProductService {
 
     public List<String> readImage(int product_id) {
         List<String> result = adminProductMapper.readImage(product_id);
-        if(result == null || result.isEmpty()){
-            throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
-        }
-        return result;
+
+        return (result == null || result.isEmpty()) ? Collections.emptyList() : result;
     }
 
 }
