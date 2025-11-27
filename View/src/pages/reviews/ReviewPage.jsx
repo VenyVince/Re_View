@@ -67,7 +67,7 @@ export default function ReviewPage() {
     }, [reviews, sortType]);
 
     return (
-        <div className="pageWrapper">
+        <div className="reviewPageWrapper">
 
             <CategoryTabs
                 categories={CATEGORIES}
@@ -75,8 +75,8 @@ export default function ReviewPage() {
                 onSelect={setSelectedCategory}
             />
 
-            <div className="titleRow">
-                <h2 className="categoryTitle">{selectedCategory}</h2>
+            <div className="reviewTitleRow">
+                <h2 className="reviewCategoryTitle">{selectedCategory}</h2>
 
                 <SortSelect
                     sortType={sortType}
@@ -85,9 +85,9 @@ export default function ReviewPage() {
             </div>
 
             {loading ? (
-                <div className="loading">로딩중...</div>
+                <div className="reviewLoading">로딩중...</div>
             ) : sortedReviews.length === 0 ? (
-                <div className="empty">리뷰가 없습니다.</div>
+                <div className="reviewEmpty">리뷰가 없습니다.</div>
             ) : (
                 <ReviewSlider
                     reviews={sortedReviews}

@@ -3,15 +3,13 @@ import React from "react";
 import "./ProductSlider.css";
 import ProductCard from "./ProductCard";
 
-// 상품 슬라이더 컴포넌트
 export default function ProductSlider({
-                                          sortedPages,       // 정렬된 페이지 목록
-                                          currentPage,       // 현재 페이지 인덱스
-                                          pageWidth,         // 슬라이더 이동 너비
-                                          selectedCategory,  // 선택된 카테고리
-                                          setPageState       // 페이지 상태 업데이트 함수
+                                          sortedPages,
+                                          currentPage,
+                                          pageWidth,
+                                          selectedCategory,
+                                          setPageState
                                       }) {
-    // 이전 페이지 이동
     const goPrev = () => {
         setPageState((prev) => ({
             ...prev,
@@ -19,7 +17,6 @@ export default function ProductSlider({
         }));
     };
 
-    // 다음 페이지 이동
     const goNext = () => {
         const last = sortedPages.length - 1;
         setPageState((prev) => ({
@@ -28,37 +25,46 @@ export default function ProductSlider({
         }));
     };
 
+    const goToPage = (index) => {
+        setPageState((prev) => ({
+            ...prev,
+            [selectedCategory]: index
+        }));
+    };
+
     return (
         <>
             {sortedPages.length > 0 ? (
-                <div className="carousel">
+                <div className="productCarousel">
 
                     {/* 왼쪽 버튼 */}
                     <button
-                        className={`slideButton left ${currentPage === 0 ? "disabled" : ""}`}
+                        className={`productSlideButton left ${
+                            currentPage === 0 ? "disabled" : ""
+                        }`}
                         onClick={goPrev}
                     >
                         &lt;
                     </button>
 
                     {/* 화면 영역 */}
-                    <div className="window">
+                    <div className="productWindow">
                         <div
-                            className="track"
+                            className="productTrack"
                             style={{ transform: `translateX(${-currentPage * pageWidth}px)` }}
                         >
                             {sortedPages.map((page, i) => (
-                                <div className="page" key={i}>
+                                <div className="productPage" key={i}>
 
                                     {/* 첫 번째 줄 */}
-                                    <div className="row">
+                                    <div className="productRow">
                                         {page.slice(0, 4).map((p) => (
                                             <ProductCard key={p.product_id} product={p} />
                                         ))}
                                     </div>
 
                                     {/* 두 번째 줄 */}
-                                    <div className="row">
+                                    <div className="productRow">
                                         {page.slice(4, 8).map((p) => (
                                             <ProductCard key={p.product_id} product={p} />
                                         ))}
@@ -71,7 +77,7 @@ export default function ProductSlider({
 
                     {/* 오른쪽 버튼 */}
                     <button
-                        className={`slideButton right ${
+                        className={`productSlideButton right ${
                             currentPage === sortedPages.length - 1 ? "disabled" : ""
                         }`}
                         onClick={goNext}
@@ -79,9 +85,24 @@ export default function ProductSlider({
                         &gt;
                     </button>
 
+                    {/* ⭐ 페이지 번호 버튼 추가 */}
+                    <div className="productPagination">
+                        {sortedPages.map((_, idx) => (
+                            <button
+                                key={idx}
+                                className={`productPageNumber ${
+                                    currentPage === idx ? "active" : ""
+                                }`}
+                                onClick={() => goToPage(idx)}
+                            >
+                                {idx + 1}
+                            </button>
+                        ))}
+                    </div>
+
                 </div>
             ) : (
-                <div className="empty">상품이 없습니다.</div>
+                <div className="productEmpty">상품이 없습니다.</div>
             )}
         </>
     );

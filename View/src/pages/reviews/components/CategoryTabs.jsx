@@ -3,16 +3,17 @@ import "./CategoryTabs.css";
 
 export default function CategoryTabs({ categories, selected, onSelect }) {
     return (
-        <div className="categoryTabs">
+        <div className="reviewCategoryTabs">
             {categories.map((c, idx) => (
                 <div
                     key={idx}
-                    className={`categoryTab ${selected === c ? "active" : ""}`}
+                    className={`reviewCategoryTab ${selected === c ? "active" : ""}`}
                     onClick={() => onSelect(c)}
                 >
                     {c}
                 </div>
             ))}
         </div>
+
     );
 }

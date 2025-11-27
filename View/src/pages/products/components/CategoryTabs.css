@@ -1,11 +1,11 @@
-.categoryTabs {
-    margin-top:10px;
+.productCategoryTabs {
+    margin-top: 10px;
     display: flex;
     gap: 10px;
     margin-bottom: 16px;
 }
 
-.categoryTab {
+.productCategoryTab {
     background: #efefef;
     border-radius: 999px;
     padding: 8px 16px;
@@ -15,7 +15,8 @@
     font-size: 14px;
 }
 
-.categoryTab.active {
+.productCategoryTab.active {
     background: #111;
-    color: #fff;
+    color: white;
+    border-color: #111;
 }

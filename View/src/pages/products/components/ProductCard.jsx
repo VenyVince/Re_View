@@ -2,46 +2,45 @@
 import React, { useState } from "react";
 import "./ProductCard.css";
 
-// 개별 상품 카드 컴포넌트
 export default function ProductCard({ product }) {
-    const [loaded, setLoaded] = useState(false); // 이미지 로딩 여부
+    const [loaded, setLoaded] = useState(false);
 
     return (
         <div className="productCard">
+
             {/* 이미지 영역 */}
-            <div className="imageWrapper">
-                {/* 블러 처리된 프리뷰 (로딩 전 표시) */}
+            <div className="productImageWrapper">
+
                 {!loaded && (
                     <img
-                        className="blurPreview"
+                        className="productBlurPreview"
                         src={product.image_url}
                         alt=""
-                        onError={(e) => (e.target.src = "/placeholder.png")} // 오류 시 대체 이미지
+                        onError={(e) => (e.target.src = "/placeholder.png")}
                     />
                 )}
 
-                {/* 실제 상품 이미지 */}
                 <img
                     className={`productImage ${loaded ? "visible" : ""}`}
                     src={product.image_url}
                     alt=""
-                    onLoad={() => setLoaded(true)} // 로딩 완료
+                    onLoad={() => setLoaded(true)}
                     onError={(e) => {
-                        e.target.src = "/placeholder.png"; // 오류 시 대체 이미지
+                        e.target.src = "/placeholder.png";
                         setLoaded(true);
                     }}
                 />
             </div>
 
             {/* 브랜드 / 평점 */}
-            <div className="brandRatingRow">
+            <div className="productBrandRatingRow">
                 <p className="productBrand">{product.prd_brand}</p>
 
                 <p
                     className={
                         product.rating
-                            ? "productRating ratingGold"
-                            : "productRating ratingNone"
+                            ? "productRating productRatingGold"
+                            : "productRating productRatingNone"
                     }
                 >
                     {product.rating

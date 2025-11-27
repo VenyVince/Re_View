@@ -1,10 +1,11 @@
-.sort-select {
+.reviewSortSelect {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 20px;
 }
 
-.sort-select select {
+.reviewSortSelect
+select {
     padding: 6px 10px;
     border: 1px solid #ccc;
     border-radius: 6px;
