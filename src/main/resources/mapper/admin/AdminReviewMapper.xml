@@ -11,7 +11,7 @@
 
     <update id="setReviewSelection">
         UPDATE REVIEW
-        SET IS_SELECTED = #{isSelected}
+        SET IS_SELECTED = #{is_selected}
         WHERE REVIEW_ID = #{review_id}
     </update>
 </mapper>
