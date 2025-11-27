@@ -28,4 +28,5 @@ public interface AdminProductMapper {
 
     List<String> readImage(int product_id);
 
+    int deleteProductImages(@Param("product_id") int product_id);
 }

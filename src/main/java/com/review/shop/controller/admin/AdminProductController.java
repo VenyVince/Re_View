@@ -1,6 +1,7 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.product.ProductUploadDTO;
 import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +25,7 @@ import java.util.List;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+
 
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -52,13 +54,17 @@ public class AdminProductController {
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/products")
-    public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
-        adminProductService.insertProduct(product);
-        int prd_id = product.getProduct_id();
-        List<String> image_url = product.getProduct_images();
 
-        adminProductService.putImage(prd_id, image_url);
+    //api/images/products 에서 이미지 업로드 후 받은 이미지 경로 리스트와 상품 정보를 같이 request body로 받음
+    public ResponseEntity<String> insertProduct(@RequestBody ProductUploadDTO productUploadDTO) {
 
+        ProductDetailDTO product = productUploadDTO.getProduct();
+
+        // product DTO에 이미지 리스트 설정
+        product.setProduct_images(productUploadDTO.getProduct_images_list());
+
+        // product DTO 업로드
+        adminProductService.uploadProductAndImages(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
     }
@@ -111,6 +117,22 @@ public class AdminProductController {
 
         detailDTO.setProduct_images(adminProductService.readImage(product_id));
         return ResponseEntity.ok(detailDTO);
+    }
+
+    //이미지 업데이트 API
+    @Operation(summary = "상품 이미지 업데이트", description = "상품의 이미지를 업데이트합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 이미지 업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PutMapping("/products/{product_id}/images")
+    public ResponseEntity<String> updateProductImages(
+            @Parameter(description = "이미지를 업데이트할 상품의 ID") @PathVariable int product_id,
+            @RequestBody List<String> imageUrls) {
+        adminProductService.updateProductImages(product_id, imageUrls);
+        return ResponseEntity.ok("상품 이미지가 업데이트되었습니다");
     }
 
 
