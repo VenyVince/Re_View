@@ -9,10 +9,14 @@
     <insert id="aboutPoint" parameterType="com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO">
         INSERT INTO point_history (
             user_id, amount, type, created_at, description
+            <if test="rivew_id!=null">, review_id</if>
         )
         VALUES (
                    #{dto.user_id}, #{dto.amount}, #{dto.type}, SYSDATE, #{dto.description}
-               )
+        <if test="review_id != null">
+            , #{review_id}
+        </if>
+        )
     </insert>
 
     <select id="selectForUpdate" resultType="int">
@@ -41,20 +45,16 @@
         FROM USER_TABLE
         WHERE USER_ID = #{user_id}
     </select>
-
-
-
-<!--    &lt;!&ndash; 베스트 리뷰 포인트 중복 체크 예시&ndash;&gt;-->
-<!--    <select id="existsBestReviewPoint" resultType="boolean">-->
-<!--        SELECT COUNT(1) > 0-->
-<!--        FROM best_review_point_reference-->
-<!--        WHERE review_id = #{review_id}-->
+<!--    <select id="selectBestReviewCandidate">-->
+<!--        select review_id from review-->
+<!--        where like_count >= 100-->
+<!--        and comment_count >= 100-->
 <!--    </select>-->
-
-<!--    &lt;!&ndash; 베스트 리뷰 포인트 reference 추가 예시&ndash;&gt;-->
-<!--    <insert id="insertBestReviewPointReference">-->
-<!--        INSERT INTO best_review_point_reference (review_id, user_id)-->
-<!--        VALUES (#{review_id}, #{user_id})-->
-<!--    </insert>-->
-
+<!--    <select id="selectBestReveiw">-->
+<!--        SELECT *,-->
+<!--               (like_count * 0.7 + comment_count * 0.3) AS score-->
+<!--        FROM review-->
+<!--        WHERE like_count >= 100 AND comment_count >= 100-->
+<!--        ORDER BY score DESC-->
+<!--    </select>-->
 </mapper>

@@ -26,7 +26,7 @@ public class AdminReviewService {
         }
         //리뷰 작성자의 user_id 반환
         int user_id = adminReviewMapper.findReviewer(review_id);
-        pointService.removeReviewPoint(user_id);
+        pointService.removeReviewPoint(user_id, review_id);
     }
 
     //  setReviewSelection 구현 - 운영자 픽 설정 (테스트 완료)
@@ -41,6 +41,6 @@ public class AdminReviewService {
         }
         //리뷰 작성자의 user_id 반환
         int user_id = adminReviewMapper.findReviewer(review_id);
-        pointService.addSelectedReviewPoint(user_id);
+        pointService.addSelectedReviewPoint(user_id, review_id);
     }
 }

@@ -20,6 +20,7 @@ public class Review_PointService {
 
 
     @Transactional
+    // 리뷰 작성
     public CreateReviewResponseDTO createReviewWithReward(
             int product_id,
             int user_id,
@@ -39,7 +40,6 @@ public class Review_PointService {
                 request.getImageUrls(),
                 request.getOrder_item_id()
         );
-        pointService.addReviewPoint(user_id);
         // 응답 DTO 구성
         CreateReviewResponseDTO response = new CreateReviewResponseDTO();
         response.setReview_id(review.getReview_id());
@@ -47,16 +47,15 @@ public class Review_PointService {
         response.setRating(review.getRating());
         response.setImageUrls(request.getImageUrls());
         response.setPointsEarned(PointService.PointConstants.CreateREVIEW);
+        Integer review_id = review.getReview_id();
         // 포인트 적립
-        pointService.addReviewPoint(user_id);
+        pointService.addReviewPoint(user_id, review_id);
         return response;
     }
 
 
 
-    /**
-     * 리뷰 삭제 (Soft Delete)
-     */
+    // 리뷰 삭제
     @Transactional
     public void deleteReviewWithPenalty(int product_id, int user_id, int review_id) {
         // 상품 존재 여부 확인
@@ -80,6 +79,6 @@ public class Review_PointService {
         productReviewMapper.deleteReview(review_id);
 
         // 포인트 회수 (삭제된 리뷰에 대해 적립된 포인트 차감)
-        pointService.removeReviewPoint(user_id);
+        pointService.removeReviewPoint(user_id, review_id);
     }
 }
