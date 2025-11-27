@@ -35,7 +35,7 @@ export default function UserDeliveryPage() {
                     <button
                         type="button"
                         className="delivery-manage-btn"
-                        onClick={() => navigate("/mypage/address")}
+                        onClick={() => navigate("address")}
                     >
                         배송지 관리
                     </button>

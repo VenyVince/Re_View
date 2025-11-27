@@ -2,14 +2,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";   // ✅ 추가
 import "../dashboard/UserDashboard.css";
-
-// 마이페이지 상단 프로필
 
 export default function UserProfileBar() {
     const { auth } = useAuth();
+    const navigate = useNavigate();              // ✅ 추가
+
     const [nickname, setNickname] = useState(auth.userId || "회원");
-    const [points, setPoints] = useState(0); // 포인트 있으면 채워 쓰기
+    const [points, setPoints] = useState(0);
 
     useEffect(() => {
         async function fetchMe() {
@@ -18,9 +19,6 @@ export default function UserProfileBar() {
                     withCredentials: true,
                 });
 
-                //console.log("✅ /api/users/me 응답:", res);
-
-                // 응답 구조가 { userInfos: [...] } 라고 했으니까
                 const info = Array.isArray(res.data?.userInfos)
                     ? res.data.userInfos[0]
                     : res.data;
@@ -65,7 +63,7 @@ export default function UserProfileBar() {
                 </div>
                 <button
                     className="mypage-profile-edit-btn"
-                    onClick={() => (window.location.href = "/mypage/profile")}
+                    onClick={() => navigate("/mypage/profile")}   // ✅ 여기만 변경
                 >
                     개인정보변경
                 </button>
