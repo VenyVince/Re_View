@@ -171,3 +171,65 @@ export const EmptyState = styled.div`
     color: #888;
   }
 `;
+
+/* 검색바 */
+export const SearchRow = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+`;
+
+export const SearchInput = styled.input`
+  flex: 1;
+  max-width: 260px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+`;
+
+
+/* 삭제 모달 */
+export const DeleteOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
+
+export const DeleteBox = styled.div`
+  background: #fff;
+  padding: 32px 40px;
+  border-radius: 16px;
+  min-width: 320px;
+  text-align: center;
+`;
+
+export const DeleteButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 8px;
+
+  button {
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .cancel-btn {
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+
+  .confirm-btn {
+    border: none;
+    background: #000;
+    padding: 8px 24px;
+    color: #fff;
+  }
+`;
