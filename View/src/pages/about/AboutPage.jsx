@@ -265,6 +265,69 @@ const AboutPage = () => {
                     </Grid>
                 </AnimatedSection>
 
+                {/* 섹션 2.5: Baumann 타입 소개 */}
+                <AnimatedSection>
+                    <SectionTitle>Baumann 피부 타입이란?</SectionTitle>
+                    <SectionDesc>
+                        Baumann 피부 타입은 미국 피부과 전문의 <strong>Leslie Baumann</strong> 박사가
+                        제안한 과학 기반 피부 분류 시스템으로<br/>
+                        <Highlight>피부를 4가지 축(O/D · S/R · P/N · W/T)</Highlight>으로 나누어
+                        총 <strong>16가지 타입</strong>으로 정의합니다.
+                        <br /><br />
+                        이 방식은 단순히 "건성/지성"만 보는 것이 아니라,
+                        <strong>유분/수분 · 민감도 · 색소침착 경향 · 주름/탄력</strong>을 하나의 프로파일로 분석하여<br/>
+                        <Highlight>더 정확한 스킨케어 추천</Highlight>이 가능하다는 점에서 전 세계적으로 사용되고 있습니다.
+                    </SectionDesc>
+
+                    <Grid style={{
+                        marginTop: "18px",
+                        gridTemplateColumns: "repeat(2, 1fr)"
+                    }}>
+                        <Card>
+                            <Badge>O/D</Badge>
+                            <CardTitle>유분/수분 밸런스</CardTitle>
+                            <CardText>
+                                피부 건조함(D)부터 번들거림(O)까지<br/>
+                                피부의 기본적인 유·수분 상태를 나타냅니다.
+                            </CardText>
+                        </Card>
+
+                        <Card>
+                            <Badge>S/R</Badge>
+                            <CardTitle>민감도</CardTitle>
+                            <CardText>
+                                자극에 얼마나 취약한지(S) 또는 안정적인지(R)를 뜻합니다.<br/>
+                                민감한 피부일수록 성분 선택이 중요하죠.
+                            </CardText>
+                        </Card>
+
+                        <Card>
+                            <Badge>P/N</Badge>
+                            <CardTitle>색소침착 경향</CardTitle>
+                            <CardText>
+                                색소가 잘 생기는 타입(P)인지,<br/>
+                                비교적 균일한 톤을 유지하는 타입(N)인지 보여줍니다.
+                            </CardText>
+                        </Card>
+
+                        <Card>
+                            <Badge>W/T</Badge>
+                            <CardTitle>주름/탄력</CardTitle>
+                            <CardText>
+                                피부 탄력(W) 혹은 주름 발생(T) 경향을 나타내며<br/>
+                                노화 관리 방향을 세우는 기준이 됩니다.
+                            </CardText>
+                        </Card>
+                    </Grid>
+
+                    <SectionDesc style={{ marginTop: "22px" }}>
+                        Re:View는 이 Baumann 모델을 기반으로
+                        <Highlight>한국 사용자에게 맞춘 한국형 피부 타입 설문</Highlight>을 개발했습니다.<br/>
+                        따라서 사용자는 자신의 타입을 더 정확히 알 수 있고<br/>
+                        <strong>나와 같은 타입의 리뷰만 골라 보는 경험</strong>을 할 수 있습니다.
+                    </SectionDesc>
+                </AnimatedSection>
+
                 {/* 섹션 3: 숫자로 보는 Re:View */}
                 <AnimatedSection>
                     <SectionTitle>숫자로 보는 Re:View</SectionTitle>

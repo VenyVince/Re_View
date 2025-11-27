@@ -112,4 +112,9 @@
         ORDER BY
             PRD_IMG_ID ASC
     </select>
+
+    <!-- 삭제 -->
+    <delete id="deleteProductImages">
+        DELETE FROM PRODUCT_IMAGE WHERE PRODUCT_ID = #{product_id}
+    </delete>
 </mapper>
