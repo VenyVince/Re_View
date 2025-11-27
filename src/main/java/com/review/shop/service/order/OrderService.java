@@ -54,12 +54,12 @@ public class OrderService {
 
         //재고 차감부분
         for (OrderDTO order : orderDTOList) {
-            int affected = orderMapper.deductStock(
+            int affectedRows = orderMapper.deductStock(
                     order.getProduct_id(),
                     order.getBuy_quantity()
             );
             // 기존에는 get으로 재고를 검사하였으나, 동시성 문제로 인해 차감 시도 후 결과로 검사하는 방식으로 변경
-            if (affected == 0) {
+            if (affectedRows == 0) {
                 throw new WrongRequestException("재고가 부족합니다. 상품ID: " + order.getProduct_id());
             }
         }
