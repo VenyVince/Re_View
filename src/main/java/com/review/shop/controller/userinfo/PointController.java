@@ -1,6 +1,6 @@
 package com.review.shop.controller.userinfo;
 
-import com.review.shop.util.Security_Util;
+import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.userinfo.user_related.Point.PointResponseDTO;
 import com.review.shop.service.userinfo.user_related.PointService;
 import io.swagger.v3.oas.annotations.Operation;

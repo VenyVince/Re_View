@@ -1,4 +1,4 @@
-package com.review.shop.util;
+package com.review.shop.Util;
 
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;

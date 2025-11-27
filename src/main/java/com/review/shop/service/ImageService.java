@@ -1,7 +1,7 @@
 package com.review.shop.service;
 
-import com.review.shop.util.FileUploadProperties;
-import com.review.shop.util.Security_Util;
+import com.review.shop.Util.FileUploadProperties;
+import com.review.shop.Util.Security_Util;
 import com.review.shop.exception.FileProcessingException;
 import com.review.shop.exception.WrongRequestException;
 import lombok.RequiredArgsConstructor;

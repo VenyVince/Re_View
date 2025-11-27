@@ -1,6 +1,6 @@
 package com.review.shop.controller.userinfo;
 
-import com.review.shop.util.Security_Util;
+import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.userinfo.userinfo.GetUserInfoResponseDTO;
 import com.review.shop.dto.userinfo.userinfo.UpdateUserInfoDTO;
 import com.review.shop.service.userinfo.UserInfoService;

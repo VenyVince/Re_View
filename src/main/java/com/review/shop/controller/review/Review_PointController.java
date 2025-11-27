@@ -1,6 +1,6 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.util.Security_Util;
+import com.review.shop.Util.Security_Util;
 import com.review.shop.service.review.Review_PointService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

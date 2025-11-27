@@ -1,6 +1,6 @@
 package com.review.shop.controller.qna;
 
-import com.review.shop.util.Security_Util;
+import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.qna.QnaDTO;
 import com.review.shop.dto.qna.QnaListResponseDTO;
 import com.review.shop.service.qna.QnaService;
