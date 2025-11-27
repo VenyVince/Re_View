@@ -1,8 +1,8 @@
 // src/pages/mypage/user/UserProfileBar.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../../context/AuthContext";
-import "./UserDashboard.css";
+import { useAuth } from "../../../../context/AuthContext";
+import "../dashboard/UserDashboard.css";
 
 // 마이페이지 상단 프로필
 
@@ -18,7 +18,7 @@ export default function UserProfileBar() {
                     withCredentials: true,
                 });
 
-                console.log("✅ /api/users/me 응답:", res);
+                //console.log("✅ /api/users/me 응답:", res);
 
                 // 응답 구조가 { userInfos: [...] } 라고 했으니까
                 const info = Array.isArray(res.data?.userInfos)

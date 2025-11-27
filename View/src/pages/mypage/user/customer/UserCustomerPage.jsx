@@ -1,9 +1,9 @@
 // src/pages/mypage/user/UserCustomerPage.jsx
 import React, { useEffect, useState } from "react";
-import UserMyPageLayout from "./UserMyPageLayout";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserCustomerPage.css";
 import axios from "axios";
-import { faqDummy } from "./dummy/customerDummy"; // FAQ 는 더미 그대로 사용
+import { faqDummy } from "../dummy/customerDummy"; // FAQ 는 더미 그대로 사용
 
 export default function UserCustomerPage() {
     // 1:1 문의 리스트 (/api/qna/my)

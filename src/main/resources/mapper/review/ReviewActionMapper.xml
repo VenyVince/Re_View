@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.review.ReviewActionMapper">
+
+    <insert id="insertComment" parameterType="map">
+        INSERT INTO review_comment (
+        review_comment_id, review_id, user_id, content, created_at
+        ) VALUES (
+        seq_review_comment.NEXTVAL, #{review_id}, #{user_id}, #{content}, SYSDATE
+        )
+    </insert>
+
+    <select id="selectCommentsByReviewId" resultType="com.review.shop.dto.review.community.ReviewCommentResponseDTO">
+        SELECT
+        c.review_comment_id,
+        c.review_id,
+        c.user_id,
+        u.nickname AS user_nickname,
+        c.content,
+        c.created_at
+        FROM review_comment c
+        JOIN USER_TABLE u ON c.user_id = u.user_id
+        WHERE c.review_id = #{review_id}
+        AND c.deleted_at IS NULL -- 삭제된 댓글 제외
+        ORDER BY c.created_at ASC  -- 옛날 댓글이 위로
+    </select>
+
+    <update id="deleteComment">
+        UPDATE review_comment
+        SET deleted_at = SYSDATE
+        WHERE review_comment_id = #{comment_id}
+        AND user_id = #{user_id} -- 본인 확인
+    </update>
+
+
+    <select id="checkUserReaction" resultType="string">
+        SELECT is_like
+        FROM review_like
+        WHERE review_id = #{review_id} AND user_id = #{user_id}
+    </select>
+
+    <insert id="insertReaction" parameterType="map">
+        INSERT INTO review_like (like_id, review_id, user_id, is_like, created_at)
+        VALUES (
+        seq_review_like.NEXTVAL,
+        #{review_id},
+        #{user_id},
+        <choose>
+            <when test="is_like == true">'1'</when>
+            <otherwise>'0'</otherwise>
+        </choose>,
+        SYSDATE
+        )
+    </insert>
+
+    <delete id="deleteReaction">
+        DELETE FROM review_like
+        WHERE review_id = #{review_id} AND user_id = #{user_id}
+    </delete>
+
+    <update id="updateReviewReactionCount">
+        UPDATE review
+        SET
+        <choose>
+            <when test="type == 'LIKE'">
+                like_count = like_count + #{amount}
+            </when>
+            <otherwise>
+                dislike_count = dislike_count + #{amount}
+            </otherwise>
+        </choose>
+        WHERE review_id = #{review_id}
+    </update>
+
+
+    <insert id="insertReport">
+        INSERT INTO review_report (
+        report_id, review_id, user_id, reason, description, status, created_at
+        ) VALUES (
+        seq_review_report.NEXTVAL, #{review_id}, #{user_id},
+        #{request.reason}, #{request.description}, 'PENDING', SYSDATE
+        )
+    </insert>
+
+</mapper>

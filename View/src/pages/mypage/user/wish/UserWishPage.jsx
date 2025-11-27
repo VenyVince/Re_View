@@ -1,7 +1,7 @@
 // src/pages/mypage/user/UserWishPage.jsx
 import React, { useState } from "react";
-import UserMyPageLayout from "./UserMyPageLayout";
-import wishDummy from "./dummy/wishDummy";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
+import wishDummy from "../dummy/wishDummy";
 import "./UserWishPage.css";
 
 export default function UserWishPage() {

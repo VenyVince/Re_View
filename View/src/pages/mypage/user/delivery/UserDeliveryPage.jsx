@@ -1,8 +1,8 @@
 // src/pages/mypage/user/UserDeliveryPage.jsx
 import React from "react";
-import UserMyPageLayout from "./UserMyPageLayout";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
-import addressDummy from "./dummy/addressDummy";
+import addressDummy from "../dummy/addressDummy";
 import { useNavigate } from "react-router-dom";
 
 export default function UserDeliveryPage() {
