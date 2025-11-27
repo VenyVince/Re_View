@@ -1,11 +1,15 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { createProduct } from "../../../api/admin/adminProductApi";
+import { createProduct } from "../../../api/admin/adminProductApi"; // JSON 등록 API
+import axiosClient from "../../../api/axiosClient"; // 이미지 업로드에 필요
+
 import {
     Wrap, Title, Panel, Row, Cell, Label, Input, Textarea,
     UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost
 } from "./AdminProductNew.style";
 
+
+// Baumann 코드 → ID 매핑표
 const BAUMANN_ID_MAP = {
     DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
     DRPW: 10, DRPT: 11, DRP_: 12, DRNW: 13, DRNT: 14, DRN_: 15, DR_W: 16, DR_T: 17, DR__: 18,
@@ -18,58 +22,74 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
+
 export default function AdminProductNew() {
+    const nav = useNavigate();
+
+    // form 상태
     const [form, setForm] = useState({
-        prd_name: "", prd_brand: "", ingredient: "", description: "",
-        price: "", category: "", stock: "", baumann_type: "",
+        prdName: "",
+        prdBrand: "",
+        ingredient: "",
+        description: "",
+        price: "",
+        category: "",
+        stock: "",
+        baumannType: "",
     });
 
-    const nav = useNavigate();
     const onChange = (k) => (e) =>
         setForm((s) => ({ ...s, [k]: e.target.value }));
 
-    // 이미지 관련 state
-    const [mainFile, setMainFile] = useState(null);        // 대표 이미지 파일
-    const [detailFiles, setDetailFiles] = useState([]);    // 상세 이미지 파일 배열
-    const [mainPreview, setMainPreview] = useState(null);  // 대표 이미지 미리보기 URL
-    const [detailPreviews, setDetailPreviews] = useState([]); // 상세 이미지 미리보기 URL들
+
+    // 이미지 선택 관련
+    const [mainFile, setMainFile] = useState(null);
+    const [mainPreview, setMainPreview] = useState(null);
+
+    const [detailFiles, setDetailFiles] = useState([]);
+    const [detailPreviews, setDetailPreviews] = useState([]);
 
     const mainRef = useRef(null);
     const detailRef = useRef(null);
 
+
+    /** =========================
+     *   대표 이미지 선택
+     ==========================*/
     const onPickMain = () => mainRef.current?.click();
-    const onPickDetail = () => detailRef.current?.click();
 
     const onMainChange = (e) => {
-        const f = e.target.files?.[0];
-        if (!f) return;
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        setMainFile(f);
-        setMainPreview((prev) => {
-            if (prev) URL.revokeObjectURL(prev);
-            return URL.createObjectURL(f);
-        });
+        setMainFile(file);
 
-        // 같은 파일 다시 선택 가능하도록 초기화
+        // 기존 미리보기 URL revoke
+        if (mainPreview) URL.revokeObjectURL(mainPreview);
+
+        // 새 미리보기
+        setMainPreview(URL.createObjectURL(file));
+
         e.target.value = "";
     };
+
+
+    /** =========================
+     *   상세 이미지 선택
+     ==========================*/
+    const onPickDetail = () => detailRef.current?.click();
 
     const onDetailChange = (e) => {
         const files = Array.from(e.target.files || []);
         if (!files.length) return;
 
-        // 중복 방지 (파일명 + 크기 + 수정시간 기준)
         const key = (f) => `${f.name}-${f.size}-${f.lastModified}`;
+        const existing = new Set(detailFiles.map(key));
 
-        setDetailFiles((prev) => {
-            const existing = new Set(prev.map(key));
-            return [...prev, ...files.filter((f) => !existing.has(key(f)))];
-        });
+        const filtered = files.filter((f) => !existing.has(key(f)));
 
-        setDetailPreviews((prev) => [
-            ...prev,
-            ...files.map((f) => URL.createObjectURL(f)),
-        ]);
+        setDetailFiles((prev) => [...prev, ...filtered]);
+        setDetailPreviews((prev) => [...prev, ...filtered.map((f) => URL.createObjectURL(f))]);
 
         e.target.value = "";
     };
@@ -82,68 +102,74 @@ export default function AdminProductNew() {
         });
     };
 
+
+    /** =========================
+     *   이미지 업로드 API 호출
+     *   POST /api/images/products
+     ==========================*/
+    const uploadImages = async () => {
+        const fd = new FormData();
+
+        // 대표 이미지
+        if (mainFile) fd.append("images", mainFile);
+
+        // 상세 이미지들
+        detailFiles.forEach((file) => fd.append("images", file));
+
+        const res = await axiosClient.post("/api/images/products", fd);
+        return res.data; // ["url1", "url2", ...]
+    };
+
+
+    /** =========================
+     *   최종 상품 등록
+     *   POST /api/admin/products (JSON)
+     ==========================*/
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        // Baumann 타입 코드 → id 매핑
-        const type = form.baumannType.trim().toUpperCase();
-        let baumannId = null;
-
-        if (type) {
-            baumannId = BAUMANN_ID_MAP[type];
-            if (!baumannId) {
-                alert(`'${type}' 은(는) 유효한 Baumann 타입이 아닙니다. 다시 확인해 주세요.`);
-                return;
-            }
-        }
-
-        // 상품 정보 JSON 부분
-        const productDto = {
-            prd_name: form.prdName.trim(),
-            prd_brand: form.prdBrand.trim(),
-            ingredient: form.ingredient.trim(),
-            description: form.description.trim(),
-            price: Number(form.price || 0),
-            category: form.category.trim(),
-            stock: Number(form.stock || 0),
-            baumann_id: baumannId ?? null,
-        };
-
         try {
-            const fd = new FormData();
+            // 1) Baumann 타입 → ID
+            const type = form.baumannType.trim().toUpperCase();
+            const baumannId = BAUMANN_ID_MAP[type] ?? null;
 
-            // JSON → Blob으로 감싸서 request라는 이름으로 전송
-            fd.append(
-                "request", // @RequestPart("request") 등과 맞추기
-                new Blob([JSON.stringify(productDto)], {
-                    type: "application/json",
-                })
-            );
+            // 2) 이미지 업로드
+            const imageUrls = await uploadImages(); // S3 URL 배열
 
-            // 대표 이미지 1장
-            if (mainFile) {
-                fd.append("mainImage", mainFile); // 백엔드 파라미터 이름과 맞추기
-            }
+            // 3) JSON DTO 구성
+            const dto = {
+                prd_name: form.prdName.trim(),
+                prd_brand: form.prdBrand.trim(),
+                ingredient: form.ingredient.trim(),
+                description: form.description.trim(),
+                price: Number(form.price || 0),
+                category: form.category.trim(),
+                stock: Number(form.stock || 0),
+                baumann_id: baumannId,
+                product_images: imageUrls,
+            };
 
-            // 상세 이미지 여러 장
-            detailFiles.forEach((file) => {
-                fd.append("detailImages", file); // List<MultipartFile> detailImages
-            });
+            // 4) 상품 등록(JSON)
+            await createProduct(dto);
 
-            await createProduct(fd);
-            alert("상품이 등록되었습니다.");
+            alert("상품 등록 완료되었습니다.");
             nav("/admin/allproducts");
-        } catch (error) {
-            console.error(error);
+
+        } catch (err) {
+            console.error("[상품 등록 오류]", err);
             alert("상품 등록에 실패했습니다.");
         }
     };
 
+
     return (
         <Wrap>
             <Title>상품 등록</Title>
+
             <form onSubmit={onSubmit}>
                 <Panel>
+
+                    {/* 상품명 */}
                     <Row>
                         <Cell>
                             <Label>상품명</Label>
@@ -155,6 +181,7 @@ export default function AdminProductNew() {
                         </Cell>
                     </Row>
 
+                    {/* 성분 */}
                     <Row>
                         <Cell>
                             <Label>성분</Label>
@@ -166,6 +193,7 @@ export default function AdminProductNew() {
                         </Cell>
                     </Row>
 
+                    {/* 상세 설명 */}
                     <Row>
                         <Cell>
                             <Label>상세 설명</Label>
@@ -177,39 +205,34 @@ export default function AdminProductNew() {
                         </Cell>
                     </Row>
 
+                    {/* 대표 이미지 */}
                     <Row>
                         <Cell>
                             <Label>대표 이미지</Label>
                             <UploadBox>
                                 <Thumb>
                                     {mainPreview ? (
-                                        <img
-                                            src={mainPreview}
-                                            alt="대표 미리보기"
-                                            style={{
-                                                width: "100%",
-                                                height: "100%",
-                                                objectFit: "cover",
-                                            }}
-                                        />
-                                    ) : (
-                                        "대표"
-                                    )}
+                                        <img src={mainPreview} alt="대표" style={{
+                                            width: "100%", height: "100%", objectFit: "cover"
+                                        }} />
+                                    ) : "대표"}
                                 </Thumb>
                                 <UploadBtn type="button" onClick={onPickMain}>
                                     대표 사진 첨부 +
                                 </UploadBtn>
                                 <input
-                                    ref={mainRef}
                                     type="file"
-                                    accept="image/*"
+                                    ref={mainRef}
                                     hidden
+                                    accept="image/*"
                                     onChange={onMainChange}
                                 />
                             </UploadBox>
                         </Cell>
                     </Row>
 
+
+                    {/* 상세 이미지 */}
                     <Row>
                         <Cell>
                             <Label>상세 이미지</Label>
@@ -225,11 +248,11 @@ export default function AdminProductNew() {
                                 </UploadBtn>
 
                                 <input
-                                    ref={detailRef}
                                     type="file"
+                                    ref={detailRef}
+                                    hidden
                                     accept="image/*"
                                     multiple
-                                    hidden
                                     onChange={onDetailChange}
                                 />
                             </UploadBox>
@@ -238,32 +261,26 @@ export default function AdminProductNew() {
                                 <div
                                     style={{
                                         display: "grid",
-                                        gridTemplateColumns:
-                                            "repeat(4, 1fr)",
+                                        gridTemplateColumns: "repeat(4, 1fr)",
                                         gap: 12,
                                         marginTop: 12,
                                     }}
                                 >
                                     {detailPreviews.map((src, i) => (
-                                        <div
-                                            key={i}
-                                            style={{ position: "relative" }}
-                                        >
+                                        <div key={i} style={{ position: "relative" }}>
                                             <img
                                                 src={src}
-                                                alt={`상세${i + 1}`}
                                                 style={{
                                                     width: "100%",
-                                                    aspectRatio: "1 / 1",
-                                                    objectFit: "cover",
+                                                    aspectRatio: "1/1",
                                                     borderRadius: 8,
+                                                    objectFit: "cover",
                                                 }}
                                             />
+
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    removeDetail(i)
-                                                }
+                                                onClick={() => removeDetail(i)}
                                                 style={{
                                                     position: "absolute",
                                                     top: 6,
@@ -271,11 +288,9 @@ export default function AdminProductNew() {
                                                     width: 24,
                                                     height: 24,
                                                     borderRadius: "50%",
-                                                    border: "1px solid #ddd",
+                                                    border: "1px solid #ccc",
                                                     background: "#fff",
-                                                    cursor: "pointer",
                                                 }}
-                                                title="삭제"
                                             >
                                                 ✕
                                             </button>
@@ -286,68 +301,63 @@ export default function AdminProductNew() {
                         </Cell>
                     </Row>
 
+                    {/* 브랜드 + 카테고리 */}
                     <Row>
                         <Cell>
                             <Label>브랜드</Label>
                             <Input
-                                placeholder="브랜드명을 입력해주세요."
                                 value={form.prdBrand}
                                 onChange={onChange("prdBrand")}
+                                placeholder="브랜드명을 입력해주세요."
                             />
                         </Cell>
                         <Cell>
                             <Label>카테고리</Label>
                             <Input
-                                placeholder="예) 크림, 토너, 세럼"
                                 value={form.category}
                                 onChange={onChange("category")}
+                                placeholder="예) 크림, 세럼..."
                             />
                         </Cell>
                     </Row>
 
+                    {/* 가격 + 재고 */}
                     <Row>
                         <Cell>
                             <Label>가격(원)</Label>
                             <Input
                                 type="number"
-                                min="0"
-                                placeholder="0"
                                 value={form.price}
                                 onChange={onChange("price")}
+                                placeholder="0"
                             />
                         </Cell>
                         <Cell>
                             <Label>재고 수량</Label>
                             <Input
                                 type="number"
-                                min="0"
-                                placeholder="0"
                                 value={form.stock}
                                 onChange={onChange("stock")}
+                                placeholder="0"
                             />
                         </Cell>
                     </Row>
 
+                    {/* Baumann 타입 */}
                     <Row>
                         <Cell>
                             <Label>Baumann 타입</Label>
                             <Input
-                                placeholder="예) DRNT, DSPW, OSNT ..."
                                 value={form.baumannType}
                                 onChange={onChange("baumannType")}
+                                placeholder="예) DRNT, DSPW, OSNT..."
                             />
-                            <p
-                                style={{
-                                    marginTop: 8,
-                                    fontSize: 12,
-                                    color: "#6b7280",
-                                }}
-                            >
-                                * Baumann 피부 타입 코드 (예: DRNT). 입력하면
-                                자동으로 ID로 변환됩니다.
+                            <p style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>
+                                * Baumann 피부 타입 코드 입력 시 ID로 자동 변환됩니다.
                             </p>
                         </Cell>
                     </Row>
+
                 </Panel>
 
                 <Actions>
@@ -356,6 +366,7 @@ export default function AdminProductNew() {
                     </Ghost>
                     <Primary type="submit">상품 등록</Primary>
                 </Actions>
+
             </form>
         </Wrap>
     );
