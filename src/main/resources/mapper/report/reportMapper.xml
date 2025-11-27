@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.report.ReportMapper">
+
+    <select id="selectReports" resultType="com.review.shop.dto.report.ReportResponseDTO">
+        SELECT
+        r.report_id,
+        r.status,
+        r.reason,
+        r.description,
+        r.created_at,
+        r.processed_at,
+
+        r.user_id AS reporter_id,
+        u1.nickname AS reporter_nickname,
+
+        r.review_id,
+        rv.content AS review_content,
+
+        rv.user_id AS review_writer_id,
+        u2.nickname AS review_writer_nickname
+
+        FROM review_report r
+        LEFT JOIN USER_TABLE u1 ON r.user_id = u1.user_id
+        LEFT JOIN review rv ON r.review_id = rv.review_id
+        LEFT JOIN USER_TABLE u2 ON rv.user_id = u2.user_id
+
+        <where>
+            <if test="status != null and status != ''">
+                r.status = #{status}
+            </if>
+        </where>
+        ORDER BY r.created_at DESC
+    </select>
+
+    <update id="updateReportStatus">
+        UPDATE review_report
+        SET
+        status = #{status},
+        processed_at = SYSDATE
+        WHERE report_id = #{report_id}
+    </update>
+
+</mapper>
