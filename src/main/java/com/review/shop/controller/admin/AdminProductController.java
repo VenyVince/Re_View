@@ -1,9 +1,6 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
-import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -116,18 +113,5 @@ public class AdminProductController {
         return ResponseEntity.ok(detailDTO);
     }
 
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-    }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(WrongRequestException.class)
-    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
 }

@@ -5,9 +5,9 @@ package com.review.shop.service.order;
 
 import com.review.shop.dto.orders.*;
 import com.review.shop.dto.product.ProductStockDTO;
-import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.Orders.OrderMapper;
+import com.review.shop.service.userinfo.user_related.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,39 +28,10 @@ public class OrderService {
     //getUserPoint 사용 위한 UserService 주입
     private final OrderPreviewService orderPreviewService;
     private final OrderMapper orderMapper;
-
-    // 포인트 검사 및 차감
-    public void checkAndDeductPoints(OrderCreateDTO orderCreateDTO) {
-
-        int user_id = orderCreateDTO.getUser_id();
-        int pointsToDeduct = orderCreateDTO.getUsing_point();
-
-        if (pointsToDeduct == 0) {
-            return;
-        }
-        if (pointsToDeduct < 0) {
-            throw new WrongRequestException ("차감할 포인트는 음수일 수 없습니다.");
-        }
-
-        // 포인트 검사 로직
-        int currentUserPoint = orderPreviewService.getUserPoint(user_id);
-
-        if(currentUserPoint < pointsToDeduct) {
-            throw new WrongRequestException ("포인트가 부족합니다.");
-        }
-
-        // 회원의 포인트를 차감
-        Integer result = deductUserPoints(user_id, pointsToDeduct);
+    private final PointService pointService;
 
 
-
-        // 회원의 포인트 기록에 히스토리 추가 
-        Integer historyResult = addPointHistory(user_id, pointsToDeduct, "사용된 포인트 차감"); //<- 이 라인에서 지금 포인트 차감 안되고 자꾸 5000만큼 늘어나는 현상 발생중
-
-        if (historyResult == null || historyResult <= 0) {
-            throw new DatabaseException ("포인트 히스토리 기록에 실패했습니다.", null);
-        }
-    }
+    //포인트 부분은 통일을 위해 석현님이 만드신 PointService로 대체
 
     //재고 수량 점검 및 차감 메소드
 
@@ -81,25 +52,16 @@ public class OrderService {
         Map<Integer, Integer> stockMap = products.stream()
                 .collect(Collectors.toMap(ProductStockDTO::getProduct_id, ProductStockDTO::getStock));
 
-        // 사용자의 구매하려는 수량과 재고 비교하는 로직임
-        for (OrderDTO order : orderDTOList) {
-            Integer currentStock = stockMap.get(order.getProduct_id());
-
-            if (currentStock == null) {
-                throw new WrongRequestException("존재하지 않는 상품입니다. ID: " + order.getProduct_id());
-            }
-
-            if (currentStock < order.getBuy_quantity()) {
-                throw new WrongRequestException("재고가 부족합니다. 상품ID: " + order.getProduct_id());
-            }
-        }
-        
         //재고 차감부분
         for (OrderDTO order : orderDTOList) {
-            orderMapper.deductStock(
+            int affectedRows = orderMapper.deductStock(
                     order.getProduct_id(),
                     order.getBuy_quantity()
             );
+            // 기존에는 get으로 재고를 검사하였으나, 동시성 문제로 인해 차감 시도 후 결과로 검사하는 방식으로 변경
+            if (affectedRows == 0) {
+                throw new WrongRequestException("재고가 부족합니다. 상품ID: " + order.getProduct_id());
+            }
         }
     }
 
@@ -158,6 +120,7 @@ public class OrderService {
         orderSaveDTO.setPayment_id(orderCreateDTO.getPayment_id());
         orderSaveDTO.setTotal_price(calculatedTotalPrice);
         orderSaveDTO.setOrder_no(orderNum);
+        orderSaveDTO.setUsed_point(orderCreateDTO.getUsing_point());
 
 
         // ORDERS 테이블에 주문 정보 저장
@@ -179,7 +142,8 @@ public class OrderService {
     @Transactional
     public void processOrder(OrderCreateDTO orderCreateDTO) {
         //포인트 차감 검사 및 반영
-        checkAndDeductPoints(orderCreateDTO);
+        //이부분은 석현님이 만드신걸로 대체
+        pointService.usePoint(orderCreateDTO.getUser_id(), orderCreateDTO.getUsing_point());
         //재고 차감 검사 및 반영
         checkAndDeductStock(orderCreateDTO);
         //DB에 주문 정보 저장

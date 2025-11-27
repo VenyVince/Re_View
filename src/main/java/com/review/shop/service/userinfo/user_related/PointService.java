@@ -157,10 +157,11 @@ public class PointService {
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
             dto.setAmount(use_point);
-            dto.setType("EARN");
+            dto.setType("USE");
             dto.setDescription("물품 구매로 인한 차감");
 
             updateUserPoint(dto);
+
             pointMapper.aboutPoint(dto, null);
 
         } catch (Exception e) {

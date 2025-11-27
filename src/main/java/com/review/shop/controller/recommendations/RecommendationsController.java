@@ -3,9 +3,6 @@ package com.review.shop.controller.recommendations;
 import com.review.shop.dto.product.RecommendationProductDTO;
 import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
-import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.exception.WrongRequestException;
 import com.review.shop.service.recommendations.RecommendationsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,9 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,18 +52,5 @@ public class RecommendationsController {
         return ResponseEntity.ok().body(response);
     }
 
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-    }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(WrongRequestException.class)
-    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
 }
