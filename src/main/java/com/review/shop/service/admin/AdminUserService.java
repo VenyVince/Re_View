@@ -4,6 +4,7 @@ import com.review.shop.dto.user.UserSummaryDTO;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminUserMapper;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +13,10 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@RolesAllowed("ADMIN")
 public class AdminUserService {
 
     private final AdminUserMapper adminUserMapper;
-
 
     // 포인트 조회
     public Integer getMemberPoints(int user_id) {
@@ -48,7 +49,6 @@ public class AdminUserService {
 
     // 밴 기록 추가
     public void setBan(int user_id, String reason) {
-
         int result = adminUserMapper.setBlacklist(user_id, reason);
 
         if(result == 0){

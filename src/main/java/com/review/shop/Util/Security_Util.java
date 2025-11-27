@@ -48,5 +48,4 @@ public class Security_Util {
 
         return role;
     }
-
 }

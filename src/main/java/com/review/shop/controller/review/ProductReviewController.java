@@ -72,7 +72,7 @@ public class ProductReviewController {
     // 특정 삼품에 대한 리뷰 작성 히스토리 확인용
     @GetMapping("/exists/update")
     @Operation(
-            summary = "리뷰 작성 가능 여부 확인",
+            summary = "리뷰 수정 및 삭제 가능 여부 확인",
             description = "사용자의 리뷰 작성 여부, 리뷰 작성 가능시 주문내역에서 리뷰 작성하라고 띄우면 될 거 같음."
     )
     @ApiResponses(value = {
