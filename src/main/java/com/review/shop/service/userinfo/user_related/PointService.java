@@ -4,9 +4,12 @@ import com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO;
 import com.review.shop.dto.userinfo.user_related.Point.PointResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.userinfo.user_related.PointMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,12 +18,44 @@ import java.util.List;
 public class PointService {
 
     private final PointMapper pointMapper;
+    private final HttpServletResponse httpServletResponse;
 
     public static class PointConstants{
         public static final int CreateREVIEW = 100;
         public static final int SelectedREVIEW = 500;
         public static final int BestREVIEW = 1000;
-        public static int usePoint = 0; // 다른 곳에서 직접 사용
+    }
+
+
+    @Transactional
+    public PointHistoryDTO updateUserPoint(PointHistoryDTO dto) {
+        // 1. 유저 포인트 조회 및 잠금
+        int user_id = dto.getUser_id();
+
+        Integer new_point = pointMapper.selectForUpdate(user_id);
+        if(new_point == null){
+            new_point = 0;
+        }
+        if ("EARN".equals(dto.getType())) {
+            new_point += dto.getAmount();
+        } else if ("USE".equals(dto.getType())) {
+            new_point -= dto.getAmount();
+        }
+
+        if (new_point < 0) {
+            throw new WrongRequestException("포인트가 부족합니다.");
+        }
+
+        // 2. 업데이트
+        pointMapper.updateUserPoint(user_id, new_point);
+
+        // 3. 응답 객체 생성
+        PointHistoryDTO response = new PointHistoryDTO();
+        response.setUser_id(user_id);
+        response.setType(dto.getType());
+        response.setAmount(dto.getAmount()); // 새 필드가 있다면 반영
+
+        return response;
     }
 
 
@@ -51,6 +86,7 @@ public class PointService {
 
 
     // 리뷰 작성 포인트 적립
+    @Transactional
     public void addReviewPoint(int user_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
@@ -59,14 +95,15 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("리뷰 작성 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리 및 합계 반영
-            pointMapper.updateUserPoint(dto);
+            pointMapper.aboutPoint(dto); // 포인트 히스토리
+            updateUserPoint(dto);
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
 
+    @Transactional
     public void removeReviewPoint(int user_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
@@ -75,14 +112,15 @@ public class PointService {
             dto.setType("USE");
             dto.setDescription("리뷰 삭제로 인한 포인트 회수");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리 및 합계 반영
+            pointMapper.aboutPoint(dto); // 포인트 히스토리
             System.out.println("끝");
-            pointMapper.updateUserPoint(dto);
+            updateUserPoint(dto);
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
 
+    @Transactional
     public void addSelectedReviewPoint(int user_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
@@ -91,14 +129,15 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("운영자 리뷰 채택 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리 및 합계 반영
-            pointMapper.updateUserPoint(dto);
+            pointMapper.aboutPoint(dto); // 포인트 히스토리
+            updateUserPoint(dto);
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
 
+    @Transactional
     public void addBestReviewPoint(int user_id) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
@@ -107,24 +146,25 @@ public class PointService {
             dto.setType("EARN");
             dto.setDescription("Best 리뷰 선정 보상");
 
-            pointMapper.aboutPoint(dto); // 포인트 히스토리 및 합계 반영
-            pointMapper.updateUserPoint(dto);
+            pointMapper.aboutPoint(dto); // 포인트 히스토리
+            updateUserPoint(dto);
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
     // 물품 구매시 Point 사용
-    public void usePoint(int user_id) {
+    @Transactional
+    public void usePoint(int user_id, int use_point) {
         try {
             PointHistoryDTO dto = new PointHistoryDTO();
             dto.setUser_id(user_id);
-            dto.setAmount(PointConstants.usePoint);
+            dto.setAmount(use_point);
             dto.setType("EARN");
             dto.setDescription("물품 구매로 인한 차감");
 
             pointMapper.aboutPoint(dto);
-            pointMapper.updateUserPoint(dto);
+            updateUserPoint(dto);
 
         } catch (Exception e) {
             throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
