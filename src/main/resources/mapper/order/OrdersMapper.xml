@@ -24,31 +24,6 @@
         WHERE USER_ID = #{user_id}
     </select>
 
-    <update id="deductPoints">
-        UPDATE USER_TABLE
-        SET
-            point = point - #{pointsToDeduct}
-        WHERE
-            user_id = #{user_id}
-            AND point >= #{pointsToDeduct}
-    </update>
-
-    <insert id="addPointHistory">
-        INSERT INTO POINT_HISTORY (
-            USER_ID,
-            AMOUNT,
-            TYPE,
-            CREATED_AT,
-            DESCRIPTION
-        )
-        VALUES (
-                   #{user_id},
-                   #{pointsChanged},
-                   'USE',
-                   SYSDATE,
-                   #{description}
-               )
-    </insert>
 
     <select id="getProductStocks" resultType="com.review.shop.dto.product.ProductStockDTO">
         SELECT
@@ -83,6 +58,7 @@
             ADDRESS_ID,
             PAYMENT_ID,
             TOTAL_PRICE,
+            USED_POINT,
             ORDER_STATUS,
             CREATED_AT
         ) VALUES (
@@ -91,6 +67,7 @@
                      #{address_id},
                      #{payment_id},
                      #{total_price},
+                    #{used_point},
                      DEFAULT,
                      DEFAULT
                  )

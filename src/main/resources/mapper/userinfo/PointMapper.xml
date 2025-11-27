@@ -9,7 +9,7 @@
     <insert id="aboutPoint" parameterType="com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO">
         INSERT INTO point_history (
             user_id, amount, type, created_at, description
-            <if test="rivew_id!=null">, review_id</if>
+            <if test="review_id!=null">, review_id</if>
         )
         VALUES (
                    #{dto.user_id}, #{dto.amount}, #{dto.type}, SYSDATE, #{dto.description}
