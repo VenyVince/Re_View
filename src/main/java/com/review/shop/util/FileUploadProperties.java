@@ -1,4 +1,4 @@
-package com.review.shop.Util;
+package com.review.shop.util;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

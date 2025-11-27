@@ -1,6 +1,6 @@
 package com.review.shop.config;
 
-import com.review.shop.Util.FileUploadProperties;
+import com.review.shop.util.FileUploadProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

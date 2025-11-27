@@ -23,7 +23,7 @@ public class PointService {
     public static class PointConstants{
         public static final int CreateREVIEW = 100;
         public static final int SelectedREVIEW = 500;
-        public static final int BestREVIEW = 1000;
+        public static final int BestREVIEW = 700;
     }
 
 
@@ -84,88 +84,59 @@ public class PointService {
         }
     }
 
+    // 포인트 적립 시 반복되는 부분 함수로 묶음
+    private void processPoint(int user_id, Integer review_id, int amount, String type, String description) {
+        try {
+            PointHistoryDTO point_history_dto = new PointHistoryDTO();
+            point_history_dto.setUser_id(user_id);
+            point_history_dto.setAmount(amount);
+            point_history_dto.setType(type);
+            point_history_dto.setDescription(description);
 
-    // 리뷰 작성 포인트 적립
+            updateUserPoint(point_history_dto);
+            pointMapper.aboutPoint(point_history_dto, review_id);
+
+        } catch (Exception e) {
+            throw new DatabaseException("포인트 처리 중 DB 오류가 발생했습니다.", e);
+        }
+    }
+
+    // 리뷰 작성시 포인트 지급 
     @Transactional
     public void addReviewPoint(int user_id, int review_id) {
-        try {
-            PointHistoryDTO dto = new PointHistoryDTO();
-            dto.setUser_id(user_id);
-            dto.setAmount(PointConstants.CreateREVIEW);
-            dto.setType("EARN");
-            dto.setDescription("리뷰 작성 보상");
-
-            updateUserPoint(dto);
-            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
-
-        } catch (Exception e) {
-            throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
-        }
+        processPoint(user_id, review_id, PointConstants.CreateREVIEW, "EARN", "리뷰 작성 보상");
     }
+
+    // 리뷰 삭제시 포인트 회수
     @Transactional
     public void removeReviewPoint(int user_id, int review_id) {
-        try {
-            PointHistoryDTO dto = new PointHistoryDTO();
-            dto.setUser_id(user_id);
-            dto.setAmount(PointConstants.CreateREVIEW);
-            dto.setType("USE");
-            dto.setDescription("리뷰 삭제로 인한 포인트 회수");
-
-            updateUserPoint(dto);
-            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
-
-        } catch (Exception e) {
-            throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
-        }
+        processPoint(user_id, review_id, PointConstants.CreateREVIEW, "USE", "리뷰 삭제로 인한 포인트 회수");
     }
+
+    // 운영자 채택 리뷰 포인트 지급
     @Transactional
     public void addSelectedReviewPoint(int user_id, int review_id) {
-        try {
-            PointHistoryDTO dto = new PointHistoryDTO();
-            dto.setUser_id(user_id);
-            dto.setAmount(PointConstants.SelectedREVIEW);
-            dto.setType("EARN");
-            dto.setDescription("운영자 리뷰 채택 보상");
-
-            updateUserPoint(dto);
-            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
-
-        } catch (Exception e) {
-            throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
-        }
+        processPoint(user_id, review_id, PointConstants.SelectedREVIEW, "EARN", "운영자 리뷰 채택 보상");
     }
+
+    // 베스트 리뷰 포인트 지급(중복 지급 방지)
     @Transactional
     public void addBestReviewPoint(int user_id, int review_id) {
         try {
-            PointHistoryDTO dto = new PointHistoryDTO();
-            dto.setUser_id(user_id);
-            dto.setAmount(PointConstants.BestREVIEW);
-            dto.setType("EARN");
-            dto.setDescription("Best 리뷰 선정 보상");
+            // 중복 지급 여부
+            boolean paid = pointMapper.checkBestReviewPoint(user_id, review_id, PointConstants.BestREVIEW, "EARN");
+            if (paid) return;
 
-            updateUserPoint(dto);
-            pointMapper.aboutPoint(dto, review_id); // 포인트 히스토리
-
+            processPoint(user_id, review_id, PointConstants.BestREVIEW, "EARN", "Best 리뷰 선정 보상");
         } catch (Exception e) {
-            throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
+            throw new DatabaseException("Best 리뷰 포인트 적립 중 DB 오류가 발생했습니다.", e);
         }
     }
-    // 물품 구매시 Point 사용
+
+    // 유저의 포인트 사용
     @Transactional
     public void usePoint(int user_id, int use_point) {
-        try {
-            PointHistoryDTO dto = new PointHistoryDTO();
-            dto.setUser_id(user_id);
-            dto.setAmount(use_point);
-            dto.setType("USE");
-            dto.setDescription("물품 구매로 인한 차감");
-
-            updateUserPoint(dto);
-
-            pointMapper.aboutPoint(dto, null);
-
-        } catch (Exception e) {
-            throw new DatabaseException("리뷰 작성 포인트 적립 중 DB 오류가 발생했습니다.", e);
-        }
+        processPoint(user_id, null, use_point, "USE", "물품 구매로 인한 차감");
     }
+
 }

@@ -1,5 +1,6 @@
 package com.review.shop.repository.review;
 
+import com.review.shop.dto.review.BestReviewDTO;
 import com.review.shop.dto.review.ProductReviewDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -31,24 +32,19 @@ public interface ProductReviewMapper {
             @Param("order_item_id") int order_item_id
     );
 
-    /**
-     * 리뷰 이미지 저장
-     */
-    int insertReviewImage(
+    // 리뷰 이미지 저장
+    void insertReviewImage(
             @Param("review_id") int review_id,
             @Param("imageUrl") String imageUrl
     );
 
-    /**
-     * 가장 최근 생성된 리뷰의 정보 조회
-     */
+    // 가장 최근 생성된 리뷰 조회(윤성님)
     ProductReviewDTO selectLastReview(
             @Param("product_id") int product_id,
             @Param("user_id") int user_id
     );
-    /**
-     * 리뷰 ID로 조회
-     */
+
+    // 리뷰 아이디로 조회
     ProductReviewDTO selectReviewById(@Param("review_id")int review_id);
 
 
@@ -58,10 +54,12 @@ public interface ProductReviewMapper {
                      @Param("rating") double rating);
 
     // 기존 리뷰 이미지 삭제
-    int deleteReviewImagesByReviewId(@Param("review_id") int review_id);
+    void deleteReviewImagesByReviewId(@Param("review_id") int review_id);
 
-    /**
-     * 리뷰 삭제 (Soft Delete)
-     */
+    // 리뷰 삭제
     void deleteReview(@Param("review_id")int review_id);
+
+    // 베스트 리뷰 선정용
+    List<BestReviewDTO> selectBestReviewIds();
+
 }

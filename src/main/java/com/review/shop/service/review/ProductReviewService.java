@@ -1,10 +1,12 @@
 package com.review.shop.service.review;
 
+import com.review.shop.dto.review.BestReviewDTO;
 import com.review.shop.dto.review.ProductReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.OrderItemIdMapper;
 import com.review.shop.repository.review.ProductReviewMapper;
+import com.review.shop.service.userinfo.user_related.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ public class ProductReviewService {
 
     private final ProductReviewMapper productReviewMapper;
     private final OrderItemIdMapper orderItemIdMapper;
+    private final PointService pointService;
 
     public boolean canCreate(int order_item_id, int user_id) {
         // 1. order_item_id 실존 여부 체크 (해당 유저의 주문인지도 확인)
@@ -172,5 +175,19 @@ public class ProductReviewService {
         updatedReview.setImages(imageUrls != null ? imageUrls : new ArrayList<>());
 
         return updatedReview;
+    }
+
+    // 베스트 리뷰 조회
+    public List<BestReviewDTO> selectBestReviewList() {
+        return productReviewMapper.selectBestReviewIds();
+    }
+
+    // 스케쥴러에서 베스트 리뷰 갱신 엔트리포인트
+    public void updateBestReviews() {
+        List<BestReviewDTO> bestList = selectBestReviewList();
+
+        for (BestReviewDTO dto : bestList) {
+            pointService.addBestReviewPoint(dto.getUser_id(), dto.getReview_id());
+        }
     }
 }

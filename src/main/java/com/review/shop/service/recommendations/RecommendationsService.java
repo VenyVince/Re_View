@@ -1,6 +1,6 @@
 package com.review.shop.service.recommendations;
 
-import com.review.shop.Util.Security_Util;
+import com.review.shop.util.Security_Util;
 import com.review.shop.dto.product.RecommendationProductDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.exception.WrongRequestException;
