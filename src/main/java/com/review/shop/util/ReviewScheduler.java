@@ -1,4 +1,4 @@
-package com.review.shop.Util;
+package com.review.shop.util;
 
 import com.review.shop.service.review.ProductReviewService;
 import lombok.RequiredArgsConstructor;

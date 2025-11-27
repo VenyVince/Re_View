@@ -1,6 +1,6 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.Util.Security_Util;
+import com.review.shop.util.Security_Util;
 import com.review.shop.dto.review.community.CommentRequestDTO;
 import com.review.shop.dto.review.community.LikeRequestDTO;
 import com.review.shop.dto.review.community.ReportRequestDTO;
