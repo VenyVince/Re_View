@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserMyPageLayout.jsx
 import React from "react";
-import "./UserDashboard.css";
+import "../dashboard/UserDashboard.css";
 import UserSidebarMenu from "./UserSidebarMenu";
 import UserProfileBar from "./UserProfileBar";
 

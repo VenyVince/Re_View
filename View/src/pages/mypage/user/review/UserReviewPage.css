@@ -1,0 +1,190 @@
+/* ===========================
+   공통 섹션
+=========================== */
+
+.myreview-section {
+    width: 100%;
+    font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+.reivew-card-title {
+    margin-top: 30px;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+.review-card-sub {
+    font-size: 14px;
+    color: #777;
+}
+
+.myreview-empty,
+.myreview-error {
+    padding: 32px 0;
+    text-align: center;
+    font-size: 14px;
+}
+
+.myreview-error {
+    color: #d32f2f;
+}
+
+/* ===========================
+   리스트 & 카드
+=========================== */
+
+.myreview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.myreview-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 0 0 1px #f2f2f2;
+}
+
+/* ===========================
+   카드 상단: 브랜드 / 상품명 / 날짜 / 버튼
+=========================== */
+
+.myreview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+/* 왼쪽: 브랜드 / 상품명 (좌측 정렬) */
+.myreview-title-block {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.myreview-brand {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 2px;
+}
+
+.myreview-product {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+}
+
+/* 오른쪽: 날짜 + 수정/삭제 버튼 */
+.myreview-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #777;
+}
+
+.myreview-date {
+    color: #888;
+}
+
+.myreview-meta-btn {
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    padding: 4px 10px;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.myreview-meta-btn:hover {
+    background: #f7f7f7;
+}
+
+/* ===========================
+   평점 / 도움돼요 / 가격
+=========================== */
+
+.myreview-rating-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+
+/* 별점 */
+.myreview-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.myreview-star {
+    font-size: 16px;
+    color: #ddd;
+}
+
+.myreview-star--on {
+    color: #ffc107; /* 노란 별 느낌 */
+}
+
+.myreview-score {
+    margin-left: 4px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* 오른쪽: 도움돼요 / 가격 */
+.myreview-extra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #555;
+}
+
+.myreview-like {
+    color: #777;
+}
+
+.myreview-price {
+    font-weight: 600;
+}
+
+/* ===========================
+   리뷰 내용 & 이미지
+=========================== */
+
+/* 리뷰 내용: 좌측 정렬 */
+.myreview-content {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    text-align: left;
+}
+
+/* 이미지 영역 (있을 때만 렌더링) */
+.myreview-images {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.myreview-thumb {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.myreview-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

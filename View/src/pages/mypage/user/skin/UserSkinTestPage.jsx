@@ -1,19 +1,25 @@
 // src/pages/mypage/user/UserSkinTestPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import UserMyPageLayout from "./UserMyPageLayout";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserSkinTestPage.css";
 
-import {BAUMANN_BADGES, BAUMANN_CODE_BY_ID, getBaumannBadge} from "../../../assets/baumann";
+import {
+    BAUMANN_BADGES,
+    BAUMANN_CODE_BY_ID,
+    BAUMANN_ID_BY_CODE,   // ✅ 코드 → id 매핑
+    getBaumannBadge,
+} from "../../../../assets/baumann";
 import {
     SECTIONS,
     QUESTION_COUNT,
     buildTallyFromSelections,
-} from "../../survey/questions";
+} from "../../../survey/questions";
 
 /** 바우만 코드 계산기 (회원가입 설문과 동일 로직) */
 function computeBaumann(tally) {
-    const pick = (a, b, A, B) => (tally[A] === tally[B] ? A : tally[A] > tally[B] ? A : B);
+    const pick = (a, b, A, B) =>
+        tally[A] === tally[B] ? A : tally[A] > tally[B] ? A : B;
     const od = pick(tally.O, tally.D, "O", "D");
     const sr = pick(tally.S, tally.R, "S", "R");
     const pw = pick(tally.P, tally.N, "P", "N");
@@ -25,7 +31,7 @@ function computeBaumann(tally) {
 const BAUMANN_TYPES = Object.keys(BAUMANN_BADGES).sort();
 
 export default function UserSkinTestPage() {
-    // ⚫ 서버에 저장되어 있는 “나의 바우만 타입”
+    // ⚫ 서버에 저장되어 있는 “나의 바우만 타입” (코드: DRNT, DSNT...)
     const [myType, setMyType] = useState(null);
 
     // ⚪ 화면에서 사용자가 현재 선택한 타입 (드롭다운 & 설문 결과가 이 값에 반영)
@@ -43,18 +49,25 @@ export default function UserSkinTestPage() {
                     withCredentials: true,
                 });
 
-                // 서버에서 내려오는 필드명: baumann_id
-                const typeId = res.data.baumann_id;
+                //console.log("[/api/users/me] 응답:", res.data);  // 🔥 여기 추가
 
-                // id → 코드 변환
-                const code = typeId ? BAUMANN_CODE_BY_ID[typeId] || null : null;
+                const { baumann_id, baumann_type } = res.data;
 
-                // 상단 “나의 바우만 타입”
+                let code = null;
+
+                // 1순위: 서버가 코드(DRNT, DSNT...)를 직접 내려주는 경우
+                if (baumann_type) {
+                    code = baumann_type;
+                }
+                // 2순위: id만 내려오는 경우 → 우리가 매핑해서 코드로 변환
+                else if (baumann_id != null && BAUMANN_CODE_BY_ID[baumann_id]) {
+                    code = BAUMANN_CODE_BY_ID[baumann_id];
+                }
+
+                console.log("해석된 바우만 코드:", code); // 🔥 이 값도 확인
+
                 setMyType(code);
-
-                // 드롭다운 초기값도 동일하게 설정
                 setSelectedType(code);
-
             } catch (e) {
                 console.error("내 정보 조회 실패 (바우만 타입):", e);
             }
@@ -119,7 +132,7 @@ export default function UserSkinTestPage() {
     const handleSelectTypeChange = (e) => {
         const value = e.target.value || null;
         setSelectedType(value);
-        // ❗ 나의 바우만 타입(myType)은 여기서는 바꾸지 않는다.
+        // ❗ myType은 여기서는 그대로, 저장 버튼 누를 때만 변경
     };
 
     // === 5. “피부타입 저장” 버튼 → 서버에 반영 ===
@@ -129,10 +142,18 @@ export default function UserSkinTestPage() {
             return;
         }
 
+        // 코드(DRNT, DSNT...) → 숫자 id로 변환
+        const baumannId = BAUMANN_ID_BY_CODE[selectedType];
+
+        if (!baumannId) {
+            alert("유효하지 않은 바우만 타입입니다.");
+            return;
+        }
+
         try {
             await axios.patch(
-                "/api/users/baumann",
-                { baumann_type: selectedType }, // 필드명은 백엔드와 맞게 수정
+                "/api/users/me/baumann",
+                { baumann_id: baumannId },   // ✅ 백엔드에서 받는 필드
                 { withCredentials: true }
             );
 
@@ -218,9 +239,9 @@ export default function UserSkinTestPage() {
                         <div className="inline-survey">
                             {/* 진행도 */}
                             <div className="inline-survey-progress">
-                <span className="inline-survey-step">
-                  {surveyIndex + 1} / {total}
-                </span>
+                                <span className="inline-survey-step">
+                                    {surveyIndex + 1} / {total}
+                                </span>
                                 <div className="inline-survey-bar">
                                     <div
                                         className="inline-survey-bar-fill"

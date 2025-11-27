@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserProfileEdit.jsx
 import React, { useEffect, useState } from "react";
-import "./UserProfileEdit.css";
+import "../layout/UserProfileEdit.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 

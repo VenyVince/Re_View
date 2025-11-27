@@ -1,7 +1,7 @@
 // src/pages/mypage/user/UserAddressPage.jsx
 import React from "react";
 import "./UserAddress.css";
-import UserMyPageLayout from "./UserMyPageLayout";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
 import UserAddressManager from "./UserAddressManager";
 
 export default function UserAddressPage() {
