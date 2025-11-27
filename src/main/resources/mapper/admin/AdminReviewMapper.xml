@@ -14,4 +14,11 @@
         SET IS_SELECTED = #{is_selected}
         WHERE REVIEW_ID = #{review_id}
     </update>
+
+    <select id="findReviewer" resultType="int">
+        select user_id
+        from review
+        where review_id = #{review_id}
+    </select>
+
 </mapper>
