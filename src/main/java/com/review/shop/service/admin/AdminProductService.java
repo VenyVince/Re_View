@@ -103,8 +103,8 @@ public class AdminProductService {
     }
 
     //이미지 삭제하기
-    public void deleteProductImages(int productId) {
-        int affected = adminProductMapper.deleteProductImages(productId);
+    public void deleteProductImages(int product_id) {
+        int affected = adminProductMapper.deleteProductImages(product_id);
         if (affected == 0) {
             throw new ResourceNotFoundException("해당 상품의 기존 이미지를 찾을 수 없습니다.");
         }
