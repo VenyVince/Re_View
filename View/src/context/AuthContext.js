@@ -9,6 +9,10 @@ export function AuthProvider({ children }) {
         loggedIn: false,
         userId: null,
         role: null,
+        loading: true,
+
+        nickname: null,
+        point: 0,
     });
 
     useEffect(() => {
@@ -18,19 +22,26 @@ export function AuthProvider({ children }) {
     // 세션 확인: 새로고침 시에도 로그인 유지 여부 확인
     async function checkSession() {
         try {
+            // 로그인 여부 / 권한 확인
             const res = await axios.get("/api/auth/me", {
                 withCredentials: true,
             });
+
+            const base = res.data; // { id, role, ... }
+
+            // 로그인 기본 정보 세팅
             setAuth({
                 loggedIn: true,
                 userId: res.data.id,
                 role: res.data.role,
+                loading: false,
             });
         } catch (err) {
             setAuth({
                 loggedIn: false,
                 userId: null,
                 role: null,
+                loading: false,
             });
         }
     }
@@ -42,6 +53,7 @@ export function AuthProvider({ children }) {
             loggedIn: true,
             userId,
             role: null,
+            loading: false,
         });
         // 바로 서버에 /api/auth/me 한 번 더 물어봐서 role까지 채움
         checkSession();
@@ -59,11 +71,12 @@ export function AuthProvider({ children }) {
         } catch (err) {
             console.error("로그아웃 요청 실패(무시 가능):", err);
         } finally {
-            // 어쨌든 프론트 쪽 로그인 상태는 비운다
+            // 프론트 쪽 로그인 상태는 비운다
             setAuth({
                 loggedIn: false,
                 userId: null,
                 role: null,
+                loading: false,
             });
         }
     };
