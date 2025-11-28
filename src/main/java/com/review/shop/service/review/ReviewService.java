@@ -1,6 +1,6 @@
 package com.review.shop.service.review;
 
-import com.review.shop.dto.review.NextReviewDTO;
+import com.review.shop.dto.common.PageResponse;
 import com.review.shop.dto.review.ReviewDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
@@ -19,7 +19,7 @@ public class ReviewService {
 
     private final ReviewMapper reviewMapper;
 
-    public NextReviewDTO<ReviewDTO> getReviewList(int page, int size, String sort, String category) {
+    public PageResponse<ReviewDTO> getReviewList(int page, int size, String sort, String category) {
         // 유효성 검사
         if (page < 1) throw new WrongRequestException("페이지 값이 올바르지 않습니다.");
         if (size < 1 || size > 100) throw new WrongRequestException("페이지 사이즈가 올바르지 않습니다.");
@@ -46,7 +46,7 @@ public class ReviewService {
             }
 
             // 결과 포장 및 반환
-            return NextReviewDTO.<ReviewDTO>builder()
+            return PageResponse.<ReviewDTO>builder()
                     .content(reviews)
                     .hasNext(hasNext) // 프론트는 이 값을 보고 버튼 활성화 결정
                     .page(page)
