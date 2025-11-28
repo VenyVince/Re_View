@@ -1,4 +1,4 @@
-package com.review.shop.service.userinfo.user_related;
+package com.review.shop.service.userinfo.other;
 
 import com.review.shop.dto.userinfo.user_related.wishlist.WishlistDTO;
 import com.review.shop.dto.userinfo.user_related.wishlist.WishlistResponseDTO;

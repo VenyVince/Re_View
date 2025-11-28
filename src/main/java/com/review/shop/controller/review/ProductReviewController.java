@@ -35,7 +35,7 @@ public class ProductReviewController {
      * 특정 상품의 리뷰 목록 조회
      */
     @GetMapping("/{product_id}/reviews")
-    @Operation(summary = "상품 리뷰 조회", description = "상품 ID로 리뷰 조회, 정렬 옵션: like_count, latest, rating")
+    @Operation(summary = "특정 상품 리뷰 조회", description = "상품 ID로 리뷰 조회, 정렬 옵션: like_count, latest, rating")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
             @ApiResponse(responseCode = "404", description = "리뷰 없음 (ResourceNotFoundException)"),

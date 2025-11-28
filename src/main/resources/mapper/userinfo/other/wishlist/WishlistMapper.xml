@@ -16,6 +16,7 @@
         FROM WISH_ITEM w
         JOIN PRODUCT p ON w.PRODUCT_ID = p.PRODUCT_ID
         WHERE w.USER_ID = #{user_id}
+        and p.deleted_at is null
         ORDER BY w.WISH_ITEM_ID DESC
     </select>
 
@@ -25,6 +26,8 @@
         FROM WISH_ITEM
         WHERE USER_ID = #{user_id}
         AND PRODUCT_ID = #{product_id}
+        and PRODUCT_ID.deleted_at is null
+
     </select>
 
     <!-- 찜 등록: ID는 Mapper에서 생성하지 않고 그냥 INSERT -->
@@ -38,5 +41,7 @@
         DELETE FROM WISH_ITEM
         WHERE USER_ID = #{user_id}
           AND PRODUCT_ID = #{product_id}
+          and PRODUCT_ID.deleted_at is null
+
     </delete>
 </mapper>

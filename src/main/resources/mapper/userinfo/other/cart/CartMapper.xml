@@ -13,13 +13,16 @@
         FROM cart_items c
         JOIN product p ON c.product_id = p.product_id
         WHERE c.user_id = #{user_id}
+        and p.deleted_at is null
     </select>
 
     <!-- 단일 상품 조회 (수량 변경 시 확인용) -->
     <select id="findCartItemByUserIdAndProductId" resultType="com.review.shop.dto.cart.CartitemResponseDTO">
         SELECT cart_items_id, product_id, quantity
         FROM cart_items
-        WHERE user_id = #{user_id} AND product_id = #{product_id}
+        WHERE user_id = #{user_id}
+        AND product_id = #{product_id}
+
     </select>
 
     <!-- 장바구니 추가 -->
