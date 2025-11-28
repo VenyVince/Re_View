@@ -50,7 +50,6 @@ public class CartController {
         cartService.addCartItem(user_id, dto);
         return ResponseEntity.ok("장바구니에 추가되었습니다.");
     }
-
     // 수량 변경
     @Operation(summary = "수량 변경", description = "장바구니에 담긴 상품 수량을 변경합니다.")
     @ApiResponses(value = {
@@ -64,6 +63,7 @@ public class CartController {
         cartService.updateQuantity(user_id, dto);
         return ResponseEntity.ok("수량이 변경되었습니다.");
     }
+
 
     // 삭제
     @Operation(summary = "삭제", description = "장바구니에서 특정 상품을 삭제합니다.")
