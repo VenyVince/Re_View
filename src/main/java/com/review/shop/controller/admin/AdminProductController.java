@@ -1,6 +1,7 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.product.ProductUpdateOnlyImageDTO;
 import com.review.shop.dto.product.ProductUploadDTO;
 import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Admin API", description = "상품 관련 관리자 기능 API")
 @RestController
@@ -55,7 +54,7 @@ public class AdminProductController {
     })
     @PostMapping("/products")
 
-    //api/images/products 에서 이미지 업로드 후 받은 이미지 경로 리스트와 상품 정보를 같이 request body로 받음
+    //api/images/products 에서 이미지 업로드 후 받은 이미지 경로 리스트와 상품 정보와, 프론트가 선택한 썸네일 정보를 같이 request body로 받음
     public ResponseEntity<String> insertProduct(@RequestBody ProductUploadDTO productUploadDTO) {
 
         ProductDetailDTO product = productUploadDTO.getProduct();
@@ -63,8 +62,8 @@ public class AdminProductController {
         // product DTO에 이미지 리스트 설정
         product.setProduct_images(productUploadDTO.getProduct_images_list());
 
-        // product DTO 업로드
-        adminProductService.uploadProductAndImages(product);
+        // product DTO 업로드, 썸네일 이미지 정보도 전송
+        adminProductService.uploadProductAndImages(product,productUploadDTO.getThumbnailUrl());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
     }
@@ -130,8 +129,8 @@ public class AdminProductController {
     @PutMapping("/products/{product_id}/images")
     public ResponseEntity<String> updateProductImages(
             @Parameter(description = "이미지를 업데이트할 상품의 ID") @PathVariable int product_id,
-            @RequestBody List<String> imageUrls) {
-        adminProductService.updateProductImages(product_id, imageUrls);
+            @RequestBody ProductUpdateOnlyImageDTO productUpdateOnlyImageDTO) {
+        adminProductService.updateProductImages(product_id, productUpdateOnlyImageDTO.getProduct_images_list(), productUpdateOnlyImageDTO.getThumbnailUrl());
         return ResponseEntity.ok("상품 이미지가 업데이트되었습니다");
     }
 

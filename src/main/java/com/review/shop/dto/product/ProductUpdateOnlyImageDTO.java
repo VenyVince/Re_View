@@ -7,8 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ProductUploadDTO {
+public class ProductUpdateOnlyImageDTO {
     private List<String> product_images_list;
-    private ProductDetailDTO product;
     private String thumbnailUrl;
 }

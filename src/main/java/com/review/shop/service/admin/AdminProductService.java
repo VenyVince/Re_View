@@ -25,6 +25,8 @@ public class AdminProductService {
         return adminProductMapper.getAllProducts();
     }
 
+
+
     // 상품 등록
     public void insertProduct(ProductDetailDTO product) {
         if (product == null) {
@@ -66,10 +68,14 @@ public class AdminProductService {
 
 
     //Product_image 테이블에 삽입하기
-    public void putImage(int product_id, List<String> imageUrl) {
+    public void putImage(int product_id, List<String> imageUrl, String thumbnailUrl) {
         for(String image : imageUrl){
             //여기에 이미지 삽입 쿼리문 작성
-            int result = adminProductMapper.insertProductImage(product_id, image);
+
+            //전달받은 thumbnailUrl과 비교해서 썸네일 여부 판단
+            String isThumbnail = (image.equals(thumbnailUrl)) ? "Y" : "N";
+
+            int result = adminProductMapper.insertProductImage(product_id, image, isThumbnail);
             if(result == 0){
                 throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
             }
@@ -78,7 +84,7 @@ public class AdminProductService {
 
     //상품 등록과 이미지 등록 트랜잭션처리
     @Transactional
-    public void uploadProductAndImages(ProductDetailDTO product) {
+    public void uploadProductAndImages(ProductDetailDTO product, String thumbnailUrl) {
 
         //상품 테이블에 데이터 먼저 삽입
         insertProduct(product);
@@ -86,7 +92,7 @@ public class AdminProductService {
         List<String> product_images = product.getProduct_images();
 
         //상품 이미지 테이블에 데이터 삽입
-        putImage(prd_id, product_images);
+        putImage(prd_id, product_images, thumbnailUrl);
     }
 
     //이미지 불러오기
@@ -104,12 +110,21 @@ public class AdminProductService {
         }
     }
 
+    // 추후에 사용할 수도 있어서 일단 남겨둠 (모든 썸네일 초기화)
+//
+//    public void restImagesThumbnail(int product_id){
+//        int affected = adminProductMapper.updateAllImagesToNo(product_id);
+//        if (affected == 0) {
+//            throw new ResourceNotFoundException("해당 상품의 기존 이미지를 찾을 수 없습니다.");
+//        }
+//    }
+
     //이미지 삭제하고 삽입하기 트랜잭션
     @Transactional
-    public void updateProductImages(int product_id, List<String> imageUrls) {
+    public void updateProductImages(int product_id, List<String> imageUrls, String thumbnailUrl) {
         //기존 이미지 삭제
         deleteProductImages(product_id);
         //새 이미지 삽입
-        putImage(product_id, imageUrls);
+        putImage(product_id, imageUrls, thumbnailUrl);
     }
 }

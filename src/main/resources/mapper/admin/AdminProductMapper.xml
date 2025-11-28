@@ -94,11 +94,13 @@
     <insert id="insertProductImage">
         INSERT INTO PRODUCT_IMAGE (
             PRODUCT_ID,
-            IMAGE_URL
+            IMAGE_URL,
+            IS_THUMNAIL
         )
         VALUES (
                    #{product_id},
-                   #{image}
+                   #{image},
+                     #{is_thumbnail}
                )
     </insert>
 
@@ -117,4 +119,12 @@
     <delete id="deleteProductImages">
         DELETE FROM PRODUCT_IMAGE WHERE PRODUCT_ID = #{product_id}
     </delete>
+
+
+    <update id="updateAllImagesToNo" parameterType="int">
+        UPDATE PRODUCT_IMAGE
+        SET IS_THUMBNAIL = 'N'
+        WHERE PRODUCT_ID = #{product_id}
+    </update>
+
 </mapper>
