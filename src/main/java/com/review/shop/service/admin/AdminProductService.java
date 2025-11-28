@@ -10,8 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -69,6 +69,11 @@ public class AdminProductService {
 
     //Product_image 테이블에 삽입하기
     public void putImage(int product_id, List<String> imageUrl, String thumbnailUrl) {
+
+        if (!imageUrl.contains(thumbnailUrl)) {
+            throw new WrongRequestException("썸네일 이미지는 업로드된 이미지 목록에 포함되어야 합니다.");
+        }
+
         for(String image : imageUrl){
             //여기에 이미지 삽입 쿼리문 작성
 
