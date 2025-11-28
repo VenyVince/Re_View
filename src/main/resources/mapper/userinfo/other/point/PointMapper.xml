@@ -39,11 +39,21 @@
         ORDER BY created_at DESC
     </select>
 
-    <!-- 사용자 총 포인트 조회 (EARN - USE) -->
+    <!-- 사용자 총 포인트 조회 -->
     <select id="getTotalPoint" resultType="int">
         SELECT POINT
         FROM USER_TABLE
         WHERE USER_ID = #{user_id}
+    </select>
+
+    <!--    베스트 리뷰 중복 지급 방지   -->
+    <select id="existsBestReviewPoint" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM point_history
+        WHERE user_id = #{user_id}
+          AND review_id = #{review_id}
+          AND amount = #{amount}
+          AND type = #{type}
     </select>
 <!--    <select id="selectBestReviewCandidate">-->
 <!--        select review_id from review-->
