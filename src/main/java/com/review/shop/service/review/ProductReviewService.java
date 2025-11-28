@@ -1,17 +1,23 @@
 package com.review.shop.service.review;
 
+import com.review.shop.dto.review.BestReviewDTO;
 import com.review.shop.dto.review.ProductReviewDTO;
+import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
+import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.OrderItemIdMapper;
 import com.review.shop.repository.review.ProductReviewMapper;
+import com.review.shop.service.userinfo.other.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +25,7 @@ public class ProductReviewService {
 
     private final ProductReviewMapper productReviewMapper;
     private final OrderItemIdMapper orderItemIdMapper;
+    private final PointService pointService;
 
     public boolean canCreate(int order_item_id, int user_id) {
         // 1. order_item_id 실존 여부 체크 (해당 유저의 주문인지도 확인)
@@ -138,6 +145,40 @@ public class ProductReviewService {
         return createdReview;
     }
 
+    @Transactional
+    // 리뷰 작성
+    public CreateReviewResponseDTO createReviewWithReward(
+            int product_id,
+            int user_id,
+            CreateReviewRequestDTO request
+    ) {
+        if(!canCreate(request.getOrder_item_id(), user_id)) {
+            // 보안상 생성시에도 확인
+            throw new WrongRequestException("잘못된 접근입니다.");
+        }
+
+        // 리뷰 작성
+        ProductReviewDTO review = createReview(
+                product_id,
+                user_id,
+                request.getContent(),
+                request.getRating(),
+                request.getImageUrls(),
+                request.getOrder_item_id()
+        );
+        // 응답 DTO 구성
+        CreateReviewResponseDTO response = new CreateReviewResponseDTO();
+        response.setReview_id(review.getReview_id());
+        response.setContent(review.getContent());
+        response.setRating(review.getRating());
+        response.setImageUrls(request.getImageUrls());
+        response.setPointsEarned(PointService.PointConstants.CreateREVIEW);
+        Integer review_id = review.getReview_id();
+        // 포인트 적립
+        pointService.addReviewPoint(user_id, review_id);
+        return response;
+    }
+
     // 리부수정
     public ProductReviewDTO updateReview(
             int review_id,
@@ -173,4 +214,60 @@ public class ProductReviewService {
 
         return updatedReview;
     }
+
+    @Transactional
+    public void deleteReviewWithPenalty(int product_id, int user_id, int review_id) {
+        // 상품 존재 여부 확인
+        int productExists = productReviewMapper.selectProductById(product_id);
+        if (productExists == 0) {
+            throw new WrongRequestException("더이상 존재하지 않는 상품입니다");
+        }
+
+        // 리뷰 존재 여부 확인
+        ProductReviewDTO review = productReviewMapper.selectReviewById(review_id);
+        if (review == null) {
+            throw new WrongRequestException("존재하지 않거나 이미 삭제된 리뷰입니다");
+        }
+
+        // 작성자 확인
+        if (review.getUser_id() != user_id) {
+            throw new WrongRequestException("본인의 리뷰만 삭제할 수 있습니다");
+        }
+
+        // Soft Delete
+        productReviewMapper.deleteReview(review_id);
+
+        // 포인트 회수 (삭제된 리뷰에 대해 적립된 포인트 차감)
+        pointService.removeReviewPoint(user_id, review_id);
+    }
+
+    // 베스트 리뷰 조회
+    public List<BestReviewDTO> selectBestReviewList() {
+        return productReviewMapper.selectBestReviewIds();
+    }
+
+    // 스케쥴러에서 베스트 리뷰 갱신 엔트리포인트
+    @Transactional
+    public void updateBestReviews() {
+        // 1. 기존 베스트 리뷰 초기화
+        productReviewMapper.resetBestReviews();
+
+        // 2. 새 베스트 리뷰 조회
+        List<BestReviewDTO> bestList = productReviewMapper.selectBestReviewIds();
+
+        // 3. 조회된 리뷰 is_checked 업데이트
+        List<Integer> review_ids = bestList.stream()
+                .map(BestReviewDTO::getReview_id)
+                .collect(Collectors.toList());
+        if (!review_ids.isEmpty()) {
+            productReviewMapper.updateBestReviews(review_ids);
+        }
+
+        // 4. 포인트 지급
+        for (BestReviewDTO dto : bestList) {
+            pointService.addBestReviewPoint(dto.getUser_id(), dto.getReview_id());
+            dto.setIs_checked(1); // DTO와 DB 동기화
+        }
+    }
+
 }
