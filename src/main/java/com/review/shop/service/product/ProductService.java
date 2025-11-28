@@ -1,7 +1,7 @@
 package com.review.shop.service.product;
 
 
-import com.review.shop.dto.product.NextProductDTO;
+import com.review.shop.dto.common.PageResponse;
 import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
@@ -19,7 +19,7 @@ public class ProductService {
 
     private final ProductMapper productMapper;
 
-    public NextProductDTO<ProductDTO> getProductList(int page, int size, String sort, String category) {
+    public PageResponse<ProductDTO> getProductList(int page, int size, String sort, String category) {
         // 유효성 검사
         if (page < 1) throw new WrongRequestException("페이지 값이 올바르지 않습니다.");
         if (size < 1 || size > 100) throw new WrongRequestException("페이지 사이즈가 올바르지 않습니다.");
@@ -46,7 +46,7 @@ public class ProductService {
             }
 
             // 결과 포장 및 반환
-            return NextProductDTO.<ProductDTO>builder()
+            return PageResponse.<ProductDTO>builder()
                     .content(products)
                     .hasNext(hasNext) // 프론트에서 이 값을 보고 > 버튼 활성화 결정
                     .page(page)
