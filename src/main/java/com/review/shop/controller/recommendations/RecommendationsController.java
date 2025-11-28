@@ -5,12 +5,14 @@ import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.service.recommendations.RecommendationsService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,7 +27,7 @@ public class RecommendationsController {
     private final RecommendationsService recommendationsService;
 
     @Operation(summary = "추천 상품 조회", description = "로그인한 사용자의 바우만 유형을 기반으로 추천 상품을 조회합니다.")
-    @PostMapping("/api/recommendations")
+    @PostMapping("/api/recommendations/{type}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "추천 상품 조회 성공",
                     content = @Content(schema = @Schema(implementation = RecommendationResponseDTO.class))),
@@ -33,7 +35,17 @@ public class RecommendationsController {
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
 
-    public ResponseEntity<Map<String, Object>> getRecommendations() {
+    public ResponseEntity<Map<String, Object>> getRecommendations(
+            @Parameter(
+                    description = "바우만 타입 필터",
+                    required = true,
+                    schema = @Schema(
+                            type = "string",
+                            allowableValues = {"all", "first", "second", "third", "fourth"},
+                            example = "all"
+                    )
+            )
+            @PathVariable String type) {
 
         //로그인 세션을 참고하여 바우만 아이디 가져오기
         Integer user_Baumann = recommendationsService.getBaumannTypeByUserId();
@@ -41,8 +53,8 @@ public class RecommendationsController {
         //바우만 아이디를 기반으로 바우만 DTO 가져오기
         RecommendationsUserDTO baumannDTO = recommendationsService.getBaumannDTOWithId(user_Baumann);
         System.out.println(baumannDTO);
-        //바우만 DTO를 기반으로 추천 상품 리스트 가져오기
-        List<RecommendationProductDTO> recommendationsPrdList = recommendationsService.findAllProductsSortedByBaumann(baumannDTO);
+        //바우만 DTO를 기반으로 type에 따른 추천 상품 리스트 가져오기
+        List<RecommendationProductDTO> recommendationsPrdList = recommendationsService.getRecommendedProducts(baumannDTO,type);
 
         Map<String, Object> response = new HashMap<>();
 
