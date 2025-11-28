@@ -96,12 +96,12 @@
         INSERT INTO PRODUCT_IMAGE (
             PRODUCT_ID,
             IMAGE_URL,
-            IS_THUMNAIL
+            IS_THUMBNAIL
         )
         VALUES (
                    #{product_id},
                    #{image},
-                     #{is_thumbnail}
+                #{is_thumbnail}
                )
     </insert>
 
