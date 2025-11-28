@@ -36,8 +36,7 @@ export default function AdminReviewPage() {
                     content: r.content,
                     price: r.price,
                     isPick:
-                        r.is_selected === 1 ||
-                        r.is_selected === true,
+                        r.is_selected === "1"
                 }));
 
                 setReviews(normalized);
@@ -64,6 +63,7 @@ export default function AdminReviewPage() {
             const k = keyword.toLowerCase();
             base = base.filter(
                 (r) =>
+                    String(r.id).includes(k) || // 리뷰 아이디 검색
                     r.reviewer.toLowerCase().includes(k) ||
                     r.content.toLowerCase().includes(k)
             );
@@ -159,7 +159,7 @@ export default function AdminReviewPage() {
                         </FilterSelect>
 
                         <SearchInput
-                            placeholder="작성자 / 내용 검색"
+                            placeholder="작성자 / 내용 / 리뷰 아이디 검색"
                             value={keyword}
                             onChange={(e) => {
                                 setKeyword(e.target.value);
