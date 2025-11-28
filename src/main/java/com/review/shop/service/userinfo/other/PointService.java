@@ -1,4 +1,4 @@
-package com.review.shop.service.userinfo.user_related;
+package com.review.shop.service.userinfo.other;
 
 import com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO;
 import com.review.shop.dto.userinfo.user_related.Point.PointResponseDTO;
@@ -6,7 +6,7 @@ import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.userinfo.user_related.PointMapper;
-import jakarta.servlet.http.HttpServletResponse;
+import com.review.shop.util.Security_Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,8 @@ import java.util.List;
 public class PointService {
 
     private final PointMapper pointMapper;
-    private final HttpServletResponse httpServletResponse;
+    private final Security_Util security_util;
+
 
     public static class PointConstants{
         public static final int CreateREVIEW = 100;
@@ -42,12 +43,24 @@ public class PointService {
             new_point -= dto.getAmount();
         }
 
-        if (new_point < 0) {
-            throw new WrongRequestException("포인트가 부족합니다.");
+        String admin = security_util.getCurrentUserRole();
+        if(admin.equals("ADMIN")){
+            if (new_point < 0) {
+                throw new WrongRequestException(user_id+"포인트가 0이하로 내려갑니다.");
+            }
+
+            // 2. 업데이트
+            pointMapper.updateUserPoint(user_id, new_point);
+        }
+        else{
+            if (new_point < 0) {
+                throw new WrongRequestException("포인트가 부족합니다.");
+            }
+
+            // 2. 업데이트
+            pointMapper.updateUserPoint(user_id, new_point);
         }
 
-        // 2. 업데이트
-        pointMapper.updateUserPoint(user_id, new_point);
 
         // 3. 응답 객체 생성
         PointHistoryDTO response = new PointHistoryDTO();

@@ -3,7 +3,7 @@ package com.review.shop.controller.userinfo;
 import com.review.shop.util.Security_Util;
 import com.review.shop.dto.cart.CartitemRequestDTO;
 import com.review.shop.dto.cart.CartitemResponseDTO;
-import com.review.shop.service.userinfo.user_related.CartService;
+import com.review.shop.service.userinfo.other.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -50,7 +50,6 @@ public class CartController {
         cartService.addCartItem(user_id, dto);
         return ResponseEntity.ok("장바구니에 추가되었습니다.");
     }
-
     // 수량 변경
     @Operation(summary = "수량 변경", description = "장바구니에 담긴 상품 수량을 변경합니다.")
     @ApiResponses(value = {
@@ -64,6 +63,7 @@ public class CartController {
         cartService.updateQuantity(user_id, dto);
         return ResponseEntity.ok("수량이 변경되었습니다.");
     }
+
 
     // 삭제
     @Operation(summary = "삭제", description = "장바구니에서 특정 상품을 삭제합니다.")

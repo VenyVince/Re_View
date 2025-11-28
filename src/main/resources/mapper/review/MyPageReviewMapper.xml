@@ -14,7 +14,8 @@
         JOIN product p ON r.product_id = p.product_id
         JOIN user_table u on r.user_id = u.user_id
         WHERE r.user_id = #{user_id}
-
+        and r.deleted_at is null
+        and p.deleted_at is null
         <if test="keyword != null and keyword != ''">
         AND (p.prd_name LIKE '%', #{keyword}, '%'
             OR r.content LIKE '%', #{keyword}, '%')
