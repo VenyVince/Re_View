@@ -13,7 +13,7 @@ public interface PointMapper {
     // 포인트 적립/사용 내역 추가
     void aboutPoint(@Param("dto")PointHistoryDTO dto, @Param("review_id")Integer review_id);
     void updateUserPoint(@Param("user_id") int user_id, @Param("newPoint") int newPoint);
-    int selectForUpdate(@Param("user_id") int user_id);
+    Integer selectForUpdate(@Param("user_id") int user_id);
 
     // 사용자 포인트 내역 조회
     List<PointResponseDTO> getPointHistoryByUserId(@Param("user_id") int user_id);

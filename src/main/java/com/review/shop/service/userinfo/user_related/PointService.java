@@ -28,7 +28,7 @@ public class PointService {
 
 
     @Transactional
-    public PointHistoryDTO updateUserPoint(PointHistoryDTO dto) {
+    public void updateUserPoint(PointHistoryDTO dto) {
         // 1. 유저 포인트 조회 및 잠금
         int user_id = dto.getUser_id();
 
@@ -55,7 +55,6 @@ public class PointService {
         response.setType(dto.getType());
         response.setAmount(dto.getAmount()); // 새 필드가 있다면 반영
 
-        return response;
     }
 
 
