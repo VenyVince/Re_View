@@ -59,7 +59,13 @@ public interface ProductReviewMapper {
     // 리뷰 삭제
     void deleteReview(@Param("review_id")int review_id);
 
-    // 베스트 리뷰 선정용
+
+    // 기존 베스트 리뷰 초기화
+    void resetBestReviews();
+
+    // 베스트 리뷰 선정
     List<BestReviewDTO> selectBestReviewIds();
 
+    // 선정된 베스트 리뷰의 is_checked 업데이트
+    void updateBestReviews(@Param("review_ids") List<Integer> review_ids);
 }

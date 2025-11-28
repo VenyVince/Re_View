@@ -132,12 +132,7 @@
     <select id="selectBestReviewIds" resultType="com.review.shop.dto.review.BestReviewDTO">
         WITH review_stats AS (
         SELECT
-        r.review_id,
-        r.user_id,
-        r.product_id,
-        r.like_count,
-        r.dislike_count,
-        r.comment_count,
+        r.review_id, r.user_id, r.product_id, r.like_count, r.dislike_count, r.comment_count,
         p.review_count,
         -- review_number은 리뷰의 순번. like가 같으면 임의로 순위가 조정되기 때문에 조건을 좀 더만듦.
         -- (like → dislike → comment 기준)
@@ -155,4 +150,21 @@
         -- 101개 리뷰의 10퍼센트는 10개로 자름.
         WHERE review_number &lt;= FLOOR(review_count * 0.1);
     </select>
+
+    <!-- 기존 is_checked 초기화 -->
+    <update id="resetBestReviews">
+        UPDATE review
+        SET is_checked = 0
+        WHERE is_checked = 1
+    </update>
+
+    <!-- 조회된 리뷰 is_checked 업데이트 -->
+    <update id="updateBestReviews">
+        UPDATE review
+        SET is_checked = 1
+        WHERE review_id IN
+        <foreach item="id" collection="reviewIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

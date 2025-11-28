@@ -9,11 +9,13 @@ import com.review.shop.repository.review.ProductReviewMapper;
 import com.review.shop.service.userinfo.user_related.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -183,11 +185,27 @@ public class ProductReviewService {
     }
 
     // 스케쥴러에서 베스트 리뷰 갱신 엔트리포인트
+    @Transactional
     public void updateBestReviews() {
-        List<BestReviewDTO> bestList = selectBestReviewList();
+        // 1. 기존 베스트 리뷰 초기화
+        productReviewMapper.resetBestReviews();
 
+        // 2. 새 베스트 리뷰 조회
+        List<BestReviewDTO> bestList = productReviewMapper.selectBestReviewIds();
+
+        // 3. 조회된 리뷰 is_checked 업데이트
+        List<Integer> review_ids = bestList.stream()
+                .map(BestReviewDTO::getReview_id)
+                .collect(Collectors.toList());
+        if (!review_ids.isEmpty()) {
+            productReviewMapper.updateBestReviews(review_ids);
+        }
+
+        // 4. 포인트 지급
         for (BestReviewDTO dto : bestList) {
             pointService.addBestReviewPoint(dto.getUser_id(), dto.getReview_id());
+            dto.setIs_checked(1); // DTO와 DB 동기화
         }
     }
+
 }
