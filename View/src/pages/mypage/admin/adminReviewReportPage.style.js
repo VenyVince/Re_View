@@ -118,10 +118,21 @@ export const StatusBadge = styled.span`
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  background-color: ${(props) =>
-    props.status === "PENDING" ? "#fff4e5" : "#e7f5ff"};
-  color: ${(props) =>
-    props.status === "PENDING" ? "#f59f00" : "#1971c2"};
+    /* 배경색 */
+    background-color: ${(props) =>
+            props.status === "PENDING"
+                    ? "#fff4e5"       // 대기 = 주황톤 배경
+                    : props.status === "PROCESSED"
+                            ? "#ffe3e3"       // 처리 = 빨강톤 배경
+                            : "#f1f3f5"};     // 반려됨 = 회색톤 배경
+
+    /* 글자 색 */
+    color: ${(props) =>
+            props.status === "PENDING"
+                    ? "#f08c00"       // 대기 = 주황
+                    : props.status === "PROCESSED"
+                            ? "#fa5252"       // 처리됨 = 빨강
+                            : "#495057"};     // 반려됨 = 진한 회색
 `;
 
 /* 버튼 */
@@ -164,4 +175,89 @@ export const PagerBtn = styled.button`
 export const PageInfo = styled.span`
   font-weight: 600;
   color: #444;
+`;
+
+
+/* 모달 배경 */
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
+
+/* 모달 박스 */
+export const ModalBox = styled.div`
+  background: #fff;
+  padding: 24px 28px;
+  border-radius: 16px;
+  min-width: 420px;
+  max-width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+`;
+
+/* 모달 제목 */
+export const ModalTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+`;
+
+/* 모달 구간 제목 */
+export const ModalSectionTitle = styled.div`
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+`;
+
+/* 모달 내용 박스 */
+export const ModalBoxContent = styled.div`
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8f9fb;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+`;
+
+/* 신고자/작성자 정보 */
+export const ModalText = styled.p`
+  font-size: 14px;
+  margin-bottom: 10px;
+`;
+
+/* 모달 버튼 영역 */
+export const ModalButtonRow = styled.div`
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+`;
+
+/* 처리완료 버튼 */
+export const ModalPrimaryButton = styled.button`
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #495057;
+  color: white;
+  border: none;
+  cursor: pointer;
+
+    &:hover {
+        background: #343a40;
+    }
+`;
+
+/* 반려 버튼 */
+export const ModalSecondaryButton = styled.button`
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
 `;
