@@ -134,28 +134,22 @@ export default function AdminProductNew() {
             const baumannId = BAUMANN_ID_MAP[type] ?? null;
 
             // 2) 이미지 업로드
-            const imageUrls = await uploadImages(); // S3 URL 배열
+            const imageUrls = await uploadImages();
+            // 예: ["/uploads/products/aaa.jpg", "/uploads/products/bbb.jpg"]
 
-            // 3) JSON DTO 구성
+            if (!imageUrls || imageUrls.length === 0) {
+                alert("이미지를 1장 이상 업로드해야 합니다.");
+                return;
+            }
+
+            // 대표 이미지 = 첫 번째 이미지
+            const thumbnailUrl = imageUrls[0];
+
+            // 3) 최종 DTO 생성
             const dto = {
-               /* product_id: 0,
-                prd_name: form.prdName.trim(),
-                prd_brand: form.prdBrand.trim(),
-                ingredient: form.ingredient.trim(),
-                description: form.description.trim(),
-                price: Number(form.price || 0),
-                category: form.category.trim(),
-                rating : 3.0,
-                review_count: 0,
-                is_sold_out: "N",
-                stock: Number(form.stock || 0),
-                baumann_id: baumannId,
-                product_images: imageUrls,*/
-                "product_images_list": [
-                    "/uploads/products/33c01284-8085-4f34-83fe-9a5a0b38780a.jpg",
-                    "/uploads/products/e7ac40e4-44b0-4d1b-90c2-7e4ec095afda.jpg"
-                ],
-                "product": {
+                product_images_list: imageUrls, // 전체 이미지 배열
+
+                product: {
                     product_id: 0,
                     prd_name: form.prdName.trim(),
                     prd_brand: form.prdBrand.trim(),
@@ -163,14 +157,14 @@ export default function AdminProductNew() {
                     price: Number(form.price || 0),
                     category: form.category.trim(),
                     stock: Number(form.stock || 0),
-                    rating : 3.0,
+                    rating: 3.0,
                     description: form.description.trim(),
                     review_count: 0,
                     is_sold_out: "N",
                     baumann_id: baumannId,
-                }
-                ,
-                "thumbnailUrl" : "/uploads/products/33c01284-8085-4f34-83fe-9a5a0b38780a.jpg"
+                },
+
+                thumbnailUrl: thumbnailUrl,
             };
 
             // 4) 상품 등록(JSON)
