@@ -7,7 +7,7 @@ import com.review.shop.dto.orders.*;
 import com.review.shop.dto.product.ProductStockDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.Orders.OrderMapper;
-import com.review.shop.service.userinfo.user_related.PointService;
+import com.review.shop.service.userinfo.other.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,12 +1,11 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.util.Security_Util;
 import com.review.shop.dto.review.ProductReviewDTO;
 import com.review.shop.dto.review.UpdateReviewRequestDTO;
 import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
 import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
 import com.review.shop.service.review.ProductReviewService;
-import com.review.shop.service.review.Review_PointService;
+import com.review.shop.util.Security_Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,8 +26,6 @@ public class ProductReviewController {
 
     private final ProductReviewService productReviewService;
     private final Security_Util security_Util;
-    private final Review_PointService review_pointService;
-
 
 
     /**
@@ -102,7 +99,7 @@ public class ProductReviewController {
     ) {
         int user_id = security_Util.getCurrentUserId();
 
-        CreateReviewResponseDTO result = review_pointService.createReviewWithReward(
+        CreateReviewResponseDTO result = productReviewService.createReviewWithReward(
                 product_id,
                 user_id,
                 request
@@ -152,6 +149,6 @@ public class ProductReviewController {
             @PathVariable int review_id) {
 
         int user_id = security_Util.getCurrentUserId();
-        review_pointService.deleteReviewWithPenalty(product_id, user_id, review_id);
+        productReviewService.deleteReviewWithPenalty(product_id, user_id, review_id);
     }
 }

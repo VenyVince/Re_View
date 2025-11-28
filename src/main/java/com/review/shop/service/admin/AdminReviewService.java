@@ -3,7 +3,7 @@ package com.review.shop.service.admin;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminReviewMapper;
-import com.review.shop.service.userinfo.user_related.PointService;
+import com.review.shop.service.userinfo.other.PointService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
