@@ -28,7 +28,7 @@
             keyColumn="PRODUCT_ID">
         INSERT INTO PRODUCT (
             PRD_NAME, PRD_BRAND, INGREDIENT, PRICE, CATEGORY,
-            STOCK, RATING, DESCRIPTION, REVIEW_COUNT, BAUMANN_ID
+            STOCK, RATING, DESCRIPTION, REVIEW_COUNT, BAUMANN_ID, IS_SOLD_OUT
         )
         VALUES (
                    #{prd_name},
@@ -40,7 +40,8 @@
                    #{rating},
                    #{description},
                    #{review_count},
-                   #{baumann_id}
+                   #{baumann_id},
+                     #{is_sold_out}
                )
     </insert>
 
