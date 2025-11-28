@@ -14,6 +14,7 @@
            OR p.prd_brand LIKE '%' || #{keyword} || '%'
            OR p.ingredient LIKE '%' || #{keyword} || '%'
            OR b.type LIKE '%' || #{keyword} || '%') <!--바우만 타입 관련 연산 추후에 재작성 -->
+        and deleted_at is null
         <if test="filter_brand != null and filter_brand != ''">
             AND p.prd_brand = #{filter_brand}
         </if>

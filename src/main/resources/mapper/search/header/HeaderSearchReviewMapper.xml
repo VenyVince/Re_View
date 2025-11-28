@@ -16,6 +16,7 @@
         JOIN baumann b ON u.baumann_id = b.baumann_id
         WHERE (r.content LIKE '%' || #{keyword} || '%'
         OR u.nickname LIKE '%' || #{keyword} || '%')
+        and deleted_at is null
         <if test="filter_brand != null and filter_brand != ''">
             AND p.prd_brand = #{filter_brand}
         </if>
