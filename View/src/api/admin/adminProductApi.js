@@ -41,18 +41,31 @@ export const updateProduct = async (productId, body) =>
 export const deleteProduct = async (productId) =>
     safeRequest(axiosClient.delete(`/api/admin/products/${productId}`));
 
-/*  이미지 업로드 (multipart)
-    ⚠ 백엔드 이미지 API 구조 확정되면 사용 예정
-    - mainImage / detailImages 구분될 가능성 있음
-    - 현재는 비활성 상태
-*/
-export const uploadProductImages = async (mainImage, detailImages) => {
-    // TODO: 백엔드 이미지 업로드 구조 확정 후 구현
-    // 예상 처리 흐름:
-    // 1) FormData 생성
-    // 2) formData.append("mainImage", mainImage)
-    // 3) detailImages.forEach(f => formData.append("detailImages", f))
-    // 4) axiosClient.post("/api/images/products", formData)
+/* ===============================
+ * 이미지 업로드 (multipart/form-data)
+ * Swagger 스펙 기준:
+ * POST /api/images/products
+ * - 필드명: images
+ * - 배열 지원
+ =============================== */
+export const uploadProductImages = async (mainImage, detailImages = []) => {
+    const fd = new FormData();
 
-    console.warn("[uploadProductImages] 이미지 업로드 API는 백엔드 확정 후 구현됩니다.");
+    // 대표 이미지
+    if (mainImage) {
+        fd.append("images", mainImage);
+    }
+
+    // 상세 이미지
+    detailImages.forEach((file) => {
+        fd.append("images", file);
+    });
+
+    const res = await axiosClient.post("/api/images/products", fd, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+
+    return res.data; // ["url1", "url2", ...]
 };
