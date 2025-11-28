@@ -88,7 +88,7 @@ export default function App() {
                     <Route path="/survey/intro" element={<SurveyIntro/>}/>
                     <Route path="/survey/baumann" element={<SurveyPage/>}/>
                     <Route path="/survey/result" element={<SurveyResult/>}/>
-                    <Route path="/mypage" element={<MyPage />} />
+                    {/*<Route path="/mypage" element={<MyPage />} />*/}
                     <Route path="/qna" element={<QnaPage />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/products" element={<ProductPage />} />
