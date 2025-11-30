@@ -1,34 +1,17 @@
 // src/pages/product/components/ProductCard.jsx
-import React, { useState } from "react";
+import React from "react";
 import "./ProductCard.css";
 
 export default function ProductCard({ product }) {
-    const [loaded, setLoaded] = useState(false);
-
     return (
         <div className="productCard">
 
-            {/* 이미지 영역 */}
+            {/* 이미지 영역 — 리뷰 방식 그대로 */}
             <div className="productImageWrapper">
-
-                {!loaded && (
-                    <img
-                        className="productBlurPreview"
-                        src={product.image_url}
-                        alt=""
-                        onError={(e) => (e.target.src = "/placeholder.png")}
-                    />
-                )}
-
                 <img
-                    className={`productImage ${loaded ? "visible" : ""}`}
-                    src={product.image_url}
-                    alt=""
-                    onLoad={() => setLoaded(true)}
-                    onError={(e) => {
-                        e.target.src = "/placeholder.png";
-                        setLoaded(true);
-                    }}
+                    src={product.image_url || "/images/no-img.png"}
+                    alt={product.prd_name}
+                    className="productImage"
                 />
             </div>
 
@@ -45,7 +28,7 @@ export default function ProductCard({ product }) {
                 >
                     {product.rating
                         ? `${product.rating.toFixed(1)} / 5.0`
-                        : "-"}
+                        : "- / 5.0"}
                 </p>
             </div>
 
