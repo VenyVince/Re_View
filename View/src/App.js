@@ -45,17 +45,21 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
 
-import UserDeliveryPage from "./pages/mypage/user/UserDeliveryPage";
-import UserProfileEdit from "./pages/mypage/user/UserProfileEdit";
+import UserDeliveryPage from "./pages/mypage/user/delivery/UserDeliveryPage";
+import UserProfileEdit from "./pages/mypage/user/profile/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
-import UserCartPage from "./pages/mypage/user/UserCartPage";
-import UserAddressPage from "./pages/mypage/user/UserAddressPage";
-import UserWishPage from "./pages/mypage/user/UserWishPage";
+import UserCartPage from "./pages/mypage/user/cart/UserCartPage";
+import UserAddressPage from "./pages/mypage/user/address/UserAddressPage";
+import UserWishPage from "./pages/mypage/user/wish/UserWishPage";
 
 import AboutPage from "./pages/about/AboutPage";
-import UserCustomerPage from "./pages/mypage/user/UserCustomerPage";
-import UserSkinTestPage from "./pages/mypage/user/UserSkinTestPage";
+import UserCustomerPage from "./pages/mypage/user/customer/UserCustomerPage";
+import UserSkinTestPage from "./pages/mypage/user/skin/UserSkinTestPage";
+import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
+import OrderPaymentPage from "./pages/order/OrderPaymentPage";
+import OrderCompletePage from "./pages/order/OrderCompletePage";
+import UserProtectedRoute from "./components/user/UserProtectedRoute";
 
 export default function App() {
     return (
@@ -84,12 +88,18 @@ export default function App() {
                     <Route path="/survey/intro" element={<SurveyIntro/>}/>
                     <Route path="/survey/baumann" element={<SurveyPage/>}/>
                     <Route path="/survey/result" element={<SurveyResult/>}/>
-                    <Route path="/mypage" element={<MyPage />} />
+                    {/*<Route path="/mypage" element={<MyPage />} />*/}
                     <Route path="/qna" element={<QnaPage />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/products" element={<ProductPage />} />
                     <Route path="/product/detail" element={<ProductDetailPage />} />
                     <Route path="/review" element={<ReviewPage />} />
+
+
+
+
+                    <Route path="/reviews" element={<ReviewPage />} />
+
                     {/* 리뷰 */}
                     <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
 
@@ -111,14 +121,21 @@ export default function App() {
                 {/*API 커넥트 예시용*/}
                 <Route path="/test-products" element={<TestProduct />} />
 
-                {/* 사용자 전용 영역 */}
-                    <Route path="/mypage" element={<UserDeliveryPage />} />
+                {/* ----- 유저 전용 보호 라우트 ----- */}
+                <Route element={<UserProtectedRoute />}>
+                    <Route path="/mypage" element={<MyPage />} />
+
                     <Route path="/mypage/address" element={<UserAddressPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
                     <Route path="/mypage/wish" element={<UserWishPage />} />
                     <Route path="/mypage/cs" element={<UserCustomerPage />} />
                     <Route path="/mypage/skin" element={<UserSkinTestPage />} />
+                    <Route path="/mypage/review" element={<UserReviewPage />} />
+
+                    <Route path="/order/payment" element={<OrderPaymentPage />} />
+                    <Route path="/order/complete" element={<OrderCompletePage />} />
+                </Route>
             </Routes>
             </main>
             <Footer />

@@ -8,25 +8,22 @@ import {
 import { fetchQnaList } from "../../../api/admin/adminQnaApi";
 
 export default function AdminQnaPage() {
-    const [list, setList] = useState([]);      // 🔹 서버에서 온 QnA 리스트
+    const [list, setList] = useState([]);
     const [page, setPage] = useState(1);
-    const pageSize = 4;
+    const pageSize = 10;
     const navigate = useNavigate();
 
-    // QnA 목록 API 연동
+    // QnA 목록 로딩
     useEffect(() => {
         const load = async () => {
             try {
-                console.log("[ADMIN] QnA 목록 호출 시작");
-                const data = await fetchQnaList();   // fetchQnaList가 data만 돌려주든, 응답 통째로 돌려주든 대비
-                console.log("[ADMIN] 원본 응답 data:", data);
+                const res = await fetchQnaList();  // axios 응답
+                console.log("QNA 목록 응답:", res);
 
-                const items = Array.isArray(data)
-                    ? data
-                    : data?.data || data?.content || data?.result || [];
+                // 실제 백엔드 응답에서 data 배열만 추출
+                const items = res.data ?? [];
 
-                console.log("[ADMIN] 파싱된 QnA items:", items);
-                setList(items);
+                setList(Array.isArray(items) ? items : []);
             } catch (error) {
                 console.error("[ADMIN] QnA 목록 불러오기 실패:", error);
                 setList([]);
@@ -45,10 +42,9 @@ export default function AdminQnaPage() {
     }, [list, page]);
 
     const handleClickRow = (item) => {
-        // 🔹 질문 클릭 시 답변 페이지로 이동 + 상태 전달
-        const qnaId = item.qnaId ?? item.id;
-        navigate(`/admin/qna/${qnaId}`, { state: item });
+        navigate(`/admin/qna/${item.qna_id}`, { state: item });
     };
+
 
     return (
         <Wrap>
@@ -58,13 +54,17 @@ export default function AdminQnaPage() {
 
                 <List>
                     {pageList.map((q) => (
-                        <Row key={q.qnaId ?? q.id} onClick={() => handleClickRow(q)}>
-                            <IconCircle>?</IconCircle>
+                        <Row key={q.qna_id} onClick={() => handleClickRow(q)}>
+                            <IconCircle status={q.status}>
+                                {q.status === "답변완료" ? "✔" : "?"}
+                            </IconCircle>
                             <TextBlock>
-                                {/* 스웨거 기준 title, username 사용 */}
-                                <QuestionText>{q.title ?? q.question}</QuestionText>
-                                { (q.username || q.customer) && (
-                                    <Meta>고객: {q.username ?? q.customer}</Meta>
+                                <QuestionText>{q.title}</QuestionText>
+                                <Meta>고객: {q.user_name}</Meta>
+                                {q.answer && (
+                                    <Meta style={{ color: "#0ea5e9" }}>
+                                        ✔ 답변 완료
+                                    </Meta>
                                 )}
                             </TextBlock>
                         </Row>

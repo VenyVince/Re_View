@@ -24,8 +24,11 @@ public interface AdminProductMapper {
 
     ProductDetailDTO readProduct(int product_id);
 
-    int insertProductImage(@Param("product_id") int product_id, @Param("image") String image);
+    int insertProductImage(@Param("product_id") int product_id, @Param("image") String image, @Param("is_thumbnail") String is_thumbnail);
 
     List<String> readImage(int product_id);
 
+    int deleteProductImages(@Param("product_id") int product_id);
+
+    int updateAllImagesToNo(int productId);
 }

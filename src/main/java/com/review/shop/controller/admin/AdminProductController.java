@@ -1,9 +1,8 @@
 package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
-import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.exception.WrongRequestException;
+import com.review.shop.dto.product.ProductUpdateOnlyImageDTO;
+import com.review.shop.dto.product.ProductUploadDTO;
 import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "Admin API", description = "상품 관련 관리자 기능 API")
 @RestController
 @RequestMapping("/api/admin")
@@ -27,6 +24,7 @@ import java.util.List;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+
 
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -55,13 +53,27 @@ public class AdminProductController {
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/products")
-    public ResponseEntity<String> insertProduct(@RequestBody ProductDetailDTO product) {
-        adminProductService.insertProduct(product);
-        int prd_id = product.getProduct_id();
-        List<String> image_url = product.getProduct_images();
 
-        adminProductService.putImage(prd_id, image_url);
+    //api/images/products 에서 이미지 업로드 후 받은 이미지 경로 리스트와 상품 정보와, 프론트가 선택한 썸네일 정보를 같이 request body로 받음
+    public ResponseEntity<String> insertProduct(@RequestBody ProductUploadDTO productUploadDTO) {
 
+        ProductDetailDTO product = productUploadDTO.getProduct();
+
+        // 이미지 리스트 유효성 검사
+        if(productUploadDTO.getProduct_images_list() == null || productUploadDTO.getProduct_images_list().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("상품 이미지는 최소 하나 이상 등록되어야 합니다.");
+        }
+        // 썸네일 유효성 검사
+        if(productUploadDTO.getThumbnailUrl() == null || productUploadDTO.getThumbnailUrl().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("썸네일 이미지는 반드시 선택되어야 합니다.");
+        }
+
+        // product DTO에 이미지 리스트 설정
+        product.setProduct_images(productUploadDTO.getProduct_images_list());
+
+
+        // product DTO 업로드, 썸네일 이미지 정보도 전송
+        adminProductService.uploadProductAndImages(product,productUploadDTO.getThumbnailUrl());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
     }
@@ -116,18 +128,29 @@ public class AdminProductController {
         return ResponseEntity.ok(detailDTO);
     }
 
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<String> handleDatabase(DatabaseException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    //이미지 업데이트 API
+    @Operation(summary = "상품 이미지 업데이트", description = "상품의 이미지를 업데이트합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 이미지 업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @PutMapping("/products/{product_id}/images")
+    public ResponseEntity<String> updateProductImages(
+            @Parameter(description = "이미지를 업데이트할 상품의 ID") @PathVariable int product_id,
+            @RequestBody ProductUpdateOnlyImageDTO productUpdateOnlyImageDTO) {
+        // 이미지 리스트 유효성 검사
+        if(productUpdateOnlyImageDTO.getProduct_images_list() == null || productUpdateOnlyImageDTO.getProduct_images_list().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("상품 이미지는 최소 하나 이상 등록되어야 합니다.");
+        }
+        // 썸네일 유효성 검사
+        if(productUpdateOnlyImageDTO.getThumbnailUrl() == null || productUpdateOnlyImageDTO.getThumbnailUrl().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("썸네일 이미지는 반드시 선택되어야 합니다.");
+        }
+        adminProductService.updateProductImages(product_id, productUpdateOnlyImageDTO.getProduct_images_list(), productUpdateOnlyImageDTO.getThumbnailUrl());
+        return ResponseEntity.ok("상품 이미지가 업데이트되었습니다");
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
 
-    @ExceptionHandler(WrongRequestException.class)
-    public ResponseEntity<String> handleWrongRequest(WrongRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
 }

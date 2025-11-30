@@ -16,8 +16,8 @@
         JOIN user_table u ON r.user_id = u.user_id
         JOIN baumann b ON u.baumann_id = b.baumann_id
         WHERE r.product_id = #{product_id}
-
-        <if test="keyword != null and keyword != ''">
+        and deleted_at is null
+          <if test="keyword != null and keyword != ''">
             AND (
             r.content LIKE CONCAT('%', #{keyword}, '%')
             OR u.nickname LIKE CONCAT('%', #{keyword}, '%')

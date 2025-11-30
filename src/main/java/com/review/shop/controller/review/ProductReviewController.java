@@ -1,12 +1,11 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.Util.Security_Util;
 import com.review.shop.dto.review.ProductReviewDTO;
 import com.review.shop.dto.review.UpdateReviewRequestDTO;
 import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
 import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
 import com.review.shop.service.review.ProductReviewService;
-import com.review.shop.service.review.Review_PointService;
+import com.review.shop.util.Security_Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,15 +26,13 @@ public class ProductReviewController {
 
     private final ProductReviewService productReviewService;
     private final Security_Util security_Util;
-    private final Review_PointService review_pointService;
-
 
 
     /**
      * 특정 상품의 리뷰 목록 조회
      */
     @GetMapping("/{product_id}/reviews")
-    @Operation(summary = "상품 리뷰 조회", description = "상품 ID로 리뷰 조회, 정렬 옵션: like_count, latest, rating")
+    @Operation(summary = "특정 상품 리뷰 조회", description = "상품 ID로 리뷰 조회, 정렬 옵션: like_count, latest, rating")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
             @ApiResponse(responseCode = "404", description = "리뷰 없음 (ResourceNotFoundException)"),
@@ -72,7 +69,7 @@ public class ProductReviewController {
     // 특정 삼품에 대한 리뷰 작성 히스토리 확인용
     @GetMapping("/exists/update")
     @Operation(
-            summary = "리뷰 작성 가능 여부 확인",
+            summary = "리뷰 수정 및 삭제 가능 여부 확인",
             description = "사용자의 리뷰 작성 여부, 리뷰 작성 가능시 주문내역에서 리뷰 작성하라고 띄우면 될 거 같음."
     )
     @ApiResponses(value = {
@@ -102,7 +99,7 @@ public class ProductReviewController {
     ) {
         int user_id = security_Util.getCurrentUserId();
 
-        CreateReviewResponseDTO result = review_pointService.createReviewWithReward(
+        CreateReviewResponseDTO result = productReviewService.createReviewWithReward(
                 product_id,
                 user_id,
                 request
@@ -152,6 +149,6 @@ public class ProductReviewController {
             @PathVariable int review_id) {
 
         int user_id = security_Util.getCurrentUserId();
-        review_pointService.deleteReviewWithPenalty(product_id, user_id, review_id);
+        productReviewService.deleteReviewWithPenalty(product_id, user_id, review_id);
     }
 }

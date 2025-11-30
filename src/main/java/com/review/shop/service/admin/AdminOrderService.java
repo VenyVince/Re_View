@@ -3,16 +3,16 @@ package com.review.shop.service.admin;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminOrderMapper;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@RolesAllowed("ADMIN")
 public class AdminOrderService {
 
     private final AdminOrderMapper adminOrderMapper;
-
-
     // 주문 상태 변경
     public void updateOrderStatus(int order_id, String orderStatus) {
         if(orderStatus ==null||orderStatus.isEmpty()){

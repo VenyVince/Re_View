@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.userinfo.user_related.PointMapper">
+
+    <!-- 포인트 히스토리 추가 -->
+    <insert id="aboutPoint" parameterType="com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO">
+        INSERT INTO point_history (
+            user_id, amount, type, created_at, description
+            <if test="review_id!=null">, review_id</if>
+        )
+        VALUES (
+                   #{dto.user_id}, #{dto.amount}, #{dto.type}, SYSDATE, #{dto.description}
+        <if test="review_id != null">
+            , #{review_id}
+        </if>
+        )
+    </insert>
+
+    <select id="selectForUpdate" resultType="int">
+        SELECT point
+        FROM user_table
+        WHERE user_id = #{user_id}
+            FOR UPDATE
+    </select>
+    <update id="updateUserPoint" parameterType="com.review.shop.dto.userinfo.user_related.Point.PointHistoryDTO">
+        UPDATE user_table
+        SET point = #{newPoint}
+        WHERE user_id = #{user_id}
+    </update>
+    <!-- 특정 사용자 포인트 내역 전체 조회 -->
+    <select id="getPointHistoryByUserId" resultType="com.review.shop.dto.userinfo.user_related.Point.PointResponseDTO">
+        SELECT
+            point_history_id, user_id, amount, type, created_at, description
+        FROM point_history
+        WHERE user_id = #{user_id}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 사용자 총 포인트 조회 -->
+    <select id="getTotalPoint" resultType="int">
+        SELECT POINT
+        FROM USER_TABLE
+        WHERE USER_ID = #{user_id}
+    </select>
+
+    <!--    베스트 리뷰 중복 지급 방지   -->
+    <select id="existsBestReviewPoint" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM point_history
+        WHERE user_id = #{user_id}
+          AND review_id = #{review_id}
+          AND amount = #{amount}
+          AND type = #{type}
+    </select>
+<!--    <select id="selectBestReviewCandidate">-->
+<!--        select review_id from review-->
+<!--        where like_count >= 100-->
+<!--        and comment_count >= 100-->
+<!--    </select>-->
+<!--    <select id="selectBestReveiw">-->
+<!--        SELECT *,-->
+<!--               (like_count * 0.7 + comment_count * 0.3) AS score-->
+<!--        FROM review-->
+<!--        WHERE like_count >= 100 AND comment_count >= 100-->
+<!--        ORDER BY score DESC-->
+<!--    </select>-->
+</mapper>

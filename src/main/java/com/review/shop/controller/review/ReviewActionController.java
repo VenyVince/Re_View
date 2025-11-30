@@ -1,6 +1,6 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.Util.Security_Util;
+import com.review.shop.util.Security_Util;
 import com.review.shop.dto.review.community.CommentRequestDTO;
 import com.review.shop.dto.review.community.LikeRequestDTO;
 import com.review.shop.dto.review.community.ReportRequestDTO;
@@ -90,7 +90,7 @@ public class ReviewActionController {
     ) {
         int user_id = securityUtil.getCurrentUserId();
         // 결과 메시지 예시: "추천되었습니다." or "반응이 취소되었습니다."
-        String resultMessage = reviewActionService.toggleReaction(review_id, user_id, request.getIsLike());
+        String resultMessage = reviewActionService.toggleReaction(review_id, user_id, request.getIs_like());
         return ResponseEntity.ok(resultMessage);
     }
 

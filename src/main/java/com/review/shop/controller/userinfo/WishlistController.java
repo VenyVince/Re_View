@@ -1,8 +1,8 @@
 package com.review.shop.controller.userinfo;
 
-import com.review.shop.Util.Security_Util;
+import com.review.shop.util.Security_Util;
 import com.review.shop.dto.userinfo.user_related.wishlist.WishlistResponseDTO;
-import com.review.shop.service.userinfo.user_related.WishlistService;
+import com.review.shop.service.userinfo.other.WishlistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

@@ -5,10 +5,12 @@ import {
     Wrap, Inner, Content, TitleRow, Title, AddButton,
     Grid, Card, Badge, Thumb, CardBody, Name,
     Price, Actions, Pagination, PagerBtn, PageInfo, EmptyState,
+    SearchRow, SearchInput,
+    DeleteOverlay, DeleteBox, DeleteButtons
 } from "./adminProductPage.style";
 import { fetchAdminProducts, deleteProduct } from "../../../api/admin/adminProductApi";
 
-// 상품 id 추출 헬퍼 함수
+// 상품 id 추출
 const getProductId = (p) =>
     p.product_id ??
     p.productId ??
@@ -17,43 +19,47 @@ const getProductId = (p) =>
     p.productno ??
     p.productNo;
 
-// 상품명/썸네일 안전하게 꺼내는 헬퍼
+// 상품명 추출 (실제 모든 경우 포함)
 const getProductName = (p) =>
-    p.prd_name ?? p.prdName ?? p.productName ?? "이름 없는 상품";
+    p.prd_name ??
+    p.product_name ??
+    p.prdName ??
+    p.productName ??
+    p.name ??
+    "";
 
+// 썸네일 추출
 const getThumbnail = (p) => {
-    // 새 DTO: List<String> product_images
     if (Array.isArray(p.product_images) && p.product_images.length > 0) {
-        return p.product_images[0]; // 첫 번째 이미지를 썸네일로 사용
+        return p.product_images[0];
     }
-    // 예전 필드가 남아있을 수도 있으니 백업용
     if (p.imageUrl) return p.imageUrl;
     return null;
 };
 
 export default function AdminProductPage() {
-    const [list, setList] = useState([]);
-    const [page, setPage] = useState(1);
-    const pageSize = 21;
     const navigate = useNavigate();
 
-    const [deleteTarget, setDeleteTarget] = useState(null); // { id, name } or null
+    const [list, setList] = useState([]);
+    const [page, setPage] = useState(1);
+    const [keyword, setKeyword] = useState("");
+    const [deleteTarget, setDeleteTarget] = useState(null);
 
+    const pageSize = 21;
+
+    // 상품 목록 불러오기
     useEffect(() => {
         const load = async () => {
             try {
-                console.log("[ADMIN] 상품 목록 호출 시작");
                 const data = await fetchAdminProducts();
-                console.log("[ADMIN] 원본 응답 data:", data);
 
                 const items = Array.isArray(data)
                     ? data
                     : data?.data || data?.content || data?.result || [];
 
-                console.log("[ADMIN] 파싱된 items:", items);
                 setList(items);
             } catch (err) {
-                console.error("[ADMIN] 상품 목록 불러오기 실패:", err);
+                console.error(err);
                 setList([]);
             }
         };
@@ -61,13 +67,24 @@ export default function AdminProductPage() {
         load();
     }, []);
 
-    const total = list.length;
+    // 검색 필터 (회원관리 방식과 동일)
+    const filteredList = useMemo(() => {
+        if (!keyword.trim()) return list;
+
+        const q = keyword.toLowerCase();
+        return list.filter((item) =>
+            getProductName(item).toLowerCase().includes(q)
+        );
+    }, [list, keyword]);
+
+    // 페이지 계산
+    const total = filteredList.length;
     const maxPage = Math.max(1, Math.ceil(total / pageSize));
 
     const pageList = useMemo(() => {
-        const s = (page - 1) * pageSize;
-        return list.slice(s, s + pageSize);
-    }, [list, page]);
+        const start = (page - 1) * pageSize;
+        return filteredList.slice(start, start + pageSize);
+    }, [filteredList, page]);
 
     const isEmpty = total === 0;
 
@@ -75,17 +92,25 @@ export default function AdminProductPage() {
         <Wrap>
             <Inner>
                 <Content>
+
                     <TitleRow>
                         <Title>등록된 상품</Title>
-                        <AddButton
-                            onClick={() =>
-                                navigate("/admin/products/new")
-                            }
-                        >
+                        <AddButton onClick={() => navigate("/admin/products/new")}>
                             상품 등록
                         </AddButton>
-
                     </TitleRow>
+
+                    {/* 검색 */}
+                    <SearchRow>
+                        <SearchInput
+                            placeholder="상품명 검색"
+                            value={keyword}
+                            onChange={(e) => {
+                                setKeyword(e.target.value);
+                                setPage(1);
+                            }}
+                        />
+                    </SearchRow>
 
                     {isEmpty ? (
                         <EmptyState>
@@ -106,58 +131,36 @@ export default function AdminProductPage() {
                                     return (
                                         <Card key={pid ?? Math.random()}>
                                             {p.isNew && <Badge>신제품</Badge>}
+
                                             <Thumb>
-                                                {thumb ? (
-                                                    <img src={thumb} alt={name} />
-                                                ) : (
-                                                    "이미지"
-                                                )}
+                                                {thumb ? <img src={thumb} alt={name} /> : "이미지"}
                                             </Thumb>
+
                                             <CardBody>
                                                 <Name>{name}</Name>
                                                 <Price>₩{(p.price ?? 0).toLocaleString()}</Price>
+
                                                 <Actions>
-                                                    {/* 수정 버튼 */}
                                                     <button
                                                         type="button"
                                                         title="수정"
-                                                        onClick={() => {
-                                                            console.log("[EDIT] 선택한 상품:", p, "ID:", pid);
-
-                                                            if (!pid && pid !== 0) {
-                                                                console.error("수정하려는 상품에 ID가 없습니다:", p);
-                                                                alert("상품 ID가 없어 수정할 수 없습니다. 콘솔을 확인해 주세요.");
-                                                                return;
-                                                            }
-                                                            navigate(`/admin/products/${pid}/edit`);
-                                                        }}
+                                                        onClick={() =>
+                                                            navigate(`/admin/products/${pid}/edit`)
+                                                        }
                                                     >
                                                         ✏️
                                                     </button>
 
-                                                    {/* 삭제 버튼 */}
                                                     <button
                                                         type="button"
                                                         title="삭제"
-                                                        onClick={async () => {
-                                                            console.log("[DELETE] 선택한 상품:", p, "ID:", pid);
-
-                                                            if (!pid && pid !== 0) {
-                                                                console.error("삭제하려는 상품에 ID가 없습니다:", p);
-                                                                alert("상품 ID가 없어 삭제할 수 없습니다. 콘솔을 확인해 주세요.");
-                                                                return;
-                                                            }
-
-                                                            setDeleteTarget({
-                                                                id: pid,
-                                                                name,
-                                                            });
-                                                        }}
+                                                        onClick={() =>
+                                                            setDeleteTarget({ id: pid, name })
+                                                        }
                                                     >
                                                         🗑️
                                                     </button>
                                                 </Actions>
-
                                             </CardBody>
                                         </Card>
                                     );
@@ -167,94 +170,69 @@ export default function AdminProductPage() {
                             <Pagination>
                                 <PagerBtn
                                     disabled={page === 1}
-                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                                 >
                                     {"<"}
                                 </PagerBtn>
-                                <PageInfo>
-                                    {page} / {maxPage}
-                                </PageInfo>
+
+                                <PageInfo>{page} / {maxPage}</PageInfo>
+
                                 <PagerBtn
                                     disabled={page === maxPage}
-                                    onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
+                                    onClick={() => setPage((prev) => Math.min(maxPage, prev + 1))}
                                 >
                                     {">"}
                                 </PagerBtn>
                             </Pagination>
                         </>
                     )}
+
+                    {/* 삭제 모달 */}
                     {deleteTarget && (
-                        <div
-                        style={{
-                            position: "fixed",
-                            inset: 0,
-                            background: "rgba(0,0,0,0.4)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            zIndex: 9999,
-                        }}>
-                            <div
-                                style={{
-                                    background: "#fff",
-                                    padding: "32px 40px",
-                                    borderRadius: "16px",
-                                    minWidth: "320px",
-                                    textAlign: "center",
-                                }}
-                            >
+                        <DeleteOverlay>
+                            <DeleteBox>
                                 <p style={{ fontSize: "18px", marginBottom: "16px" }}>
-                                    <strong>{deleteTarget.id}</strong> 번 상품
-                                    <br />
-                                    <strong>“{deleteTarget.name}”</strong>
-                                    <br />
+                                    <strong>{deleteTarget.id}</strong> 번 상품<br />
+                                    <strong>“{deleteTarget.name}”</strong><br />
                                     을(를) 삭제하시겠습니까?
                                 </p>
 
-                                <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "8px" }}>
+                                <DeleteButtons>
                                     <button
                                         type="button"
-                                        onClick={()=>setDeleteTarget(null)}
-                                        style={{
-                                            padding: "8px 16px",
-                                            borderRadius: "999px",
-                                            border: "1px solid #ccc",
-                                            background: "#fff",
-                                            cursor: "pointer",
-                                        }}
+                                        className="cancel-btn"
+                                        onClick={() => setDeleteTarget(null)}
                                     >
                                         취소
                                     </button>
+
                                     <button
                                         type="button"
+                                        className="confirm-btn"
                                         onClick={async () => {
                                             try {
-                                                await deleteProduct(deleteTarget.id); // 🔥 실제 삭제
-                                                setList(prev =>
-                                                    prev.filter(item => getProductId(item) !== deleteTarget.id)
+                                                await deleteProduct(deleteTarget.id);
+                                                setList((prev) =>
+                                                    prev.filter(
+                                                        (item) => getProductId(item) !== deleteTarget.id
+                                                    )
                                                 );
                                                 alert("상품이 삭제되었습니다.");
                                             } catch (e) {
                                                 console.error(e);
                                                 alert("상품 삭제 실패…!");
                                             } finally {
-                                                setDeleteTarget(null); // 모달 닫기
+                                                setDeleteTarget(null);
                                             }
                                         }}
-                                        style={{
-                                            padding: "8px 24px",
-                                            borderRadius: "999px",
-                                            border: "none",
-                                            background: "#000",
-                                            color: "#fff",
-                                            cursor: "pointer",
-                                        }}>
+                                    >
                                         예
                                     </button>
-                                </div>
-                            </div>
-                        </div>
+                                </DeleteButtons>
+                            </DeleteBox>
+                        </DeleteOverlay>
                     )}
+
                 </Content>
             </Inner>
         </Wrap>

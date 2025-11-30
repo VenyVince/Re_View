@@ -31,8 +31,13 @@ public interface RecommendationsMapper {
     RecommendationsUserDTO getBaumannDTOWithId(@Param("user_Baumann") Integer user_Baumann);
 
     // 바우만 타입으로 비교하여 추천 상품 리스트를 리턴
-    List<RecommendationProductDTO> findAllProductsSortedByBaumann(@Param("first") String first,
-                                                                  @Param("second") String second,
-                                                                  @Param("third") String third,
-                                                                  @Param("fourth") String fourth);
+    List<RecommendationProductDTO> findRecommencementsWithAll(@Param("userInfo") List<String> userInfo);
+
+    List<RecommendationProductDTO> findRecommencementsWithFirst(@Param("userInfo") List<String> userInfo);
+
+    List<RecommendationProductDTO> findRecommencementsWithSecond(@Param("userInfo") List<String> userInfo);
+
+    List<RecommendationProductDTO> findRecommencementsWithThird(@Param("userInfo") List<String> userInfo);
+
+    List<RecommendationProductDTO> findRecommencementsWithFourth(@Param("userInfo") List<String> userInfo);
 }

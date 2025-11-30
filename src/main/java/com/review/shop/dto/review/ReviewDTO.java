@@ -20,4 +20,6 @@ public class ReviewDTO {
     private int price;               // 가격
     private String content;          // 리뷰 내용
     private float rating;           // 평점
+    private String is_selected;     // 베스트 리뷰 선정 여부 ('0' or '1')
+    private String is_checked;      // 관리자 확인 여부 ('0' or '1')
 }
