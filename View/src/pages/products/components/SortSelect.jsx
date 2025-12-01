@@ -2,20 +2,19 @@
 import React from "react";
 import "./SortSelect.css";
 
-// 정렬 옵션 셀렉트 박스
 export default function SortSelect({
-                                       sortType,         // 현재 선택된 정렬 기준
-                                       setSortType,      // 정렬 기준 변경 함수
-                                       selectedCategory, // 선택된 카테고리
-                                       setPageState      // 페이지 초기화 함수
+                                       sortType,
+                                       setSortType,
+                                       selectedCategory,
+                                       setPageState
                                    }) {
     return (
         <select
-            className="sortSelect"
+            className="productSortSelect"
             value={sortType}
             onChange={(e) => {
-                setSortType(e.target.value);                     // 정렬 기준 변경
-                setPageState((prev) => ({                       // 선택된 카테고리의 페이지 0으로 초기화
+                setSortType(e.target.value);
+                setPageState((prev) => ({
                     ...prev,
                     [selectedCategory]: 0
                 }));

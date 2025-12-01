@@ -1,4 +1,4 @@
-.productCarousel {
+.reviewCarousel {
     position: relative;
     width: 1200px;
     background: #fafafa;
@@ -8,7 +8,7 @@
 }
 
 /* 좌우 버튼 */
-.productSlideButton {
+.reviewSlideButton {
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -21,60 +21,60 @@
     transform: translateY(-50%);
 }
 
-.productSlideButton.left {
+.reviewSlideButton.left {
     left: -60px;
 }
 
-.productSlideButton.right {
+.reviewSlideButton.right {
     right: -60px;
 }
 
-.productSlideButton.disabled {
+.reviewSlideButton.disabled {
     opacity: 0.3;
     pointer-events: none;
 }
 
 /* 보여지는 영역 */
-.productWindow {
+.reviewWindow {
     width: 1200px;
     overflow: hidden;
 }
 
 /* 트랙 */
-.productTrack {
+.reviewTrack {
     display: flex;
     transition: transform 0.45s ease;
 }
 
 /* 페이지 */
-.productPage {
+.reviewPage {
     width: 1200px;
     flex-shrink: 0;
 }
 
-/* 한 줄 4개 */
-.productRow {
+/* 한 줄 (4개 카드) */
+.reviewRow {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 22px;
     margin: 0 20px 22px;
 }
 
-/* 상품 없음 */
-.productEmpty {
+/* 리뷰 없음 */
+.reviewEmpty {
     padding: 60px;
     text-align: center;
     color: #999;
 }
 
-.productPagination {
+.reviewPagination {
     margin-top: 16px;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
 }
 
-.productPageNumber {
+.reviewPageNumber {
     padding: 6px 12px;
     font-size: 14px;
     border-radius: 6px;
@@ -84,8 +84,7 @@
     transition: 0.2s;
 }
 
-.productPageNumber.active {
+.reviewPageNumber.active {
     background: #333;
     color: #fff;
 }
-
