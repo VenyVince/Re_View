@@ -1,6 +1,6 @@
 package com.review.shop.controller.recommendations;
 
-import com.review.shop.dto.product.RecommendationProductDTO;
+import com.review.shop.dto.product.RecommendationDTO;
 import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.service.recommendations.RecommendationsService;
@@ -54,7 +54,7 @@ public class RecommendationsController {
         RecommendationsUserDTO baumannDTO = recommendationsService.getBaumannDTOWithId(user_Baumann);
         System.out.println(baumannDTO);
         //바우만 DTO를 기반으로 type에 따른 추천 상품 리스트 가져오기
-        List<RecommendationProductDTO> recommendationsPrdList = recommendationsService.getRecommendedProducts(baumannDTO,type);
+        List<RecommendationDTO> recommendationsPrdList = recommendationsService.getRecommendedProducts(baumannDTO,type);
 
         Map<String, Object> response = new HashMap<>();
 
