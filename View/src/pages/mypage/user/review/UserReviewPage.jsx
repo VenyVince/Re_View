@@ -1,81 +1,76 @@
 // src/pages/mypage/user/review/UserReviewPage.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserReviewPage.css";
 
-// ✅ 더미 데이터 (API 스키마 기반)
-// review_id, writer, created_at, image_url, brand_name,
-// product_name, like_count, price, content, rating
-const MOCK_REVIEWS = [
-    {
-        review_id: 1,
-        writer: "더미유저",
-        created_at: "2025-11-20T10:15:00",
-        image_url:
-            "https://images.unsplash.com/photo-1585386959984-a4155223f3f8?w=600&q=80",
-        brand_name: "라곰(LAGOM)",
-        product_name: "셀럽 마이크로 폼 클렌저",
-        like_count: 12,
-        price: 19000,
-        content:
-            "거품도 부드럽고 세안 후에 당김이 거의 없어요. 민감성인데도 자극이 적어서 잘 쓰고 있습니다.",
-        rating: 4.5,
-    },
-    {
-        review_id: 2,
-        writer: "더미유저",
-        created_at: "2025-11-18T21:03:00",
-        image_url: "",
-        brand_name: "라로슈포제",
-        product_name: "시카플라스트 밤 B5+",
-        like_count: 5,
-        price: 22000,
-        content:
-            "트러블 올라올 때 국소 부위에만 발라주고 있어요. 유분감은 조금 있지만 진정 효과는 확실합니다.",
-        rating: 4.0,
-    },
-    {
-        review_id: 3,
-        writer: "더미유저",
-        created_at: "2025-11-10T09:40:00",
-        image_url:
-            "https://images.unsplash.com/photo-1612810432633-96f64dc8ccb6?w=600&q=80",
-        brand_name: "닥터지",
-        product_name: "레드 블레미쉬 수딩 크림",
-        like_count: 27,
-        price: 28000,
-        content:
-            "수분감 위주 크림이라 악건성인 분들에겐 겨울에 살짝 부족할 수 있는데, 지성·복합성에겐 딱 좋은 느낌이에요.",
-        rating: 5.0,
-    },
-];
+export default function UserReviewPage() {
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-export default function UserMyReviewPage() {
-    // 날짜 포맷 (YYYY-MM-DD)
-    const formatDate = (isoString) => {
-        if (!isoString) return "";
-        return isoString.slice(0, 10);
+    const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
+    const formatPrice = (price) =>
+        price == null ? "" : price.toLocaleString("ko-KR");
+    const formatRating = (rating) =>
+        rating == null ? "-" : Number(rating).toFixed(1);
+
+    const fetchMyReviews = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const res = await axios.get("/api/users/reviews/search", {
+                params: {
+                    keyword: "",      // 전체 조회용
+                    sort: "latest",   // 최신순
+                    filter_rating: 0, // 필터 없음
+                },
+                withCredentials: true,
+            });
+
+            console.log(" /api/users/reviews/search 응답:", res.data);
+
+            // 응답 형태 방어적으로 처리
+            const root = res.data.data || res.data;
+
+            // 예시: { reviews: [...] } 또는 { content: [...] } 등등 대비
+            const list =
+                root.reviews ||
+                root.content ||
+                root.items ||
+                root.list ||
+                [];
+
+            setReviews(Array.isArray(list) ? list : []);
+        } catch (e) {
+            console.error(" 내 리뷰 조회 실패:", e);
+            console.error(" 응답:", e.response?.status, e.response?.data);
+
+            if (e.response?.status === 401) {
+                setError("로그인이 필요합니다. 다시 로그인해 주세요.");
+            } else {
+                // 지금은 DB 에러 때문에 이 문장이 보이는 상태
+                setError("작성한 후기를 불러오는 중 오류가 발생했어요.");
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const formatPrice = (price) => {
-        if (price == null) return "";
-        return price.toLocaleString("ko-KR");
-    };
-
-    const formatRating = (rating) => {
-        if (rating == null) return "-";
-        return Number(rating).toFixed(1);
-    };
-
-    const reviews = MOCK_REVIEWS; // 🔹 지금은 그냥 더미 배열 그대로 사용
+    useEffect(() => {
+        fetchMyReviews();
+    }, []);
 
     return (
         <UserMyPageLayout>
             <section className="mypage-section myreview-section">
                 <h3 className="reivew-card-title">나의 작성 후기</h3>
-                <p className="review-card-sub">작성한 리뷰는...</p>
+                <p className="review-card-sub">작성한 리뷰를 한눈에 확인할 수 있어요.</p>
 
-                {reviews.length === 0 && (
+                {loading && <p className="myreview-loading">불러오는 중...</p>}
+                {error && <p className="myreview-error">{error}</p>}
+                {!loading && !error && reviews.length === 0 && (
                     <p className="myreview-empty">아직 작성한 후기가 없어요.</p>
                 )}
 
@@ -86,9 +81,7 @@ export default function UserMyReviewPage() {
                             <header className="myreview-header">
                                 <div className="myreview-title-block">
                                     <div className="myreview-brand">{review.brand_name}</div>
-                                    <div className="myreview-product">
-                                        {review.product_name}
-                                    </div>
+                                    <div className="myreview-product">{review.product_name}</div>
                                 </div>
 
                                 <div className="myreview-meta">
