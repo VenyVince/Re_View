@@ -1,12 +1,18 @@
 // src/pages/product/components/ProductCard.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";   // ← 추가
 import "./ProductCard.css";
 
 export default function ProductCard({ product }) {
-    return (
-        <div className="productCard">
+    const navigate = useNavigate();  // ← 추가
 
-            {/* 이미지 영역 — 리뷰 방식 그대로 */}
+    return (
+        <div
+            className="productCard"
+            onClick={() => navigate(`/product/${product.product_id}`)}   // ← 클릭 시 이동
+        >
+
+            {/* 이미지 영역 */}
             <div className="productImageWrapper">
                 <img
                     src={product.image_url || "/images/no-img.png"}

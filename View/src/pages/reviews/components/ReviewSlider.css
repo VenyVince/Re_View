@@ -40,19 +40,19 @@
     overflow: hidden;
 }
 
-/* 트랙 */
+/* 슬라이드 트랙 */
 .reviewTrack {
     display: flex;
     transition: transform 0.45s ease;
 }
 
-/* 페이지 */
+/* 한 페이지 */
 .reviewPage {
     width: 1200px;
     flex-shrink: 0;
 }
 
-/* 한 줄 (4개 카드) */
+/* 한 줄(4개 카드) */
 .reviewRow {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -67,13 +67,42 @@
     color: #999;
 }
 
-.reviewPagination {
+/*  페이지 번호 + 후기 등록 버튼 부모 */
+.reviewPaginationRow {
     margin-top: 16px;
+    position: relative;
+    height: 40px;
+}
+
+/*  페이지 번호 가운데 정렬 */
+.reviewPagination {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    justify-content: center;
     gap: 8px;
 }
 
+/*  후기 등록 버튼 오른쪽 정렬 */
+.reviewWriteButton {
+    position: absolute;
+    right: 0;
+    padding: 8px 14px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    margin-right: 20px;
+}
+
+.reviewWriteButton:hover {
+    background: #333;
+}
+
+/* 페이지 번호 버튼 */
 .reviewPageNumber {
     padding: 6px 12px;
     font-size: 14px;
