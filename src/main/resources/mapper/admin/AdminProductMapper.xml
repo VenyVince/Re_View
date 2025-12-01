@@ -28,7 +28,7 @@
             keyColumn="PRODUCT_ID">
         INSERT INTO PRODUCT (
             PRD_NAME, PRD_BRAND, INGREDIENT, PRICE, CATEGORY,
-            STOCK, RATING, DESCRIPTION, REVIEW_COUNT, BAUMANN_ID
+            STOCK, RATING, DESCRIPTION, REVIEW_COUNT, BAUMANN_ID, IS_SOLD_OUT
         )
         VALUES (
                    #{prd_name},
@@ -40,7 +40,8 @@
                    #{rating},
                    #{description},
                    #{review_count},
-                   #{baumann_id}
+                   #{baumann_id},
+                     #{is_sold_out}
                )
     </insert>
 
@@ -94,11 +95,13 @@
     <insert id="insertProductImage">
         INSERT INTO PRODUCT_IMAGE (
             PRODUCT_ID,
-            IMAGE_URL
+            IMAGE_URL,
+            IS_THUMBNAIL
         )
         VALUES (
                    #{product_id},
-                   #{image}
+                   #{image},
+                #{is_thumbnail}
                )
     </insert>
 
@@ -117,4 +120,12 @@
     <delete id="deleteProductImages">
         DELETE FROM PRODUCT_IMAGE WHERE PRODUCT_ID = #{product_id}
     </delete>
+
+
+    <update id="updateAllImagesToNo" parameterType="int">
+        UPDATE PRODUCT_IMAGE
+        SET IS_THUMBNAIL = 'N'
+        WHERE PRODUCT_ID = #{product_id}
+    </update>
+
 </mapper>

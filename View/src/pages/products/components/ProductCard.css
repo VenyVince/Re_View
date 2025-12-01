@@ -10,7 +10,8 @@
     box-shadow: 0 8px 22px rgba(0,0,0,0.12);
 }
 
-.imageWrapper {
+/* 이미지 Wrapper */
+.productImageWrapper {
     position: relative;
     width: 100%;
     height: 180px;
@@ -18,7 +19,8 @@
     overflow: hidden;
 }
 
-.blurPreview {
+/* 블러 프리뷰 */
+.productBlurPreview {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -29,6 +31,7 @@
     transition: opacity 0.3s ease;
 }
 
+/* 실제 이미지 */
 .productImage {
     position: absolute;
     width: 100%;
@@ -43,7 +46,8 @@
     opacity: 1;
 }
 
-.brandRatingRow {
+/* 브랜드 + 평점 */
+.productBrandRatingRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -58,16 +62,14 @@
 .productRating {
     font-size: 12px;
     font-weight: 600;
-}
-
-.ratingGold {
     color: #DAA520;
 }
 
-.ratingNone {
+.productRatingNone {
     color: #777;
 }
 
+/* 상품명 */
 .productName {
     font-size: 14px;
     font-weight: 600;
@@ -76,6 +78,7 @@
     text-align: left;
 }
 
+/* 가격 */
 .productPrice {
     font-size: 16px;
     font-weight: 700;

@@ -1,53 +1,43 @@
 // src/pages/product/components/ProductCard.jsx
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";   // ← 추가
 import "./ProductCard.css";
 
-// 개별 상품 카드 컴포넌트
 export default function ProductCard({ product }) {
-    const [loaded, setLoaded] = useState(false); // 이미지 로딩 여부
+    const navigate = useNavigate();  // ← 추가
 
     return (
-        <div className="productCard">
-            {/* 이미지 영역 */}
-            <div className="imageWrapper">
-                {/* 블러 처리된 프리뷰 (로딩 전 표시) */}
-                {!loaded && (
-                    <img
-                        className="blurPreview"
-                        src={product.image_url}
-                        alt=""
-                        onError={(e) => (e.target.src = "/placeholder.png")} // 오류 시 대체 이미지
-                    />
-                )}
+        <div
+            className="productCard"
+            onClick={() => navigate(`/product/${product.product_id}`)}   // ← 클릭 시 이동
+        >
 
-                {/* 실제 상품 이미지 */}
+            {/* 이미지 영역 */}
+            <div className="productImageWrapper">
                 <img
-                    className={`productImage ${loaded ? "visible" : ""}`}
-                    src={product.image_url}
-                    alt=""
-                    onLoad={() => setLoaded(true)} // 로딩 완료
-                    onError={(e) => {
-                        e.target.src = "/placeholder.png"; // 오류 시 대체 이미지
-                        setLoaded(true);
-                    }}
+                    src={product.image_url || "/images/no-img.png"}
+                    alt={product.prd_name}
+                    className="productImage"
                 />
             </div>
 
             {/* 브랜드 / 평점 */}
-            <div className="brandRatingRow">
+            <div className="productBrandRatingRow">
                 <p className="productBrand">{product.prd_brand}</p>
 
                 <p
                     className={
-                        product.rating
-                            ? "productRating ratingGold"
-                            : "productRating ratingNone"
+                        !product.rating || Number(product.rating) === 0
+                            ? "productRating productRatingNone"
+                            : "productRating"
                     }
                 >
-                    {product.rating
-                        ? `${product.rating.toFixed(1)} / 5.0`
-                        : "-"}
+                    {!product.rating || Number(product.rating) === 0
+                        ? "-"
+                        : `${Number(product.rating).toFixed(1)} / 5.0`}
                 </p>
+
+
             </div>
 
             {/* 상품명 */}

@@ -1,6 +1,6 @@
 package com.review.shop.controller.product;
 
-import com.review.shop.dto.product.NextProductDTO;
+import com.review.shop.dto.common.PageResponse;
 import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.service.product.ProductDetailService;
@@ -31,13 +31,13 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping
-    public ResponseEntity<NextProductDTO<ProductDTO>> getProducts(
+    public ResponseEntity<PageResponse<ProductDTO>> getProducts(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             @RequestParam(value = "sort", defaultValue = "latest") String sort,
             @RequestParam(value = "category", required = false) String category // 카테고리 추가 (없으면 null)
     ) {
-        NextProductDTO<ProductDTO> response = productService.getProductList(page, size, sort, category);
+        PageResponse<ProductDTO> response = productService.getProductList(page, size, sort, category);
         return ResponseEntity.ok(response);
     }
 

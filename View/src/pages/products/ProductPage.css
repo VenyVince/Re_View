@@ -1,24 +1,32 @@
-.pageWrapper {
+.productPageWrapper {
     width: 1200px;
     margin: 0 auto;
     padding: 10px 0 60px;
 }
 
 /* Title + Sort */
-.titleRow {
+.productTitleRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    margin: 14px 0;
 }
 
-.categoryTitle {
+.productCategoryTitle {
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
-.no-product, .loading {
-    padding: 60px;
+/* 상품 없음 + 로딩 */
+.productLoading {
     text-align: center;
-    color: #999;
+    padding: 40px 0;
+    font-size: 18px;
+    color:#555;
+}
+.productEmpty{
+    text-align: center;
+    padding: 40px 0;
+    font-size: 17px;
+    color: #555;
 }

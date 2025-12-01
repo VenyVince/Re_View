@@ -10,4 +10,5 @@ import java.util.List;
 public class ProductUploadDTO {
     private List<String> product_images_list;
     private ProductDetailDTO product;
+    private String thumbnailUrl;
 }

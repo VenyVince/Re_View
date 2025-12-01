@@ -1,6 +1,6 @@
 package com.review.shop.dto.recommendations;
 
-import com.review.shop.dto.product.RecommendationProductDTO;
+import com.review.shop.dto.product.RecommendationDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,5 +14,5 @@ public class RecommendationResponseDTO {
     private String message;
 
     @Schema(description = "추천 상품 리스트")
-    private List<RecommendationProductDTO> recommended_products;
+    private List<RecommendationDTO> recommended_products;
 }
