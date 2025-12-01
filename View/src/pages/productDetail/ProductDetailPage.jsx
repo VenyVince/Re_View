@@ -75,7 +75,7 @@ export default function ProductDetailPage() {
                         <div className="pd-field-box">
                             <span className="pd-field-label">평균 별점</span>
                             <div className="pd-field-value">
-                                {product.rating} / 5.0
+                                {Number(product.rating).toFixed(1)} / 5.0
                             </div>
                         </div>
 

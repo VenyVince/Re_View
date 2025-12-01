@@ -27,15 +27,17 @@ export default function ProductCard({ product }) {
 
                 <p
                     className={
-                        product.rating
-                            ? "productRating productRatingGold"
-                            : "productRating productRatingNone"
+                        !product.rating || Number(product.rating) === 0
+                            ? "productRating productRatingNone"
+                            : "productRating"
                     }
                 >
-                    {product.rating
-                        ? `${product.rating.toFixed(1)} / 5.0`
-                        : "- / 5.0"}
+                    {!product.rating || Number(product.rating) === 0
+                        ? "-"
+                        : `${Number(product.rating).toFixed(1)} / 5.0`}
                 </p>
+
+
             </div>
 
             {/* 상품명 */}
