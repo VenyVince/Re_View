@@ -1,9 +1,15 @@
+/* ===============================
+   전체 Wrapper
+================================ */
 .pd-qna-wrapper {
     width: 100%;
     margin-top: 20px;
 }
 
-/* 작성 영역 */
+
+/* ===============================
+   작성 영역 (제목 + 내용 + 등록)
+================================ */
 .pd-qna-write-row {
     display: flex;
     align-items: center;
@@ -29,7 +35,22 @@
     cursor: pointer;
 }
 
-/* 헤더 */
+/* 내용 입력 textarea */
+.pd-qna-content-input {
+    width: 100%;
+    height: 80px;
+    resize: vertical;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 8px;
+    margin-bottom: 40px;
+}
+
+
+/* ===============================
+   QnA 헤더
+================================ */
 .pd-qna-header-row {
     display: flex;
     padding: 12px 8px;
@@ -43,7 +64,10 @@
 .col-writer { width: 15%; text-align: center; }
 .col-date { width: 25%; text-align: right; }
 
-/* 리스트 */
+
+/* ===============================
+   QnA 리스트
+================================ */
 .pd-qna-list {
     list-style: none;
     padding: 0;
@@ -65,7 +89,10 @@
 .pd-qna-writer-inline { width: 15%; text-align: center; }
 .pd-qna-date { width: 25%; text-align: right; }
 
-/* 펼침 영역 */
+
+/* ===============================
+   펼침 영역 (제목 + 내용 + 답변)
+================================ */
 .pd-qna-content-area {
     margin-top: 12px;
     padding: 12px;
@@ -73,17 +100,31 @@
     border-radius: 6px;
 }
 
-/* 공통 */
+/* 제목/내용 블록 */
+.pd-qna-content-block {
+    margin-bottom: 12px;
+}
+
+.pd-qna-content-title {
+    margin-bottom: 6px;
+    font-size: 15px;
+}
+
+.pd-qna-content-text {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* 답변 */
 .pd-qna-answer {
     margin-top: 8px;
     padding: 10px;
     border-radius: 6px;
-    color: #333;           /* 기본 글씨색 */
+    color: #333;
 }
 
-/* 🔥 답변이 있을 때만 빨간색 강조 */
+/* 답변 있음 */
 .pd-qna-answer.has-answer {
-    margin-top: 10px;
     background: #fff6f6;
     border-left: 3px solid #ff4d4d;
     padding: 10px;
@@ -91,7 +132,9 @@
 }
 
 
-/* 비었을 때 */
+/* ===============================
+   빈 값
+================================ */
 .pd-qna-empty {
     padding: 16px;
     color: #777;
