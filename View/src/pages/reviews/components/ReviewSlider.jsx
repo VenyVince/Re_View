@@ -1,11 +1,13 @@
 // src/pages/reviews/components/ReviewSlider.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";   // ⭐ 추가
 import "./ReviewSlider.css";
 import ReviewCard from "./ReviewCard";
 
 export default function ReviewSlider({ reviews, pageWidth }) {
 
     const [currentPage, setCurrentPage] = useState(0);
+    const navigate = useNavigate();   // ⭐ 추가
 
     if (!Array.isArray(reviews) || reviews.length === 0) {
         return <div className="reviewEmpty">리뷰가 없습니다.</div>;
@@ -71,17 +73,29 @@ export default function ReviewSlider({ reviews, pageWidth }) {
                 &gt;
             </button>
 
-            {/* ⭐ 페이지 번호 UI 추가 */}
-            <div className="reviewPagination">
-                {sortedPages.map((_, idx) => (
-                    <button
-                        key={idx}
-                        className={`reviewPageNumber ${currentPage === idx ? "active" : ""}`}
-                        onClick={() => setCurrentPage(idx)}
-                    >
-                        {idx + 1}
-                    </button>
-                ))}
+            <div className="reviewPaginationRow">
+
+                {/* 페이지 번호 */}
+                <div className="reviewPagination">
+                    {sortedPages.map((_, idx) => (
+                        <button
+                            key={idx}
+                            className={`reviewPageNumber ${currentPage === idx ? "active" : ""}`}
+                            onClick={() => setCurrentPage(idx)}
+                        >
+                            {idx + 1}
+                        </button>
+                    ))}
+                </div>
+
+                {/* 후기 등록하기 버튼 (오른쪽 정렬) */}
+                <button
+                    className="reviewWriteButton"
+                    onClick={() => navigate(`/review/write/1`)}   // ⭐ 이동 기능 추가
+                >
+                    후기 등록하기
+                </button>
+
             </div>
 
         </div>
