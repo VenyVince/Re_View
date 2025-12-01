@@ -1,0 +1,54 @@
+/* src/pages/reviewDetail/components/ReviewDetailContent.css */
+
+.rd-content {
+    padding-top: 18px;
+}
+
+.rd-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #374151;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+/* 리뷰 이미지 리스트 */
+.rd-img-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.rd-img-box img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    background: #f9f9f9;
+}
+
+/* 하단 사용자 표기 (오른쪽 정렬) */
+.rd-user-info {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.rd-baumann {
+    background: #f3f4f6; /* gray-100 */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    color: #4b5563; /* gray-600 */
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 9999px;
+}
+
+.rd-nickname {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}

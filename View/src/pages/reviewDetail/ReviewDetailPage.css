@@ -1,0 +1,48 @@
+/* src/pages/reviewDetail/ReviewDetailPage.css */
+/* 깔끔 · 심플 · 여백 많은 스타일 */
+
+.rd-wrap {
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 28px 16px 48px;
+    background: #fafafa;
+    box-sizing: border-box;
+}
+
+/* 메인(제품 요약 + 리뷰 본문) */
+.rd-main {
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* 댓글 박스 */
+.rd-comments-box {
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.rd-comments-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.rd-comments-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.rd-comments-count {
+    font-size: 13px;
+    color: #888;
+}

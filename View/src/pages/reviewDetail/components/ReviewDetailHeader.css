@@ -1,0 +1,56 @@
+/* src/pages/reviewDetail/components/ReviewDetailHeader.css */
+
+.rd-header {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.rd-header-left {
+    flex-shrink: 0;
+}
+
+.rd-product-image {
+    width: 152px;
+    height: 152px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f7f7f7;
+    border: 1px solid #eaeaea;
+}
+
+.rd-header-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.rd-brand {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280
+}
+
+.rd-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.rd-rating {
+    font-size: 15px;
+    font-weight: 600;
+    color: #DAA520;
+}
+
+/* 가격 라인 */
+.rd-price {
+    font-size: 19px;
+    font-weight: 700;
+    color: #ff0000;
+    margin-top: 2px;
+}
+

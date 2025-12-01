@@ -62,10 +62,6 @@
 .productRating {
     font-size: 12px;
     font-weight: 600;
-}
-
-/* 평점 색상 */
-.productRatingGold {
     color: #DAA520;
 }
 
