@@ -1,7 +1,7 @@
 package com.review.shop.repository.recommendations;
 
 import com.review.shop.dto.product.ProductDTO;
-import com.review.shop.dto.product.RecommendationProductDTO;
+import com.review.shop.dto.product.RecommendationDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -31,13 +31,13 @@ public interface RecommendationsMapper {
     RecommendationsUserDTO getBaumannDTOWithId(@Param("user_Baumann") Integer user_Baumann);
 
     // 바우만 타입으로 비교하여 추천 상품 리스트를 리턴
-    List<RecommendationProductDTO> findRecommencementsWithAll(@Param("userInfo") List<String> userInfo);
+    List<RecommendationDTO> findRecommencementsWithAll(@Param("userInfo") List<String> userInfo);
 
-    List<RecommendationProductDTO> findRecommencementsWithFirst(@Param("userInfo") List<String> userInfo);
+    List<RecommendationDTO> findRecommencementsWithFirst(@Param("userInfo") List<String> userInfo);
 
-    List<RecommendationProductDTO> findRecommencementsWithSecond(@Param("userInfo") List<String> userInfo);
+    List<RecommendationDTO> findRecommencementsWithSecond(@Param("userInfo") List<String> userInfo);
 
-    List<RecommendationProductDTO> findRecommencementsWithThird(@Param("userInfo") List<String> userInfo);
+    List<RecommendationDTO> findRecommencementsWithThird(@Param("userInfo") List<String> userInfo);
 
-    List<RecommendationProductDTO> findRecommencementsWithFourth(@Param("userInfo") List<String> userInfo);
+    List<RecommendationDTO> findRecommencementsWithFourth(@Param("userInfo") List<String> userInfo);
 }

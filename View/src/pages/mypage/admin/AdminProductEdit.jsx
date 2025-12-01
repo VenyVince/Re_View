@@ -4,7 +4,7 @@ import {
     Wrap, Inner, Title, Panel, Row, Label, Input,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper
 } from "./adminProductEdit.style";
-import { updateProduct, fetchAdminProduct } from "../../../api/admin/adminProductApi";
+import { updateProduct, fetchAdminProduct, uploadProductImages } from "../../../api/admin/adminProductApi";
 
 // 바우만 타입 코드
 const BAUMANN_ID_MAP = {
@@ -19,7 +19,7 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
-// id → 코드 역매핑(기존 상품의 baumann_id 표시용)
+// 역매핑
 const BAUMANN_CODE_BY_ID = Object.fromEntries(
     Object.entries(BAUMANN_ID_MAP).map(([code, id]) => [id, code])
 );
@@ -27,6 +27,8 @@ const BAUMANN_CODE_BY_ID = Object.fromEntries(
 export default function AdminProductEdit() {
     const { id } = useParams();
     const navigate = useNavigate();
+
+    const [originalBaumannId, setOriginalBaumannId] = useState(null);
 
     const [form, setForm] = useState({
         prd_name: "",
@@ -52,15 +54,14 @@ export default function AdminProductEdit() {
         const load = async () => {
             try {
                 const data = await fetchAdminProduct(id);
-                console.log("[EDIT] 기존 상품 데이터:", data);
 
                 // 이미지 null-safe 처리
                 const images = Array.isArray(data.product_images)
                     ? data.product_images
                     : [];
 
-                const repImage = images[0] ?? "";
-                const detailImage = images[1] ?? "";
+                // baumann_id 원본 저장
+                setOriginalBaumannId(data.baumann_id);
 
                 setForm((prev) => ({
                     ...prev,
@@ -68,16 +69,13 @@ export default function AdminProductEdit() {
                     ingredient: data.ingredient ?? "",
                     prd_brand: data.prd_brand ?? "",
                     category: data.category ?? "",
-                    price: data.price != null ? String(data.price) : "",
-                    stock: data.stock != null ? String(data.stock) : "",
+                    price: String(data.price ?? ""),
+                    stock: String(data.stock ?? ""),
                     description: data.description ?? "",
-
-                    // Baumann 데이터 설정 (역매핑)
                     baumannType: BAUMANN_CODE_BY_ID[data.baumann_id] ?? "",
-
                     product_images: images,
-                    mainPreview: repImage,
-                    detailPreview: detailImage,
+                    mainPreview: images[0] ?? "",
+                    detailPreview: images[1] ?? "",
                 }));
             } catch (e) {
                 console.error(e);
@@ -93,59 +91,94 @@ export default function AdminProductEdit() {
     // input 변경 처리
     const onChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        setForm((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
-    // 이미지 선택 미리보기 처리
+    // 이미지 선택 미리보기
     const onPickImage = (key, previewKey) => (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const url = URL.createObjectURL(file);
-        setForm((prev) => ({ ...prev, [key]: file, [previewKey]: url }));
+
+        setForm((prev) => ({
+            ...prev,
+            [key]: file,
+            [previewKey]: url
+        }));
     };
 
     // 제출
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        let baumann_id = null;
-        if (form.baumannType.trim()) {
-            const type = form.baumannType.trim().toUpperCase();
-            baumann_id = BAUMANN_ID_MAP[type];
-            if (!baumann_id) {
-                alert(`'${type}' 은(는) 유효한 Baumann 타입이 아닙니다.`);
+        try {
+            let baumann_id = null;
+            if (form.baumannType.trim()) {
+                const type = form.baumannType.trim().toUpperCase();
+                baumann_id = BAUMANN_ID_MAP[type];
+                if (!baumann_id) {
+                    alert("유효하지 않은 Baumann 코드입니다.");
+                    return;
+                }
+            }
+
+            // 기존이미지 유지 + 새 이미지 업로드 병합
+            let finalImages = [...form.product_images];
+
+            // 대표/상세 새 이미지 업로드한 경우
+            if (form.mainImage || form.detailImage) {
+                const uploaded = await uploadProductImages(
+                    form.mainImage,
+                    form.detailImage ? [form.detailImage] : []
+                );
+
+                // 반환 결과는 배열 → 그대로 덮어씀
+                finalImages = uploaded;
+            }
+
+            if (finalImages.length === 0) {
+                alert("상품 이미지는 최소 1개 이상이어야 합니다.");
                 return;
             }
-        }
 
-        const payload = {
-            prd_name: form.prd_name.trim(),
-            ingredient: form.ingredient.trim(),
-            prd_brand: form.prd_brand.trim(),
-            category: form.category.trim(),
-            price: Number(form.price) || 0,
-            stock: Number(form.stock) || 0,
-            description: form.description.trim(),
-            baumann_id,
-            is_sold_out: "N",
+            // update payload 구성
+            const payload = {
+                prd_name: form.prd_name.trim(),
+                ingredient: form.ingredient.trim(),
+                prd_brand: form.prd_brand.trim(),
+                category: form.category.trim(),
+                price: Number(form.price) || 0,
+                stock: Number(form.stock) || 0,
+                description: form.description.trim(),
+                baumann_id,
+                is_sold_out: "N",
 
-            // ✔ 추가
-            rating: 0,         // 필수: CHECK 제약조건 위반 방지
-            review_count: 0,   // 필수: CHECK 제약조건 위반 방지
-        };
+                // Oracle 체크 제약 조건 방지
+                rating: 0,
+                review_count: 0,
 
-        try {
-            console.log("[EDIT PAYLOAD]", payload);
+                // 항상 product_images 포함해야 함
+                product_images: finalImages
+            };
+
+            console.log("[PATCH PAYLOAD]", payload);
+
             await updateProduct(id, payload);
-
-            alert("상품이 수정되었습니다!");
+            alert("상품이 성공적으로 수정되었습니다!");
             navigate("/admin/allproducts");
-        } catch (error) {
-            console.error(error);
-            alert("상품 수정에 실패했습니다.");
+
+        } catch (err) {
+            console.error(err);
+            alert("상품 수정 중 오류가 발생했습니다.");
         }
     };
+
+
+
 
     if (loading) {
         return (

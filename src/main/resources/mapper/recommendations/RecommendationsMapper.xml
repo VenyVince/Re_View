@@ -22,231 +22,241 @@
             BAUMANN_ID = #{user_Baumann}
     </select>
 
-    <select id="findRecommencementsWithAll" resultType="com.review.shop.dto.product.RecommendationProductDTO">
+    <!-- 공통 SELECT 절 -->
+    <sql id="productSelectColumns">
+        p.product_id,
+    p.prd_name,
+    p.prd_brand,
+    p.price,
+    p.rating,
+    p.review_count,
+
+    (SELECT pi.IMAGE_URL
+     FROM PRODUCT_IMAGE pi
+     WHERE pi.PRODUCT_ID = p.PRODUCT_ID
+       AND ROWNUM = 1) AS image_url,
+
+    (SELECT REVIEW_ID
+     FROM (
+       SELECT r.REVIEW_ID
+       FROM REVIEW r
+       WHERE r.PRODUCT_ID = p.PRODUCT_ID
+       ORDER BY r.LIKE_COUNT DESC
+     )
+     WHERE ROWNUM = 1) AS top_review_id,
+
+    (SELECT CONTENT
+     FROM (
+       SELECT r.CONTENT
+       FROM REVIEW r
+       WHERE r.PRODUCT_ID = p.PRODUCT_ID
+       ORDER BY r.LIKE_COUNT DESC
+     )
+     WHERE ROWNUM = 1) AS top_review_content,
+
+    (SELECT LIKE_COUNT
+     FROM (
+       SELECT r.LIKE_COUNT
+       FROM REVIEW r
+       WHERE r.PRODUCT_ID = p.PRODUCT_ID
+       ORDER BY r.LIKE_COUNT DESC
+     )
+     WHERE ROWNUM = 1) AS top_review_like_count,
+
+    (SELECT RATING
+     FROM (
+       SELECT r.RATING
+       FROM REVIEW r
+       WHERE r.PRODUCT_ID = p.PRODUCT_ID
+       ORDER BY r.LIKE_COUNT DESC
+     )
+     WHERE ROWNUM = 1) AS top_review_rating
+
+    </sql>
+
+    <!-- 공통 매칭 스코어 계산 -->
+    <sql id="matchScoreAll">
+        (
+            (CASE
+                WHEN b.FIRST = #{userInfo[0]} THEN 10
+                WHEN b.FIRST IS NULL THEN 0
+                ELSE -30
+                END) +
+                (CASE
+                WHEN b.SECOND = #{userInfo[1]} THEN 10
+                WHEN b.SECOND IS NULL THEN 0
+                ELSE -30
+                END) +
+                (CASE
+                WHEN b.THIRD = #{userInfo[2]} THEN 10
+                WHEN b.THIRD IS NULL THEN 0
+                ELSE -30
+                END) +
+                (CASE
+                WHEN b.FOURTH = #{userInfo[3]} THEN 10
+                WHEN b.FOURTH IS NULL THEN 0
+                ELSE -30
+                END)
+        ) AS match_score
+    </sql>
+
+    <!-- First 제외한 매칭 스코어 -->
+    <sql id="matchScoreWithoutFirst">
+        (
+            30 +
+            (CASE
+            WHEN b.SECOND = #{userInfo[1]} THEN 10
+            WHEN b.SECOND IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.THIRD = #{userInfo[2]} THEN 10
+            WHEN b.THIRD IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.FOURTH = #{userInfo[3]} THEN 10
+            WHEN b.FOURTH IS NULL THEN 0
+            ELSE -30
+            END)
+        ) AS match_score
+    </sql>
+
+    <!-- Second 제외한 매칭 스코어 -->
+    <sql id="matchScoreWithoutSecond">
+        (
+            30 +
+            (CASE
+            WHEN b.FIRST = #{userInfo[0]} THEN 10
+            WHEN b.FIRST IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.THIRD = #{userInfo[2]} THEN 10
+            WHEN b.THIRD IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.FOURTH = #{userInfo[3]} THEN 10
+            WHEN b.FOURTH IS NULL THEN 0
+            ELSE -30
+            END)
+        ) AS match_score
+    </sql>
+
+    <!-- Third 제외한 매칭 스코어 -->
+    <sql id="matchScoreWithoutThird">
+        (
+            30 +
+            (CASE
+            WHEN b.FIRST = #{userInfo[0]} THEN 10
+            WHEN b.FIRST IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.SECOND = #{userInfo[1]} THEN 10
+            WHEN b.SECOND IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.FOURTH = #{userInfo[3]} THEN 10
+            WHEN b.FOURTH IS NULL THEN 0
+            ELSE -30
+            END)
+        ) AS match_score
+    </sql>
+
+    <!-- Fourth 제외한 매칭 스코어 -->
+    <sql id="matchScoreWithoutFourth">
+        (
+            30 +
+            (CASE
+            WHEN b.FIRST = #{userInfo[0]} THEN 10
+            WHEN b.FIRST IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.SECOND = #{userInfo[1]} THEN 10
+            WHEN b.SECOND IS NULL THEN 0
+            ELSE -30
+            END) +
+            (CASE
+            WHEN b.THIRD = #{userInfo[2]} THEN 10
+            WHEN b.THIRD IS NULL THEN 0
+            ELSE -30
+            END)
+        ) AS match_score
+    </sql>
+
+    <!-- 공통 정렬 -->
+    <sql id="orderByMatchScore">
+        ORDER BY
+        match_score DESC,
+        review_count DESC,
+        rating DESC
+    </sql>
+
+    <select id="findRecommencementsWithAll" resultType="com.review.shop.dto.product.RecommendationDTO">
         SELECT * FROM (
-                          SELECT
-                              p.product_id,
-                              p.prd_name,
-                              p.prd_brand,
-                              p.price,
-                              p.rating,
-                              p.review_count,
-
-                              (SELECT pi.IMAGE_URL
-                               FROM PRODUCT_IMAGE pi
-                               WHERE pi.PRODUCT_ID = p.PRODUCT_ID
-                                 AND ROWNUM = 1) AS image_url,
-
-                              (
-                                  (CASE
-                                       WHEN b.FIRST = #{userInfo[0]} THEN 10
-                                       WHEN b.FIRST IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.SECOND = #{userInfo[1]} THEN 10
-                                       WHEN b.SECOND IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.THIRD = #{userInfo[2]} THEN 10
-                                       WHEN b.THIRD IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.FOURTH = #{userInfo[3]} THEN 10
-                                       WHEN b.FOURTH IS NULL THEN 0
-                                       ELSE -30
-                                      END)
-                                  ) AS match_score
-
-                          FROM PRODUCT p
-                                   JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-                      )
+        SELECT
+        <include refid="productSelectColumns"/>,
+        <include refid="matchScoreAll"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        )
         WHERE match_score >= 20
-        ORDER BY
-            match_score DESC,
-            review_count DESC,
-            rating DESC
+        <include refid="orderByMatchScore"/>
     </select>
 
-    <select id="findRecommencementsWithFirst" resultType="com.review.shop.dto.product.RecommendationProductDTO">
+    <select id="findRecommencementsWithFirst" resultType="com.review.shop.dto.product.RecommendationDTO">
         SELECT * FROM (
-                          SELECT
-                              p.product_id,
-                              p.prd_name,
-                              p.prd_brand,
-                              p.price,
-                              p.rating,
-                              p.review_count,
-
-                              (SELECT pi.IMAGE_URL
-                               FROM PRODUCT_IMAGE pi
-                               WHERE pi.PRODUCT_ID = p.PRODUCT_ID
-                                 AND ROWNUM = 1) AS image_url,
-
-                              (
-                                  30 +
-                                  (CASE
-                                       WHEN b.SECOND = #{userInfo[1]} THEN 10
-                                       WHEN b.SECOND IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.THIRD = #{userInfo[2]} THEN 10
-                                       WHEN b.THIRD IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.FOURTH = #{userInfo[3]} THEN 10
-                                       WHEN b.FOURTH IS NULL THEN 0
-                                       ELSE -30
-                                      END)
-                                  ) AS match_score
-
-                          FROM PRODUCT p
-                                   JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-                          WHERE b.FIRST = #{userInfo[0]}
-                      )
+        SELECT
+        <include refid="productSelectColumns"/>,
+        <include refid="matchScoreWithoutFirst"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE b.FIRST = #{userInfo[0]}
+        )
         WHERE match_score > 0
-        ORDER BY
-            match_score DESC,
-            review_count DESC,
-            rating DESC
+        <include refid="orderByMatchScore"/>
     </select>
 
-    <select id="findRecommencementsWithSecond" resultType="com.review.shop.dto.product.RecommendationProductDTO">
+    <select id="findRecommencementsWithSecond" resultType="com.review.shop.dto.product.RecommendationDTO">
         SELECT * FROM (
-                          SELECT
-                              p.product_id,
-                              p.prd_name,
-                              p.prd_brand,
-                              p.price,
-                              p.rating,
-                              p.review_count,
-
-                              (SELECT pi.IMAGE_URL
-                               FROM PRODUCT_IMAGE pi
-                               WHERE pi.PRODUCT_ID = p.PRODUCT_ID
-                                 AND ROWNUM = 1) AS image_url,
-
-                              (
-                                  30 +
-                                  (CASE
-                                       WHEN b.FIRST = #{userInfo[0]} THEN 10
-                                       WHEN b.FIRST IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.THIRD = #{userInfo[2]} THEN 10
-                                       WHEN b.THIRD IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.FOURTH = #{userInfo[3]} THEN 10
-                                       WHEN b.FOURTH IS NULL THEN 0
-                                       ELSE -30
-                                      END)
-                                  ) AS match_score
-
-                          FROM PRODUCT p
-                                   JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-                          WHERE b.SECOND = #{userInfo[1]}
-                      )
+        SELECT
+        <include refid="productSelectColumns"/>,
+        <include refid="matchScoreWithoutSecond"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE b.SECOND = #{userInfo[1]}
+        )
         WHERE match_score > 0
-        ORDER BY
-            match_score DESC,
-            review_count DESC,
-            rating DESC
+        <include refid="orderByMatchScore"/>
     </select>
 
-    <select id="findRecommencementsWithThird" resultType="com.review.shop.dto.product.RecommendationProductDTO">
+    <select id="findRecommencementsWithThird" resultType="com.review.shop.dto.product.RecommendationDTO">
         SELECT * FROM (
-                          SELECT
-                              p.product_id,
-                              p.prd_name,
-                              p.prd_brand,
-                              p.price,
-                              p.rating,
-                              p.review_count,
-
-                              (SELECT pi.IMAGE_URL
-                               FROM PRODUCT_IMAGE pi
-                               WHERE pi.PRODUCT_ID = p.PRODUCT_ID
-                                 AND ROWNUM = 1) AS image_url,
-
-                              (
-                                  30 +
-                                  (CASE
-                                       WHEN b.FIRST = #{userInfo[0]} THEN 10
-                                       WHEN b.FIRST IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.SECOND = #{userInfo[1]} THEN 10
-                                       WHEN b.SECOND IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.FOURTH = #{userInfo[3]} THEN 10
-                                       WHEN b.FOURTH IS NULL THEN 0
-                                       ELSE -30
-                                      END)
-                                  ) AS match_score
-
-                          FROM PRODUCT p
-                                   JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-                          WHERE b.THIRD = #{userInfo[2]}
-                      )
+        SELECT
+        <include refid="productSelectColumns"/>,
+        <include refid="matchScoreWithoutThird"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE b.THIRD = #{userInfo[2]}
+        )
         WHERE match_score > 0
-        ORDER BY
-            match_score DESC,
-            review_count DESC,
-            rating DESC
+        <include refid="orderByMatchScore"/>
     </select>
 
-    <select id="findRecommencementsWithFourth" resultType="com.review.shop.dto.product.RecommendationProductDTO">
+    <select id="findRecommencementsWithFourth" resultType="com.review.shop.dto.product.RecommendationDTO">
         SELECT * FROM (
-                          SELECT
-                              p.product_id,
-                              p.prd_name,
-                              p.prd_brand,
-                              p.price,
-                              p.rating,
-                              p.review_count,
-
-                              (SELECT pi.IMAGE_URL
-                               FROM PRODUCT_IMAGE pi
-                               WHERE pi.PRODUCT_ID = p.PRODUCT_ID
-                                 AND ROWNUM = 1) AS image_url,
-
-                              (
-                                  30 +
-                                  (CASE
-                                       WHEN b.FIRST = #{userInfo[0]} THEN 10
-                                       WHEN b.FIRST IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.SECOND = #{userInfo[1]} THEN 10
-                                       WHEN b.SECOND IS NULL THEN 0
-                                       ELSE -30
-                                      END) +
-                                  (CASE
-                                       WHEN b.THIRD = #{userInfo[2]} THEN 10
-                                       WHEN b.THIRD IS NULL THEN 0
-                                       ELSE -30
-                                      END)
-                                  ) AS match_score
-
-                          FROM PRODUCT p
-                                   JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-                          WHERE b.FOURTH = #{userInfo[3]}
-                      )
+        SELECT
+        <include refid="productSelectColumns"/>,
+        <include refid="matchScoreWithoutFourth"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE b.FOURTH = #{userInfo[3]}
+        )
         WHERE match_score > 0
-        ORDER BY
-            match_score DESC,
-            review_count DESC,
-            rating DESC
+        <include refid="orderByMatchScore"/>
     </select>
 </mapper>

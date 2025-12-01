@@ -1,7 +1,7 @@
 package com.review.shop.service.recommendations;
 
 import com.review.shop.util.Security_Util;
-import com.review.shop.dto.product.RecommendationProductDTO;
+import com.review.shop.dto.product.RecommendationDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.recommendations.RecommendationsMapper;
@@ -38,7 +38,7 @@ public class RecommendationsService {
 
 
     //바우만 타입에 따른 추천 상품 필터링 메서드들
-    public List<RecommendationProductDTO> getRecommendedProducts(RecommendationsUserDTO baumannDTO, String type){
+    public List<RecommendationDTO> getRecommendedProducts(RecommendationsUserDTO baumannDTO, String type){
         //사용자의 바우만 타입 정보를 리스트로 변환
         List<String> userInfo = List.of(
                 baumannDTO.getFirst(),
@@ -46,7 +46,7 @@ public class RecommendationsService {
                 baumannDTO.getThird(),
                 baumannDTO.getFourth()
         );
-        List<RecommendationProductDTO> recommendedProducts = switch (type) {
+        List<RecommendationDTO> recommendedProducts = switch (type) {
             case "all" ->
                     recommendationsMapper.findRecommencementsWithAll(userInfo);
             case "first" -> recommendationsMapper.findRecommencementsWithFirst(userInfo);
