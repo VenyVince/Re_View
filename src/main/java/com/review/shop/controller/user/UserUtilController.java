@@ -69,6 +69,8 @@ public class UserUtilController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "아이디 찾기 성공 (메시지 문자열 반환)"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "아이디를 찾을 수 없음.",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/api/auth/find-id")
