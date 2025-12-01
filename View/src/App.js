@@ -29,6 +29,7 @@ import ReviewWrite from "./pages/review/ReviewWrite"; // 리뷰 작성 페이지
 import ProductPage from "./pages/products/ProductPage"; // 상품 페이지
 import ReviewPage from "./pages/reviews/ReviewPage"; //리뷰 페이지
 import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
+import ReviewDetail from "./pages/reviewDetail/ReviewDetailPage"; //리뷰상세페이지
 
 import SearchPage from './pages/search/SearchPage';
 import Header from "./components/layout/Header/Header";
@@ -94,11 +95,9 @@ export default function App() {
                     <Route path="/products" element={<ProductPage />} />
                     <Route path="/product/:productId" element={<ProductDetailPage />} />
                     <Route path="/review" element={<ReviewPage />} />
-
-
-
-
                     <Route path="/reviews" element={<ReviewPage />} />
+                    <Route path="/review/:reviewId" element={<ReviewDetail />} />
+
 
                     {/* 리뷰 */}
                     <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
