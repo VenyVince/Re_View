@@ -4,7 +4,7 @@ import {
     Wrap, Inner, Title, Panel, Row, Label, Input,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper
 } from "./adminProductEdit.style";
-import { updateProduct, fetchAdminProduct, uploadProductImages } from "../../../api/admin/adminProductApi";
+import { updateProduct, fetchAdminProduct, updateProductImages } from "../../../api/admin/adminProductApi";
 
 // 바우만 타입 코드
 const BAUMANN_ID_MAP = {
@@ -39,12 +39,12 @@ export default function AdminProductEdit() {
         stock: "",
         description: "",
         baumannType: "",
-
         product_images: [],
         mainPreview: "",
         detailPreview: "",
         mainImage: null,
         detailImage: null,
+        rating: 0,
     });
 
     const [loading, setLoading] = useState(true);
@@ -76,6 +76,7 @@ export default function AdminProductEdit() {
                     product_images: images,
                     mainPreview: images[0] ?? "",
                     detailPreview: images[1] ?? "",
+                    rating: data.rating ?? 0,
                 }));
             } catch (e) {
                 console.error(e);
@@ -116,7 +117,7 @@ export default function AdminProductEdit() {
         e.preventDefault();
 
         try {
-            let baumann_id = null;
+            let baumann_id = originalBaumannId;
             if (form.baumannType.trim()) {
                 const type = form.baumannType.trim().toUpperCase();
                 baumann_id = BAUMANN_ID_MAP[type];
@@ -126,59 +127,38 @@ export default function AdminProductEdit() {
                 }
             }
 
-            // 기존이미지 유지 + 새 이미지 업로드 병합
-            let finalImages = [...form.product_images];
-
-            // 대표/상세 새 이미지 업로드한 경우
+            // 이미지 변경 여부 확인 -> 변경 시 put/ images 호출
             if (form.mainImage || form.detailImage) {
-                const uploaded = await uploadProductImages(
-                    form.mainImage,
-                    form.detailImage ? [form.detailImage] : []
-                );
-
-                // 반환 결과는 배열 → 그대로 덮어씀
-                finalImages = uploaded;
+                await updateProductImages(id, form.mainImage, form.detailImage);
             }
 
-            if (finalImages.length === 0) {
-                alert("상품 이미지는 최소 1개 이상이어야 합니다.");
-                return;
-            }
-
-            // update payload 구성
+            // 상품 정보 patch
             const payload = {
-                prd_name: form.prd_name.trim(),
-                ingredient: form.ingredient.trim(),
-                prd_brand: form.prd_brand.trim(),
-                category: form.category.trim(),
-                price: Number(form.price) || 0,
-                stock: Number(form.stock) || 0,
-                description: form.description.trim(),
+                prd_name: form.prd_name,
+                prd_brand: form.prd_brand,
+                ingredient: form.ingredient,
+                category: form.category,
+                price: Number(form.price),
+                stock: Number(form.stock),
+                description: form.description,
                 baumann_id,
-                is_sold_out: "N",
-
-                // Oracle 체크 제약 조건 방지
-                rating: 0,
-                review_count: 0,
-
-                // 항상 product_images 포함해야 함
-                product_images: finalImages
+                is_sold_out: form.is_sold_out ?? 0, // 또는 "N" 고정
+                rating: form.rating ?? 0,
+                review_count: form.review_count ?? 0,
+                product_images: form.product_images ?? [],
             };
 
-            console.log("[PATCH PAYLOAD]", payload);
+            console.log("PATCH PAYLOAD", payload);
 
             await updateProduct(id, payload);
-            alert("상품이 성공적으로 수정되었습니다!");
-            navigate("/admin/allproducts");
 
+            alert("상품이 성공적으로 수정되었습니다.");
+            navigate("/admin/allproducts");
         } catch (err) {
             console.error(err);
             alert("상품 수정 중 오류가 발생했습니다.");
         }
     };
-
-
-
 
     if (loading) {
         return (
