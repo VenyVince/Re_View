@@ -92,7 +92,7 @@ export default function App() {
                     <Route path="/qna" element={<QnaPage />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/products" element={<ProductPage />} />
-                    <Route path="/product/detail" element={<ProductDetailPage />} />
+                    <Route path="/product/:productId" element={<ProductDetailPage />} />
                     <Route path="/review" element={<ReviewPage />} />
 
 

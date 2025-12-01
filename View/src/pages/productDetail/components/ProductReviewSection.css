@@ -1,81 +1,13 @@
+/* ------------------------------------------------------------
+   리뷰 전체 영역
+------------------------------------------------------------ */
 .review-wrapper {
     margin-top: 30px;
 }
-/* ---------------- 리뷰 작성 영역 ---------------- */
-.review-form {
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    text-align: left;
-    background: #FAFAFA;
-}
-.review-form h3 {
-    margin-bottom: 10px;
-    margin-left: 10px;
-}
-.rating-input {
-    margin-bottom: 10px;
-    margin-left: 10px;
-}
-.rating-input .star {
-    font-size: 22px;
-    cursor: pointer;
-    color: #ccc;
-    margin-right: 4px;
-}
-.rating-input .star.active {
-    color: gold;
-}
-.review-form textarea {
-    width: 100%;
-    height: 80px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    resize: none;
-}
-/* 사진추가 + 등록하기 한 줄 */
-.review-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 12px;
-    gap:5px;
-}
-/* 사진 추가 버튼 */
-.add-image {
-    background: #fff;
-    border: 1px solid #bbb;
-    color: #666;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    display: inline-block;
-    width:10%;
-}
-/* 등록하기 버튼 */
-.submit-btn {
-    background: #000;
-    color: #fff;
-    padding: 9px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    width:90%;
-}
-.preview-box {
-    margin-top: 10px;
-    display: flex;
-    gap: 6px;
-}
-.preview-box img {
-    width: 60px;
-    height: 60px;
-    border-radius: 6px;
-    object-fit: cover;
-}
+
+/* ------------------------------------------------------------
+   정렬 탭
+------------------------------------------------------------ */
 .review-sort {
     display: flex;
     gap: 16px;
@@ -85,28 +17,48 @@
     padding-bottom: 10px;
     justify-content: flex-end; /* 오른쪽 정렬 */
 }
+
 .review-sort span {
     color: #777;
     cursor: pointer;
 }
+
 .review-sort span.active {
     color: #000;
     font-weight: 700;
     border-bottom: 2px solid #000;
     padding-bottom: 2px;
 }
-/* ---------------- 리뷰 리스트 ---------------- */
+
+/* ------------------------------------------------------------
+   리뷰 없음 안내 문구
+------------------------------------------------------------ */
+.review-empty {
+    width: 100%;
+    padding: 40px 0;
+    text-align: center;
+    color: #666;
+}
+
+/* ------------------------------------------------------------
+   리뷰 리스트 (항상 세로 1열)
+------------------------------------------------------------ */
 .review-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
     width: 100%;
 }
-.no-review {
-    padding: 40px 0;
-    text-align: center;
-    color: #666;
+
+.review-wrapper .review-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px;
 }
+
+/* ------------------------------------------------------------
+   리뷰 카드
+------------------------------------------------------------ */
 .review-card {
     width: 100% !important;
     padding: 18px;
@@ -114,68 +66,86 @@
     border-radius: 10px;
     background: #FAFAFA;
     box-sizing: border-box;
+    max-width: none !important;
 }
-/* 1줄 */
+
+/* ------------------------------------------------------------
+   1줄 - 닉네임 / 바우만 / 좋아요·싫어요
+------------------------------------------------------------ */
 .review-top {
     display: flex;
     justify-content: space-between;
     margin-bottom: 8px;
 }
+
 .nickname {
     font-weight: 700;
     margin-right: 6px;
 }
+
 .baumann {
     font-size: 14px;
     color: #666;
 }
+
+/* 좋아요 / 싫어요 */
 .like, .dislike {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;   /* hover 흔들림 방지 */
+    min-width: 40px; /* hover로 흔들리지 않도록 최소폭 고정 */
     padding: 4px 6px;
     border-radius: 6px;
+    cursor: pointer;
 }
+
 .like.active {
     color: #2F7BFF;
     font-weight: 700;
 }
+
 .dislike.active {
     color: #E63946;
     font-weight: 700;
 }
-.dislike:hover,
-.like:hover{
-    cursor:pointer;
-}
-/* 2줄 */
+
+/* ------------------------------------------------------------
+   2줄 - 별점
+------------------------------------------------------------ */
 .rating-line {
     margin-bottom: 6px;
     text-align: left;
 }
+
 .stars {
     font-size: 18px;
+    color: gold;
     margin-right: 8px;
-    color:gold;
 }
+
 .rating-num {
     font-size: 14px;
     color: #777;
 }
-/* 3줄 */
+
+/* ------------------------------------------------------------
+   3줄 - 내용 + 이미지 + 날짜
+------------------------------------------------------------ */
 .review-body {
     display: flex;
     justify-content: space-between;
     text-align: left;
 }
+
 .review-content {
     flex: 1;
     margin-right: 10px;
 }
+
 .review-extra {
     text-align: right;
 }
+
 .review-img {
     width: 75px;
     height: 75px;
@@ -183,18 +153,8 @@
     object-fit: cover;
     margin-bottom: 5px;
 }
+
 .date {
     font-size: 12px;
     color: #777;
-}
-/* :흰색_확인_표시: 이 컴포넌트 안의 리뷰 리스트는 무조건 세로 1열 */
-.review-wrapper .review-list {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px;
-}
-/* :흰색_확인_표시: 각 카드가 한 줄 전체를 차지하도록 */
-.review-wrapper .review-card {
-    width: 100% !important;
-    max-width: none !important;
 }

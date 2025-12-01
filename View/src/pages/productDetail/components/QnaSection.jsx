@@ -4,44 +4,59 @@ import "./QnaSection.css";
 
 export default function QnaSection({ qnaList, onWrite }) {
     const [openId, setOpenId] = useState(null);
+
+    // 입력 상태
     const [writeTitle, setWriteTitle] = useState("");
+    const [writeContent, setWriteContent] = useState("");
 
     const toggleOpen = (id) => {
         setOpenId(openId === id ? null : id);
     };
 
     const handleSubmit = () => {
-        if (!writeTitle.trim()) {
-            alert("문의할 내용을 입력해주세요.");
+        if (!writeTitle.trim() || !writeContent.trim()) {
+            alert("제목과 내용을 모두 입력해주세요.");
             return;
         }
 
-        const newQna = {
-            title: writeTitle
-        };
+        onWrite({
+            title: writeTitle,
+            content: writeContent
+        });
 
-        onWrite(newQna);
         setWriteTitle("");
+        setWriteContent("");
     };
 
     return (
         <div className="pd-qna-wrapper">
 
-            {/* 작성 영역 */}
+            {/* 작성 영역: 제목 + 등록 */}
             <div className="pd-qna-write-row">
                 <input
                     type="text"
                     className="pd-qna-title-input"
-                    placeholder="문의할 내용을 입력하세요"
+                    placeholder="제목을 입력하세요"
                     value={writeTitle}
                     onChange={(e) => setWriteTitle(e.target.value)}
                 />
+
                 <button className="pd-qna-write-submit" onClick={handleSubmit}>
                     등록
                 </button>
             </div>
 
-            {/* 헤더 */}
+            {/* 작성 영역: 내용 */}
+            <div className="pd-qna-write-row">
+                <textarea
+                    className="pd-qna-content-input"
+                    placeholder="내용을 입력하세요"
+                    value={writeContent}
+                    onChange={(e) => setWriteContent(e.target.value)}
+                />
+            </div>
+
+            {/* QnA 헤더 */}
             <div className="pd-qna-header-row">
                 <span className="col-title">문의 내역</span>
                 <span className="col-writer">닉네임</span>
@@ -68,15 +83,18 @@ export default function QnaSection({ qnaList, onWrite }) {
                         {openId === q.qna_id && (
                             <div className="pd-qna-content-area">
 
-                                <p>{q.content}</p>
+                                {/* 제목 + 내용 */}
+                                <div className="pd-qna-content-block">
+                                    <div className="pd-qna-content-title"><strong>제목:</strong> {q.title}</div>
+                                    <div className="pd-qna-content-text"><strong>내용:</strong> {q.content}</div>
+                                </div>
 
+                                {/* 답변 */}
                                 {q.answer ? (
-                                    // 🔥 답변이 있을 때
                                     <div className="pd-qna-answer has-answer">
                                         <strong>답변:</strong> {q.answer}
                                     </div>
                                 ) : (
-                                    // 🔥 답변이 없을 때
                                     <div className="pd-qna-answer no-answer">
                                         답변 준비 중입니다
                                     </div>
@@ -84,9 +102,6 @@ export default function QnaSection({ qnaList, onWrite }) {
 
                             </div>
                         )}
-
-
-
                     </li>
                 ))}
             </ul>
