@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,7 +72,7 @@ public class UserUtilController {
             @ApiResponse(responseCode = "404", description = "아이디를 찾을 수 없음.",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @GetMapping("/api/auth/find-id")
+    @PostMapping("/api/auth/find-id")
     public ResponseEntity<String> findId(@RequestBody Map<String, String> payload) {
         String name = payload.get("name");
         String phoneNumber = payload.get("phone_number");
