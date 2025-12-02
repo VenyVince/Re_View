@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class HeaderSearchProductDTO {
+    private String product_id;
     private String prd_name;
     private String prd_brand;
     private String category;

@@ -28,7 +28,7 @@
 
     <select id="searchReviews" resultMap="reviewResultMap">
         SELECT r.review_id, r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at,
-               p.prd_name, p.prd_brand, p.category,
+               p.prd_name, p.prd_brand, p.category, p.product_id,
                u.nickname,
                b.type as user_baumann_type,
                 ri.image_url
