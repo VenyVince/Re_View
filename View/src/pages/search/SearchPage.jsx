@@ -6,7 +6,7 @@ import "./SearchPage.css";
 import CategoryFilter from "./components/CategoryFilter";
 import BrandFilter from "./components/BrandFilter";
 import SearchBar from "./components/SearchBar";
-import SearchResult from "./components/SearchResult";
+import SearchResult from "./components/searchResult/SearchResult";
 
 export default function SearchPage() {
     const location = useLocation();
@@ -15,7 +15,7 @@ export default function SearchPage() {
     const keyword = queryParams.get("keyword") || "";
 
     const [mode, setMode] = useState("product");
-    const [selectedCategory, setSelectedCategory] = useState(""); // 단일 카테고리
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedBrand, setSelectedBrand] = useState("");
     const [products, setProducts] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -23,7 +23,10 @@ export default function SearchPage() {
     const [error, setError] = useState("");
     const [sortType, setSortType] = useState("popular");
 
-    // 단일 카테고리 필터에 맞춰 data를 필터링하는 함수
+    // 검색 결과 기반 카테고리
+    const [dynamicCategories, setDynamicCategories] = useState([]);
+
+    // 카테고리 필터 공통 함수
     const filterByCategory = (list, category) => {
         if (!category || category === "전체") return list;
         return list.filter(item => item.category === category);
@@ -35,6 +38,7 @@ export default function SearchPage() {
                 setProducts([]);
                 setReviews([]);
                 setBrands([]);
+                setDynamicCategories([]);
                 setMode("product");
                 return;
             }
@@ -48,19 +52,39 @@ export default function SearchPage() {
                     }
                 });
 
-                let dataProducts = res.data.products || [];
-                let dataReviews = res.data.reviews || [];
+                const originalProducts = res.data.products || [];
+                const originalReviews = res.data.reviews || [];
 
-                // 🔥 선택된 category 에 따라 필터
-                dataProducts = filterByCategory(dataProducts, selectedCategory);
-                dataReviews = filterByCategory(dataReviews, selectedCategory);
+                /** -------------------------------------------
+                 * 1) 검색 결과 기반 카테고리 생성
+                 ------------------------------------------- */
+                const categoriesFromProducts = originalProducts
+                    .map(p => p.category)
+                    .filter(Boolean);
 
-                setProducts(dataProducts);
-                setReviews(dataReviews);
+                const categoriesFromReviews = originalReviews
+                    .map(r => r.category)
+                    .filter(Boolean);
 
-                // 🔥 브랜드 카운트
+                const merged = [...categoriesFromProducts, ...categoriesFromReviews];
+                const unique = [...new Set(merged)];
+
+                setDynamicCategories(["전체", ...unique]);
+
+                /** -------------------------------------------
+                 * 2) product / review 카테고리 필터
+                 ------------------------------------------- */
+                const filteredProducts = filterByCategory(originalProducts, selectedCategory);
+                const filteredReviews = filterByCategory(originalReviews, selectedCategory);
+
+                setProducts(filteredProducts);
+                setReviews(filteredReviews);
+
+                /** -------------------------------------------
+                 * 3) 브랜드 생성
+                 ------------------------------------------- */
                 const brandMap = {};
-                [...dataProducts, ...dataReviews].forEach(item => {
+                filteredProducts.forEach(item => {
                     const brand = item.prd_brand || "기타";
                     brandMap[brand] = (brandMap[brand] || 0) + 1;
                 });
@@ -71,8 +95,10 @@ export default function SearchPage() {
 
                 setBrands(sortedBrands);
 
-                // 🔥 리뷰 자동 전환 (닉네임 검색 등에만)
-                if (dataReviews.length > 0 && dataProducts.length === 0) {
+                /** -------------------------------------------
+                 * 4) 리뷰 모드 자동 전환
+                 ------------------------------------------- */
+                if (filteredReviews.length > 0 && filteredProducts.length === 0) {
                     setMode("review");
                 } else {
                     setMode("product");
@@ -85,6 +111,7 @@ export default function SearchPage() {
                 setProducts([]);
                 setReviews([]);
                 setBrands([]);
+                setDynamicCategories([]);
                 setMode("product");
             }
         };
@@ -102,10 +129,9 @@ export default function SearchPage() {
 
             <div className="search-filters">
                 <CategoryFilter
+                    categories={dynamicCategories}
                     selectedCategory={selectedCategory}
-                    onSelect={(cat) => {
-                        setSelectedCategory(cat); // 🔥 keyword 변경 없음
-                    }}
+                    onSelect={setSelectedCategory}
                 />
 
                 <hr className="divider-light" />
@@ -120,18 +146,15 @@ export default function SearchPage() {
                 <hr className="divider-strong" />
             </div>
 
-            <SearchBar
-                mode={mode}
-                setMode={setMode}
-                setSortType={setSortType}
-            />
+            <SearchBar mode={mode} setMode={setMode} setSortType={setSortType} />
 
             {error ? (
                 <p className="no-result">{error}</p>
             ) : (
                 <SearchResult
                     mode={mode}
-                    results={mode === "product" ? products : reviews}
+                    products={products}
+                    reviews={reviews}
                     selectedCategory={selectedCategory}
                     selectedBrand={selectedBrand}
                     sortType={sortType}
