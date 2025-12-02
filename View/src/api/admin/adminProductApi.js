@@ -48,6 +48,7 @@ export const deleteProduct = async (productId) =>
  * - 필드명: images
  * - 배열 지원
  =============================== */
+// 등록용
 export const uploadProductImages = async (mainImage, detailImages = []) => {
     const fd = new FormData();
 
@@ -68,4 +69,21 @@ export const uploadProductImages = async (mainImage, detailImages = []) => {
     });
 
     return res.data; // ["url1", "url2", ...]
+};
+
+// 수정용
+export const updateProductImages = async (productId, mainImage, detailImage) => {
+  const fd = new FormData();
+
+  if(mainImage){
+      fd.append("images", mainImage);
+  }
+
+  if(detailImage){
+      fd.append("images",detailImage);
+  }
+
+  return axiosClient.put(`/api/admin/products/${productId}/images`,fd,{
+      headers: { "Content-Type" : "multipart/form-data"}
+  });
 };
