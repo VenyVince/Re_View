@@ -33,7 +33,9 @@ export function AuthProvider({ children }) {
             setAuth({
                 loggedIn: true,
                 userId: res.data.id,
+                nickname: res.data.nickname ?? res.data.id,
                 role: res.data.role,
+                point: res.data.point ?? 0, // 초기값만 있고 인증 성공 시 point 사라짐 -> 그 부분 방지위한 코드
                 loading: false,
             });
         } catch (err) {
@@ -47,11 +49,12 @@ export function AuthProvider({ children }) {
     }
 
     // 로그인 성공 시 호출 (LoginPage에서 사용)
-    const login = (userId) => {
+    const login = ({id, nickname}) => {
         // 일단 프론트 상태만 로그인으로 바꾸고
         setAuth({
             loggedIn: true,
-            userId,
+            userId : id,
+            nickname,
             role: null,
             loading: false,
         });
