@@ -8,13 +8,16 @@
     <select id="searchProducts" resultType="com.review.shop.dto.search.header.HeaderSearchProductDTO">
         SELECT  p.product_id, p.prd_name, p.prd_brand, p.price, p.rating, p.category, p.description,
                b.type AS baumann_type
+        pi.image_url AS thumbnail_url
         FROM product p
         JOIN baumann b ON p.baumann_id = b.baumann_id
+        LEFT JOIN product_image pi ON pi.product_id = p.product_id
+        AND pi.is_thumbnail = 'Y'
         WHERE (p.prd_name LIKE '%' || #{keyword} || '%'
            OR p.prd_brand LIKE '%' || #{keyword} || '%'
            OR p.ingredient LIKE '%' || #{keyword} || '%'
            OR b.type LIKE '%' || #{keyword} || '%') <!--바우만 타입 관련 연산 추후에 재작성 -->
-        and deleted_at is null
+        and p.deleted_at IS NULL
         <if test="filter_brand != null and filter_brand != ''">
             AND p.prd_brand = #{filter_brand}
         </if>

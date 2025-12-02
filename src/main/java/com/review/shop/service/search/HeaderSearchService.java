@@ -44,6 +44,7 @@ public class HeaderSearchService {
             if (reviews.isEmpty()) {
                 throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
+            //ListHeaderSearchReviewDTO에 이미지 리턴 추가
             ListHeaderSearchReviewDTO response = new ListHeaderSearchReviewDTO();
             response.setReviews(reviews);
 
@@ -60,6 +61,7 @@ public class HeaderSearchService {
             if (reviews.isEmpty()) {
                 throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
+            //ListHeaderSearchProductDTO에 대표 이미지 리턴 추가
             ListHeaderSearchProductDTO response = new ListHeaderSearchProductDTO();
             response.setProducts(reviews);
 

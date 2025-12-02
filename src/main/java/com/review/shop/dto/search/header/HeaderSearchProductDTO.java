@@ -12,4 +12,5 @@ public class HeaderSearchProductDTO {
     private float rating;
     private String baumann_type;
     private String description;
+    private String thumbnail_url;
 }
