@@ -20,4 +20,5 @@ public class HeaderSearchReviewDTO {
 
     private String prd_name;
     private String prd_brand;
+    private String category;
 }

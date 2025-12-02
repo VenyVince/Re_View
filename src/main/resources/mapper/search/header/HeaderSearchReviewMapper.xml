@@ -7,7 +7,7 @@
 
     <select id="searchReviews" resultType="com.review.shop.dto.search.header.HeaderSearchReviewDTO">
         SELECT r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at,
-               p.prd_name, p.prd_brand,
+               p.prd_name, p.prd_brand, p.category,
                u.nickname,
                b.type as user_baumann_type
         FROM review r
