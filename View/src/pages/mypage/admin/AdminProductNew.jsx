@@ -160,7 +160,7 @@ export default function AdminProductNew() {
                     rating: 3.0,
                     description: form.description.trim(),
                     review_count: 0,
-                    is_sold_out: "N",
+                    is_sold_out: 0,
                     baumann_id: baumannId,
                 },
 
