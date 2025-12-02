@@ -33,12 +33,14 @@ export const Panel = styled.div`
 export const Row = styled.div`
   display: flex;
   align-items: ${({ $fullHeight }) => ($fullHeight ? "flex-start" : "center")};
-  gap: 24px;
+  gap: 10px;
+    border-top: 1px solid #e5e7eb;
+    padding: 20px 0 3px;
 `;
 
 export const Label = styled.div`
   width: 120px;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 600;
   color: #4b5563;
   flex-shrink: 0;
@@ -63,7 +65,7 @@ export const Avatar = styled.div`
 `;
 
 export const ProfileName = styled.div`
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 500;
 `;
 
@@ -73,20 +75,6 @@ export const ProductBox = styled.div`
   gap: 16px;
 `;
 
-export const ProductThumb = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  span {
-    font-size: 24px;
-  }
-`;
 
 export const ProductInfo = styled.div`
   display: flex;
