@@ -1,0 +1,142 @@
+/* ================================
+   SearchResult 공통 Wrapper
+================================ */
+.search-result {
+    width: 100%;
+}
+
+/* ================================
+   Product / Review 리스트 공통
+================================ */
+.result-list {
+    margin-top: 10px;
+    margin-bottom: 40px;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 기존 유지 */
+
+    gap: 20px;
+    justify-items: center;
+    width: 100%;
+}
+
+/* ================================
+   카드 공통 (상품 + 리뷰)
+================================ */
+.result-card {
+    width: 100%;
+    max-width: 250px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+    list-style: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ================================
+   이미지 공통
+================================ */
+.img-wrapper {
+    width: 100%;
+    height: 200px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 이미지 없을 때 alt 텍스트 */
+.alt-text {
+    width: 100%;
+    height: 100%;
+    display: flex;               /* img 없을 때 나타남 */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* ================================
+   브랜드 + 별점 (상품/리뷰 동일 구조)
+================================ */
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+
+    font-size: 13px;
+    color: #555;
+}
+
+.card-brand {
+    font-weight: 500;
+}
+
+.card-rating {
+    font-weight: 600;
+    color: #f5a623;
+}
+
+/* ================================
+   상품 이름
+================================ */
+.card-name {
+    text-align: left;
+    font-weight: 600;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #222;
+}
+
+/* ================================
+   상품 가격
+================================ */
+.card-price {
+    color: #e60023;
+    font-weight: 700;
+    margin-top: 4px;
+    font-size: 15px;
+    text-align: left;
+}
+
+/* ================================
+   리뷰 내용
+================================ */
+.card-review-content {
+    color: #555;
+    font-size: 14px;
+    margin-top: 6px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+/* ================================
+   결과 없음
+================================ */
+.no-result {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
+    width: 100%;
+}
