@@ -1,6 +1,7 @@
 package com.review.shop.repository.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,7 +15,7 @@ public interface AdminProductMapper {
 
     //상품 수정
     int updateProduct(@Param("product_id") int product_id,
-                      @Param("product") ProductDetailDTO product);
+                      @Param("product") ProductUpdateOnlyPrdInfoDTO product);
 
     //상품 삭제
     int deleteProduct(int product_id);

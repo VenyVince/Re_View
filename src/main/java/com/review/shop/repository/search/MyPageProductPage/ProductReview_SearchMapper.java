@@ -1,6 +1,6 @@
-package com.review.shop.repository.search.MyPagenProductPage;
+package com.review.shop.repository.search.MyPageProductPage;
 
-import com.review.shop.dto.search.MyPagenProductPage.Product.ProductReview_SearchDTO;
+import com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_SearchDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

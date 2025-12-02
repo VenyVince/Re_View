@@ -120,8 +120,10 @@ export default function RegisterPage() {
             name: form.name,
             email: form.email,
             nickname: form.nickname,
-            phoneNumber: form.phone,
-            baumannId: BAUMANN_TO_ID[form.baumann],
+
+            // 바우만 아이디는 String이여야하고, phoneNumber과 baumannId로 카멜케이스로 작성되어 오류발생한 부분 수정하였습니다.
+            phone_number: form.phone,
+            baumann_id: form.baumann,
             role: 'USER',
         };
 

@@ -1,4 +1,4 @@
-package com.review.shop.dto.search.MyPagenProductPage.MyPage;
+package com.review.shop.dto.search.MyPageProductPage.MyPage;
 
 import lombok.Data;
 

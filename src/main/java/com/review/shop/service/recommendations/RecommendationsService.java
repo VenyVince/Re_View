@@ -1,10 +1,10 @@
 package com.review.shop.service.recommendations;
 
-import com.review.shop.util.Security_Util;
 import com.review.shop.dto.product.RecommendationDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
-import com.review.shop.exception.WrongRequestException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.recommendations.RecommendationsMapper;
+import com.review.shop.util.Security_Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class RecommendationsService {
     public Integer getBaumannTypeByUserId(){
         Integer user_Baumann =  recommendationsMapper.getBaumannTypeByUserId(security_util.getCurrentUserId());
         if(user_Baumann==null){
-            throw new WrongRequestException("해당 사용자의 바우만 타입이 존재하지 않습니다.");
+            throw new ResourceNotFoundException("해당 사용자의 바우만 타입이 존재하지 않습니다.");
         }
         return user_Baumann;
     }
@@ -31,7 +31,7 @@ public class RecommendationsService {
 
         RecommendationsUserDTO baumannDTO = recommendationsMapper.getBaumannDTOWithId(user_Baumann);
         if (baumannDTO==null){
-            throw new WrongRequestException("해당 바우만 타입이 존재하지 않습니다.");
+            throw new ResourceNotFoundException("해당 바우만 타입이 존재하지 않습니다.");
         }
         return baumannDTO;
     }
@@ -57,7 +57,7 @@ public class RecommendationsService {
         };
 
         if (recommendedProducts == null || recommendedProducts.isEmpty()) {
-            throw new WrongRequestException(type + " 타입 추천 상품이 존재하지 않습니다.");
+            throw new ResourceNotFoundException(type + " 타입 추천 상품이 존재하지 않습니다.");
         }
 
         return recommendedProducts;

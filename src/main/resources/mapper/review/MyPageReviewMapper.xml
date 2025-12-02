@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--sort: 생성일, 별점, 추천-->
-<mapper namespace="com.review.shop.repository.search.MyPagenProductPage.MyPageReviewMapper">
+<mapper namespace="com.review.shop.repository.search.MyPageProductPage.MyPageReviewMapper">
 
-    <select id="SearchMyReviews" resultType="com.review.shop.dto.search.MyPagenProductPage.MyPage.MyPageReviewDTO">
+    <select id="SearchMyReviews" resultType="com.review.shop.dto.search.MyPageProductPage.MyPage.MyPageReviewDTO">
         SELECT
         p.prd_name,
         r.content, r.created_at, r.rating,

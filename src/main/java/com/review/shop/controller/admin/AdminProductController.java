@@ -2,6 +2,7 @@ package com.review.shop.controller.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.product.ProductUpdateOnlyImageDTO;
+import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
 import com.review.shop.dto.product.ProductUploadDTO;
 import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +46,7 @@ public class AdminProductController {
         return ResponseEntity.ok(adminProductService.getAllProducts());
     }
 
-    @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
+    @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다. product body의 이미지 리스트는 null로 전달하세요. product_images_list는 이미지 등록 api /api/images/products로 반환받은 값입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "상품 등록 성공"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류"),
@@ -89,7 +90,7 @@ public class AdminProductController {
     @PatchMapping("/products/{product_id}")
     public ResponseEntity<String> updateProduct(
             @Parameter(description = "수정할 상품의 ID") @PathVariable int product_id,
-            @RequestBody ProductDetailDTO product) {
+            @RequestBody ProductUpdateOnlyPrdInfoDTO product) {
         adminProductService.updateProduct(product_id, product);
         return ResponseEntity.ok("상품이 수정되었습니다");
     }

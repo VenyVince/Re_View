@@ -1,6 +1,6 @@
 package com.review.shop.controller.search;
 
-import com.review.shop.dto.search.MyPagenProductPage.Product.ProductReview_SearchResponseDTO;
+import com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_SearchResponseDTO;
 import com.review.shop.service.search.ProductReview_SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

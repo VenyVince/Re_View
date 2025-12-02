@@ -1,7 +1,7 @@
 package com.review.shop.controller.search;
 
 import com.review.shop.util.Security_Util;
-import com.review.shop.dto.search.MyPagenProductPage.MyPage.MyPageReviewResponseDTO;
+import com.review.shop.dto.search.MyPageProductPage.MyPage.MyPageReviewResponseDTO;
 import com.review.shop.service.search.MyPageReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
