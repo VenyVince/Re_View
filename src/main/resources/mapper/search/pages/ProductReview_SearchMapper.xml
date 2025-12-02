@@ -5,23 +5,41 @@
 <!--sort: 생성일, 별점, 추천-->
 <mapper namespace="com.review.shop.repository.search.MyPageProductPage.ProductReview_SearchMapper">
 
-    <select id="searchReviews" resultType="com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_SearchDTO">
-        SELECT
-        r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at, r.updated_at,
-        p.prd_name, p.prd_brand,
-        u.nickname,
-        b.type AS user_baumann_type
+        <resultMap id="productReviewMap" type="com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_SearchDTO">
+            <id property="review_id" column="review_id"/>
 
+            <result property="content" column="content"/>
+            <result property="rating" column="rating"/>
+            <result property="like_count" column="like_count"/>
+            <result property="dislike_count" column="dislike_count"/>
+            <result property="is_selected" column="is_selected"/>
+            <result property="created_at" column="created_at"/>
+            <result property="updated_at" column="updated_at"/>
+            <result property="nickname" column="nickname"/>
+            <result property="user_baumann_type" column="user_baumann_type"/>
+
+            <collection property="image_urls" ofType="java.lang.String">
+                <result column="image_url"/>
+            </collection>
+        </resultMap>
+
+    <select id="searchReviews" resultMap="productReviewMap">
+        SELECT
+        r.review_id, r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at, r.updated_at,
+        u.nickname,
+        b.type AS user_baumann_type,
+        ri.image_url
         FROM review r
+        LEFT JOIN review_images ri ON r.review_id = ri.review_id
         JOIN product p ON r.product_id = p.product_id
         JOIN user_table u ON r.user_id = u.user_id
         JOIN baumann b ON u.baumann_id = b.baumann_id
         WHERE r.product_id = #{product_id}
-        and deleted_at is null
-          <if test="keyword != null and keyword != ''">
+        and r.deleted_at is null
+        <if test="keyword != null and keyword != ''">
             AND (
-            r.content LIKE CONCAT('%', #{keyword}, '%')
-            OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+            r.content LIKE '%' || #{keyword} || '%'
+            OR u.nickname LIKE '%' || #{keyword} || '%'
             )
         </if>
 
