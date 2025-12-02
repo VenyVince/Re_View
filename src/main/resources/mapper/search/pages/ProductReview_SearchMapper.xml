@@ -3,14 +3,15 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--sort: 생성일, 별점, 추천-->
-<mapper namespace="com.review.shop.repository.search.MyPagenProductPage.ProductReview_SearchMapper">
+<mapper namespace="com.review.shop.repository.search.MyPageProductPage.ProductReview_SearchMapper">
 
-    <select id="searchReviews" resultType="com.review.shop.dto.search.MyPagenProductPage.Product.ProductReview_SearchDTO">
+    <select id="searchReviews" resultType="com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_SearchDTO">
         SELECT
         r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at, r.updated_at,
         p.prd_name, p.prd_brand,
         u.nickname,
         b.type AS user_baumann_type
+
         FROM review r
         JOIN product p ON r.product_id = p.product_id
         JOIN user_table u ON r.user_id = u.user_id
