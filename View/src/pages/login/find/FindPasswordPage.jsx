@@ -12,11 +12,11 @@ export default function FindPasswordPage() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!isEmail(email)) {
-            alert('아이디(이메일) 형식을 확인해 주세요.');
+            alert('이메일 형식을 확인해 주세요.');
             return;
         }
-        // 더미: 인증번호가 메일로 발송되었다고 가정하고 다음 단계로
-        nav('/find/password/reset', { state: { email } });
+        // 임시 비밀번호 전송이므로 FindPasswordReset은 생략합니다.
+        nav('/find/password/done', { state: { email } });
     };
 
     return (
@@ -28,10 +28,10 @@ export default function FindPasswordPage() {
             <main className="find-main" style={{ maxWidth: 560 }}>
                 <form className="find-form" onSubmit={handleSubmit}>
                     <label className="find-label">
-                        아이디
+                        가입시 사용된 이메일을 입력해주세요
                         <input
                             type="email"
-                            placeholder="아이디(이메일)"
+                            placeholder="(example : abc@gmail.com)"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />

@@ -6,7 +6,7 @@ import './Find.css';
 export default function FindIdResult() {
     const nav = useNavigate();
     const { state } = useLocation();
-    const email = state?.email || 'unknown@example.com';
+    const message = state?.resultMessage || '결과를 불러올 수 없습니다.';
 
     return (
         <div className="find-result-wrap">
@@ -19,7 +19,7 @@ export default function FindIdResult() {
 
                 <div className="find-result-box">
                     <div className="find-check">✔</div>
-                    <h2 className="find-email">{email}</h2>
+                    <h2 className="find-id">{message}</h2>
                     <p className="find-desc">아이디 찾기가 완료되었습니다.</p>
 
                     <button

@@ -17,10 +17,10 @@ export default function FindPasswordDone() {
                 <div className="find-result-box">
                     <div className="find-check">✓</div>
                     <h2 className="find-email" style={{ fontSize: 28 }}>
-                        비밀번호 설정이 완료되었습니다.
+                        임시 비밀번호가 전송되었습니다.
                     </h2>
                     <p className="find-desc">
-                        로그인하시면 더욱 다양한 서비스를 제공받으실 수 있습니다.
+                        이메일을 확인하시고, 로그인 후 비밀번호를 변경해 주세요.
                     </p>
 
                     <button className="find-login-btn" onClick={() => nav('/login')}>
