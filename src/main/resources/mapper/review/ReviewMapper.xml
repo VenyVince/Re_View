@@ -44,4 +44,59 @@
         </choose>
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
+
+    <select id="getReviewBase" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$ReviewDetailDTO">
+        SELECT
+        r.review_id,
+        r.product_id,
+        u.nickname,
+        b.type AS baumann_type,
+        r.rating,
+        r.content,
+        TO_CHAR(r.created_at, 'YYYY-MM-DD') as created_at,
+        r.like_count,
+        r.dislike_count
+        FROM review r
+        JOIN USER_TABLE u ON r.user_id = u.user_id
+        LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
+        WHERE r.review_id = #{review_id}
+    </select>
+
+    <select id="getProductByReviewId" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$ProductInfoDTO">
+        SELECT
+        p.product_id,
+        p.prd_name,
+        p.prd_brand,
+        p.price,
+        p.category,
+        (SELECT image_url FROM product_image WHERE product_id = p.product_id AND ROWNUM = 1) as product_image
+        FROM review r
+        JOIN product p ON r.product_id = p.product_id
+        WHERE r.review_id = #{review_id}
+    </select>
+
+    <select id="getReviewImages" resultType="string">
+        SELECT image_url
+        FROM review_images
+        WHERE review_id = #{review_id}
+    </select>
+
+    <select id="getComments" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$CommentDTO">
+        SELECT
+        c.review_comment_id as comment_id,
+        u.nickname,
+        c.content,
+        TO_CHAR(c.created_at, 'YYYY-MM-DD') as created_at
+        FROM review_comment c
+        JOIN USER_TABLE u ON c.user_id = u.user_id
+        WHERE c.review_id = #{review_id}
+        ORDER BY c.created_at ASC
+    </select>
+
+    <select id="getUserReaction" resultType="string">
+        SELECT is_like
+        FROM REVIEW_LIKE
+        WHERE review_id = #{review_id}
+        AND user_id = #{user_id}
+    </select>
 </mapper>
