@@ -142,7 +142,7 @@ export default function AdminProductEdit() {
                 stock: Number(form.stock),
                 description: form.description,
                 baumann_id,
-                is_sold_out: form.is_sold_out ?? 0, // 또는 "N" 고정
+                is_sold_out: form.is_sold_out ?? 0, // 또는 0 고정
                 rating: form.rating ?? 0,
                 review_count: form.review_count ?? 0,
                 product_images: form.product_images ?? [],
