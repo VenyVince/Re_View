@@ -32,7 +32,9 @@ public class RecommendationsController {
             @ApiResponse(responseCode = "200", description = "추천 상품과 리뷰 조회 성공",
                     content = @Content(schema = @Schema(implementation = RecommendationResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
-                    content = @Content(schema = @Schema(implementation = String.class)))
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "자원 없음",
+                    content = @Content(schema = @Schema(implementation = String.class))),
     })
 
     public ResponseEntity<Map<String, Object>> getRecommendations(
