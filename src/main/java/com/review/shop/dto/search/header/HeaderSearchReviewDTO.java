@@ -16,7 +16,6 @@ public class HeaderSearchReviewDTO {
     private String user_baumann_type;
 
     //    Review_table
-    private int review_id;
     private float rating;
     private int like_count;
     private int dislike_count;

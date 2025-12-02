@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class MyPageReviewDTO {
+    private int product_id;
     private int review_id;
 
     private String prd_name;

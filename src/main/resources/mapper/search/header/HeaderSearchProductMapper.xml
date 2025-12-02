@@ -7,7 +7,7 @@
 
     <select id="searchProducts" resultType="com.review.shop.dto.search.header.HeaderSearchProductDTO">
         SELECT  p.product_id, p.prd_name, p.prd_brand, p.price, p.rating, p.category, p.description,
-               b.type AS baumann_type
+               b.type AS baumann_type,
         pi.image_url AS thumbnail_url
         FROM product p
         JOIN baumann b ON p.baumann_id = b.baumann_id

@@ -7,7 +7,7 @@
 
     <resultMap id="myPageReviewMap" type="com.review.shop.dto.search.MyPageProductPage.MyPage.MyPageReviewDTO">
         <id property="review_id" column="review_id"/>
-
+        <result property="product_id" column="product_id"/>
         <result property="prd_name" column="prd_name"/>
         <result property="content" column="content"/>
         <result property="created_at" column="created_at"/>
@@ -21,8 +21,8 @@
 
     <select id="SearchMyReviews" resultMap="myPageReviewMap">
         SELECT
-        p.prd_name,
-        r.content, r.created_at, r.rating,
+        p.prd_name, p.product_id,
+        r.content, r.created_at, r.rating, r.review_id,
         u.baumann_id,
         ri.image_url
         FROM review r
