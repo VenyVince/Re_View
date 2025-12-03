@@ -6,8 +6,11 @@ export default function ProductInfoSection() {
 
     return (
         <div className="pd-info-section">
+
+            {/* 제목 영역 */}
             <div className="pd-info-title"></div>
 
+            {/* 상품 상세 이미지 리스트 */}
             <div className="pd-info-images">
                 {images.map((num) => (
                     <div key={num} className="pd-info-img-box">
@@ -17,6 +20,7 @@ export default function ProductInfoSection() {
                     </div>
                 ))}
             </div>
+
         </div>
     );
 }
