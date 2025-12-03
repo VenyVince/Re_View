@@ -51,7 +51,7 @@ export default function LoginPage() {
 
             if (err.response) {
                 // 서버가 응답한 HTTP 오류
-                if (err.response.status === 400) {
+                if (err.response.status === 400 || err.response.status === 404) {
                     setError('아이디 또는 비밀번호가 올바르지 않습니다.');
                 }
 

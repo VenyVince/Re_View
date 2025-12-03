@@ -5,6 +5,7 @@ package com.review.shop.controller.user;
 import com.review.shop.dto.user.LoginRequestDTO;
 import com.review.shop.dto.user.PasswordUpdateDTO;
 import com.review.shop.dto.user.UserInfoDTO;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +41,7 @@ import java.util.Map;
 public class UserController  {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "회원 가입")
     @ApiResponses({
@@ -77,8 +79,9 @@ public class UserController  {
             @Parameter(hidden = true)
             HttpServletRequest request
     ) {
-
-        int user_id = userService.getUserByLoginId(loginDto.getId()).getUser_id();
+        UserInfoDTO userInfoDTO = userService.getUserByLoginId(loginDto.getId());
+        int user_id = userInfoDTO.getUser_id();
+        String encodedPassword = userInfoDTO.getPassword();
 
         // true면 밴리스트에 존재
         boolean isBanned = userService.isUserBanned(user_id);
@@ -86,6 +89,10 @@ public class UserController  {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "밴 당한 사용자입니다. 관리자에게 문의하세요."));
+        }
+
+        if (!passwordEncoder.matches(loginDto.getPassword(), encodedPassword)) {
+            throw new ResourceNotFoundException("비밀번호가 일치하지 않습니다.");
         }
 
         UsernamePasswordAuthenticationToken token =
