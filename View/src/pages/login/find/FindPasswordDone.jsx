@@ -1,10 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import logo from '../../../assets/logo.png';
 import './Find.css';
 
 export default function FindPasswordDone() {
     const nav = useNavigate();
+    const location = useLocation();
+    const email = location.state?.email || '';
 
     return (
         <div className="find-result-wrap">
@@ -20,6 +22,7 @@ export default function FindPasswordDone() {
                         임시 비밀번호가 전송되었습니다.
                     </h2>
                     <p className="find-desc">
+                        <strong>{email}</strong>로 임시 비밀번호를 전송했습니다.<br />
                         이메일을 확인하시고, 로그인 후 비밀번호를 변경해 주세요.
                     </p>
 
