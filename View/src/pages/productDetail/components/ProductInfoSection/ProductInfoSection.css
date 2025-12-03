@@ -1,9 +1,12 @@
-/* ===== 상품 정보 섹션 전체 ===== */
+/* =========================================================
+   상품 정보 섹션 전체 레이아웃
+========================================================= */
 .pd-info-section {
     background: #fafafa;
     padding: 20px;
     border-radius: 10px;
     border: 1px solid #e5e5e5;
+    margin-bottom: 150px;
 }
 
 .pd-info-title {
@@ -12,15 +15,19 @@
     margin-bottom: 15px;
 }
 
-/* 모든 이미지가 보이도록 height 제한 제거 */
+/* =========================================================
+   이미지 리스트
+   - height 제한 제거하여 전체 이미지 출력
+========================================================= */
 .pd-info-images {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: auto;          /* ★ 중요 */
-    overflow: visible;     /* ★ 중요 */
+    height: auto;
+    overflow: visible;
 }
 
+/* 이미지 placeholder (샘플 영역) */
 .pd-info-placeholder {
     width: 100%;
     height: 400px;
@@ -33,7 +40,6 @@
     color: #666;
 }
 
-
 /* 실제 이미지 */
 .pd-info-img-box img {
     width: 100%;
@@ -42,7 +48,9 @@
     object-fit: cover;
 }
 
-/* 더보기 / 접기 버튼 */
+/* =========================================================
+   더보기 / 접기 버튼
+========================================================= */
 .pd-more-btn {
     margin-top: 10px;
     width: 100%;
@@ -52,7 +60,6 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     cursor: pointer;
-
 }
 
 .pd-more-btn:hover {

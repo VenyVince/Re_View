@@ -1,0 +1,94 @@
+/* =========================================================
+   MiniBuyBox (미니 구매 박스)
+   - 하단바 위 고정 레이어
+========================================================= */
+.pd-mini-buy-box {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    padding: 6px 0 6px;
+    z-index: 2000;
+    bottom: 60px; /* 하단바 높이만큼 위로 */
+}
+
+.pd-mini-inner {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+/* 상단: 닫기 버튼 영역 */
+.pd-mini-top {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.pd-mini-close {
+    background: none;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    margin-bottom: 4px;
+}
+
+/* 하단: 제목/수량/가격/버튼 영역 */
+.pd-mini-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pd-mini-title {
+    font-size: 18px;
+    font-weight: 700;
+    max-width: 55%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-mini-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 수량 조절 */
+.pd-mini-qty {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pd-mini-qty button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 16px;
+}
+
+/* 가격/구매 버튼 */
+.pd-mini-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e60023;
+}
+
+.pd-mini-buy-btn {
+    padding: 8px 14px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}

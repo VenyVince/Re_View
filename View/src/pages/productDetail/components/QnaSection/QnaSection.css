@@ -1,15 +1,11 @@
-/* ===============================
-   전체 Wrapper
-================================ */
+/******** 전체 Wrapper ********/
 .pd-qna-wrapper {
     width: 100%;
     margin-top: 20px;
+    margin-bottom: 150px;
 }
 
-
-/* ===============================
-   작성 영역 (제목 + 내용 + 등록)
-================================ */
+/******** 작성 영역 (제목 + 내용 + 등록) ********/
 .pd-qna-write-row {
     display: flex;
     align-items: center;
@@ -47,10 +43,7 @@
     margin-bottom: 40px;
 }
 
-
-/* ===============================
-   QnA 헤더
-================================ */
+/******** QnA 헤더 ********/
 .pd-qna-header-row {
     display: flex;
     padding: 12px 8px;
@@ -62,12 +55,14 @@
 
 .col-title { width: 60%; }
 .col-writer { width: 15%; text-align: center; }
-.col-date { width: 25%; text-align: right; }
+.col-date {
+    margin-left: auto;
+    text-align: right;
+    padding-right: 50px;
+}
 
 
-/* ===============================
-   QnA 리스트
-================================ */
+/******** QnA 리스트 ********/
 .pd-qna-list {
     list-style: none;
     padding: 0;
@@ -87,12 +82,13 @@
 
 .pd-qna-title { width: 60%; }
 .pd-qna-writer-inline { width: 15%; text-align: center; }
-.pd-qna-date { width: 25%; text-align: right; }
+.pd-qna-date {
+    margin-left: auto;
+    text-align: right;
+    padding-right: 30px;
+}
 
-
-/* ===============================
-   펼침 영역 (제목 + 내용 + 답변)
-================================ */
+/******** 펼침 영역 (제목 + 내용 + 답변) ********/
 .pd-qna-content-area {
     margin-top: 12px;
     padding: 12px;
@@ -131,10 +127,7 @@
     border-radius: 4px;
 }
 
-
-/* ===============================
-   빈 값
-================================ */
+/******** 빈 값 ********/
 .pd-qna-empty {
     padding: 16px;
     color: #777;
