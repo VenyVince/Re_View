@@ -17,6 +17,9 @@ export default function UserMyReviewPage() {
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState("");
     const [editRating, setEditRating] = useState(0);
+    const [keyword, setKeyword] = useState("");
+    const [sort, setSort] = useState("latest");
+    const [filterRating, setFilterRating] = useState(0);
 
     // 날짜 포맷 (YYYY-MM-DD)
     const formatDate = (isoString) => {
@@ -30,78 +33,115 @@ export default function UserMyReviewPage() {
     };
 
     // === 1. 내 리뷰 목록 불러오기 ===
+    const fetchMyReviews = async ({
+        keywordValue = keyword,
+        sortValue = sort,
+        filterRatingValue = filterRating,
+    } = {}) => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const res = await axios.get("/api/users/reviews/search", {
+                params: {
+                    keyword: keywordValue,
+                    sort: sortValue,
+                    filter_rating: filterRatingValue,
+                },
+                withCredentials: true,
+            });
+
+            // MyPageReviewResponseDTO 래퍼 안에 들어있다고 가정
+            const root = res.data.data || res.data;
+
+            let list =
+                root.myPageReviews ||
+                root.reviews ||
+                root.reviewList ||
+                root.content ||
+                root.items ||
+                root.list ||
+                [];
+
+            if (!Array.isArray(list)) list = [];
+
+            // API 스키마 정규화(필드 이름 통일 + 이미지 배열 정리)
+            const normalized = list.map((review) => ({
+                ...review,
+                product_id: review.product_id ?? review.productId,
+                review_id: review.review_id ?? review.reviewId,
+                imageUrls:
+                    review.image_urls ??
+                    review.imageUrls ??
+                    (review.image_url ? [review.image_url] : []),
+                // 마이페이지에서 보는 건 어차피 "내 리뷰"라 기본적으로 수정/삭제 가능하다고 봄
+                // 백엔드에서 추가 규칙이 있으면 canUpdate 플래그를 따로 내려줘도 됨
+                canUpdate:
+                    review.canUpdate ??
+                    review.can_update ??
+                    true,
+            }));
+
+            setReviews(normalized);
+            setCurrentPage(1); // 새로 불러올 때는 항상 1페이지로
+        } catch (e) {
+            console.error("내 리뷰 목록 조회 오류:", e);
+            setError("작성한 후기를 불러오는 중 오류가 발생했어요.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 백엔드에 수정/삭제 가능 여부 확인 요청
+    const checkCanUpdate = async (reviewId) => {
+        try {
+            const res = await axios.get("/api/reviews/exists/update", {
+                data: reviewId,
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const body = res.data || {};
+            return !!(body.canUpdate ?? body.can_update);
+        } catch (e) {
+            console.error("리뷰 수정/삭제 가능 여부 확인 오류:", e);
+            return false;
+        }
+    };
+
     useEffect(() => {
-        const fetchMyReviews = async () => {
-            try {
-                setLoading(true);
-                setError("");
-
-                const res = await axios.get("/api/users/reviews/search", {
-                    params: {
-                        keyword: "",
-                        sort: "latest",
-                        filter_rating: 0,
-                    },
-                    withCredentials: true,
-                });
-
-                // MyPageReviewResponseDTO 래퍼 안에 들어있다고 가정
-                const root = res.data.data || res.data;
-
-                let list =
-                    root.myPageReviews ||
-                    root.reviews ||
-                    root.reviewList ||
-                    root.content ||
-                    root.items ||
-                    root.list ||
-                    [];
-
-                if (!Array.isArray(list)) list = [];
-
-                // API 스키마 정규화(필드 이름 통일 + 이미지 배열 정리)
-                const normalized = list.map((review) => ({
-                    ...review,
-                    product_id: review.product_id ?? review.productId,
-                    review_id: review.review_id ?? review.reviewId,
-                    imageUrls:
-                        review.image_urls ??
-                        review.imageUrls ??
-                        (review.image_url ? [review.image_url] : []),
-                    // 마이페이지에서 보는 건 어차피 "내 리뷰"라 기본적으로 수정/삭제 가능하다고 봄
-                    // 백엔드에서 추가 규칙이 있으면 canUpdate 플래그를 따로 내려줘도 됨
-                    canUpdate:
-                        review.canUpdate ??
-                        review.can_update ??
-                        true,
-                }));
-
-                setReviews(normalized);
-                setCurrentPage(1); // 새로 불러올 때는 항상 1페이지로
-            } catch (e) {
-                console.error("내 리뷰 목록 조회 오류:", e);
-                setError("작성한 후기를 불러오는 중 오류가 발생했어요.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
+        // 초기 진입 시 기본 조건으로 한 번 조회
         fetchMyReviews();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        fetchMyReviews({
+            keywordValue: keyword,
+            sortValue: sort,
+            filterRatingValue: filterRating,
+        });
+    };
 
     // === 2. 삭제 ===
     const handleDelete = async (review) => {
-        if (!review.canUpdate) {
-            alert("이 리뷰는 삭제 권한이 없습니다.");
-            return;
-        }
-
         if (!review.review_id) {
             alert(
                 "이 리뷰에는 review_id 정보가 없어 삭제할 수 없습니다. (백엔드 DTO 확인 필요)"
             );
             return;
         }
+
+        // 백엔드에 실제로 삭제 가능 여부 확인
+        const allowed = await checkCanUpdate(review.review_id);
+        if (!allowed) {
+            alert("이 리뷰는 삭제 권한이 없습니다.");
+            return;
+        }
+
         if (!review.product_id) {
             alert(
                 "이 리뷰에는 product_id 정보가 없어 삭제할 수 없습니다. (MyPageReviewDTO에 product_id 추가 필요)"
@@ -129,16 +169,18 @@ export default function UserMyReviewPage() {
     };
 
     // === 3. 수정 모드 진입 ===
-    const handleStartEdit = (review) => {
-        if (!review.canUpdate) {
-            alert("이 리뷰는 수정 권한이 없습니다.");
-            return;
-        }
-
+    const handleStartEdit = async (review) => {
         if (!review.review_id) {
             alert(
                 "이 리뷰에는 review_id 정보가 없어 수정할 수 없습니다. (백엔드 DTO 확인 필요)"
             );
+            return;
+        }
+
+        // 백엔드에 실제로 수정 가능 여부 확인
+        const allowed = await checkCanUpdate(review.review_id);
+        if (!allowed) {
+            alert("이 리뷰는 수정 권한이 없습니다.");
             return;
         }
 
@@ -229,6 +271,42 @@ export default function UserMyReviewPage() {
                 <p className="review-card-sub">
                     내가 작성한 상품 후기를 한눈에 확인할 수 있어요.
                 </p>
+                <form className="myreview-search-bar" onSubmit={handleSearchSubmit}>
+                    <input
+                        type="text"
+                        className="myreview-search-input"
+                        placeholder="상품명 또는 내용으로 검색"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                    />
+
+                    <select
+                        className="myreview-search-select"
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value)}
+                    >
+                        <option value="latest">최신순</option>
+                        <option value="oldest">오래된순</option>
+                        <option value="rating_highest">별점 높은순</option>
+                        <option value="rating_lowest">별점 낮은순</option>
+                        <option value="likes">도움돼요 많은순</option>
+                    </select>
+
+                    <select
+                        className="myreview-search-select"
+                        value={filterRating}
+                        onChange={(e) => setFilterRating(Number(e.target.value))}
+                    >
+                        <option value={0}>전체 평점</option>
+                        <option value={4.5}>4.5점 이상</option>
+                        <option value={4}>4.0점 이상</option>
+                        <option value={3}>3.0점 이상</option>
+                    </select>
+
+                    <button type="submit" className="myreview-search-btn">
+                        검색
+                    </button>
+                </form>
 
                 {loading && <p className="myreview-loading">불러오는 중...</p>}
                 {error && <p className="myreview-error">{error}</p>}

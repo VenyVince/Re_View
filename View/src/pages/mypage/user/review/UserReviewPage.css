@@ -370,3 +370,67 @@
     padding: 0 14px;
     font-weight: 500;
 }
+
+/* ===========================
+   검색 / 정렬 / 필터 UI
+=========================== */
+
+.myreview-search-bar {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.myreview-search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background: #fff;
+}
+
+.myreview-search-input:focus {
+    outline: none;
+    border-color: #111;
+    background-color: #fff;
+}
+
+.myreview-search-select {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.myreview-search-select:focus {
+    outline: none;
+    border-color: #111;
+}
+
+.myreview-search-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    background-color: #111;
+    color: #fff;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.myreview-search-btn:hover {
+    background-color: #000;
+}
+
+/* 반응형 처리 */
+@media (max-width: 600px) {
+    .myreview-search-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
