@@ -31,13 +31,13 @@ function computeBaumann(tally) {
 const BAUMANN_TYPES = Object.keys(BAUMANN_BADGES).sort();
 
 export default function UserSkinTestPage() {
-    // ⚫ 서버에 저장되어 있는 “나의 바우만 타입” (코드: DRNT, DSNT...)
+    // 서버에 저장되어 있는 “나의 바우만 타입” (코드: DRNT, DSNT...)
     const [myType, setMyType] = useState(null);
 
-    // ⚪ 화면에서 사용자가 현재 선택한 타입 (드롭다운 & 설문 결과가 이 값에 반영)
+    // 화면에서 사용자가 현재 선택한 타입 (드롭다운 & 설문 결과가 이 값에 반영)
     const [selectedType, setSelectedType] = useState(null);
 
-    // 🔸 설문 상태
+    // 설문 상태
     const [surveySelections, setSurveySelections] = useState({});
     const [surveyIndex, setSurveyIndex] = useState(0);
 
@@ -64,7 +64,7 @@ export default function UserSkinTestPage() {
                     code = BAUMANN_CODE_BY_ID[baumann_id];
                 }
 
-                console.log("해석된 바우만 코드:", code); // 🔥 이 값도 확인
+                console.log("해석된 바우만 코드:", code); // 이 값도 확인
 
                 setMyType(code);
                 setSelectedType(code);
@@ -153,8 +153,13 @@ export default function UserSkinTestPage() {
         try {
             await axios.patch(
                 "/api/users/me/baumann",
-                { baumann_id: baumannId },   // ✅ 백엔드에서 받는 필드
-                { withCredentials: true }
+                baumannId, // @RequestBody int baumann_id 에 맞게 숫자 그대로 전송
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
             );
 
             setMyType(selectedType); // 이제야 상단 “나의 바우만 타입”이 변경됨
