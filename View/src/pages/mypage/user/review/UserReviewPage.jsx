@@ -9,6 +9,10 @@ export default function UserMyReviewPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    // 페이지네이션 상태 (10개씩 노출)
+    const [currentPage, setCurrentPage] = useState(1);
+    const PAGE_SIZE = 10;
+
     // 수정 모드 상태
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState("");
@@ -32,7 +36,6 @@ export default function UserMyReviewPage() {
                 setLoading(true);
                 setError("");
 
-                // 마이페이지용 내 리뷰 목록
                 const res = await axios.get("/api/users/reviews/search", {
                     params: {
                         keyword: "",
@@ -42,9 +45,9 @@ export default function UserMyReviewPage() {
                     withCredentials: true,
                 });
 
+                // MyPageReviewResponseDTO 래퍼 안에 들어있다고 가정
                 const root = res.data.data || res.data;
 
-                // 백엔드 응답 필드 이름 : myPageReviews (추가 안전장치)
                 let list =
                     root.myPageReviews ||
                     root.reviews ||
@@ -56,44 +59,27 @@ export default function UserMyReviewPage() {
 
                 if (!Array.isArray(list)) list = [];
 
-                // 리뷰별 수정/삭제 권한 체크 (/api/reviews/exists/update)
-                const listWithPerms = await Promise.all(
-                    list.map(async (review) => {
-                        if (!review.review_id) {
-                            // review_id 없으면 권한 체크 불가 → 버튼 비활성화
-                            return { ...review, canUpdate: false };
-                        }
-                        try {
-                            const permRes = await axios({
-                                method: "get",
-                                url: "/api/reviews/exists/update",
-                                //️ 이 컨트롤러는 @RequestBody int review_id 를 받으므로
-                                // params 가 아니라 data 로 넘겨야 함
-                                data: review.review_id,
-                                withCredentials: true,
-                            });
+                // API 스키마 정규화(필드 이름 통일 + 이미지 배열 정리)
+                const normalized = list.map((review) => ({
+                    ...review,
+                    product_id: review.product_id ?? review.productId,
+                    review_id: review.review_id ?? review.reviewId,
+                    imageUrls:
+                        review.image_urls ??
+                        review.imageUrls ??
+                        (review.image_url ? [review.image_url] : []),
+                    // 마이페이지에서 보는 건 어차피 "내 리뷰"라 기본적으로 수정/삭제 가능하다고 봄
+                    // 백엔드에서 추가 규칙이 있으면 canUpdate 플래그를 따로 내려줘도 됨
+                    canUpdate:
+                        review.canUpdate ??
+                        review.can_update ??
+                        true,
+                }));
 
-                            const permData = permRes.data || {};
-                            const canUpdate =
-                                permData.canUpdate ??
-                                permData.can_update ??
-                                permData.result ??
-                                false;
-
-                            return { ...review, canUpdate: Boolean(canUpdate) };
-                        } catch (e) {
-                            console.error(
-                                "권한 체크 실패 (exists/update):",
-                                review.review_id,
-                                e
-                            );
-                            return { ...review, canUpdate: false };
-                        }
-                    })
-                );
-
-                setReviews(listWithPerms);
+                setReviews(normalized);
+                setCurrentPage(1); // 새로 불러올 때는 항상 1페이지로
             } catch (e) {
+                console.error("내 리뷰 목록 조회 오류:", e);
                 setError("작성한 후기를 불러오는 중 오류가 발생했어요.");
             } finally {
                 setLoading(false);
@@ -111,32 +97,33 @@ export default function UserMyReviewPage() {
         }
 
         if (!review.review_id) {
-            alert("이 리뷰에는 review_id 정보가 없어 삭제할 수 없습니다. (백엔드 DTO 확인 필요)");
+            alert(
+                "이 리뷰에는 review_id 정보가 없어 삭제할 수 없습니다. (백엔드 DTO 확인 필요)"
+            );
             return;
         }
         if (!review.product_id) {
-            // deleteReview 컨트롤러는 product_id 도 PathVariable 로 받는다.
-            alert("이 리뷰에는 product_id 정보가 없어 삭제할 수 없습니다. (MyPageReviewDTO에 product_id 추가 필요)");
+            alert(
+                "이 리뷰에는 product_id 정보가 없어 삭제할 수 없습니다. (MyPageReviewDTO에 product_id 추가 필요)"
+            );
             return;
         }
 
         if (!window.confirm("이 후기를 삭제하시겠습니까?")) return;
 
         try {
-            // 컨트롤러 시그니처: @DeleteMapping("/{product_id}/{review_id}")
+            // DELETE /api/reviews/{product_id}/{review_id}
             await axios.delete(
                 `/api/reviews/${review.product_id}/${review.review_id}`,
-                {
-                    withCredentials: true,
-                }
+                { withCredentials: true }
             );
 
-            // 화면에서 제거
             setReviews((prev) =>
                 prev.filter((r) => r.review_id !== review.review_id)
             );
             alert("후기가 삭제되었어요.");
         } catch (e) {
+            console.error("리뷰 삭제 오류:", e);
             alert("후기 삭제 중 오류가 발생했습니다.");
         }
     };
@@ -149,7 +136,9 @@ export default function UserMyReviewPage() {
         }
 
         if (!review.review_id) {
-            alert("이 리뷰에는 review_id 정보가 없어 수정할 수 없습니다. (백엔드 DTO 확인 필요)");
+            alert(
+                "이 리뷰에는 review_id 정보가 없어 수정할 수 없습니다. (백엔드 DTO 확인 필요)"
+            );
             return;
         }
 
@@ -179,6 +168,7 @@ export default function UserMyReviewPage() {
             return;
         }
 
+        // 🔧 여기 오타 있었던 부분 (editRati...ng -> editRating)
         const ratingNumber = Number(editRating);
         if (Number.isNaN(ratingNumber) || ratingNumber <= 0 || ratingNumber > 5) {
             alert("별점은 1 ~ 5 사이의 숫자로 입력해주세요.");
@@ -186,14 +176,14 @@ export default function UserMyReviewPage() {
         }
 
         try {
-            //  컨트롤러 시그니처: @PatchMapping("/{review_id}")
-            //  RequestBody: UpdateReviewRequestDTO (content, rating, imageUrls)
+            // PATCH /api/reviews/{review_id}
             await axios.patch(
                 `/api/reviews/${editingId}`,
                 {
                     content: editContent.trim(),
                     rating: ratingNumber,
-                    imageUrls: target?.imageUrls || null, // 지금은 이미지 수정 안 쓰면 null/빈배열
+                    // 지금은 이미지 수정 UI는 없으니 기존 배열 그대로 보내기
+                    imageUrls: target?.imageUrls ?? [],
                 },
                 { withCredentials: true }
             );
@@ -214,8 +204,22 @@ export default function UserMyReviewPage() {
             alert("후기가 수정되었어요.");
             handleCancelEdit();
         } catch (e) {
+            console.error("리뷰 수정 오류:", e);
             alert("후기 수정 중 오류가 발생했습니다.");
         }
+    };
+
+    // 페이지네이션 계산
+    const totalPages = Math.max(1, Math.ceil(reviews.length / PAGE_SIZE));
+    const pagedReviews = reviews.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE
+    );
+
+    const handlePageChange = (nextPage) => {
+        if (nextPage < 1 || nextPage > totalPages) return;
+        setCurrentPage(nextPage);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     return (
@@ -234,7 +238,7 @@ export default function UserMyReviewPage() {
                 )}
 
                 <div className="myreview-list">
-                    {reviews.map((review) => {
+                    {pagedReviews.map((review) => {
                         const isEditing = editingId === review.review_id;
                         const canUpdate = Boolean(review.canUpdate);
 
@@ -249,7 +253,6 @@ export default function UserMyReviewPage() {
                                 {/* 상단: 상품명 + 날짜 + 버튼 */}
                                 <header className="myreview-header">
                                     <div className="myreview-title-block">
-                                        {/* DTO에 brand_name 있으면 여기서 같이 표기 가능 */}
                                         <div className="myreview-product">
                                             {review.prd_name}
                                         </div>
@@ -265,9 +268,7 @@ export default function UserMyReviewPage() {
                                                 <button
                                                     type="button"
                                                     className="myreview-meta-btn"
-                                                    onClick={() =>
-                                                        handleStartEdit(review)
-                                                    }
+                                                    onClick={() => handleStartEdit(review)}
                                                     disabled={!canUpdate}
                                                 >
                                                     수정
@@ -275,23 +276,13 @@ export default function UserMyReviewPage() {
                                                 <button
                                                     type="button"
                                                     className="myreview-meta-btn"
-                                                    onClick={() =>
-                                                        handleDelete(review)
-                                                    }
+                                                    onClick={() => handleDelete(review)}
                                                     disabled={!canUpdate}
                                                 >
                                                     삭제
                                                 </button>
                                             </>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                className="myreview-meta-btn"
-                                                onClick={handleCancelEdit}
-                                            >
-                                                취소
-                                            </button>
-                                        )}
+                                        ) : null}
                                     </div>
                                 </header>
 
@@ -302,78 +293,142 @@ export default function UserMyReviewPage() {
                                             const score = isEditing
                                                 ? Number(editRating) || 0
                                                 : Number(review.rating) || 0;
-                                            const filled = score >= idx + 1;
+
+                                            let starClass = "myreview-star";
+                                            if (score >= idx + 1) {
+                                                starClass += " myreview-star--on";
+                                            } else if (score >= idx + 0.5) {
+                                                starClass += " myreview-star--half";
+                                            }
+
                                             return (
-                                                <span
-                                                    key={idx}
-                                                    className={
-                                                        "myreview-star" +
-                                                        (filled
-                                                            ? " myreview-star--on"
-                                                            : "")
-                                                    }
-                                                >
+                                                <span key={idx} className={starClass}>
                                                     ★
                                                 </span>
                                             );
                                         })}
                                         <span className="myreview-score">
                                             {isEditing
-                                                ? Number(
-                                                    editRating || 0
-                                                ).toFixed(1)
+                                                ? Number(editRating || 0).toFixed(1)
                                                 : formatRating(review.rating)}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* 내용: 보기 모드 / 수정 모드 분기 */}
+                                {/* 내용: 보기 모드 / 수정 모드 */}
                                 {!isEditing ? (
-                                    <p className="myreview-content">
-                                        {review.content}
-                                    </p>
+                                    <p className="myreview-content">{review.content}</p>
                                 ) : (
                                     <div className="myreview-edit-area">
-                                        <div className="myreview-edit-rating-input">
-                                            <label>
-                                                별점
+                                        {/* 상단: 별점 입력 */}
+                                        <div className="myreview-edit-header">
+                                            <div className="myreview-edit-rating">
+                                                <span className="myreview-edit-label">별점</span>
                                                 <input
                                                     type="number"
                                                     min="1"
                                                     max="5"
                                                     step="0.5"
+                                                    className="myreview-edit-rating-input"
                                                     value={editRating}
-                                                    onChange={(e) =>
-                                                        setEditRating(
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                    onChange={(e) => setEditRating(e.target.value)}
                                                 />
-                                            </label>
+                                                <span className="myreview-edit-rating-max">
+                                                    / 5
+                                                </span>
+                                            </div>
+                                            <span className="myreview-edit-help">
+                                                내용과 별점을 수정한 뒤 &ldquo;저장하기&rdquo;를 눌러주세요.
+                                            </span>
                                         </div>
+
+                                        {/* 내용 입력 */}
                                         <textarea
                                             className="myreview-edit-textarea"
                                             value={editContent}
-                                            onChange={(e) =>
-                                                setEditContent(e.target.value)
-                                            }
-                                            rows={4}
+                                            onChange={(e) => setEditContent(e.target.value)}
+                                            rows={5}
+                                            placeholder="상품을 사용해 본 느낌을 자세히 적어주세요."
                                         />
-                                        <button
-                                            type="button"
-                                            className="myreview-save-btn"
-                                            onClick={handleSaveEdit}
-                                        >
-                                            저장하기
-                                        </button>
+
+                                        {/* 버튼 영역 */}
+                                        <div className="myreview-edit-actions">
+                                            <button
+                                                type="button"
+                                                className="myreview-cancel-btn"
+                                                onClick={handleCancelEdit}
+                                            >
+                                                취소
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="myreview-save-btn"
+                                                onClick={handleSaveEdit}
+                                            >
+                                                저장하기
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 
-                                {/* 이미지가 필요하면 DTO에 image_url(또는 imageUrls) 추가 후 여기서 렌더링 */}
+                                {/* 리뷰 이미지 */}
+                                {Array.isArray(review.imageUrls) &&
+                                    review.imageUrls.length > 0 && (
+                                        <div className="myreview-images">
+                                            {review.imageUrls.map((url, idx) => (
+                                                <div key={idx} className="myreview-thumb">
+                                                    <img
+                                                        src={url}
+                                                        alt={`리뷰 이미지 ${idx + 1}`}
+                                                        className="myreview-thumb-img"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                             </article>
                         );
                     })}
                 </div>
+                {/* 페이지네이션 */}
+                {totalPages > 1 && (
+                    <div className="myreview-pagination">
+                        <button
+                            type="button"
+                            className="myreview-page-btn myreview-page-prev"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            이전
+                        </button>
+
+                        {Array.from({ length: totalPages }).map((_, idx) => {
+                            const page = idx + 1;
+                            return (
+                                <button
+                                    key={page}
+                                    type="button"
+                                    className={
+                                        "myreview-page-btn" +
+                                        (page === currentPage ? " myreview-page-btn--active" : "")
+                                    }
+                                    onClick={() => handlePageChange(page)}
+                                >
+                                    {page}
+                                </button>
+                            );
+                        })}
+
+                        <button
+                            type="button"
+                            className="myreview-page-btn myreview-page-next"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            다음
+                        </button>
+                    </div>
+                )}
             </section>
         </UserMyPageLayout>
     );
