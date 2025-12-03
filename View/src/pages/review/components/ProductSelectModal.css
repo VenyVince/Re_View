@@ -109,3 +109,35 @@
     border: none;
     cursor: pointer;
 }
+
+/* 필터 탭 */
+.filter-tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 12px;
+    gap: 6px;
+}
+
+.filter-tabs button {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    background: #f3f4f6;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 0 4px;
+    font-size: 14px;
+}
+
+.filter-tabs button.active {
+    background: #111827;
+    color: white;
+}
+
+/* 체크 아이콘 */
+.check-icon {
+    margin-left: auto;
+    font-size: 20px;
+    color: #10b981; /* 초록 체크 */
+    font-weight: 700;
+}

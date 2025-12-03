@@ -58,7 +58,7 @@ public class ProductReviewController {
             @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
     })
     public ResponseEntity<Map<String, Boolean>> canCreate(
-            @RequestBody int order_item_id) {
+            @RequestParam int order_item_id) {
         int user_id = security_Util.getCurrentUserId();
         boolean canCreate = productReviewService.canCreate(order_item_id, user_id);
         Map<String, Boolean> response = new HashMap<>();
