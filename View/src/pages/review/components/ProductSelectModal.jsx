@@ -1,47 +1,63 @@
 // src/pages/review/components/ProductSelectModal.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "./ProductSelectModal.css"; // 스타일 따로 분리
+import "./ProductSelectModal.css";
+import {
+    fetchOrders,
+    fetchOrderDetail,
+    checkReviewExists,
+} from "../../../api/review/reviewApi";
 
 const PAGE_SIZE = 5;
 
 const ProductSelectModal = ({ onClose, onSelect }) => {
     const [items, setItems] = useState([]);
+    const [filtered, setFiltered] = useState([]);
     const [page, setPage] = useState(1);
+    const [filterType, setFilterType] = useState("ALL"); // ALL | NOT_WRITTEN | DONE
     const [loading, setLoading] = useState(true);
 
-    const startIndex = (page - 1) * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-
-    const paginatedItems = items.slice(startIndex, endIndex);
-
     useEffect(() => {
-        fetchOrders();
+        loadItems();
     }, []);
 
-    async function fetchOrders() {
+    async function loadItems() {
         try {
-            // 주문 목록 가져오기
-            const res = await axios.get("/api/orders");
-            const orders = res.data;
+            const orderRes = await fetchOrders();
+            const orders = orderRes.data;
 
             let allItems = [];
 
-            // 주문 상세에서 order_items 가져오기
+            // 주문 상세 불러오기
             for (const order of orders) {
-                const detail = await axios.get(`/api/orders/${order.order_id}`);
-
-                if (detail.data.order_items) {
-                    // order_items에 구매 날짜(created_at)도 붙여주기
-                    const items = detail.data.order_items.map((item) => ({
-                        ...item,
-                        purchase_date: order.created_at
-                    }));
-                    allItems.push(...items);
-                }
+                const detail = await fetchOrderDetail(order.order_id);
+                const orderItems = detail.data.order_items.map((item) => ({
+                    ...item,
+                    purchase_date: order.created_at,
+                }));
+                allItems.push(...orderItems);
             }
 
-            setItems(allItems);
+            // 리뷰 존재 여부 확인
+            const withStatus = await Promise.all(
+                allItems.map(async (item) => {
+                    try {
+                        const r = await checkReviewExists(item.order_item_id);
+
+                        return {
+                            ...item,
+                            canCreate: r.data.canCreate, // true = 작성 가능
+                        };
+                    } catch (e) {
+                        return {
+                            ...item,
+                            canCreate: null, // 오류 시 null 처리
+                        };
+                    }
+                })
+            );
+
+            setItems(withStatus);
+            applyFilter(filterType, withStatus);
         } catch (error) {
             console.error(error);
             alert("구매한 상품을 불러오지 못했습니다.");
@@ -50,46 +66,89 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
         }
     }
 
+    // 필터 적용
+    const applyFilter = (type, baseList = items) => {
+        let result = baseList;
+
+        if (type === "NOT_WRITTEN") {
+            result = baseList.filter((i) => i.canCreate === true);
+        } else if (type === "DONE") {
+            result = baseList.filter((i) => i.canCreate === false);
+        }
+
+        setFiltered(result);
+        setPage(1);
+    };
+
+    useEffect(() => {
+        applyFilter(filterType);
+    }, [filterType]);
+
+    const startIndex = (page - 1) * PAGE_SIZE;
+    const paginated = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+
     return (
         <div className="modal-backdrop">
             <div className="modal-box">
                 <h2 className="modal-title">구매한 상품 선택</h2>
 
+                {/* 필터 */}
+                <div className="filter-tabs">
+                    <button
+                        className={filterType === "ALL" ? "active" : ""}
+                        onClick={() => setFilterType("ALL")}
+                    >
+                        전체
+                    </button>
+                    <button
+                        className={filterType === "NOT_WRITTEN" ? "active" : ""}
+                        onClick={() => setFilterType("NOT_WRITTEN")}
+                    >
+                        미작성
+                    </button>
+                    <button
+                        className={filterType === "DONE" ? "active" : ""}
+                        onClick={() => setFilterType("DONE")}
+                    >
+                        작성완료
+                    </button>
+                </div>
+
+                {/* 목록 */}
                 <div className="item-list">
-                    {/* 로딩 중 */}
                     {loading ? (
                         <div className="empty">⏳ 불러오는 중...</div>
-                    ) : paginatedItems.length === 0 ? (
-                        <div className="empty">구매한 상품이 없습니다</div>
+                    ) : paginated.length === 0 ? (
+                        <div className="empty">상품이 없습니다</div>
                     ) : (
-                        paginatedItems.map((item) => {
-                            const name = item?.product_name ?? "상품명 없음";
-                            const price = item?.product_price ?? 0;
-                            const date = item?.purchase_date ?? "날짜 없음";
+                        paginated.map((item) => (
+                            <div
+                                key={item.order_item_id}
+                                className="item-box"
+                                onClick={() => onSelect(item)}
+                            >
+                                <div className="thumb">🛒</div>
 
-                            return (
-                                <div
-                                    key={item.order_item_id}
-                                    className="item-box"
-                                    onClick={() => onSelect(item)}
-                                >
-                                    <div className="thumb">🛒</div>
-
-                                    <div className="item-info">
-                                        <div className="name">{name}</div>
-                                        <div className="price">
-                                            ₩{price.toLocaleString()}
-                                        </div>
-                                        <div className="date">
-                                            구매 날짜 {date}
-                                        </div>
+                                <div className="item-info">
+                                    <div className="name">{item.product_name}</div>
+                                    <div className="price">
+                                        ₩{item.product_price.toLocaleString()}
+                                    </div>
+                                    <div className="date">
+                                        구매 날짜 {item.purchase_date}
                                     </div>
                                 </div>
-                            );
-                        })
+
+                                {/* 체크 아이콘 (리뷰 작성 완료) */}
+                                {item.canCreate === false && (
+                                    <div className="check-icon">✔</div>
+                                )}
+                            </div>
+                        ))
                     )}
                 </div>
 
+                {/* 페이지네이션 */}
                 <div className="pagination">
                     <button
                         disabled={page === 1}
@@ -97,11 +156,9 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
                     >
                         이전
                     </button>
-
                     <span>{page}</span>
-
                     <button
-                        disabled={endIndex >= items.length}
+                        disabled={startIndex + PAGE_SIZE >= filtered.length}
                         onClick={() => setPage(page + 1)}
                     >
                         다음

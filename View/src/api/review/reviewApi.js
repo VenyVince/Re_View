@@ -20,5 +20,12 @@ export const fetchOrders = () => {
 
 // 주문 상세 조회
 export const fetchOrderDetail = (orderId) => {
-    return axiosClient.get(`api/orders/${orderId}`);
+    return axiosClient.get(`/api/orders/${orderId}`);
+};
+
+// 리뷰 작성 가능 여부 확인
+export const checkReviewExists = (orderItemId) => {
+    return axiosClient.get(`/api/reviews/exists/create`, {
+        params: { order_item_id: orderItemId }
+    });
 };
