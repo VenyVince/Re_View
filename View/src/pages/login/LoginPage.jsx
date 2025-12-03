@@ -51,9 +51,16 @@ export default function LoginPage() {
 
             if (err.response) {
                 // 서버가 응답한 HTTP 오류
-                if (err.response.status === 400 || err.response.status === 401) {
+                if (err.response.status === 400) {
                     setError('아이디 또는 비밀번호가 올바르지 않습니다.');
-                } else {
+                }
+
+                // 401번은 영구 제제 사용자에게 발생하는 상태코드입니다. 12/01 이재빈
+                else if (err.response.status === 401) {
+                    setError('영구 제재 조치를 받은 회원입니다. 관리자에게 문의하세요.');
+                }
+
+                else {
                     setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
                 }
             } else if (err.request) {

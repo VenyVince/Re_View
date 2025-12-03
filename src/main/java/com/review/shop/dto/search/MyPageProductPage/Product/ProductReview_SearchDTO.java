@@ -1,12 +1,15 @@
-package com.review.shop.dto.search.MyPagenProductPage.Product;
+package com.review.shop.dto.search.MyPageProductPage.Product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.sql.Date;
+import java.util.List;
 
 @Data
 public class ProductReview_SearchDTO {
+    private int review_id;
+
     //    User_table
     private String nickname;
     private String user_baumann_type;
@@ -29,4 +32,7 @@ public class ProductReview_SearchDTO {
             return "(수정됨)"; // 수정되면 수정되었다고 표시함
         }
     }
+
+    //     Review_image
+    private List<String> image_urls;
 }

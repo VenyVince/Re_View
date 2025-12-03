@@ -1,6 +1,7 @@
 package com.review.shop.service.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
@@ -39,7 +40,7 @@ public class AdminProductService {
     }
 
     // 상품 수정
-    public void updateProduct(int product_id, ProductDetailDTO product) {
+    public void updateProduct(int product_id, ProductUpdateOnlyPrdInfoDTO product) {
         if (product == null) {
             throw new WrongRequestException("수정할 상품 정보가 전달되지 않았습니다.");
         }

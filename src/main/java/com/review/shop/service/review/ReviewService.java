@@ -2,7 +2,9 @@ package com.review.shop.service.review;
 
 import com.review.shop.dto.common.PageResponse;
 import com.review.shop.dto.review.ReviewDTO;
+import com.review.shop.dto.review.ReviewDetailResponseDTO;
 import com.review.shop.exception.DatabaseException;
+import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.review.ReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +58,47 @@ public class ReviewService {
         } catch (DataAccessException e) {
             throw new DatabaseException("리뷰 목록 조회 중 DB 오류가 발생했습니다.", e);
         }
+    }
+
+    public ReviewDetailResponseDTO getReviewDetail(int review_id, int user_id) {
+        // 리뷰 기본 정보 + 상품 정보 조회 (조인 쿼리 추천)
+        ReviewDetailResponseDTO.ReviewDetailDTO reviewDTO = reviewMapper.getReviewBase(review_id);
+
+        if (reviewDTO == null) {
+            throw new ResourceNotFoundException("리뷰를 찾을 수 없습니다.");
+        }
+
+        // 상품 정보 별도 조회 (또는 위에서 조인으로 가져왔다면 생략 가능)
+        ReviewDetailResponseDTO.ProductInfoDTO productDTO = reviewMapper.getProductByReviewId(review_id);
+
+        // 리뷰 이미지 리스트 조회
+        List<String> images = reviewMapper.getReviewImages(review_id);
+        reviewDTO.setImages(images);
+
+        // 댓글 목록 조회
+        List<ReviewDetailResponseDTO.CommentDTO> comments = reviewMapper.getComments(review_id);
+
+        // 좋아요/싫어요 여부 확인 (로그인한 경우)
+        if (user_id > 0) {
+            // DB에서 가져온 값 (예: "1", "0", 또는 null)
+            String reaction = reviewMapper.getUserReaction(review_id, user_id);
+            boolean isLiked = "1".equals(reaction);
+            boolean isDisliked = "0".equals(reaction);
+
+            reviewDTO.setUser_liked(isLiked);
+            reviewDTO.setUser_disliked(isDisliked);
+
+        } else {
+            // 비로그인 상태
+            reviewDTO.setUser_liked(false);
+            reviewDTO.setUser_disliked(false);
+        }
+
+        // 6. 조립 및 반환
+        return ReviewDetailResponseDTO.builder()
+                .review(reviewDTO)
+                .product(productDTO)
+                .comments(comments)
+                .build();
     }
 }
