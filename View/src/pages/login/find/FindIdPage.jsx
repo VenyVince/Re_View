@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo.png';
 import './Find.css';
+import axios from "axios";
 
 export default function FindIdPage() {
     const nav = useNavigate();
@@ -12,17 +13,45 @@ export default function FindIdPage() {
         setForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 더미 검증
         if (form.name.trim() && /^01[0-9]-?\d{3,4}-?\d{4}$/.test(form.phone)) {
-            // 아이디를 찾았다고 가정
-            const dummyEmail = 'test@review.com';
-            nav('/find/id/result', { state: { email: dummyEmail } });
+
+            try {
+                // 백엔드 API 호출
+                const response = await axios.post('/api/auth/find-id', {
+                    name: form.name,
+                    phone_number: form.phone
+                });
+
+                // 결과값 result로 state로 전달
+                nav('/find/id/result', { state: { resultMessage: response.data } });
+
+            } catch (error) {
+                if (error.response) {
+                    const status = error.response.status;
+                    if (status === 404) {
+                        // [404] 아이디를 찾을 수 없음
+                        alert("입력하신 정보와 일치하는 아이디가 없습니다.");
+                    } else if (status === 400) {
+                        // [400] 백엔드 오류
+                        alert("잘못된 요청입니다. 다시 시도해주세요.");
+                    } else {
+                        // 그 외 (500 등)
+                        alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                    }
+                } else {
+                    // 서버 응답 자체가 없는 경우 (네트워크 문제 등)
+                    alert("서버와 연결할 수 없습니다.");
+                }
+                console.error("API Error:", error);
+            }
+
         } else {
-            alert('입력 정보를 확인해 주세요.');
+            alert('이름과 휴대폰 번호를 정확히 입력해 주세요.');
         }
+
     };
 
     return (

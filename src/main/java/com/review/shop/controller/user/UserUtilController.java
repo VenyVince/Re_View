@@ -52,6 +52,10 @@ public class UserUtilController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 발송 성공 (메시지 문자열 반환)"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse (responseCode = "404", description = "사용자 정보 불일치",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "500", description = "DB오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/api/auth/send-temp-password")
