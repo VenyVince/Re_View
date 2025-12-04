@@ -29,7 +29,7 @@ export default function ProductDetailPage() {
     const { adjustBottomBarPosition } = useBottomBar();
     const { adjustMiniBoxPosition } = useMiniBuyBox();
 
-    // 상품 상세 정보 조회
+    // 상품 상세 조회
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -43,14 +43,19 @@ export default function ProductDetailPage() {
         fetchProduct();
     }, [productId]);
 
-    // 스크롤 시 TOP 버튼 활성화
+    // product 로딩 확인
+    useEffect(() => {
+        if (product) console.log("🔥 로딩된 product:", product);
+    }, [product]);
+
+    // TOP 버튼
     useEffect(() => {
         const onScroll = () => setShowTopBtn(window.scrollY > 300);
         window.addEventListener("scroll", onScroll);
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // 탭 변경 시 UI 위치 보정
+    // 탭 변경 시 위치 보정
     useEffect(() => {
         requestAnimationFrame(() => {
             adjustBottomBarPosition();
@@ -58,7 +63,7 @@ export default function ProductDetailPage() {
         });
     }, [activeTab]);
 
-    // 스크롤/리사이즈 시 하단바 유지 보정
+    // 스크롤/리사이즈 시 하단바 보정
     useEffect(() => {
         const onScrollOrResize = () => {
             adjustBottomBarPosition();
@@ -72,7 +77,7 @@ export default function ProductDetailPage() {
         };
     }, [showMiniBuyBox]);
 
-    // 미니 박스 열릴 때 즉시 보정
+    // 미니박스 열릴 때 보정
     useEffect(() => {
         if (showMiniBuyBox) {
             requestAnimationFrame(() => {
@@ -88,7 +93,6 @@ export default function ProductDetailPage() {
         <div className="pd-detail-wrapper">
             <div className="pd-page">
 
-                {/* 상단 상품 정보 */}
                 <div className="pd-wrap">
                     <div className="pd-left">
                         <div className="pd-image-placeholder">상품 이미지</div>
@@ -97,7 +101,6 @@ export default function ProductDetailPage() {
                     <div className="pd-right">
                         <div className="pd-brand">{product.prd_brand}</div>
                         <div className="pd-name">{product.prd_name}</div>
-
                         <div className="pd-price">{product.price.toLocaleString()}원</div>
 
                         <div className="pd-field-box">
@@ -117,9 +120,7 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
-                {/* 탭 + 콘텐츠 */}
                 <div className="pd-bottom-section">
-
                     <div className="pd-tabs-row">
                         <button
                             className={activeTab === "info" ? "active" : ""}
@@ -145,15 +146,10 @@ export default function ProductDetailPage() {
 
                     <div className="pd-content-area">
                         {activeTab === "info" && <ProductInfoSection product={product} />}
-
-                        {/* ★ 리뷰: productId만 전달 */}
                         {activeTab === "review" && <ProductReviewSection productId={productId} />}
-
-                        {/* ★ QnA: productId만 전달 */}
                         {activeTab === "qna" && <QnaSection productId={productId} />}
                     </div>
 
-                    {/* 미니 구매 박스 */}
                     <MiniBuyBox
                         showMiniBuyBox={showMiniBuyBox}
                         setShowMiniBuyBox={setShowMiniBuyBox}
@@ -163,7 +159,6 @@ export default function ProductDetailPage() {
                         miniActionType={miniActionType}
                     />
 
-                    {/* 하단 고정 바 */}
                     <BottomBar
                         wish={wish}
                         setWish={setWish}
@@ -171,10 +166,10 @@ export default function ProductDetailPage() {
                         setShowMiniBuyBox={setShowMiniBuyBox}
                         adjustBottomBarPosition={adjustBottomBarPosition}
                         adjustMiniBoxPosition={adjustMiniBoxPosition}
+                        product={product}
                     />
                 </div>
 
-                {/* TOP 버튼 */}
                 {showTopBtn && (
                     <button
                         className="pd-top-btn"
