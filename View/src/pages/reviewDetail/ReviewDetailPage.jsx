@@ -1,5 +1,7 @@
 // src/pages/reviewDetail/ReviewDetailPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import "./ReviewDetailPage.css";
 
 import ReviewDetailHeader from "./components/ReviewDetailHeader";
@@ -8,47 +10,125 @@ import ReviewCommentList from "./components/ReviewCommentList";
 import ReviewCommentWriteBox from "./components/ReviewCommentWriteBox";
 
 export default function ReviewDetailPage() {
-    // 더미 데이터 (데이터 키/형식 변경 없음)
-    const [review] = useState({
-        review_id: 1,
-        product_id: 10,
-        nickname: "스킨케어러버",
-        baumann_type: "DSPT",
-        rating: 5,
-        content:
-            "정말 좋아요! 피부가 촉촉하고 편안해졌어요. 사용감이 너무 좋고 재구매 의사 있습니다.",
-        images: ["https://picsum.photos/200/200?1", "https://picsum.photos/200/200?2"],
-        created_at: "2025-02-05",
-        like_count: 12,
-        dislike_count: 1,
-        prd_brand: "바이오더마",
-        prd_name: "하이드라비오 토너",
-        product_image: "https://picsum.photos/200/200?3",
-        price: 38000,
-        category: "스킨/토너",
-    });
+    const { reviewId } = useParams();
 
-    const [comments] = useState([
-        { comment_id: 1, nickname: "민감피부",baumann_type: "DSPT", content: "리뷰 덕분에 도움 됐어요!", created_at: "2025-02-06" },
-        { comment_id: 2, nickname: "글로우러버",baumann_type: "OSPW", content: "좋은 리뷰 감사합니다 :)", created_at: "2025-02-07" },
-    ]);
+    const [review, setReview] = useState(null);
+    const [comments, setComments] = useState([]);
+
+    // 리뷰 상세 + 댓글 불러오기
+    useEffect(() => {
+        axios.get(`/api/reviews/${reviewId}`).then((res) => {
+            const r = res.data.review;
+            const p = res.data.product;
+
+            const mergedReview = {
+                ...r,
+                prd_brand: p.prd_brand,
+                prd_name: p.prd_name,
+                product_image: p.product_image,
+                price: p.price,
+                category: p.category
+            };
+
+            setReview(mergedReview);
+            setComments(res.data.comments);
+        });
+    }, [reviewId]);
+
+    if (!review) return <div>불러오는 중...</div>;
+
+    //댓글 작성 후 최신 댓글 다시 GET
+    const handleCommentSubmit = () => {
+        axios
+            .get(`/api/reviews/${reviewId}`)
+            .then((res) => setComments(res.data.comments))
+            .catch((err) => {
+                if (err.response?.status === 404) {
+                    alert("로그인이 필요합니다.");
+                } else {
+                    console.error(err);
+                }
+            });
+    };
+
+    //좋아요
+    const handleLike = async () => {
+        try {
+            if (review.user_disliked) {
+                await axios.post(`/api/reviews/${reviewId}/reaction`, { is_like: false });
+            }
+
+            await axios.post(`/api/reviews/${reviewId}/reaction`, { is_like: true });
+
+            const res = await axios.get(`/api/reviews/${reviewId}?t=${Date.now()}`);
+            const r = res.data.review;
+            const p = res.data.product;
+
+            setReview({
+                ...r,
+                prd_brand: p.prd_brand,
+                prd_name: p.prd_name,
+                product_image: p.product_image,
+                price: p.price,
+                category: p.category
+            });
+        } catch (err) {
+            if (err.response?.status === 404) alert("로그인이 필요합니다.");
+            else console.error(err);
+        }
+    };
+
+    //싫어요
+    const handleDislike = async () => {
+        try {
+            if (review.user_liked) {
+                await axios.post(`/api/reviews/${reviewId}/reaction`, { is_like: true });
+            }
+
+            await axios.post(`/api/reviews/${reviewId}/reaction`, { is_like: false });
+
+            const res = await axios.get(`/api/reviews/${reviewId}?t=${Date.now()}`);
+            const r = res.data.review;
+            const p = res.data.product;
+
+            setReview({
+                ...r,
+                prd_brand: p.prd_brand,
+                prd_name: p.prd_name,
+                product_image: p.product_image,
+                price: p.price,
+                category: p.category
+            });
+        } catch (err) {
+            if (err.response?.status === 404) alert("로그인이 필요합니다.");
+            else console.error(err);
+        }
+    };
 
     return (
         <div className="rd-wrap">
-            {/* 상단 제품 요약 + 리뷰 본문을 하나의 메인 박스로 */}
+
             <section className="rd-main">
-                <ReviewDetailHeader review={review} />
+                <ReviewDetailHeader
+                    review={review}
+                    onLike={handleLike}
+                    onDislike={handleDislike}
+                />
                 <ReviewDetailContent review={review} />
             </section>
 
-            {/* 댓글 영역 */}
             <section className="rd-comments-box">
                 <div className="rd-comments-header">
                     <h3>댓글</h3>
                     <span className="rd-comments-count">{comments.length}</span>
                 </div>
+
                 <ReviewCommentList comments={comments} />
-                <ReviewCommentWriteBox reviewId={review.review_id} />
+
+                <ReviewCommentWriteBox
+                    reviewId={review.review_id}
+                    onSubmit={handleCommentSubmit}
+                />
             </section>
         </div>
     );
