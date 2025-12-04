@@ -72,6 +72,7 @@
 
 /* 라디오 + 태그 영역 */
 .address-radio-area {
+    width: 68px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
