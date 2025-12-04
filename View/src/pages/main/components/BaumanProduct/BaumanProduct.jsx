@@ -3,12 +3,48 @@ import "./BaumanProduct.css";
 import dummyData from "../../../../assets/dummyData.png";
 import { getBaumannBadge } from "../../../../assets/baumann";
 import axios from "axios";
-
-const PAGE_SIZE = 32; // 한 페이지 32개
+import { useNavigate } from "react-router-dom";
 
 export default function BaumanProduct() {
-    const currentType = "DRNW";
+    const navigate = useNavigate();
 
+    // 바우만 타입 상태
+    const [currentType, setCurrentType] = useState(null);
+
+    const allBaumannTypes = [
+        "DRNT","DRNW","DRPT","DRPW",
+        "DSNT","DSNW","DSPT","DSPW",
+        "ORNT","ORNW","ORPT","ORPW",
+        "OSNT","OSNW","OSPT","OSPW"
+    ];
+
+    function getRandomType() {
+        return allBaumannTypes[Math.floor(Math.random() * allBaumannTypes.length)];
+    }
+
+    /* 로그인 상태 체크 → 타입 결정 */
+    useEffect(() => {
+        const fetchUserType = async () => {
+            try {
+                const res = await axios.get("/api/auth/my-baumann-type");
+
+                if (typeof res.data === "string" && res.data.length > 0) {
+                    setCurrentType(res.data);
+                    console.log("바우만 타입 응답:", res.data);
+                } else {
+                    setCurrentType(getRandomType());
+                }
+
+            } catch (err) {
+                setCurrentType(getRandomType());
+            }
+        };
+
+        fetchUserType();
+    }, []);
+
+
+    /* 바우만 타입 태그 표시용 리스트 */
     const skinTypeList = [
         { type: "DRNT", tags: ["건성", "저자극", "비색소", "탄력"] },
         { type: "DRNW", tags: ["건성", "저자극", "비색소", "주름"] },
@@ -25,71 +61,72 @@ export default function BaumanProduct() {
         { type: "OSNT", tags: ["지성", "민감성", "비색소", "탄력"] },
         { type: "OSNW", tags: ["지성", "민감성", "비색소", "주름"] },
         { type: "OSPT", tags: ["지성", "민감성", "색소성", "탄력"] },
-        { type: "OSPW", tags: ["지성", "민감성", "색소성", "주름"] },
+        { type: "OSPW", tags: ["지성", "민감성", "색소성", "주름"] }
     ];
 
     const selectedType = skinTypeList.find((t) => t.type === currentType);
 
+
+    /* 탭 상태 */
+    const [activeTab, setActiveTab] = useState("product");
+
+    /* 데이터 상태 */
     const [products, setProducts] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1); // ✅ 전체 페이지 수
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // 상품 호출
     useEffect(() => {
-        const fetchProducts = async () => {
+        if (!currentType) return;
+
+        const fetchRecommendProducts = async () => {
             try {
                 setLoading(true);
                 setError("");
 
-                const res = await axios.get("/api/products", {
-                    params: { page, size: PAGE_SIZE, sort: "latest" },
-                });
+                // DRNW → first/second/third/fourth 매핑
+                // 16가지 Baumann 타입을 백엔드 추천 모델에서 요구하는 4가지 그룹(first~fourth)으로 단순화하기 위해, 피부 특성축(S/R, P/N 조합)을 기준으로 비슷한 타입끼리 묶어 매핑
+                const typeMap = {
+                    DRNT: "first", DRNW: "first",
+                    DRPT: "second", DRPW: "second",
+                    DSNT: "third", DSNW: "third",
+                    DSPT: "fourth", DSPW: "fourth",
+                    ORNT: "first", ORNW: "first",
+                    ORPT: "second", ORPW: "second",
+                    OSNT: "third", OSNW: "third",
+                    OSPT: "fourth", OSPW: "fourth",
+                };
 
-                // 응답 구조 확인
-                const raw = Array.isArray(res.data)
-                    ? res.data
-                    : Array.isArray(res.data?.data)
-                        ? res.data.data
-                        : [];
+                const mappedType = typeMap[currentType] || "all";
+                const res = await axios.post(`/api/recommendations/${mappedType}`);
 
-                // ✅ 백엔드가 totalCount 내려줄 경우 사용
-                const totalCount = res.data?.totalCount || 0;
-                if (totalCount > 0) {
-                    setTotalPages(Math.ceil(totalCount / PAGE_SIZE));
-                } else {
-                    // 혹시 totalCount가 없으면 임시 추정 (상품이 꽉 차면 다음 페이지 있다고 가정)
-                    setTotalPages(raw.length < PAGE_SIZE ? page : page + 1);
-                }
+                const rawProducts = res.data?.recommended_products || [];
 
-                // 백엔드 → 프론트 매핑
-                const mapped = raw.map((p) => {
-                    const id = p.product_id ?? p.id;
-                    const name = p.prd_name ?? p.name ?? "-";
-                    const brand = p.prd_brand ?? p.brand ?? "브랜드 미정";
-                    const imageUrl = p.image_url ?? p.imageUrl ?? null;
-                    const price =
-                        typeof p.price === "number" ? p.price : Number(p.price || 0);
-                    const rating =
-                        typeof p.rating === "number"
-                            ? p.rating
-                            : Number(p.rating || 0);
+                // 상품 + 대표 리뷰 매핑
+                const mappedProducts = rawProducts.map((p) => ({
+                    id: p.product_id,
+                    name: p.prd_name,
+                    brand: p.prd_brand,
+                    imageUrl: p.image_url,
+                    price: p.price,
+                    rating: p.rating,
+                    ratingText: p.rating ? `${p.rating}/5.0` : "-",
+                    discount: 0,
+                    isBest: p.rating >= 4.5, // 별점 4.5 이상 → BEST 표시
+                    topReview: p.top_review_content
+                        ? {
+                            id: p.top_review_id,
+                            content: p.top_review_content,
+                            rating: p.top_review_rating,
+                            likes: p.top_review_likes
+                        }
+                        : null
+                }));
 
-                    return {
-                        id,
-                        name,
-                        brand,
-                        imageUrl,
-                        price,
-                        ratingText: rating ? `${rating.toFixed(1)}/5.0` : "-",
-                        discount: 0,
-                        isBest: true,
-                    };
-                });
+                setProducts(mappedProducts);
 
-                setProducts(mapped);
             } catch (err) {
-                console.error("상품 조회 실패:", err);
+                console.error(err);
                 setError("추천 상품을 불러오지 못했습니다.");
                 setProducts([]);
             } finally {
@@ -97,32 +134,36 @@ export default function BaumanProduct() {
             }
         };
 
-        fetchProducts();
-    }, [page]);
+        fetchRecommendProducts();
+    }, [currentType]);
 
-    if (!selectedType) return null;
+    if (!selectedType) return <p style={{textAlign:"center"}}>로딩 중...</p>;
 
-    const hasNext = !loading && products.length === PAGE_SIZE;
-
-    const handlePrevPage = () => {
-        if (page > 1 && !loading) {
-            setPage((prev) => prev - 1);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-    };
-
-    const handleNextPage = () => {
-        if ((hasNext || page < totalPages) && !loading) {
-            setPage((prev) => prev + 1);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-    };
 
     return (
         <section className="bauman-section">
             <h2 className="bauman-title">{selectedType.type}의 추천 상품</h2>
 
+            {/* 탭 UI */}
+            <div className="bauman-tabs">
+                <button
+                    className={activeTab === "product" ? "tab-active" : ""}
+                    onClick={() => setActiveTab("product")}
+                >
+                    추천상품
+                </button>
+
+                <button
+                    className={activeTab === "review" ? "tab-active" : ""}
+                    onClick={() => setActiveTab("review")}
+                >
+                    리뷰
+                </button>
+            </div>
+
             <div className="bauman-box">
+
+                {/* 타입 정보 박스 */}
                 <div className="bauman-header">
                     <div className="bauman-header-right">
                         <div className="bauman-type-badge">
@@ -140,101 +181,104 @@ export default function BaumanProduct() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="bauman-tag-buttons">
-                            <button className="bauman-tag-btn bauman-tag-all">ALL</button>
-                            {selectedType.tags.map((tag, idx) => (
-                                <button key={idx} className="bauman-tag-btn">
-                                    {tag}
-                                </button>
-                            ))}
-                        </div>
                     </div>
                 </div>
 
                 {error && <p className="bauman-error">{error}</p>}
 
-                <div className="product-grid">
-                    {loading && products.length === 0 ? (
-                        <p
-                            className="bauman-loading"
-                            style={{
-                                gridColumn: "1 / -1",
-                                textAlign: "center",
-                            }}
-                        >
-                            상품을 불러오는 중입니다...
-                        </p>
-                    ) : products.length === 0 ? (
-                        <p
-                            className="bauman-empty"
-                            style={{
-                                gridColumn: "1 / -1",
-                                textAlign: "center",
-                            }}
-                        >
-                            추천 상품이 없습니다.
-                        </p>
-                    ) : (
-                        products.map((item) => (
-                            <article
-                                key={item.id}
-                                className="product-card"
-                                onClick={() => console.log("상품 클릭:", item.id)}
-                                style={{ cursor: "pointer" }}
-                            >
-                                <div className="product-thumb">
-                                    {item.isBest && <span className="product-badge">Best</span>}
-                                    <div className="product-thumb-inner">
-                                        <img
-                                            src={item.imageUrl || dummyData}
-                                            alt={item.name}
-                                        />
-                                    </div>
-                                </div>
+                {/* 상품 탭 */}
+                {activeTab === "product" && (
+                    <div className="product-grid">
+                        {loading ? (
+                            <p style={{ textAlign: "center" }}>상품을 불러오는 중입니다...</p>
+                        ) : products.length === 0 ? (
+                            <p style={{ textAlign: "center" }}>추천 상품이 없습니다.</p>
+                        ) : (
+                            products.map((item) => (
+                                <article key={item.id} className="product-card"
+                                         onClick={() => navigate(`/product/${item.id}`)}
+                                         style={{ cursor: "pointer" }}>
 
-                                <div className="product-meta">
-                                    <div className="product-brand-row">
-                                        <span className="product-brand">{item.brand}</span>
-                                        <span className="product-rating">{item.ratingText}</span>
+                                    <div className="product-thumb">
+                                        {item.isBest && <span className="product-badge">Best</span>}
+                                        <div className="product-thumb-inner">
+                                            <img src={item.imageUrl || dummyData} alt={item.name} />
+                                        </div>
                                     </div>
-                                    <p className="product-name">{item.name}</p>
 
-                                    <div className="product-price-row">
-                    <span className="product-discount">
-                      {item.discount.toString().padStart(2, "0")}%
-                    </span>
-                                        <span className="product-price">
-                      {item.price.toLocaleString()}
-                                            <span className="product-price-unit"> 원</span>
-                    </span>
+                                    <div className="product-text-box">
+                                        <div className="product-text-top">
+                                            <span className="product-brand">{item.brand}</span>
+                                            <span className="product-rating">{item.ratingText}</span>
+                                        </div>
+
+                                        <p className="product-title">{item.name}</p>
+
+                                        <div className="product-price-line">
+                                            <span className="product-discount">
+                                                {item.discount.toString().padStart(2, "0")}%
+                                            </span>
+                                            <span className="product-price">
+                                                {item.price.toLocaleString()}
+                                                <span className="unit"> 원</span>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            </article>
-                        ))
-                    )}
-                </div>
 
-                {/* ✅ 페이지네이션 */}
-                <div className="bauman-pagination">
-                    <button
-                        className="page-arrow"
-                        onClick={handlePrevPage}
-                        disabled={page === 1 || loading}
-                    >
-                        &lt;
-                    </button>
-                    <span className="page-indicator">
-            {page} / {totalPages}
-          </span>
-                    <button
-                        className="page-arrow"
-                        onClick={handleNextPage}
-                        disabled={page >= totalPages || loading}
-                    >
-                        &gt;
-                    </button>
-                </div>
+                                </article>
+                            ))
+                        )}
+                    </div>
+                )}
+
+                {/* 리뷰탭 */}
+                {activeTab === "review" && (
+                    <div className="product-grid">
+                        {products.filter(p => p.topReview).length === 0 ? (
+                            <p style={{ textAlign: "center" }}>리뷰가 없습니다.</p>
+                        ) : (
+                            products
+                                .filter(p => p.topReview)
+                                .map((item) => {
+
+                                    // 리뷰 내용 줄이기 (최대 60자)
+                                    const previewText =
+                                        item.topReview.content.length > 60
+                                            ? item.topReview.content.slice(0, 60) + "..."
+                                            : item.topReview.content;
+
+                                    return (
+                                        <article
+                                            key={item.id}
+                                            className="product-card"
+                                            onClick={() => navigate(`/review/${item.topReview.id}`)}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            <div className="product-thumb">
+                                                <div className="product-thumb-inner">
+                                                    <img src={item.imageUrl || dummyData} alt={item.name} />
+                                                </div>
+                                            </div>
+
+                                            <div className="product-text-box">
+                                                <div className="product-text-top">
+                                                    <span className="product-brand">{item.brand}</span>
+                                                    <span className="product-rating">{item.ratingText}</span>
+                                                </div>
+
+                                                <p className="product-title">{item.name}</p>
+
+                                                <p className="product-review-preview">
+                                                    {previewText}
+                                                </p>
+                                            </div>
+                                        </article>
+                                    );
+                                })
+                        )}
+                    </div>
+                )}
+
             </div>
         </section>
     );
