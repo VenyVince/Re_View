@@ -23,4 +23,6 @@ public interface UserMapper {
     String findEmailById(@Param("id") String id);
 
     Integer convertBaumannTypeToInt(String type);
+
+    String findTypeByUserId(@Param("currentId") int currentId);
 }
