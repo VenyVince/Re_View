@@ -1,14 +1,23 @@
 // src/pages/reviewDetail/components/ReviewCommentWriteBox.jsx
 import React, { useState } from "react";
+import axios from "axios";
 import "./ReviewCommentWriteBox.css";
 
-export default function ReviewCommentWriteBox({ reviewId }) {
+export default function ReviewCommentWriteBox({ reviewId, onSubmit }) {
     const [text, setText] = useState("");
 
     const handleSubmit = () => {
         if (!text.trim()) return;
-        alert("댓글 등록 API 연결 예정");
-        setText("");
+
+        axios
+            .post(`/api/reviews/${reviewId}/comments`, {
+                content: text
+            })
+            .then(() => {
+                setText("");      // 입력창 초기화
+                if (onSubmit) onSubmit(); // 부모에게 콜백 보내기 (댓글 다시 불러오기)
+            })
+            .catch((err) => console.error(err));
     };
 
     return (

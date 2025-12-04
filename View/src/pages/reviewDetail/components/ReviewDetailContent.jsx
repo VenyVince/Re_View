@@ -2,7 +2,7 @@
 import React from "react";
 import "./ReviewDetailContent.css";
 
-export default function ReviewDetailContent({ review }) {
+export default function ReviewDetailContent({ review,product }) {
     return (
         <div className="rd-content">
 
