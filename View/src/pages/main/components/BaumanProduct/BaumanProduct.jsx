@@ -26,22 +26,23 @@ export default function BaumanProduct() {
     useEffect(() => {
         const fetchUserType = async () => {
             try {
-                const res = await axios.get("/api/auth/me");
-                // 로그인 + 바우만 타입 있을 경우
-                if (res.data?.baumannType) {
-                    setCurrentType(res.data.baumannType);
+                const res = await axios.get("/api/auth/my-baumann-type");
+
+                if (typeof res.data === "string" && res.data.length > 0) {
+                    setCurrentType(res.data);
+                    console.log("바우만 타입 응답:", res.data);
                 } else {
-                    // 로그인은 됐지만 타입이 없음
                     setCurrentType(getRandomType());
                 }
+
             } catch (err) {
-                // 로그인 X → 랜덤 타입
                 setCurrentType(getRandomType());
             }
         };
 
         fetchUserType();
     }, []);
+
 
     /* 바우만 타입 태그 표시용 리스트 */
     const skinTypeList = [
@@ -84,6 +85,7 @@ export default function BaumanProduct() {
                 setError("");
 
                 // DRNW → first/second/third/fourth 매핑
+                // 16가지 Baumann 타입을 백엔드 추천 모델에서 요구하는 4가지 그룹(first~fourth)으로 단순화하기 위해, 피부 특성축(S/R, P/N 조합)을 기준으로 비슷한 타입끼리 묶어 매핑
                 const typeMap = {
                     DRNT: "first", DRNW: "first",
                     DRPT: "second", DRPW: "second",
