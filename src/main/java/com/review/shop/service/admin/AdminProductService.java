@@ -5,6 +5,7 @@ import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.admin.AdminProductMapper;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 public class AdminProductService {
 
     private final AdminProductMapper adminProductMapper;
+    private final ImageService imageService;
 
     //getAllProducts
     public List<ProductDetailDTO> getAllProducts() {
@@ -101,12 +103,20 @@ public class AdminProductService {
         putImage(prd_id, product_images, thumbnailUrl);
     }
 
-    //이미지 불러오기
+    // 이미지 불러오기
     public List<String> readImage(int product_id) {
-        List<String> result = adminProductMapper.readImage(product_id);
+        List<String> objectKeys = adminProductMapper.readImage(product_id);
 
-        return (result == null || result.isEmpty()) ? Collections.emptyList() : result;
+        if (objectKeys == null || objectKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // presigned URL로 변환
+        return objectKeys.stream()
+                .map(imageService::presignedUrlGet)  // presigned GET 변환
+                .toList();
     }
+
 
     //이미지 삭제하기
     public void deleteProductImages(int product_id) {
