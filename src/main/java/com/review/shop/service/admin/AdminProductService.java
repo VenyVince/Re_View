@@ -103,7 +103,7 @@ public class AdminProductService {
         putImage(prd_id, product_images, thumbnailUrl);
     }
 
-    // 이미지 불러오기
+    // 이미지 불러오기z
     public List<String> readImage(int product_id) {
         List<String> objectKeys = adminProductMapper.readImage(product_id);
 
