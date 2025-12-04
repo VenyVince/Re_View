@@ -45,5 +45,5 @@ frontend/node_modules
 
 
 # MinIO / DB Data
-minio_data/
-db_data/
+infra/minio_data/
+infra/db_data/
