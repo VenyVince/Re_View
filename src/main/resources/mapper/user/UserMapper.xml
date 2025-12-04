@@ -72,6 +72,13 @@
             TYPE = #{type}
     </select>
 
+    <select id="findTypeByUserId" resultType="string">
+        SELECT b.TYPE
+        FROM USER_TABLE u
+                 JOIN BAUMANN b ON u.BAUMANN_ID = b.BAUMANN_ID
+        WHERE USER_ID = #{currentId}
+    </select>
+
 </mapper>
 
 
