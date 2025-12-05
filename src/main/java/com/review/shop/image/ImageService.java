@@ -1,7 +1,9 @@
 package com.review.shop.image;
 
+import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.image.minio.MinioProperties;
+import com.review.shop.repository.ImageMapper;
 import com.review.shop.util.Security_Util;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
@@ -9,7 +11,9 @@ import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +23,7 @@ public class ImageService {
 
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
-
+    private final ImageMapper imageMapper;
 
     // presigned url : 임의로 생성된 url(post, get요청등)
     // object key: 실질적인 저장소 키값
@@ -69,6 +73,34 @@ public class ImageService {
         }
         return presignedUrlPost("products", file_name);
     }
+
+    //전달받은 objectKey 상품 이미지 테이블에 저장하기
+    public void saveProductImageObjectKey(int product_id, List<String> objectKeyList, String thumbnail_objectKey) {
+        if(!objectKeyList.contains(thumbnail_objectKey)){
+            throw new WrongRequestException("썸네일 이미지가 이미지 목록에 포함되어 있지 않습니다.");
+        }
+
+        for(String objectKey : objectKeyList){
+
+            String isThumbnail = (objectKey.equals(thumbnail_objectKey)) ? "Y" : "N";
+
+            int result = imageMapper.insertProductObjectKey(product_id, objectKey, isThumbnail);
+            if(result == 0){
+                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
+            }
+        }
+    }
+
+    public void saveReviewImageObjectKey(int review_id, List<String> objectKeyList) {
+        for(String objectKey : objectKeyList){
+            int result = imageMapper.insertReviewObjectKey(review_id, objectKey);
+            if(result == 0){
+                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
+            }
+        }
+    }
+
+
 
 
     // presigned post URL 생성
