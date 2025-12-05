@@ -305,3 +305,36 @@
     white-space: normal;
     text-align: left;
 }
+
+/* 비로그인 blur 처리 */
+.blur-block {
+    filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.5;
+}
+
+/* 오버레이 박스 */
+.overlay-lock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.92);
+    padding: 30px 34px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+
+.overlay-btn {
+    margin-top: 12px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #FFD966;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
