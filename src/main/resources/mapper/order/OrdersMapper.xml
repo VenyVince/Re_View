@@ -7,11 +7,13 @@
     <select id="getProductsByIds" resultType="com.review.shop.dto.orders.OrderCheckoutProductInfoDTO">
         SELECT
         p.PRODUCT_ID   AS product_id,
-        pi.IMAGE_URL   AS image_url,
+        pi.IMAGE_URL   AS thumbnail_url,
         p.PRD_NAME     AS prd_name,
         p.PRICE        AS price
         FROM PRODUCT p
-        LEFT JOIN PRODUCT_IMAGE pi ON p.PRODUCT_ID = pi.PRODUCT_ID
+        LEFT JOIN PRODUCT_IMAGE pi
+        ON p.PRODUCT_ID = pi.PRODUCT_ID
+        AND pi.IS_THUMBNAIL = 'Y'
         WHERE p.PRODUCT_ID IN
         <foreach collection="product_ids" item="id" open="(" close=")" separator=",">
             #{id}

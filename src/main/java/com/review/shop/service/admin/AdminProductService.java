@@ -1,6 +1,7 @@
 package com.review.shop.service.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.product.ProductDetailWithThumbnailDTO;
 import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
@@ -12,7 +13,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -24,7 +24,7 @@ public class AdminProductService {
     private final ImageService imageService;
 
     //getAllProducts
-    public List<ProductDetailDTO> getAllProducts() {
+    public List<ProductDetailWithThumbnailDTO> getAllProducts() {
         return adminProductMapper.getAllProducts();
     }
 
@@ -61,8 +61,8 @@ public class AdminProductService {
     }
 
     // 상품 상세조회
-    public ProductDetailDTO getProductDetail(int product_id) {
-        ProductDetailDTO result = adminProductMapper.readProduct(product_id);
+    public ProductDetailWithThumbnailDTO getProductDetail(int product_id) {
+        ProductDetailWithThumbnailDTO result = adminProductMapper.readProduct(product_id);
         if (result == null) {
             throw new ResourceNotFoundException("조회할 상품을 찾을 수 없습니다.");
         }
@@ -103,18 +103,13 @@ public class AdminProductService {
         putImage(prd_id, product_images, thumbnailUrl);
     }
 
-    // 이미지 불러오기z
-    public List<String> readImage(int product_id) {
-        List<String> objectKeys = adminProductMapper.readImage(product_id);
-
-        if (objectKeys == null || objectKeys.isEmpty()) {
-            return Collections.emptyList();
+    //이미지 불러오기
+    public String readImage(int product_id) {
+        String result = adminProductMapper.readImage(product_id);
+        if(result == null){
+            throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
         }
-
-        // presigned URL로 변환
-        return objectKeys.stream()
-                .map(imageService::presignedUrlGet)  // presigned GET 변환
-                .toList();
+        return result;
     }
 
 
