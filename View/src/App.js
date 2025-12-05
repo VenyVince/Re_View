@@ -46,7 +46,6 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
 
-import UserDeliveryPage from "./pages/mypage/user/delivery/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/profile/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
