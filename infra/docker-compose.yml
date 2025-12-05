@@ -4,10 +4,21 @@ services:
     image: quay.io/minio/minio
     ports:
       - "9000:9000"
-      - "9001:9001"
+      - "9001:9001" #MinIO console UI
     environment:
       MINIO_ROOT_USER: review
       MINIO_ROOT_PASSWORD: pass1234
     volumes:
       - ./minio_data:/data
     command: server /data --console-address ":9001"
+
+  oracle-db:
+    image: gvenzl/oracle-xe:latest
+    container_name: review-db
+    ports:
+      - "1521:1521"
+    environment:
+      ORACLE_PASSWORD: ${REVIEW_PW}
+      ORACLE_DATABASE: ${REVIEW_SID}
+    volumes:
+      - ./oracle-data:/opt/oracle/oradata
