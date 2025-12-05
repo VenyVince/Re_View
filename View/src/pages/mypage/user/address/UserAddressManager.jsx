@@ -47,7 +47,6 @@ export default function UserAddressManager() {
 
             setAddresses(normalized);
         } catch (e) {
-            console.error("📛 배송지 목록 조회 실패:", e);
             setError("배송지 목록을 불러오는 중 오류가 발생했어요.");
         } finally {
             setLoading(false);
@@ -106,7 +105,6 @@ export default function UserAddressManager() {
                 await fetchAddresses();
                 navigate("/mypage");
             } catch (e) {
-                console.error("📛 기본 배송지 변경 실패:", e);
                 alert("기본 배송지 변경 중 오류가 발생했습니다.");
             }
             return;
@@ -130,7 +128,7 @@ export default function UserAddressManager() {
 
         try {
             if (editingId !== null) {
-                // ✏️ 수정 모드 → PATCH /api/addresses/{address_id}
+                //️ 수정 모드 → PATCH /api/addresses/{address_id}
                 await axios.patch(`/api/addresses/${editingId}`, payload, {
                     withCredentials: true,
                 });
@@ -148,7 +146,6 @@ export default function UserAddressManager() {
             setShowForm(false);
             navigate("/mypage");
         } catch (e) {
-            console.error("📛 배송지 저장 실패:", e);
             alert("배송지 저장 중 오류가 발생했습니다.");
         }
     };
@@ -194,7 +191,6 @@ export default function UserAddressManager() {
             });
             setAddresses((prev) => prev.filter((a) => a.address_id !== id));
         } catch (e) {
-            console.error("📛 배송지 삭제 실패:", e);
             alert("배송지 삭제 중 오류가 발생했습니다.");
         }
     };

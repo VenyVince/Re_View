@@ -65,7 +65,6 @@ export default function UserOrderDetailPage() {
 
                 setOrder(res.data);
             } catch (e) {
-                console.error("❌ 주문 상세 조회 실패:", e);
                 if (e.response?.status === 404) {
                     setError("해당 주문을 찾을 수 없습니다.");
                 } else if (e.response?.status === 401) {

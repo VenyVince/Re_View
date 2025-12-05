@@ -8,18 +8,18 @@ import { useNavigate } from "react-router-dom";
 export default function UserDeliveryPage() {
     const navigate = useNavigate();
 
-    // 🔹 기본 배송지 상태
+    // 기본 배송지 상태
     const [defaultAddress, setDefaultAddress] = useState(null);
     const [addrLoading, setAddrLoading] = useState(true);
     const [addrError, setAddrError] = useState("");
 
-    // 🔹 주문 목록 상태
+    // 주문 목록 상태
     const [orders, setOrders] = useState([]);
     const [orderLoading, setOrderLoading] = useState(false);
     const [orderError, setOrderError] = useState("");
     const [trackingOrder, setTrackingOrder] = useState(null);
 
-    // 🔹 영수증 팝업 상태
+    // 영수증 팝업 상태
     const [receiptOrderId, setReceiptOrderId] = useState(null);
     const [receiptDetail, setReceiptDetail] = useState(null);
     const [receiptLoading, setReceiptLoading] = useState(false);
@@ -57,7 +57,7 @@ export default function UserDeliveryPage() {
         return "****-****-****-" + digits.slice(-4);
     };
 
-    // 🔸 기본 배송지 불러오기
+    // 기본 배송지 불러오기
     const fetchDefaultAddress = async () => {
         try {
             setAddrLoading(true);
@@ -86,14 +86,13 @@ export default function UserDeliveryPage() {
 
             setDefaultAddress(def);
         } catch (e) {
-            console.error("📛 기본 배송지 조회 실패:", e);
             setAddrError("기본 배송지 정보를 불러오는 중 오류가 발생했어요.");
         } finally {
             setAddrLoading(false);
         }
     };
 
-    // 🔸 주문 리스트 불러오기
+    // 주문 리스트 불러오기
     const fetchOrders = async (pageNo = 1) => {
         try {
             setOrderLoading(true);
@@ -111,7 +110,6 @@ export default function UserDeliveryPage() {
             const list = Array.isArray(res.data) ? res.data : [];
             setOrders(list);
         } catch (e) {
-            console.error("📛 주문 내역 조회 실패:", e);
             setOrderError("주문 내역을 불러오는 중 오류가 발생했어요.");
         } finally {
             setOrderLoading(false);
@@ -160,7 +158,7 @@ export default function UserDeliveryPage() {
         setTrackingOrder(null);
     };
 
-    // 🔸 영수증 모달 열기
+    // 영수증 모달 열기
     const openReceiptModal = async (orderId) => {
         try {
             setReceiptOrderId(orderId);
@@ -173,7 +171,6 @@ export default function UserDeliveryPage() {
             });
             setReceiptDetail(res.data);
         } catch (e) {
-            console.error("📛 영수증 상세 조회 실패:", e);
             setReceiptError("영수증 정보를 불러오는 중 오류가 발생했어요.");
         } finally {
             setReceiptLoading(false);
