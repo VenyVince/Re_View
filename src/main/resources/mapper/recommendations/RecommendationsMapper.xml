@@ -34,6 +34,7 @@
     (SELECT pi.IMAGE_URL
      FROM PRODUCT_IMAGE pi
      WHERE pi.PRODUCT_ID = p.PRODUCT_ID
+       AND pi.IS_THUMBNAIL = 'Y'
        AND ROWNUM = 1) AS image_url,
 
     (SELECT REVIEW_ID
