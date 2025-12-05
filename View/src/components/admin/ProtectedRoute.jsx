@@ -1,13 +1,19 @@
+// src/components/admin/ProtectedRoute.jsx
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProtectedRoute({ requireAdmin = false }) {
-    const raw = localStorage.getItem("auth");
-    const auth = raw ? JSON.parse(raw) : null;
+    const { auth } = useAuth();
 
-    // 개발 중 테스트용 우회가 필요하면 아래 주석 해제
-    // return <Outlet />;
+    if (auth.loading) return null;
 
-    if (!auth?.loggedIn) return <Navigate to="/login" replace />;
-    if (requireAdmin && auth?.role !== "ADMIN") return <Navigate to="/" replace />;
+    if (!auth.loggedIn) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (requireAdmin && auth.role !== "ROLE_ADMIN") {
+        return <Navigate to="/login" replace />;
+    }
+
     return <Outlet />;
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderCheckoutProductInfoDTO {
     private int product_id;
-    private String image_url;
+    private String thumbnail_url;
     private String prd_name;
     private int price;
     private int buy_quantity;

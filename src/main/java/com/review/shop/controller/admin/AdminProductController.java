@@ -1,9 +1,6 @@
 package com.review.shop.controller.admin;
 
-import com.review.shop.dto.product.ProductDetailDTO;
-import com.review.shop.dto.product.ProductUpdateOnlyImageDTO;
-import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
-import com.review.shop.dto.product.ProductUploadDTO;
+import com.review.shop.dto.product.*;
 import com.review.shop.service.admin.AdminProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,10 +27,7 @@ public class AdminProductController {
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ProductDetailDTO.class))
-                    )
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProductDetailWithThumbnailDTO.class)))
             ),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
@@ -45,6 +39,9 @@ public class AdminProductController {
     public ResponseEntity<?> getAllProducts() {
         return ResponseEntity.ok(adminProductService.getAllProducts());
     }
+
+
+
 
     @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다. product body의 이미지 리스트는 null로 전달하세요. product_images_list는 이미지 등록 api /api/images/products로 반환받은 값입니다.")
     @ApiResponses(value = {
@@ -113,7 +110,7 @@ public class AdminProductController {
     @Operation (summary = "상품 상세 조회", description = "특정 상품의 상세 정보를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 상세 조회 성공",
-                    content = @Content(schema = @Schema(implementation = ProductDetailDTO.class))
+                    content = @Content(schema = @Schema(implementation = ProductDetailWithThumbnailDTO.class))
             ),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
@@ -123,9 +120,9 @@ public class AdminProductController {
     @GetMapping("/products/{product_id}")
     public ResponseEntity<?> getProductDetail(
             @Parameter(description = "조회할 상품의 ID") @PathVariable int product_id) {
-        ProductDetailDTO detailDTO = adminProductService.getProductDetail(product_id);
+        ProductDetailWithThumbnailDTO detailDTO = adminProductService.getProductDetail(product_id);
 
-        detailDTO.setProduct_images(adminProductService.readImage(product_id));
+        detailDTO.setThumbnail_url(adminProductService.readImage(product_id));
         return ResponseEntity.ok(detailDTO);
     }
 

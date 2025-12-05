@@ -1,17 +1,18 @@
 package com.review.shop.service.admin;
 
 import com.review.shop.dto.product.ProductDetailDTO;
+import com.review.shop.dto.product.ProductDetailWithThumbnailDTO;
 import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.admin.AdminProductMapper;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -20,9 +21,10 @@ import java.util.List;
 public class AdminProductService {
 
     private final AdminProductMapper adminProductMapper;
+    private final ImageService imageService;
 
     //getAllProducts
-    public List<ProductDetailDTO> getAllProducts() {
+    public List<ProductDetailWithThumbnailDTO> getAllProducts() {
         return adminProductMapper.getAllProducts();
     }
 
@@ -59,8 +61,8 @@ public class AdminProductService {
     }
 
     // 상품 상세조회
-    public ProductDetailDTO getProductDetail(int product_id) {
-        ProductDetailDTO result = adminProductMapper.readProduct(product_id);
+    public ProductDetailWithThumbnailDTO getProductDetail(int product_id) {
+        ProductDetailWithThumbnailDTO result = adminProductMapper.readProduct(product_id);
         if (result == null) {
             throw new ResourceNotFoundException("조회할 상품을 찾을 수 없습니다.");
         }
@@ -102,11 +104,14 @@ public class AdminProductService {
     }
 
     //이미지 불러오기
-    public List<String> readImage(int product_id) {
-        List<String> result = adminProductMapper.readImage(product_id);
-
-        return (result == null || result.isEmpty()) ? Collections.emptyList() : result;
+    public String readImage(int product_id) {
+        String result = adminProductMapper.readImage(product_id);
+        if(result == null){
+            throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
+        }
+        return result;
     }
+
 
     //이미지 삭제하기
     public void deleteProductImages(int product_id) {

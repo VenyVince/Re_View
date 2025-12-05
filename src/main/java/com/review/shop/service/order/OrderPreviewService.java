@@ -53,7 +53,7 @@ public class OrderPreviewService {
             // 수량 설정된 새로운 DTO 생성
             OrderCheckoutProductInfoDTO resultDTO = new OrderCheckoutProductInfoDTO(
                     product.getProduct_id(),
-                    product.getImage_url(),
+                    product.getThumbnail_url(),
                     product.getPrd_name(),
                     product.getPrice(),
                     quantity  // 주문 수량 설정

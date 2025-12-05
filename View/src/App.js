@@ -46,7 +46,6 @@ import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
 
-import UserDeliveryPage from "./pages/mypage/user/delivery/UserDeliveryPage";
 import UserProfileEdit from "./pages/mypage/user/profile/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
@@ -61,6 +60,7 @@ import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
 import OrderPaymentPage from "./pages/order/OrderPaymentPage";
 import OrderCompletePage from "./pages/order/OrderCompletePage";
 import UserProtectedRoute from "./components/user/UserProtectedRoute";
+import UserOrderDetailPage from "./pages/mypage/user/delivery/UserOrderDetailPage";
 
 export default function App() {
     return (
@@ -131,6 +131,7 @@ export default function App() {
                     <Route path="/mypage/cs" element={<UserCustomerPage />} />
                     <Route path="/mypage/skin" element={<UserSkinTestPage />} />
                     <Route path="/mypage/review" element={<UserReviewPage />} />
+                    <Route path="/mypage/orders/:orderId" element={<UserOrderDetailPage />} />
 
                     <Route path="/order/payment" element={<OrderPaymentPage />} />
                     <Route path="/order/complete" element={<OrderCompletePage />} />
