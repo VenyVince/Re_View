@@ -3,16 +3,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
-import addressDummy from "../dummy/addressDummy";
+// ❌ 더미 데이터는 이제 사용 안 함
+// import addressDummy from "../dummy/addressDummy";
 import { useNavigate } from "react-router-dom";
 
 export default function UserDeliveryPage() {
     const navigate = useNavigate();
 
-    const defaultAddress =
-        addressDummy.find((addr) => addr.is_default) || addressDummy[0];
+    // 🔹 기본 배송지 상태
+    const [defaultAddress, setDefaultAddress] = useState(null);
+    const [addrLoading, setAddrLoading] = useState(true);
+    const [addrError, setAddrError] = useState("");
 
-    // 주문 목록 상태
+    // 🔹 주문 목록 상태
     const [orders, setOrders] = useState([]);
     const [orderLoading, setOrderLoading] = useState(false);
     const [orderError, setOrderError] = useState("");
@@ -41,7 +44,43 @@ export default function UserDeliveryPage() {
                 ? order.item_count
                 : 1;
 
-    // 주문 리스트 불러오기
+    // 🔸 기본 배송지 불러오기
+    const fetchDefaultAddress = async () => {
+        try {
+            setAddrLoading(true);
+            setAddrError("");
+
+            const res = await axios.get("/api/addresses", {
+                withCredentials: true,
+            });
+
+            // 서비스가 List<AddressDTO> 를 바로 리턴한다고 가정
+            const raw = Array.isArray(res.data)
+                ? res.data
+                : res.data?.addresses || [];
+
+            // is_default: "1" / "0" → boolean 으로 변환
+            const normalized = raw.map((a) => ({
+                ...a,
+                is_default: a.is_default === "1",
+            }));
+
+            // 기본 배송지 찾기 (없으면 첫 번째)
+            const def =
+                normalized.find((a) => a.is_default) ||
+                normalized[0] ||
+                null;
+
+            setDefaultAddress(def);
+        } catch (e) {
+            console.error("📛 기본 배송지 조회 실패:", e);
+            setAddrError("기본 배송지 정보를 불러오는 중 오류가 발생했어요.");
+        } finally {
+            setAddrLoading(false);
+        }
+    };
+
+    // 🔸 주문 리스트 불러오기
     const fetchOrders = async (pageNo = 1) => {
         try {
             setOrderLoading(true);
@@ -55,11 +94,11 @@ export default function UserDeliveryPage() {
                 withCredentials: true,
             });
 
-
-            // 컨트롤러가 List<OrderListResponseDTO> 를 바로 리턴하니까 그대로 배열로 사용
+            // 컨트롤러가 List<OrderListResponseDTO> 를 바로 리턴
             const list = Array.isArray(res.data) ? res.data : [];
             setOrders(list);
         } catch (e) {
+            console.error("📛 주문 내역 조회 실패:", e);
             setOrderError("주문 내역을 불러오는 중 오류가 발생했어요.");
         } finally {
             setOrderLoading(false);
@@ -67,6 +106,7 @@ export default function UserDeliveryPage() {
     };
 
     useEffect(() => {
+        fetchDefaultAddress();
         fetchOrders(1);
     }, []);
 
@@ -85,32 +125,53 @@ export default function UserDeliveryPage() {
             {/* ▶ 세션 카드 1 : 주문 배송 관리(기본 배송지 카드) */}
             <section className="mypage-section delivery-summary-section">
                 <div className="delivery-default-card">
-                    <div className="delivery-default-left">
-                        <div className="delivery-default-label">기본 배송지</div>
-                        <div className="delivery-default-main">
-                            <span className="delivery-tag">
-                                {defaultAddress.address_name}
-                            </span>
-                            <span className="delivery-recipient">
-                                {defaultAddress.recipient}
-                            </span>
-                            <span className="delivery-phone">
-                                {defaultAddress.phone}
-                            </span>
+                    {addrLoading ? (
+                        <div className="delivery-default-loading">
+                            기본 배송지를 불러오는 중입니다...
                         </div>
-                        <div className="delivery-default-sub">
-                            ({defaultAddress.postal_code}) {defaultAddress.address},{" "}
-                            {defaultAddress.detail_address}
+                    ) : addrError ? (
+                        <div className="delivery-default-error">{addrError}</div>
+                    ) : !defaultAddress ? (
+                        <div className="delivery-default-empty">
+                            등록된 기본 배송지가 없습니다.
+                            <button
+                                type="button"
+                                className="delivery-manage-btn inline"
+                                onClick={() => navigate("/mypage/address")}
+                            >
+                                배송지 등록하러 가기
+                            </button>
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            <div className="delivery-default-left">
+                                <div className="delivery-default-label">기본 배송지</div>
+                                <div className="delivery-default-main">
+                                    <span className="delivery-tag">
+                                        {defaultAddress.address_name || "배송지"}
+                                    </span>
+                                    <span className="delivery-recipient">
+                                        {defaultAddress.recipient_name}
+                                    </span>
+                                    <span className="delivery-phone">
+                                        {defaultAddress.phone_number}
+                                    </span>
+                                </div>
+                                <div className="delivery-default-sub">
+                                    ({defaultAddress.postal_code}) {defaultAddress.address}{" "}
+                                    {defaultAddress.detail_address}
+                                </div>
+                            </div>
 
-                    <button
-                        type="button"
-                        className="delivery-manage-btn"
-                        onClick={() => navigate("/mypage/address")}
-                    >
-                        배송지 관리
-                    </button>
+                            <button
+                                type="button"
+                                className="delivery-manage-btn"
+                                onClick={() => navigate("/mypage/address")}
+                            >
+                                배송지 관리
+                            </button>
+                        </>
+                    )}
                 </div>
             </section>
 
@@ -162,7 +223,7 @@ export default function UserDeliveryPage() {
                                     key={order.order_id}
                                     className="delivery-order-card"
                                 >
-                                    {/* 상단: 상태 + 자세히 링크 (카드 전체 상단 1줄) */}
+                                    {/* 상단: 상태 + 자세히 링크 */}
                                     <div className="delivery-order-header">
                                         <span className="delivery-order-status-label">
                                             {statusText}
@@ -178,9 +239,8 @@ export default function UserDeliveryPage() {
                                         </button>
                                     </div>
 
-                                    {/* 하단: 좌측 텍스트 정보 / 우측 버튼들 */}
+                                    {/* 하단: 좌측 텍스트 / 우측 버튼들 */}
                                     <div className="delivery-order-body">
-                                        {/* 왼쪽 : 주문 정보 텍스트 */}
                                         <div className="delivery-order-left">
                                             <div className="delivery-order-date">
                                                 {formatDate(order.created_at)} 주문
@@ -208,7 +268,6 @@ export default function UserDeliveryPage() {
                                             </div>
                                         </div>
 
-                                        {/* 오른쪽 : 버튼들 */}
                                         <div className="delivery-order-right">
                                             <button
                                                 type="button"

@@ -1,4 +1,3 @@
-// src/pages/mypage/user/delivery/UserOrderDetailPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -143,11 +142,14 @@ export default function UserOrderDetailPage() {
                     </button>
                 </header>
 
+                {/* 상단 구분선 */}
+                <div className="order-detail-divider" />
+
                 {/* 주문 정보 요약 */}
                 <div className="order-detail-summary">
                     <div className="order-detail-summary-row">
                         <span className="order-detail-label">주문 상태</span>
-                        <span className="order-detail-value">
+                        <span className="order-detail-status-badge">
                             {order.order_status}
                         </span>
                     </div>
@@ -165,68 +167,33 @@ export default function UserOrderDetailPage() {
                     </div>
                 </div>
 
-                {/* 배송지 정보 */}
-                <section className="order-detail-block">
-                    <h4 className="order-detail-block-title">배송지 정보</h4>
-                    <div className="order-detail-block-body">
-                        <div className="order-detail-row">
-                            <span className="order-detail-label">받는 분</span>
-                            <span className="order-detail-value">
-                                {order.recipient}
-                            </span>
+                {/* 배송지 / 결제 정보 2열 레이아웃 */}
+                <div className="order-detail-two-column">
+                    {/* 배송지 정보 */}
+                    <section className="order-detail-block">
+                        <h4 className="order-detail-block-title">배송지 정보</h4>
+                        <div className="order-detail-block-body">
+                            <div className="order-detail-row">
+                                <span className="order-detail-label">받는 분</span>
+                                <span className="order-detail-value">
+                                    {order.recipient}
+                                </span>
+                            </div>
+                            <div className="order-detail-row">
+                                <span className="order-detail-label">연락처</span>
+                                <span className="order-detail-value">
+                                    {order.phone}
+                                </span>
+                            </div>
+                            <div className="order-detail-row">
+                                <span className="order-detail-label">주소</span>
+                                <span className="order-detail-value">
+                                    ({order.postal_code}) {order.address}{" "}
+                                    {order.detail_address}
+                                </span>
+                            </div>
                         </div>
-                        <div className="order-detail-row">
-                            <span className="order-detail-label">연락처</span>
-                            <span className="order-detail-value">
-                                {order.phone}
-                            </span>
-                        </div>
-                        <div className="order-detail-row">
-                            <span className="order-detail-label">주소</span>
-                            <span className="order-detail-value">
-                                ({order.postal_code}) {order.address}{" "}
-                                {order.detail_address}
-                            </span>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 결제 정보 */}
-                <section className="order-detail-block">
-                    <h4 className="order-detail-block-title">결제 정보</h4>
-                    <div className="order-detail-block-body">
-                        <div className="order-detail-row">
-                            <span className="order-detail-label">결제 수단</span>
-                            <span className="order-detail-value">
-                                {order.card_company || "-"}{" "}
-                                {maskCardNumber(order.card_number)}
-                            </span>
-                        </div>
-                        <div className="order-detail-row">
-                            <span className="order-detail-label">상품 금액</span>
-                            <span className="order-detail-value">
-                                {formatPrice(itemsTotal)}원
-                            </span>
-                        </div>
-                        <div className="order-detail-row">
-                            <span className="order-detail-label">배송비</span>
-                            <span className="order-detail-value">
-                                {shippingFee > 0
-                                    ? `${formatPrice(shippingFee)}원`
-                                    : "무료"}
-                            </span>
-                        </div>
-                        <div className="order-detail-row order-detail-row-total">
-                            <span className="order-detail-label">총 결제 금액</span>
-                            <span className="order-detail-value order-detail-total">
-                                {formatPrice(order.total_price)}원
-                            </span>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 주문 상품 목록 */}
-                <section className="order-detail-block">
+                    </section>
                     <h4 className="order-detail-block-title">주문 상품</h4>
                     <div className="order-detail-items">
                         {order.order_items && order.order_items.length > 0 ? (
@@ -241,10 +208,7 @@ export default function UserOrderDetailPage() {
                                         </div>
                                         <div className="order-detail-item-meta">
                                             수량 {item.quantity}개 · 개당{" "}
-                                            {formatPrice(
-                                                item.product_price
-                                            )}
-                                            원
+                                            {formatPrice(item.product_price)}원
                                         </div>
                                     </div>
                                     <div className="order-detail-item-price">
@@ -258,6 +222,47 @@ export default function UserOrderDetailPage() {
                             </p>
                         )}
                     </div>
+
+                </div>
+
+                {/* 주문 상품 목록 */}
+                <section className="order-detail-block">
+                    <h4 className="order-detail-block-title">결제 정보</h4>
+                    {/* 결제 정보 */}
+                    <section className="order-detail-block">
+
+                        <div className="order-detail-block-body">
+                            <div className="order-detail-row">
+                                <span className="order-detail-label">결제 수단</span>
+                                <span className="order-detail-value">
+                                    {order.card_company || "-"}{" "}
+                                    {maskCardNumber(order.card_number)}
+                                </span>
+                            </div>
+                            <div className="order-detail-row">
+                                <span className="order-detail-label">상품 금액</span>
+                                <span className="order-detail-value">
+                                    {formatPrice(itemsTotal)}원
+                                </span>
+                            </div>
+                            <div className="order-detail-row">
+                                <span className="order-detail-label">배송비</span>
+                                <span className="order-detail-value">
+                                    {shippingFee > 0
+                                        ? `${formatPrice(shippingFee)}원`
+                                        : "무료"}
+                                </span>
+                            </div>
+                            <div className="order-detail-row order-detail-row-total">
+                                <span className="order-detail-label">총 결제 금액</span>
+                                <span className="order-detail-value order-detail-total">
+                                    {formatPrice(order.total_price)}원
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+
                 </section>
             </section>
         </UserMyPageLayout>

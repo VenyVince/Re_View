@@ -17,6 +17,9 @@
     margin-bottom: 24px;
 }
 
+.order-detail-title{
+    text-align: left;
+}
 /* 섹션 타이틀 */
 .address-section-title {
     font-size: 18px;
@@ -260,4 +263,39 @@
     background-color: #000;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.16);
+}
+
+.address-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.address-list-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.address-count {
+    font-size: 13px;
+    color: #666;
+}
+
+.address-add-btn {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.address-add-btn:hover {
+    background: #f5f5f5;
+}
+
+.order-detail-items {
+    margin-bottom: 24px;
 }
