@@ -70,21 +70,25 @@
         WHERE PRODUCT_ID = #{product_id}
     </update>
 
-    <select id="getAllProducts" resultMap="productDetailCollectionMap">
+    <select id="getAllProducts" resultType="ProductDetailWithThumbnailDTO">
         SELECT
-            P.PRODUCT_ID, P.PRD_NAME, P.PRD_BRAND, P.INGREDIENT, P.PRICE, P.CATEGORY, P.STOCK, P.RATING, P.DESCRIPTION, P.REVIEW_COUNT,
+            P.PRODUCT_ID, P.PRD_NAME, P.PRD_BRAND, P.INGREDIENT, P.PRICE,
+            P.CATEGORY, P.STOCK, P.RATING, P.DESCRIPTION, P.REVIEW_COUNT,
             P.BAUMANN_ID, P.IS_SOLD_OUT, P.CREATED_AT, P.UPDATED_AT, P.DELETED_AT,
-            PI.IMAGE_URL
+            PI.IMAGE_URL AS THUMBNAIL_URL
         FROM
             PRODUCT P
                 LEFT JOIN
-            PRODUCT_IMAGE PI ON P.PRODUCT_ID = PI.PRODUCT_ID  WHERE
+            PRODUCT_IMAGE PI
+            ON P.PRODUCT_ID = PI.PRODUCT_ID
+                AND PI.IS_THUMBNAIL = 'Y'
+        WHERE
             P.DELETED_AT IS NULL
         ORDER BY
             P.PRODUCT_ID ASC, PI.PRD_IMG_ID ASC
     </select>
 
-    <select id="readProduct" resultType="com.review.shop.dto.product.ProductDetailDTO">
+    <select id="readProduct" resultType="com.review.shop.dto.product.ProductDetailWithThumbnailDTO">
         SELECT
             PRODUCT_ID, PRD_NAME, PRD_BRAND, INGREDIENT, PRICE, CATEGORY,
             STOCK, RATING, DESCRIPTION, REVIEW_COUNT, BAUMANN_ID, IS_SOLD_OUT
@@ -111,7 +115,7 @@
         FROM
             PRODUCT_IMAGE
         WHERE
-            PRODUCT_ID = #{product_id}
+            PRODUCT_ID = #{product_id} AND IS_THUMBNAIL = 'Y'
         ORDER BY
             PRD_IMG_ID ASC
     </select>
@@ -121,11 +125,5 @@
         DELETE FROM PRODUCT_IMAGE WHERE PRODUCT_ID = #{product_id}
     </delete>
 
-
-    <update id="updateAllImagesToNo" parameterType="int">
-        UPDATE PRODUCT_IMAGE
-        SET IS_THUMBNAIL = 'N'
-        WHERE PRODUCT_ID = #{product_id}
-    </update>
 
 </mapper>

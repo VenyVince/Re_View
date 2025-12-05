@@ -1,12 +1,14 @@
 package com.review.shop.controller.orders;
 
-import com.review.shop.util.Security_Util;
+import com.review.shop.dto.orders.OrderCheckoutProductInfoDTO;
 import com.review.shop.dto.orders.OrderCheckoutResponse;
 import com.review.shop.dto.orders.OrderCreateDTO;
 import com.review.shop.dto.orders.OrderDTO;
 import com.review.shop.service.order.OrderPreviewService;
 import com.review.shop.service.order.OrderService;
+import com.review.shop.util.Security_Util;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,12 +29,14 @@ public class OrderController {
     private final OrderPreviewService orderPreviewService;
     private final OrderService orderService;
     private final Security_Util security_util;
-    //배송지 관리는 추후에 추가 예정
+
     // 주문 미리보기 엔드포인트
     @Operation (summary = "주문 미리보기", description = "주문할 상품들의 정보와 총 가격, 사용자의 포인트를 조회합니다.")
     @PostMapping("/api/orders/checkout")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "주문 미리보기 성공"),
+            @ApiResponse(responseCode = "200", description = "주문 미리보기 성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderCheckoutProductInfoDTO.class)))
+            ),
             @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
