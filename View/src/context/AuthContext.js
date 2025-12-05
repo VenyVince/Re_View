@@ -9,10 +9,9 @@ export function AuthProvider({ children }) {
         loggedIn: false,
         userId: null,
         role: null,
-        loading: true,
-
         nickname: null,
         point: 0,
+        loading: true,
     });
 
     useEffect(() => {
@@ -26,8 +25,6 @@ export function AuthProvider({ children }) {
             const res = await axios.get("/api/auth/me", {
                 withCredentials: true,
             });
-
-            const base = res.data; // { id, role, ... }
 
             // 로그인 기본 정보 세팅
             setAuth({
@@ -43,6 +40,8 @@ export function AuthProvider({ children }) {
                 loggedIn: false,
                 userId: null,
                 role: null,
+                nickname: null,
+                point: 0,
                 loading: false,
             });
         }
@@ -50,16 +49,12 @@ export function AuthProvider({ children }) {
 
     // 로그인 성공 시 호출 (LoginPage에서 사용)
     const login = ({id, nickname}) => {
-        // 일단 프론트 상태만 로그인으로 바꾸고
-        setAuth({
-            loggedIn: true,
-            userId : id,
-            nickname,
-            role: null,
-            loading: false,
-        });
-        // 바로 서버에 /api/auth/me 한 번 더 물어봐서 role까지 채움
-        checkSession();
+        // 서버에 세션이 실제로 생기기 때문에 프론트에서 값 임의로 박을 필요 없음
+        setAuth((prev) =>({
+            ...prev,
+            loading: true,
+        }));
+        checkSession(); // 로그인 성공 후 실제 role, userId 자동 반영
     };
 
     // 로그아웃: 서버 세션 정리 + 전역 상태 초기화
@@ -79,6 +74,8 @@ export function AuthProvider({ children }) {
                 loggedIn: false,
                 userId: null,
                 role: null,
+                nickname: null,
+                point: 0,
                 loading: false,
             });
         }
