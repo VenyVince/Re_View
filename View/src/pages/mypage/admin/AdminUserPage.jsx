@@ -182,7 +182,7 @@ export default function AdminUserPage() {
                             <UserTable>
                                 <thead>
                                 <tr>
-                                    <th>유저 ID</th>
+                                    <th>No.</th>
                                     <th>이름</th>
                                     <th>닉네임</th>
                                     <th>역할</th>
@@ -192,12 +192,13 @@ export default function AdminUserPage() {
                                 </thead>
 
                                 <tbody>
-                                {pagedUsers.map((u) => {
+                                {pagedUsers.map((u, idx) => {
                                     const isBanned = bannedUserIds.includes(u.id);
+                                    const rowNumber = (page - 1) * pageSize + idx + 1;
 
                                     return (
                                         <tr key={u.id}>
-                                            <td>{u.id}</td>
+                                            <td>{rowNumber}</td>
                                             <td>{u.realName || "-"}</td>
                                             <td>{u.nickname || "-"}</td>
                                             <td>{u.role === "ADMIN" ? "관리자" : "회원"}</td>
