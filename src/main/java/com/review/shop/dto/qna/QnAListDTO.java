@@ -12,4 +12,6 @@ public class QnAListDTO {
     private Long qna_id;
     private String user_name;
     private String title;
+    private String prd_name;
+
 }

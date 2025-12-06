@@ -12,7 +12,7 @@
         ) VALUES (
                      #{product_id},
                      #{objectKey},
-                     #{IS_THUMBNAIL}
+                     #{is_thumbnail}
                  )
     </insert>
 

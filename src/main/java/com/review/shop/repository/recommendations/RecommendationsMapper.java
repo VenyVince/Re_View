@@ -2,6 +2,7 @@ package com.review.shop.repository.recommendations;
 
 import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.dto.product.RecommendationDTO;
+import com.review.shop.dto.recommendations.RecommendationAdminPickDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -40,4 +41,6 @@ public interface RecommendationsMapper {
     List<RecommendationDTO> findRecommencementsWithThird(@Param("userInfo") List<String> userInfo);
 
     List<RecommendationDTO> findRecommencementsWithFourth(@Param("userInfo") List<String> userInfo);
+
+    List<RecommendationAdminPickDTO> getRandomRecommendationAdminPicks();
 }

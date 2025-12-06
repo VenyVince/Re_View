@@ -25,6 +25,19 @@ public class AdminProductService {
 
     //getAllProducts
     public List<ProductDetailWithThumbnailDTO> getAllProducts() {
+
+        List<ProductDetailWithThumbnailDTO> products = adminProductMapper.getAllProducts();
+        if (products == null || products.isEmpty()) {
+            throw new ResourceNotFoundException("등록된 상품이 없습니다.");
+        }
+
+//        현재 db에 변환용 데이터가 없어서 주석처리
+
+//        for(ProductDetailWithThumbnailDTO product : products){
+//            String thumbnailUrl = product.getThumbnail_url();
+//            product.setThumbnail_url(imageService.presignedUrlGet(thumbnailUrl));
+//        }
+
         return adminProductMapper.getAllProducts();
     }
 
@@ -70,25 +83,7 @@ public class AdminProductService {
     }
 
 
-    //Product_image 테이블에 삽입하기
-    public void putImage(int product_id, List<String> imageUrl, String thumbnailUrl) {
 
-        if (!imageUrl.contains(thumbnailUrl)) {
-            throw new WrongRequestException("썸네일 이미지는 업로드된 이미지 목록에 포함되어야 합니다.");
-        }
-
-        for(String image : imageUrl){
-            //여기에 이미지 삽입 쿼리문 작성
-
-            //전달받은 thumbnailUrl과 비교해서 썸네일 여부 판단
-            String isThumbnail = (image.equals(thumbnailUrl)) ? "Y" : "N";
-
-            int result = adminProductMapper.insertProductImage(product_id, image, isThumbnail);
-            if(result == 0){
-                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
-            }
-        }
-    }
 
     //상품 등록과 이미지 등록 트랜잭션처리
     @Transactional
@@ -100,7 +95,7 @@ public class AdminProductService {
         List<String> product_images = product.getProduct_images();
 
         //상품 이미지 테이블에 데이터 삽입
-        putImage(prd_id, product_images, thumbnailUrl);
+        imageService.saveProductImageObjectKey(prd_id, product_images, thumbnailUrl);
     }
 
     //이미지 불러오기
@@ -136,6 +131,6 @@ public class AdminProductService {
         //기존 이미지 삭제
         deleteProductImages(product_id);
         //새 이미지 삽입
-        putImage(product_id, imageUrls, thumbnailUrl);
+        imageService.saveProductImageObjectKey(product_id, imageUrls, thumbnailUrl);
     }
 }
