@@ -1,6 +1,6 @@
 // src/pages/productDetail/components/BottomBar.jsx
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BottomBar.css";
 
@@ -14,43 +14,78 @@ export default function BottomBar({
                                       product,
                                   }) {
     const navigate = useNavigate();
-    const productName = product?.prd_name;
 
+    // -------------------------------
+    // 1) 찜 상태 조회(GET)
+    // -------------------------------
+    useEffect(() => {
+        const productId = product?.product_id;
+        if (!productId) return;
+
+        const fetchWishState = async () => {
+            try {
+                const res = await fetch(`/api/wishlist?product_id=${productId}`, {
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+                const list = data.wishlist || [];
+
+                // wishlist 배열 안에 현재 product_id가 존재하면 찜 상태 true
+                const isWished = list.some(item => item.product_id === productId);
+
+                setWish(isWished);
+
+            } catch (err) {
+                console.error("찜 상태 조회 실패:", err);
+            }
+        };
+
+        fetchWishState();
+    }, [product, setWish]);
+
+    // -------------------------------
+    // 2) 찜 추가 / 삭제 (POST / DELETE)
+    // -------------------------------
     const handleWish = async () => {
-        if (!productName) {
+        const productId = product?.product_id;
+
+        if (!productId) {
             alert("상품 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
             return;
         }
 
         try {
-            // UI 반영
+            // UI 먼저 반영
             setWish(!wish);
 
-            const res = await fetch(
-                `/api/wishlist?product_name=${encodeURIComponent(productName)}`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                }
-            );
+            const url = `/api/wishlist?product_id=${productId}`;
+            const method = wish ? "DELETE" : "POST";
+
+            const res = await fetch(url, {
+                method,
+                credentials: "include",
+            });
 
             if (!res.ok) {
-                if (res.status === 400) {
-                    alert("이미 찜한 상품입니다.");
-                    return;
-                }
-                alert("찜 추가 중 오류가 발생했습니다.");
+                alert("찜 처리 중 오류가 발생했습니다.");
+                setWish(wish); // 실패 시 원복
                 return;
             }
 
-            alert("찜 목록에 추가되었습니다!");
-
-            // ⭐ 찜 성공 → 마이페이지 찜 목록으로 이동
-            navigate("/mypage/wish");
+            if (!wish) {
+                alert("찜 목록에 추가되었습니다!");
+            } else {
+                alert("찜 목록에서 제거되었습니다.");
+            }
 
         } catch (err) {
-            console.error("찜 등록 오류:", err);
+            console.error("찜 처리 오류:", err);
             alert("서버와 통신 중 문제가 발생했습니다.");
+            setWish(wish); // 실패 시 원복
         }
     };
 

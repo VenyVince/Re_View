@@ -26,6 +26,9 @@ export default function ProductDetailPage() {
     const [showMiniBuyBox, setShowMiniBuyBox] = useState(false);
     const [miniActionType, setMiniActionType] = useState("buy");
 
+    // ★ 추가된 부분: 장바구니 팝업 상태
+    const [showCartPopup, setShowCartPopup] = useState(false);
+
     const { adjustBottomBarPosition } = useBottomBar();
     const { adjustMiniBoxPosition } = useMiniBuyBox();
 
@@ -157,6 +160,7 @@ export default function ProductDetailPage() {
                         qty={qty}
                         setQty={setQty}
                         miniActionType={miniActionType}
+                        setShowCartPopup={setShowCartPopup}   // ★ 추가
                     />
 
                     <BottomBar
@@ -179,6 +183,37 @@ export default function ProductDetailPage() {
                         <span className="top-text">TOP</span>
                     </button>
                 )}
+
+                {/* ---------------------- */}
+                {/* ★ 장바구니 팝업 UI 추가 */}
+                {/* ---------------------- */}
+                {showCartPopup && (
+                    <div className="cart-popup-overlay">
+                        <div className="cart-popup">
+                            <div className="popup-message">
+                                <p>🛒 장바구니에 담겼습니다!</p>
+                                <p>장바구니로 이동하시겠습니까?</p>
+                            </div>
+
+                            <div className="popup-buttons">
+                                <button
+                                    className="popup-close"
+                                    onClick={() => setShowCartPopup(false)}
+                                >
+                                    닫기
+                                </button>
+
+                                <button
+                                    className="popup-go-cart"
+                                    onClick={() => (window.location.href = "/mypage/cart")}
+                                >
+                                    장바구니 이동
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
             </div>
         </div>
     );

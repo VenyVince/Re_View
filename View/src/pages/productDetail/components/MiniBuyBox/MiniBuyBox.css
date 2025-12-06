@@ -92,3 +92,62 @@
     font-weight: 700;
     cursor: pointer;
 }
+
+/* =========================================================
+   장바구니 팝업
+========================================================= */
+
+.cart-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.cart-popup {
+    background: #fff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    width: 290px;
+    text-align: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.popup-message {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* 팝업 버튼 */
+.popup-close {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    cursor: pointer;
+}
+
+.popup-go-cart {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
