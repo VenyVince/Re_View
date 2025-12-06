@@ -1,6 +1,7 @@
-// src/pages/productDetail/components/MiniBuyBox.jsx
+// src/pages/productDetail/components/MiniBuyBox/MiniBuyBox.jsx
 import React from "react";
 import "./MiniBuyBox.css";
+import { useNavigate } from "react-router-dom";
 
 export default function MiniBuyBox({
                                        showMiniBuyBox,
@@ -8,31 +9,46 @@ export default function MiniBuyBox({
                                        product,
                                        qty,
                                        setQty,
-                                       miniActionType
+                                       miniActionType,
+                                       setShowCartPopup
                                    }) {
+    const navigate = useNavigate();
 
-    // 미니박스가 열리지 않았으면 렌더링하지 않음
     if (!showMiniBuyBox) return null;
 
-    // ---------------------------------------------
-    // 장바구니 / 구매하기 요청 처리 (POST)
-    // ---------------------------------------------
     const handleAction = async () => {
         try {
-            // 1) 공통으로 보낼 데이터
+            // ----------------------------
+            // 🚀 구매하기 동작
+            // ----------------------------
+            if (miniActionType === "buy") {
+                // OrderPaymentPage가 요구하는 데이터 구조로 직접 전달
+                const orderItem = {
+                    prd_name: product.prd_name,
+                    prd_brand: product.prd_brand,
+                    price: product.price,
+                    quantity: qty
+                };
+
+                navigate("/order/payment", {
+                    state: {
+                        items: [orderItem]   // 반드시 배열로 전달!
+                    }
+                });
+
+                setShowMiniBuyBox(false);
+                return;
+            }
+
+            // ----------------------------
+            // 🧺 장바구니 담기
+            // ----------------------------
             const payload = {
-                product_id: product.product_id, // 상품 고유 ID
-                quantity: qty                   // 선택한 수량
+                product_id: product.product_id,
+                quantity: qty
             };
 
-            // 2) 액션 타입에 따라 API 결정
-            const url =
-                miniActionType === "cart"
-                    ? "/api/mypage/cart"         // 장바구니 담기
-                    : "/api/order/payment";    // 구매하기
-
-            // 3) 실제 POST 요청
-            const response = await fetch(url, {
+            const response = await fetch("/api/cart", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -43,14 +59,8 @@ export default function MiniBuyBox({
                 return;
             }
 
-            // 4) 동작 완료 후 메시지
-            if (miniActionType === "cart") {
-                alert("장바구니에 담겼습니다!");
-            } else {
-                alert("구매 페이지로 이동합니다!");
-            }
-
-            // 5) 미니박스 닫기
+            // 장바구니 팝업 표시
+            setShowCartPopup(true);
             setShowMiniBuyBox(false);
 
         } catch (err) {
@@ -63,7 +73,6 @@ export default function MiniBuyBox({
         <div className="pd-mini-buy-box">
             <div className="pd-mini-inner">
 
-                {/* 닫기 버튼 */}
                 <div className="pd-mini-top">
                     <button
                         className="pd-mini-close"
@@ -73,25 +82,21 @@ export default function MiniBuyBox({
                     </button>
                 </div>
 
-                {/* 상품명 / 수량조절 / 가격 / 액션 버튼 */}
                 <div className="pd-mini-bottom">
                     <div className="pd-mini-title">{product.prd_name}</div>
 
                     <div className="pd-mini-actions">
 
-                        {/* 수량 조절 */}
                         <div className="pd-mini-qty">
                             <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)}>-</button>
                             <span>{qty}</span>
                             <button onClick={() => setQty(qty + 1)}>+</button>
                         </div>
 
-                        {/* 총 금액 */}
                         <div className="pd-mini-price">
                             {(product.price * qty).toLocaleString()}원
                         </div>
 
-                        {/* 장바구니 / 구매 버튼 */}
                         <button
                             className="pd-mini-buy-btn"
                             onClick={handleAction}

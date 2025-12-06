@@ -58,10 +58,23 @@
     text-align: left;
 }
 
+
 /* 댓글 없음 */
 .rd-no-comment {
     padding: 16px 0;
     color: #6b7280;
     font-size: 14px;
     text-align: center;
+}
+.rd-comment-delete-btn {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    color: #e63946;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.rd-comment-delete-btn:hover {
+    text-decoration: underline;
 }
