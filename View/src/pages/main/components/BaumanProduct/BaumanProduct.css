@@ -338,3 +338,108 @@
     font-weight: 600;
     cursor: pointer;
 }
+/* 리뷰 카드도 상품 카드처럼 4개씩 나열 */
+.review-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 36px 28px;
+    margin-top: 20px;
+}
+
+/* 리뷰 카드 */
+.review-card-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 16px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: #fff;
+    width: 260px;
+}
+
+/* 이미지 박스 */
+.review-thumb {
+    position: relative;
+    background: #f4f6ff;
+    border-radius: 8px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.review-thumb-inner img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
+/* 텍스트 */
+.review-text-box {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 브랜드 & 평점 */
+.review-text-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.review-brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+.review-rating {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+}
+
+/* 제목 */
+.review-title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #222;
+    text-align: left;
+    margin: 0;
+}
+
+/* 리뷰 내용 */
+.review-content-line {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #444;
+    line-height: 1.45;
+    text-align: left;
+}
+
+/* 페이지네이션 */
+.pagination {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination button {
+    padding: 6px 14px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}

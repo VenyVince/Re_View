@@ -75,3 +75,9 @@
     margin-left: 8px;
     text-decoration: none;
 }
+
+.login-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;     /* ← 이 간격이 체크박스~텍스트 사이 */
+}

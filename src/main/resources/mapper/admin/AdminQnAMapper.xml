@@ -14,11 +14,13 @@
 
     <select id="getAllQna" resultType="com.review.shop.dto.qna.QnAListDTO">
         SELECT
-            q.QNA_ID    AS qna_id,
-            q.TITLE     AS title,
-            u.NAME      AS user_name
+            q.QNA_ID       AS qna_id,
+            q.TITLE        AS title,
+            u.NAME         AS user_name,
+            p.PRD_NAME     AS prd_name
         FROM QNA q
                  JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+                 JOIN PRODUCT p ON q.PRODUCT_ID = p.PRODUCT_ID
         WHERE q.DELETED_AT IS NULL
         ORDER BY q.QNA_ID DESC
     </select>

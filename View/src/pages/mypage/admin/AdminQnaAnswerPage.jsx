@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import {
-    Wrap, Inner, Title, QuestionHeader, IconCircle,
-    TextBlock, QuestionText, Meta, AnswerBox, AnswerTitleInput, AnswerTextarea,
-    AnswerButtonWrap, AnswerButton,QuestionContent} from "./adminQnaPage.style";
-import {fetchQnaDetail, updateQnaAnswer,} from "../../../api/admin/adminQnaApi";
+    Wrap, Inner, Content, TitleRow, CenterTitle, BackButton,
+    QuestionHeader, IconCircle, TextBlock, QuestionText, Meta,
+    QuestionContent, AnswerBox, AnswerTitleInput, AnswerTextarea,
+    AnswerButtonWrap, AnswerButton
+} from "./adminQnaPage.style";
+
+import { fetchQnaDetail, updateQnaAnswer } from "../../../api/admin/adminQnaApi";
 
 export default function AdminQnaAnswerPage() {
-    const { id } = useParams(); // URL의 qnaId
+    const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -23,48 +26,28 @@ export default function AdminQnaAnswerPage() {
         }
     );
 
-    const [answerTitle, setAnswerTitle] = useState("");
     const [answerBody, setAnswerBody] = useState("");
 
-    // 상세 데이터 로딩
     useEffect(() => {
-        const loadDetail = async () => {
+        const load = async () => {
             if (stateData) {
                 setQuestion(stateData);
-
-                if (stateData.answer) {
-                    setAnswerBody(stateData.answer);
-                }
-
-                // stateData에는 title/user_name만 있고 content는 없음
-                // content 없으면 detail API 호출 계속 진행
-                if (stateData.content) {
-                    return;        // content 있으면 API 안 불러도 됨
-                }
+                if (stateData.answer) setAnswerBody(stateData.answer);
+                if (stateData.content) return;
             }
 
             try {
                 const res = await fetchQnaDetail(id);
-                console.log("QNA 상세:", res.data);
-                console.log("상세 조회 데이터 키들:", Object.keys(res.data));
-                const q = res.data;
-
-                setQuestion(q);
-
-                // 기존 답변 세팅
-                if (q.answer) {
-                    setAnswerBody(q.answer);
-                }
-
-            } catch (error) {
-                console.error("[ADMIN] QnA 상세 조회 실패:", error);
+                setQuestion(res.data);
+                if (res.data.answer) setAnswerBody(res.data.answer);
+            } catch (e) {
+                console.error("QnA 상세 조회 실패:", e);
             }
         };
 
-        loadDetail();
+        load();
     }, [id, stateData]);
 
-    // 답변 등록/수정
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -72,53 +55,51 @@ export default function AdminQnaAnswerPage() {
             await updateQnaAnswer(question.qna_id, answerBody);
             alert("답변이 등록되었습니다.");
             navigate("/admin/qna");
-        } catch (error) {
-            console.error("[ADMIN] 답변 등록 실패:", error);
-            alert("답변 등록에 실패했습니다.");
+        } catch (e) {
+            alert("답변 등록 실패!");
         }
     };
 
     return (
         <Wrap>
             <Inner>
-                <Title>Q&A 관리</Title>
+                <Content>
 
-                {/* 상단 질문 영역 */}
-                <QuestionHeader>
-                    <IconCircle>?</IconCircle>
-                    <TextBlock>
-                        <QuestionText>{question.title}</QuestionText>
-                        <Meta>상품번호: {question.product_id}</Meta>
-                        <Meta>고객: {question.user_name}</Meta>
-                        <Meta style={{ marginTop: "6px" }}>
-                            작성일: {question.created_at}
-                        </Meta>
-                    </TextBlock>
-                </QuestionHeader>
+                    <TitleRow>
+                        <BackButton onClick={() => navigate(-1)}>← 뒤로가기</BackButton>
+                        <CenterTitle>Q&A 관리</CenterTitle>
+                    </TitleRow>
 
-                <QuestionContent>
-                    {question.content}
-                </QuestionContent>
+                    <QuestionHeader>
+                        <IconCircle>?</IconCircle>
+                        <TextBlock>
+                            <QuestionText>{question.title}</QuestionText>
+                            <Meta>상품번호: {question.product_id}</Meta>
+                            <Meta>고객: {question.user_name}</Meta>
+                            <Meta>
+                                작성일: {question.created_at && question.created_at.slice(0, 16).replace("T", " ")}
+                            </Meta>
+                        </TextBlock>
+                    </QuestionHeader>
 
-                {/* 답변 작성 박스 */}
-                <form onSubmit={handleSubmit}>
-                    <AnswerBox>
-                        <AnswerTitleInput
-                            placeholder="(선택) 답변 제목을 입력해주세요."
-                            value={answerTitle}
-                            onChange={(e) => setAnswerTitle(e.target.value)}
-                        />
-                        <AnswerTextarea
-                            placeholder="답변 내용을 입력해주세요."
-                            value={answerBody}
-                            onChange={(e) => setAnswerBody(e.target.value)}
-                        />
-                    </AnswerBox>
+                    <QuestionContent>{question.content}</QuestionContent>
 
-                    <AnswerButtonWrap>
-                        <AnswerButton type="submit">답변등록</AnswerButton>
-                    </AnswerButtonWrap>
-                </form>
+                    <form onSubmit={handleSubmit}>
+                        <AnswerBox>
+                            <AnswerTitleInput placeholder="(선택) 답변 제목을 입력해주세요." />
+                            <AnswerTextarea
+                                placeholder="답변 내용을 입력해주세요."
+                                value={answerBody}
+                                onChange={(e) => setAnswerBody(e.target.value)}
+                            />
+                        </AnswerBox>
+
+                        <AnswerButtonWrap>
+                            <AnswerButton type="submit">답변등록</AnswerButton>
+                        </AnswerButtonWrap>
+                    </form>
+
+                </Content>
             </Inner>
         </Wrap>
     );
