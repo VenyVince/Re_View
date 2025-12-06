@@ -64,12 +64,11 @@ export default function BaumanProduct() {
     ];
 
     /*
-      🔥 UI에 보여줄 타입 결정
+      UI에 보여줄 타입 결정
       - 로그인: 유저의 currentType
       - 비로그인: 랜덤 타입
     */
     const displayType = currentType || getRandomType();
-
     const selectedType = skinTypeList.find((t) => t.type === displayType);
 
     /* 탭 */
@@ -94,7 +93,7 @@ export default function BaumanProduct() {
                 setError("");
 
                 /*
-                   🔥 DRNW → first/second/third/fourth 매핑 이유
+                   first/second/third/fourth 매핑 이유
                    백엔드 추천 모델은 16가지 Baumann 타입을 그대로 사용하지 않고,
                    피부 특성축 (S/R, P/N 조합)에 따라 유사한 그룹 4가지로 단순화한다.
 
@@ -137,7 +136,8 @@ export default function BaumanProduct() {
                             id: p.top_review_id,
                             content: p.top_review_content,
                             rating: p.top_review_rating,
-                            likes: p.top_review_likes
+                            likes: p.top_review_likes,
+                            productName: p.prd_name,
                         }
                         : null
                 }));
@@ -155,6 +155,47 @@ export default function BaumanProduct() {
 
         fetchRecommendProducts();
     }, [currentType]);
+
+    // 리뷰 모아서 하나의 리스트로 사용
+    const reviewList = products
+        .filter((p) => p.topReview)
+        .map((p) => ({
+            ...p.topReview,
+            productName: p.name,
+            brand: p.brand,
+            imageUrl: p.imageUrl,
+        }));
+
+    // 상품 페이지네이션
+    const [productPage, setProductPage] = useState(1);
+    const productPageSize = 16;
+
+    // 리뷰 페이지네이션
+    const [reviewPage, setReviewPage] = useState(1);
+    const reviewPageSize = 16;
+
+    // 페이지 별 데이터 분리
+    // 상품
+    const productStart = (productPage - 1) * productPageSize;
+    const displayedProducts = products.slice(productStart, productStart + productPageSize);
+
+    const productTotalPages = Math.ceil(products.length / productPageSize);
+
+    // 리뷰
+    const reviewStart = (reviewPage - 1) * reviewPageSize;
+    const displayedReviews = reviewList.slice(reviewStart, reviewStart + reviewPageSize);
+
+    const reviewTotalPages = Math.ceil(reviewList.length / reviewPageSize);
+
+    // 탭 전환 시 페이지 초기화
+    useEffect(() => {
+        if (activeTab === "product") {
+            setProductPage(1);
+        } else {
+            setReviewPage(1);
+        }
+    }, [activeTab]);
+
 
     return (
         <section className="bauman-section">
@@ -180,7 +221,7 @@ export default function BaumanProduct() {
 
             <div className="bauman-box">
 
-                {/* 타입 박스 — 비로그인도 랜덤 타입으로 항상 보임 */}
+                {/* 타입 박스  */}
                 {selectedType && (
                     <div className="bauman-header">
                         <div className="bauman-header-right">
@@ -203,77 +244,170 @@ export default function BaumanProduct() {
                     </div>
                 )}
 
-                {/* 🔥 에러는 로그인한 경우에만 보이도록 */}
+                {/* 에러표시 */}
                 {error && currentType !== null && (
                     <p className="bauman-error">{error}</p>
                 )}
 
-                <div style={{ position: "relative" }}>
-
-                    {/* 상품 영역 (비로그인 → blur 처리) */}
-                    <div className={currentType ? "" : "blur-block"}>
-                        <div className="product-grid">
-                            {loading ? (
-                                <p style={{ textAlign: "center" }}>상품을 불러오는 중입니다...</p>
-                            ) : products.length === 0 ? (
-                                <p style={{ textAlign: "center" }}>추천 상품이 없습니다.</p>
-                            ) : (
-                                products.map((item) => (
-                                    <article
-                                        key={item.id}
-                                        className="product-card"
-                                        style={{ cursor: currentType ? "pointer" : "default" }}
-                                        onClick={() =>
-                                            currentType &&
-                                            navigate(`/product/${item.id}`)
-                                        }
-                                    >
-                                        <div className="product-thumb">
-                                            {item.isBest && <span className="product-badge">Best</span>}
-                                            <div className="product-thumb-inner">
-                                                <img src={item.imageUrl || dummyData} alt={item.name} />
-                                            </div>
-                                        </div>
-
-                                        <div className="product-text-box">
-                                            <div className="product-text-top">
-                                                <span className="product-brand">{item.brand}</span>
-                                                <span className="product-rating">{item.ratingText}</span>
+                {/* 추천 상품 탭 랜더링*/}
+                {activeTab === "product" && (
+                    <div style={{ position: "relative" }}>
+                        {/* 상품 영역 (비로그인 → blur 처리) */}
+                        <div className={currentType ? "" : "blur-block"}>
+                            <div className="product-grid">
+                                {loading ? (
+                                    <p style={{ textAlign: "center" }}>상품을 불러오는 중입니다...</p>
+                                ) : products.length === 0 ? (
+                                    <p style={{ textAlign: "center" }}>추천 상품이 없습니다.</p>
+                                ) : (
+                                    displayedProducts.map((item) => (
+                                        <article
+                                            key={item.id}
+                                            className="product-card"
+                                            style={{ cursor: currentType ? "pointer" : "default" }}
+                                            onClick={() =>
+                                                currentType &&
+                                                navigate(`/product/${item.id}`)
+                                            }
+                                        >
+                                            <div className="product-thumb">
+                                                {item.isBest && <span className="product-badge">Best</span>}
+                                                <div className="product-thumb-inner">
+                                                    <img src={item.imageUrl || dummyData} alt={item.name} />
+                                                </div>
                                             </div>
 
-                                            <p className="product-title">{item.name}</p>
+                                            <div className="product-text-box">
+                                                <div className="product-text-top">
+                                                    <span className="product-brand">{item.brand}</span>
+                                                    <span className="product-rating">{item.ratingText}</span>
+                                                </div>
 
-                                            <div className="product-price-line">
-                                                <span className="product-discount">
-                                                    {item.discount.toString().padStart(2, "0")}%
-                                                </span>
-                                                <span className="product-price">
-                                                    {item.price.toLocaleString()}
-                                                    <span className="unit"> 원</span>
-                                                </span>
+                                                <p className="product-title">{item.name}</p>
+
+                                                <div className="product-price-line">
+                                                    <span className="product-discount">
+                                                        {item.discount.toString().padStart(2, "0")}%
+                                                    </span>
+                                                    <span className="product-price">
+                                        {item.price.toLocaleString()}
+                                                        <span className="unit"> 원</span>
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </article>
-                                ))
-                            )}
+                                        </article>
+                                    ))
+                                )}
+                            </div>
+                            {/* 상품 페이지 네이션*/}
+                            <div className="pagination">
+                                <button
+                                    disabled={productPage === 1}
+                                    onClick={() => setProductPage(productPage - 1)}
+                                >
+                                    이전
+                                </button>
+
+                                <span>{productPage} / {productTotalPages}</span>
+
+                                <button
+                                    disabled={productPage === productTotalPages}
+                                    onClick={() => setProductPage(productPage + 1)}
+                                >
+                                    다음
+                                </button>
+                            </div>
                         </div>
+
+
+
+                        {/* 비로그인 → 회원가입 유도 오버레이 */}
+                        {!currentType && (
+                            <div className="overlay-lock">
+                                <p style={{ fontSize: "17px", fontWeight: "700" }}>
+                                    회원가입하고 추천 상품을 만나보세요!
+                                </p>
+                                <button
+                                    className="overlay-btn"
+                                    onClick={() => navigate("/register")}
+                                >
+                                    회원가입 하러가기
+                                </button>
+                            </div>
+                        )}
                     </div>
+                )}
 
-                    {/* 비로그인 → 회원가입 유도 오버레이 */}
-                    {!currentType && (
-                        <div className="overlay-lock">
-                            <p style={{ fontSize: "17px", fontWeight: "700" }}>
-                                회원가입하고 추천 상품을 만나보세요!
+                {/* 리뷰 탭 */}
+                {activeTab === "review" && (
+                    <div className="review-list-area">
+                        {/* 리뷰 없을 때 */}
+                        {reviewList.length === 0 && (
+                            <p style={{ textAlign: "center", marginTop: "40px" }}>
+                                아직 이 타입에 대한 리뷰가 없습니다.
                             </p>
-                            <button
-                                className="overlay-btn"
-                                onClick={() => navigate("/register")}
-                            >
-                                회원가입 하러가기
-                            </button>
-                        </div>
-                    )}
-                </div>
+                        )}
+
+                        {/* 리뷰 목록 */}
+                        {reviewList.length > 0 && (
+                            <>
+                                <div className="review-grid">
+                                    {displayedReviews.map((review) => (
+                                        <div
+                                            key={review.id}
+                                            className="review-card-box"
+                                            onClick={() => navigate(`/review/${review.id}`)}
+                                        >
+                                            <div className="review-thumb">
+                                                <img
+                                                    src={review.imageUrl || dummyData}
+                                                    alt={review.productName}
+                                                />
+                                            </div>
+
+                                            <div className="review-text-box">
+                                                <div className="review-text-top">
+                                                    <span className="review-brand">{review.brand}</span>
+                                                    <span className="review-rating">
+                                                        {review.rating?.toFixed(1)} / 5.0
+                                                    </span>
+                                                </div>
+
+                                                <p className="review-title">{review.productName}</p>
+
+                                                <p className="review-content-line">
+                                                    "{review.content}"
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* 리뷰 페이지네이션 */}
+                                <div className="pagination">
+                                    <button
+                                        disabled={reviewPage === 1}
+                                        onClick={() => setReviewPage(reviewPage - 1)}
+                                    >
+                                        이전
+                                    </button>
+
+                                    <span>
+                                        {reviewPage} / {reviewTotalPages}
+                                    </span>
+
+                                    <button
+                                        disabled={reviewPage === reviewTotalPages}
+                                        onClick={() => setReviewPage(reviewPage + 1)}
+                                    >
+                                        다음
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+
             </div>
         </section>
     );
