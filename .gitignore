@@ -48,3 +48,5 @@ frontend/node_modules
 infra/minio_data
 infra/db_data
 infra/oracle-data
+
+xl.meta

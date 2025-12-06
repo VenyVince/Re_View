@@ -19,6 +19,5 @@ services:
       - "1521:1521"
     environment:
       ORACLE_PASSWORD: ${REVIEW_PW}
-      ORACLE_DATABASE: ${REVIEW_SID}
     volumes:
       - ./oracle-data:/opt/oracle/oradata
