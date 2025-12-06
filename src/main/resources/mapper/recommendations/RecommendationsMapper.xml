@@ -260,4 +260,21 @@
         WHERE match_score > 0
         <include refid="orderByMatchScore"/>
     </select>
+
+    <select id="getRandomRecommendationAdminPicks" resultType="com.review.shop.dto.recommendations.RecommendationAdminPickDTO">
+        SELECT
+            p.prd_name as product_name,
+            p.PRD_BRAND as product_brand,
+            pi.IMAGE_URL as thumbnail_url,
+            p.price,
+            r.content
+        FROM review r
+                 INNER JOIN product p ON r.product_id = p.product_id
+            <!-- 현재는 LEFT JOIN인데 이미지가 있는 리뷰만 가져오고싶다면 INNER JOIN으로 해야함 -->
+                 LEFT JOIN product_image pi ON p.product_id = pi.product_id AND pi.is_thumbnail = 'Y'
+        WHERE r.IS_SELECTED = '1'
+        ORDER BY DBMS_RANDOM.VALUE
+            FETCH FIRST 3 ROWS ONLY
+    </select>
+
 </mapper>

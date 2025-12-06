@@ -1,6 +1,7 @@
 package com.review.shop.service.recommendations;
 
 import com.review.shop.dto.product.RecommendationDTO;
+import com.review.shop.dto.recommendations.RecommendationAdminPickDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.repository.recommendations.RecommendationsMapper;
@@ -61,5 +62,15 @@ public class RecommendationsService {
         }
 
         return recommendedProducts;
+    }
+
+    public List<RecommendationAdminPickDTO> getRandomRecommendationAdminPicks(){
+        List<RecommendationAdminPickDTO> result = recommendationsMapper.getRandomRecommendationAdminPicks();
+
+        if (result == null || result.isEmpty()) {
+            throw new ResourceNotFoundException("어드민 픽 상품이 존재하지 않습니다.");
+        }
+
+        return result;
     }
 }

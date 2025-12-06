@@ -1,6 +1,7 @@
 package com.review.shop.controller.recommendations;
 
 import com.review.shop.dto.product.RecommendationDTO;
+import com.review.shop.dto.recommendations.RecommendationResponseWrapper;
 import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.service.recommendations.RecommendationsService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,6 +65,25 @@ public class RecommendationsController {
         response.put("message", "추천 상품 조회에 성공했습니다.");
         response.put("recommended_products", recommendationsPrdList);
 
+        return ResponseEntity.ok().body(response);
+    }
+
+    @Operation(summary = "운영자 픽 리뷰 조회", description = "무작위로 선정된 3개의 운영자 픽 리뷰를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "운영자 픽 리뷰 조회 성공",
+                    content = @Content(schema = @Schema(implementation = RecommendationResponseWrapper.class))),
+            @ApiResponse(responseCode = "404" , description = "자원 없음",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "500", description = "서버(DB) 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/api/recommendations/admin-pick")
+    public ResponseEntity<RecommendationResponseWrapper> getAdminPickRecommendations(){
+
+        RecommendationResponseWrapper response = new RecommendationResponseWrapper();
+
+        response.setMessage("운영자 픽 리뷰 조회에 성공했습니다.");
+        response.setAdmin_pick(recommendationsService.getRandomRecommendationAdminPicks());
         return ResponseEntity.ok().body(response);
     }
 
