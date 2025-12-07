@@ -31,9 +31,12 @@ export default function UserProfileBar() {
                     setNickname(auth.userId);
                 }
 
-                if (typeof info?.point === "number") {
-                    setPoints(info.point);
-                }
+                // 포인트: null / 문자열까지 모두 처리
+                const rawPoint =
+                    info?.point ?? info?.points ?? info?.point_balance ?? 0;
+
+                const numericPoint = Number(rawPoint);
+                setPoints(Number.isNaN(numericPoint) ? 0 : numericPoint);
             } catch (e) {
                 console.error("/api/users/me 조회 실패:", e);
                 if (auth.userId) setNickname(auth.userId);
