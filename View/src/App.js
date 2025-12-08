@@ -61,6 +61,7 @@ import OrderPaymentPage from "./pages/order/OrderPaymentPage";
 import OrderCompletePage from "./pages/order/OrderCompletePage";
 import UserProtectedRoute from "./components/user/UserProtectedRoute";
 import UserOrderDetailPage from "./pages/mypage/user/delivery/UserOrderDetailPage";
+import UserPointHistoryPage from "./pages/mypage/user/UserPointHistoryPage";
 
 export default function App() {
     return (
@@ -126,6 +127,7 @@ export default function App() {
 
                     <Route path="/mypage/address" element={<UserAddressPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
+                    <Route path="/mypage/points" element={<UserPointHistoryPage />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
                     <Route path="/mypage/wish" element={<UserWishPage />} />
                     <Route path="/mypage/cs" element={<UserCustomerPage />} />
