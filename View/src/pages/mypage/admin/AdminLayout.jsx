@@ -49,6 +49,7 @@ function AdminLayout() {
                 <SideLink to="report">신고 관리</SideLink>
                 <SideLink to="qna">Q&A 관리</SideLink>
                 <SideLink to="users">유저 관리</SideLink>
+                <SideLink to="orders">주문 / 배송 관리</SideLink>
             </Sidebar>
 
             <ContentArea>
