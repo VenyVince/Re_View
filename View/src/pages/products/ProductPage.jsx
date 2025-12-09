@@ -5,152 +5,124 @@ import { fetchProductsByCategory } from "../../api/products/productApi";
 import "./ProductPage.css";
 
 import CategoryTabs from "./components/CategoryTabs";
-import SortSelect from "./components/SortSelect";
-import ProductSlider from "./components/ProductSlider";
+import ProductSortSelect from "./components/ProductSortSelect";
+import ProductList from "./components/ProductList";
 
 export default function ProductPage() {
-    const CATEGORIES = ["스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
 
+    // 카테고리 및 상태값
+    const CATEGORIES = ["스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
     const CATEGORY_MAP = {
-        "스킨/토너": ["토너", "스킨"],
+        "스킨/토너": ["스킨", "토너"],
         "에센스/세럼/앰플": ["에센스", "세럼", "앰플"],
         "크림": ["크림", "스킨케어/크림"],
         "로션": ["로션"],
         "클렌징": ["클렌징"]
     };
-
-    const PAGE_SIZE = 8;
-    const PAGE_WIDTH = 1200;
-
-    const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
-    const [grouped, setGrouped] = useState({});
-    const [pageState, setPageState] = useState({});
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [products, setProducts] = useState([]);
     const [sortType, setSortType] = useState("recommend");
+    const [selectedBrand, setSelectedBrand] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [brandReady, setBrandReady] = useState(false);
 
+    // 카테고리 변경 시 상품 조회
     useEffect(() => {
-        const backendCats = CATEGORY_MAP[selectedCategory] ?? [];
-
         setLoading(true);
+        setBrandReady(false);
+        setProducts([]);
+        setSelectedBrand(null);
 
-        Promise.all(backendCats.map(cat => fetchProductsByCategory(cat)))
-            .then(responses => {
-                const merged = responses.flatMap(r => r.data?.content ?? []);
+        async function load() {
+            try {
+                if (selectedCategory === null) {
+                    const res = await fetchProductsByCategory(null);
+                    setProducts(res.data?.content ?? []);
+                    setBrandReady(true);
+                    return;
+                }
+
+                const categoriesToCall = CATEGORY_MAP[selectedCategory] || [];
+
+                const responses = await Promise.all(
+                    categoriesToCall.map(cat => fetchProductsByCategory(cat))
+                );
+
+                const merged = responses.flatMap(res => res.data?.content ?? []);
 
                 const unique = Array.from(
                     new Map(merged.map(item => [item.product_id, item])).values()
                 );
 
-                const pages = [];
-                for (let i = 0; i < unique.length; i += PAGE_SIZE) {
-                    pages.push(unique.slice(i, i + PAGE_SIZE));
-                }
-
-                setGrouped(prev => ({
-                    ...prev,
-                    [selectedCategory]: pages
-                }));
-
-                setPageState(prev => ({
-                    ...prev,
-                    [selectedCategory]: 0
-                }));
-            })
-            .finally(() => setLoading(false));
-    }, [selectedCategory]);
-
-    useEffect(() => {
-        const backendCats = CATEGORY_MAP[selectedCategory] ?? [];
-
-        Promise.all(backendCats.map(cat => fetchProductsByCategory(cat)))
-            .then(responses => {
-                const merged = responses.flatMap(r => r.data?.content ?? []);
-
-                const unique = Array.from(
-                    new Map(merged.map(item => [item.product_id, item])).values()
-                );
-
-                const pages = [];
-                for (let i = 0; i < unique.length; i += PAGE_SIZE) {
-                    pages.push(unique.slice(i, i + PAGE_SIZE));
-                }
-
-                setGrouped(prev => ({
-                    ...prev,
-                    [selectedCategory]: pages
-                }));
-
-                setPageState(prev => ({
-                    ...prev,
-                    [selectedCategory]: 0
-                }));
-            });
-    }, [selectedCategory]);
-
-    const rawPages = grouped[selectedCategory] || [];
-    const currentPage = pageState[selectedCategory] || 0;
-
-    const sortedPages = useMemo(() => {
-        if (!rawPages.length) return [];
-
-        const all = rawPages.flat();
-
-        const sorted = [...all].sort((a, b) => {
-            switch (sortType) {
-                case "price_low":
-                    return a.price - b.price;
-                case "price_high":
-                    return b.price - a.price;
-                case "name":
-                    return a.prd_name.localeCompare(b.prd_name);
-                default:
-                    return 0;
+                setProducts(unique);
+                setBrandReady(true);
+            } catch (err) {
+                console.error("상품 조회 오류:", err);
+            } finally {
+                setLoading(false);
             }
-        });
-
-        const pages = [];
-        for (let i = 0; i < sorted.length; i += PAGE_SIZE) {
-            pages.push(sorted.slice(i, i + PAGE_SIZE));
         }
 
-        return pages;
-    }, [rawPages, sortType]);
+        load();
+    }, [selectedCategory]);
 
+    // 브랜드 및 정렬 필터 적용
+    const filteredProducts = useMemo(() => {
+        let items = [...products];
+
+        if (selectedBrand) {
+            items = items.filter((p) => p.prd_brand === selectedBrand);
+        }
+
+        switch (sortType) {
+            case "price_low":
+                return items.sort((a, b) => a.price - b.price);
+            case "price_high":
+                return items.sort((a, b) => b.price - a.price);
+            case "name":
+                return items.sort((a, b) => a.prd_name.localeCompare(b.prd_name));
+            default:
+                return items;
+        }
+    }, [products, selectedBrand, sortType]);
+
+    // 선택 텍스트 생성
+    const selectedText = (() => {
+        const catLabel = selectedCategory === null ? "전체" : selectedCategory;
+        if (selectedBrand) return `${catLabel} · ${selectedBrand}`;
+        return catLabel;
+    })();
+
+    // UI 렌더링
     return (
         <div className="productPageWrapper">
+
+            <div className="selected-info">{selectedText}</div>
 
             <CategoryTabs
                 categories={CATEGORIES}
                 selected={selectedCategory}
                 onSelect={setSelectedCategory}
-                resetPageState={setPageState}
+                products={products}
+                selectedBrand={selectedBrand}
+                onBrandSelect={setSelectedBrand}
+                loading={loading}
             />
 
             <div className="productTitleRow">
-                <h2 className="productCategoryTitle">{selectedCategory}</h2>
-
-                <SortSelect
+                <ProductSortSelect
                     sortType={sortType}
                     setSortType={setSortType}
-                    selectedCategory={selectedCategory}
-                    setPageState={setPageState}
                 />
             </div>
 
             {loading ? (
                 <div className="productLoading">로딩중...</div>
-            ) : sortedPages.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
                 <div className="productEmpty">상품이 없습니다.</div>
             ) : (
-                <ProductSlider
-                    sortedPages={sortedPages}
-                    currentPage={currentPage}
-                    pageWidth={PAGE_WIDTH}
-                    selectedCategory={selectedCategory}
-                    setPageState={setPageState}
-                />
+                <ProductList products={filteredProducts} />
             )}
-
         </div>
     );
 }

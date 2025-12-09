@@ -1,13 +1,14 @@
+/* 페이지 레이아웃 */
 .productPageWrapper {
     width: 1200px;
     margin: 0 auto;
     padding: 10px 0 60px;
 }
 
-/* Title + Sort */
+/* 상단 제목 / 정렬 영역 */
 .productTitleRow {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin: 14px 0;
 }
@@ -17,16 +18,25 @@
     font-weight: 600;
 }
 
-/* 상품 없음 + 로딩 */
+/* 로딩 / 상품 없음 표시 */
 .productLoading {
     text-align: center;
     padding: 40px 0;
     font-size: 18px;
     color:#555;
 }
-.productEmpty{
+
+.productEmpty {
     text-align: center;
     padding: 40px 0;
     font-size: 17px;
     color: #555;
+}
+
+/* 선택된 정보 표시 */
+.selected-info {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #111;
 }

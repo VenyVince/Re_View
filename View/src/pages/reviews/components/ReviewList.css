@@ -1,0 +1,17 @@
+/* 리뷰 리스트 전체 wrapper */
+.reviewListWrapper {
+    width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding-bottom: 80px;
+}
+
+/* 빈 목록 */
+.reviewListEmpty {
+    width: 1200px;
+    margin: 50px auto;
+    text-align: center;
+    color: #777;
+}

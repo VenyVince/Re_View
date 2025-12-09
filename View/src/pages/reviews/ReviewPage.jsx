@@ -5,15 +5,15 @@ import axios from "axios";
 import "./ReviewPage.css";
 
 import CategoryTabs from "./components/CategoryTabs";
-import SortSelect from "./components/SortSelect";
-import ReviewSlider from "./components/ReviewSlider";
+import ReviewSortSelect from "./components/ReviewSortSelect";
+import ReviewList from "./components/ReviewList";
 
 export default function ReviewPage() {
 
-    const CATEGORIES = ["스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
-
-    // UI 카테고리 → 백엔드 카테고리 매핑
+    // 카테고리 및 상태값
+    const CATEGORIES = ["전체", "스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
     const CATEGORY_MAP = {
+        "전체": null,
         "스킨/토너": ["스킨", "토너"],
         "에센스/세럼/앰플": ["에센스", "세럼", "앰플"],
         "크림": ["크림"],
@@ -21,64 +21,105 @@ export default function ReviewPage() {
         "클렌징": ["클렌징"]
     };
 
-    const PAGE_WIDTH = 1200;
-
     const [reviews, setReviews] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("스킨/토너");
+    const [selectedCategory, setSelectedCategory] = useState("전체");
+    const [selectedBrand, setSelectedBrand] = useState(null);
     const [sortType, setSortType] = useState("popular");
     const [loading, setLoading] = useState(true);
 
-    // 🔥 카테고리별로 리뷰 호출
+    // 리뷰 API 호출
     useEffect(() => {
         setLoading(true);
 
         const backendCategories = CATEGORY_MAP[selectedCategory];
 
+        if (backendCategories === null) {
+            axios.get("/api/reviews", { params: { page: 1, size: 50 } })
+                .then(res => {
+                    setReviews(res.data.content || []);
+                    setSelectedBrand(null);
+                    setLoading(false);
+                })
+                .catch(() => {
+                    setReviews([]);
+                    setLoading(false);
+                });
+            return;
+        }
+
         Promise.all(
             backendCategories.map(cat =>
                 axios.get("/api/reviews", {
                     params: { page: 1, size: 50, category: cat }
-                }).catch(err => {
-                    console.log("🔥 카테고리 요청 실패:", cat);
-                    return { data: { content: [] } }; // 실패 시 빈 배열
-                })
+                }).catch(() => ({ data: { content: [] } }))
             )
         )
             .then(results => {
                 const merged = results.flatMap(res => res.data.content || []);
                 setReviews(merged);
+                setSelectedBrand(null);
                 setLoading(false);
             })
-            .catch(err => {
-                console.error(err);
+            .catch(() => {
                 setReviews([]);
                 setLoading(false);
             });
+
     }, [selectedCategory]);
 
-    // 🔥 정렬
-    const sortedReviews = useMemo(() => {
+    // 브랜드 목록 생성
+    const brandList = useMemo(() => {
+        const brands = reviews.map(r => r.brand_name).filter(Boolean);
+        return Array.from(new Set(brands)).sort((a, b) => a.localeCompare(b));
+    }, [reviews]);
+
+    // 정렬 및 브랜드 필터 적용
+    const filteredReviews = useMemo(() => {
         let list = [...reviews];
 
-        if (sortType === "low") list.sort((a, b) => a.price - b.price);
-        if (sortType === "high") list.sort((a, b) => b.price - a.price);
+        if (selectedBrand) {
+            list = list.filter(r => r.brand_name === selectedBrand);
+        }
+
+        if (sortType === "popular") {
+            list.sort((a, b) => b.like_count - a.like_count);
+        }
+        if (sortType === "rating_high") {
+            list.sort((a, b) => b.rating - a.rating);
+        }
+        if (sortType === "rating_low") {
+            list.sort((a, b) => a.rating - b.rating);
+        }
+        if (sortType === "recent") {
+            list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        }
 
         return list;
-    }, [reviews, sortType]);
+    }, [reviews, selectedBrand, sortType]);
 
+    // 상단 선택 텍스트
+    const selectedText = (() => {
+        if (selectedBrand) return `${selectedCategory} · ${selectedBrand}`;
+        return selectedCategory;
+    })();
+
+    // UI 렌더링
     return (
         <div className="reviewPageWrapper">
+
+            <div className="selected-info">{selectedText}</div>
 
             <CategoryTabs
                 categories={CATEGORIES}
                 selected={selectedCategory}
                 onSelect={setSelectedCategory}
+                brandList={brandList}
+                selectedBrand={selectedBrand}
+                onBrandSelect={setSelectedBrand}
             />
 
             <div className="reviewTitleRow">
-                <h2 className="reviewCategoryTitle">{selectedCategory}</h2>
-
-                <SortSelect
+                <ReviewSortSelect
                     sortType={sortType}
                     setSortType={setSortType}
                 />
@@ -86,13 +127,10 @@ export default function ReviewPage() {
 
             {loading ? (
                 <div className="reviewLoading">로딩중...</div>
-            ) : sortedReviews.length === 0 ? (
+            ) : filteredReviews.length === 0 ? (
                 <div className="reviewEmpty">리뷰가 없습니다.</div>
             ) : (
-                <ReviewSlider
-                    reviews={sortedReviews}
-                    pageWidth={PAGE_WIDTH}
-                />
+                <ReviewList reviews={filteredReviews} />
             )}
         </div>
     );

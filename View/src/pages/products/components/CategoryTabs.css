@@ -1,22 +1,70 @@
-.productCategoryTabs {
-    margin-top: 10px;
+/* 전체 wrapper */
+.filter-wrapper {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
 }
 
-.productCategoryTab {
-    background: #efefef;
-    border-radius: 999px;
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
-    transition: 0.2s;
+/* 한 줄 레이아웃 */
+.filter-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: start;
+    column-gap: 20px;
+}
+
+/* 라벨 */
+.filter-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* 버튼 그룹 */
+.filter-list {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+/* 옵션 버튼 */
+.filter-option {
     font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    color: #555;
+    padding: 6px 14px;
+    min-width: 70px;
+    text-align: center;
+    line-height: 18px;
+    box-sizing: border-box;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
 }
 
-.productCategoryTab.active {
-    background: #111;
-    color: white;
-    border-color: #111;
+/* hover */
+.filter-option:hover {
+    color: #111;
+}
+
+/* active */
+.filter-option.active {
+    color: #111;
+    font-weight: 600;
+    border-bottom: 2px solid #111;
+}
+
+/* 선택 정보 텍스트 */
+.selected-info {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #111;
 }
