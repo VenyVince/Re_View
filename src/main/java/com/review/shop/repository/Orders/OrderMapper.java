@@ -48,6 +48,6 @@ import java.util.List;
         void insertOrderItems(List<OrderItemDTO> orderItems);
 
 
-    List<OrderAdminDTO> findByOrderNoContainingOrDeliveryNumContaining(String keyword, String keyword1);
+    List<OrderAdminDTO> findByOrderNoContainingOrDeliveryNumContaining(@Param("keyword") String keyword);
 }
 

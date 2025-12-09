@@ -106,7 +106,7 @@
         FROM orders o
                  INNER JOIN user_table u ON o.user_id = u.user_id
         WHERE o.order_no LIKE '%' || #{keyword} || '%'
-           OR o.delivery_num LIKE '%' || #{keyword1} || '%'
+           OR o.delivery_num LIKE '%' || #{keyword} || '%'
     </select>
 
 </mapper>

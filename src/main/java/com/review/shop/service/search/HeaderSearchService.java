@@ -78,7 +78,7 @@ public class HeaderSearchService {
 
     public List<OrderAdminDTO> searchOrders(String keyword, String status, String sort) {
         List<OrderAdminDTO> orders = orderMapper
-                .findByOrderNoContainingOrDeliveryNumContaining(keyword, keyword);
+                .findByOrderNoContainingOrDeliveryNumContaining(keyword);
 
         if (!"all".equals(status)) {
             String statusKorean = switch(status) {
