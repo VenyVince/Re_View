@@ -253,11 +253,16 @@ export const ModalPrimaryButton = styled.button`
     }
 `;
 
-/* 반려 버튼 */
+/* 반려, 대기 버튼 */
 export const ModalSecondaryButton = styled.button`
   padding: 8px 12px;
   border-radius: 8px;
   background: #fff;
   border: 1px solid #ddd;
   cursor: pointer;
+    
+    &:hover {
+        background: #f1f3f5;
+        border-color: #cfd4da;
+    }
 `;
