@@ -1,8 +1,8 @@
 package com.review.shop.service.admin;
 
-import com.review.shop.dto.product.ProductDetailDTO;
 import com.review.shop.dto.product.ProductDetailWithThumbnailDTO;
 import com.review.shop.dto.product.ProductUpdateOnlyPrdInfoDTO;
+import com.review.shop.dto.product.ProductUploadDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
@@ -31,20 +31,22 @@ public class AdminProductService {
             throw new ResourceNotFoundException("등록된 상품이 없습니다.");
         }
 
-//        현재 db에 변환용 데이터가 없어서 주석처리
+        products.forEach(product -> {
+            String objectKey = product.getThumbnail_url();
+            if (objectKey != null && !objectKey.isEmpty()) {
+                String presignedUrl = imageService.presignedUrlGet(objectKey);
+                product.setThumbnail_url(presignedUrl);
+            }
+            }
+        );
 
-//        for(ProductDetailWithThumbnailDTO product : products){
-//            String thumbnailUrl = product.getThumbnail_url();
-//            product.setThumbnail_url(imageService.presignedUrlGet(thumbnailUrl));
-//        }
-
-        return adminProductMapper.getAllProducts();
+        return products;
     }
 
 
 
     // 상품 등록
-    public void insertProduct(ProductDetailDTO product) {
+    public void insertOnlyProduct(ProductUpdateOnlyPrdInfoDTO product) {
         if (product == null) {
             throw new WrongRequestException("상품 정보가 전달되지 않았습니다.");
         }
@@ -55,7 +57,7 @@ public class AdminProductService {
     }
 
     // 상품 수정
-    public void updateProduct(int product_id, ProductUpdateOnlyPrdInfoDTO product) {
+    public void updateProduct(int product_id, ProductUploadDTO product) {
         if (product == null) {
             throw new WrongRequestException("수정할 상품 정보가 전달되지 않았습니다.");
         }
@@ -73,64 +75,42 @@ public class AdminProductService {
         }
     }
 
-    // 상품 상세조회
-    public ProductDetailWithThumbnailDTO getProductDetail(int product_id) {
-        ProductDetailWithThumbnailDTO result = adminProductMapper.readProduct(product_id);
-        if (result == null) {
-            throw new ResourceNotFoundException("조회할 상품을 찾을 수 없습니다.");
-        }
-        return result;
-    }
-
-
-
-
     //상품 등록과 이미지 등록 트랜잭션처리
     @Transactional
-    public void uploadProductAndImages(ProductDetailDTO product, String thumbnailUrl) {
+    public void uploadProductAndImages(ProductUpdateOnlyPrdInfoDTO product, String thumbnailUrl, String detailImageUrl) {
 
-        //상품 테이블에 데이터 먼저 삽입
-        insertProduct(product);
+        //상품을 먼저 삽입
+        insertOnlyProduct(product);
         int prd_id = product.getProduct_id();
-        List<String> product_images = product.getProduct_images();
 
         //상품 이미지 테이블에 데이터 삽입
-        imageService.saveProductImageObjectKey(prd_id, product_images, thumbnailUrl);
+        imageService.saveProductImageObjectKey(prd_id, thumbnailUrl, detailImageUrl);
     }
 
-    //이미지 불러오기
-    public String readImage(int product_id) {
-        String result = adminProductMapper.readImage(product_id);
-        if(result == null){
+    public ProductUploadDTO getProductInfo(int productId) {
+        ProductUploadDTO prdInfo = adminProductMapper.getProductInfo(productId);
+
+        if(prdInfo == null){
+            throw new ResourceNotFoundException("해당 상품의 정보를 찾을 수 없습니다.");
+        }
+
+
+        //썸네일 변환
+        String thumbnailImageKey = prdInfo.getThumbnail_image();
+        if (thumbnailImageKey == null) {
             throw new ResourceNotFoundException("해당 상품의 이미지를 찾을 수 없습니다.");
         }
-        return result;
-    }
+        String presignedThumbnailUrl = imageService.presignedUrlGet(thumbnailImageKey);
+        prdInfo.setThumbnail_image(presignedThumbnailUrl);
 
-
-    //이미지 삭제하기
-    public void deleteProductImages(int product_id) {
-        int affected = adminProductMapper.deleteProductImages(product_id);
-        if (affected == 0) {
-            throw new ResourceNotFoundException("해당 상품의 기존 이미지를 찾을 수 없습니다.");
+        //상세보기 변환
+        String detailImageKey = adminProductMapper.readImage(productId);
+        if (detailImageKey == null) {
+            throw new ResourceNotFoundException("해당 상품의 상세 이미지를 찾을 수 없습니다.");
         }
-    }
+        String presignedDetailUrl = imageService.presignedUrlGet(detailImageKey);
+        prdInfo.setDetail_image(presignedDetailUrl);
 
-    // 추후에 사용할 수도 있어서 일단 남겨둠 (모든 썸네일 초기화)
-//
-//    public void restImagesThumbnail(int product_id){
-//        int affected = adminProductMapper.updateAllImagesToNo(product_id);
-//        if (affected == 0) {
-//            throw new ResourceNotFoundException("해당 상품의 기존 이미지를 찾을 수 없습니다.");
-//        }
-//    }
-
-    //이미지 삭제하고 삽입하기 트랜잭션
-    @Transactional
-    public void updateProductImages(int product_id, List<String> imageUrls, String thumbnailUrl) {
-        //기존 이미지 삭제
-        deleteProductImages(product_id);
-        //새 이미지 삽입
-        imageService.saveProductImageObjectKey(product_id, imageUrls, thumbnailUrl);
+        return prdInfo;
     }
 }

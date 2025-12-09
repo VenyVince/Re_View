@@ -6,7 +6,6 @@ import {
 } from "./adminProductEdit.style";
 import { updateProduct, fetchAdminProduct, updateProductImages } from "../../../api/admin/adminProductApi";
 
-// 바우만 타입 코드
 const BAUMANN_ID_MAP = {
     DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
     DRPW: 10, DRPT: 11, DRP_: 12, DRNW: 13, DRNT: 14, DRN_: 15, DR_W: 16, DR_T: 17, DR__: 18,
@@ -19,7 +18,6 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
-// 역매핑
 const BAUMANN_CODE_BY_ID = Object.fromEntries(
     Object.entries(BAUMANN_ID_MAP).map(([code, id]) => [id, code])
 );
@@ -29,6 +27,7 @@ export default function AdminProductEdit() {
     const navigate = useNavigate();
 
     const [originalBaumannId, setOriginalBaumannId] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const [form, setForm] = useState({
         prd_name: "",
@@ -39,48 +38,48 @@ export default function AdminProductEdit() {
         stock: "",
         description: "",
         baumannType: "",
-        product_images: [],
         mainPreview: "",
         detailPreview: "",
         mainImage: null,
         detailImage: null,
         rating: 0,
+        review_count: 0,
+        is_sold_out: 0
     });
 
-    const [loading, setLoading] = useState(true);
-
-    // 기존 데이터 가져오기
     useEffect(() => {
         const load = async () => {
             try {
                 const data = await fetchAdminProduct(id);
+                const { product, thumbnail_image, detail_image } = data;
 
-                // 이미지 null-safe 처리
-                const images = Array.isArray(data.product_images)
-                    ? data.product_images
-                    : [];
+                if (!product) {
+                    throw new Error("No product data");
+                }
 
-                // baumann_id 원본 저장
-                setOriginalBaumannId(data.baumann_id);
+                setOriginalBaumannId(product.baumann_id);
 
                 setForm((prev) => ({
                     ...prev,
-                    prd_name: data.prd_name ?? "",
-                    ingredient: data.ingredient ?? "",
-                    prd_brand: data.prd_brand ?? "",
-                    category: data.category ?? "",
-                    price: String(data.price ?? ""),
-                    stock: String(data.stock ?? ""),
-                    description: data.description ?? "",
-                    baumannType: BAUMANN_CODE_BY_ID[data.baumann_id] ?? "",
-                    product_images: images,
-                    mainPreview: images[0] ?? "",
-                    detailPreview: images[1] ?? "",
-                    rating: data.rating ?? 0,
+                    prd_name: product.prd_name ?? "",
+                    ingredient: product.ingredient ?? "",
+                    prd_brand: product.prd_brand ?? "",
+                    category: product.category ?? "",
+                    price: String(product.price ?? ""),
+                    stock: String(product.stock ?? ""),
+                    description: product.description ?? "",
+                    baumannType: BAUMANN_CODE_BY_ID[product.baumann_id] ?? "",
+                    rating: product.rating ?? 0,
+                    review_count: product.review_count ?? 0,
+                    is_sold_out: product.is_sold_out ?? 0,
+                    mainPreview: thumbnail_image ?? "",
+                    detailPreview: detail_image ?? "",
+                    mainImage: null,
+                    detailImage: null
                 }));
             } catch (e) {
                 console.error(e);
-                alert("상품 정보를 불러오지 못했습니다.\n상품 ID: " + id);
+                alert("상품 정보를 불러오지 못했습니다.");
                 navigate("/admin/allproducts");
             } finally {
                 setLoading(false);
@@ -89,7 +88,6 @@ export default function AdminProductEdit() {
         load();
     }, [id, navigate]);
 
-    // input 변경 처리
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({
@@ -98,7 +96,6 @@ export default function AdminProductEdit() {
         }));
     };
 
-    // 이미지 선택 미리보기
     const onPickImage = (key, previewKey) => (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -112,7 +109,6 @@ export default function AdminProductEdit() {
         }));
     };
 
-    // 제출
     const onSubmit = async (e) => {
         e.preventDefault();
 
@@ -127,28 +123,28 @@ export default function AdminProductEdit() {
                 }
             }
 
-            // 이미지 변경 여부 확인 -> 변경 시 put/ images 호출
             if (form.mainImage || form.detailImage) {
                 await updateProductImages(id, form.mainImage, form.detailImage);
             }
 
-            // 상품 정보 patch
             const payload = {
-                prd_name: form.prd_name,
-                prd_brand: form.prd_brand,
-                ingredient: form.ingredient,
-                category: form.category,
-                price: Number(form.price),
-                stock: Number(form.stock),
-                description: form.description,
-                baumann_id,
-                is_sold_out: form.is_sold_out ?? 0, // 또는 0 고정
-                rating: form.rating ?? 0,
-                review_count: form.review_count ?? 0,
-                product_images: form.product_images ?? [],
+                product: {
+                    product_id: Number(id), // ID도 DTO 안에 포함
+                    prd_name: form.prd_name,
+                    prd_brand: form.prd_brand,
+                    ingredient: form.ingredient,
+                    category: form.category,
+                    price: Number(form.price),
+                    stock: Number(form.stock),
+                    description: form.description,
+                    baumann_id: baumann_id,
+                    is_sold_out: form.is_sold_out ?? 0,
+                    rating: form.rating ?? 0,
+                    review_count: form.review_count ?? 0
+                },
+                thumbnail_image: form.mainPreview,
+                detail_image: form.detailPreview
             };
-
-            console.log("PATCH PAYLOAD", payload);
 
             await updateProduct(id, payload);
 
@@ -175,10 +171,8 @@ export default function AdminProductEdit() {
         <Wrap>
             <Inner>
                 <Title>상품 수정</Title>
-
                 <form onSubmit={onSubmit}>
                     <Panel>
-
                         <Row>
                             <Label>상품명</Label>
                             <Input
@@ -188,7 +182,6 @@ export default function AdminProductEdit() {
                                 placeholder="상품명을 입력해주세요."
                             />
                         </Row>
-
                         <Row>
                             <Label>성분</Label>
                             <TextArea
@@ -198,18 +191,6 @@ export default function AdminProductEdit() {
                                 placeholder="성분을 입력해주세요."
                             />
                         </Row>
-
-                        <Row>
-                            <Label>상세 설명</Label>
-                            <TextArea
-                                name="description"
-                                value={form.description}
-                                onChange={onChange}
-                                placeholder="상세 설명을 입력해주세요."
-                            />
-                        </Row>
-
-                        {/* 대표 사진 */}
                         <Row>
                             <Label>대표 사진</Label>
                             <ImageBox>
@@ -229,8 +210,6 @@ export default function AdminProductEdit() {
                                 />
                             </ImageBox>
                         </Row>
-
-                        {/* 상세 사진 */}
                         <Row>
                             <Label>상세 사진</Label>
                             <ImageBox>
@@ -250,8 +229,6 @@ export default function AdminProductEdit() {
                                 />
                             </ImageBox>
                         </Row>
-
-                        {/* 브랜드/카테고리 */}
                         <Row>
                             <Label>브랜드 / 카테고리</Label>
                             <div style={{ flex: 1, display: "flex", gap: "12px" }}>
@@ -269,8 +246,6 @@ export default function AdminProductEdit() {
                                 />
                             </div>
                         </Row>
-
-                        {/* 가격/재고 */}
                         <Row>
                             <Label>가격 / 재고</Label>
                             <div style={{ flex: 1, display: "flex", gap: "12px" }}>
@@ -292,8 +267,6 @@ export default function AdminProductEdit() {
                                 />
                             </div>
                         </Row>
-
-                        {/* 바우만 타입 */}
                         <Row>
                             <Label>Baumann 타입</Label>
                             <div style={{ flex: 1 }}>
@@ -309,7 +282,6 @@ export default function AdminProductEdit() {
                             </div>
                         </Row>
                     </Panel>
-
                     <FooterRow>
                         <SubmitBtn type="submit">상품 수정</SubmitBtn>
                     </FooterRow>

@@ -75,22 +75,18 @@ public class ImageService {
     }
 
     //전달받은 objectKey 상품 이미지 테이블에 저장하기
-    public void saveProductImageObjectKey(int product_id, List<String> objectKeyList, String thumbnail_objectKey) {
-        if(!objectKeyList.contains(thumbnail_objectKey)){
-            throw new WrongRequestException("썸네일 이미지가 이미지 목록에 포함되어 있지 않습니다.");
-        }
+    public void saveProductImageObjectKey(int product_id, String thumbnail_image, String detail_image) {
+       if(thumbnail_image == null || detail_image == null){
+           throw new WrongRequestException("이미지 정보가 올바르지 않습니다.");
+       }
 
-        for(String objectKey : objectKeyList){
-
-            String isThumbnail = (objectKey.equals(thumbnail_objectKey)) ? "Y" : "N";
-
-            int result = imageMapper.insertProductObjectKey(product_id, objectKey, isThumbnail);
-            if(result == 0){
-                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
-            }
+        int result = imageMapper.insertProductObjectKey(product_id, thumbnail_image, detail_image);
+        if(result == 0){
+            throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
         }
     }
 
+    //전달받은 objectKey 리뷰 이미지 테이블에 저장하기
     public void saveReviewImageObjectKey(int review_id, List<String> objectKeyList) {
         for(String objectKey : objectKeyList){
             int result = imageMapper.insertReviewObjectKey(review_id, objectKey);
@@ -103,7 +99,7 @@ public class ImageService {
 
 
 
-    // presigned post URL 생성
+    // 파일을 업로드하고 FE에 presigned URL과 object key 반환
     private Map<String, Object> presignedUrlPost(String folder, String file_name) {
 
         String ext = "";
@@ -134,6 +130,21 @@ public class ImageService {
         }
     }
 
+    // 업로드용
+    public String presignedUrlUpload(String objectKey) {
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.PUT) // ★ 핵심: 쓰기 권한 (PUT)
+                            .bucket(minioProperties.getBucket())
+                            .object(objectKey)
+                            .expiry(60 * 5)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("업로드 URL 생성 실패", e);
+        }
+    }
 
     // 조회 시 objectKey → presigned GET URL 변환
     public String presignedUrlGet(String objectKey) {

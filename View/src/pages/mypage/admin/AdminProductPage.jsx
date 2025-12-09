@@ -30,10 +30,9 @@ const getProductName = (p) =>
 
 // 썸네일 추출
 const getThumbnail = (p) => {
-    if (Array.isArray(p.product_images) && p.product_images.length > 0) {
-        return p.product_images[0];
+    if (p.thumbnail_url) {
+        return p.thumbnail_url;
     }
-    if (p.imageUrl) return p.imageUrl;
     return null;
 };
 
