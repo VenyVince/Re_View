@@ -1,6 +1,4 @@
 import axiosClient from "../axiosClient";
-import axios from "axios";
-
 
 /* 공통 에러 핸들러 */
 async function safeRequest(promise) {
@@ -13,14 +11,6 @@ async function safeRequest(promise) {
     }
 }
 
-export const getPresignedUrl = async (fileName) => {
-    // 백엔드 컨트롤러: GET /api/admin/products/presigned-url?fileName=...
-    const response = await axios.post(`/api/images/products/presigned-urls`, {
-        params: { fileName }
-    });
-    return response.data; // { presignedUrl: "...", fileUrl: "..." } 형태
-};
-
 /* 전체 상품 조회 */
 export const fetchAdminProducts = async () =>
     safeRequest(axiosClient.get("/api/admin/allproducts"));
@@ -28,7 +18,7 @@ export const fetchAdminProducts = async () =>
 /* 단일 상품 조회 */
 export const fetchAdminProduct = async (productId) => {
     const data = await safeRequest(
-        axiosClient.get(`/api/admin/products/find/${productId}`)
+        axiosClient.get(`/api/admin/products/${productId}`)
     );
 
     return {

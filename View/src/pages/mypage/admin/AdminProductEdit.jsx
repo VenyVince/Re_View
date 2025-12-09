@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import {
     Wrap, Inner, Title, Panel, Row, Label, Input,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper
 } from "./adminProductEdit.style";
-import { updateProduct, fetchAdminProduct, getPresignedUrl } from "../../../api/admin/adminProductApi";
+import { updateProduct, fetchAdminProduct, updateProductImages } from "../../../api/admin/adminProductApi";
 
 const BAUMANN_ID_MAP = {
     DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
@@ -124,32 +123,13 @@ export default function AdminProductEdit() {
                 }
             }
 
-            let finalMainKey = form.mainPreview;
-            let finalDetailKey = form.detailPreview;
-
-            if (form.mainImage) {
-                const data = await getPresignedUrl(form.mainImage.name);
-
-                await axios.put(data.presignedUrl, form.mainImage, {
-                    headers: { "Content-Type": form.mainImage.type }
-                });
-
-                finalMainKey = data.objectKey;
-            }
-
-            if (form.detailImage) {
-                const data = await getPresignedUrl(form.detailImage.name);
-
-                await axios.put(data.presignedUrl, form.detailImage, {
-                    headers: { "Content-Type": form.detailImage.type }
-                });
-
-                finalDetailKey = data.objectKey;
+            if (form.mainImage || form.detailImage) {
+                await updateProductImages(id, form.mainImage, form.detailImage);
             }
 
             const payload = {
                 product: {
-                    product_id: Number(id),
+                    product_id: Number(id), // ID도 DTO 안에 포함
                     prd_name: form.prd_name,
                     prd_brand: form.prd_brand,
                     ingredient: form.ingredient,
@@ -162,8 +142,8 @@ export default function AdminProductEdit() {
                     rating: form.rating ?? 0,
                     review_count: form.review_count ?? 0
                 },
-                thumbnail_image: finalMainKey,
-                detail_image: finalDetailKey
+                thumbnail_image: form.mainPreview,
+                detail_image: form.detailPreview
             };
 
             await updateProduct(id, payload);
