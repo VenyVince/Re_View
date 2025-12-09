@@ -11,4 +11,7 @@ public class WishlistDTO {
     private String prd_name;
     private String prd_brand;
     private int price;
+
+    private String image_url;
+    private String product_thumbnail_url;
 }
