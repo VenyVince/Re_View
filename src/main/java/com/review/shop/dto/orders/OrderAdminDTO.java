@@ -9,5 +9,6 @@ public class OrderAdminDTO {
     private String order_status;
     private String order_no;
     private String delivery_num;
+    private String created_at;
     private Integer order_id;
 }

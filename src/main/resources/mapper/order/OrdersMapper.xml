@@ -93,4 +93,20 @@
         SELECT * FROM DUAL
     </insert>
 
+    <select id="findByOrderNoContainingOrDeliveryNumContaining"
+            resultType="com.review.shop.dto.orders.OrderAdminDTO">
+        SELECT
+            u.name as user_name,
+            o.created_at,
+            o.total_price,
+            o.order_status,
+            o.order_no,
+            o.order_id,
+            o.delivery_num
+        FROM orders o
+                 INNER JOIN user_table u ON o.user_id = u.user_id
+        WHERE o.order_no LIKE '%' || #{keyword} || '%'
+           OR o.delivery_num LIKE '%' || #{keyword1} || '%'
+    </select>
+
 </mapper>

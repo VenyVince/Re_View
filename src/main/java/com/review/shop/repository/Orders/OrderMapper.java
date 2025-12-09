@@ -1,5 +1,6 @@
 package com.review.shop.repository.Orders;
 
+import com.review.shop.dto.orders.OrderAdminDTO;
 import com.review.shop.dto.orders.OrderCheckoutProductInfoDTO;
 import com.review.shop.dto.orders.OrderItemDTO;
 import com.review.shop.dto.orders.OrderSaveDTO;
@@ -47,5 +48,6 @@ import java.util.List;
         void insertOrderItems(List<OrderItemDTO> orderItems);
 
 
-    }
+    List<OrderAdminDTO> findByOrderNoContainingOrDeliveryNumContaining(String keyword, String keyword1);
+}
 
