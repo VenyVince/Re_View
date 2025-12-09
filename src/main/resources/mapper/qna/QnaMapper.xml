@@ -27,6 +27,7 @@
         FROM qna q
         JOIN USER_TABLE u ON q.user_id = u.user_id
         WHERE q.qna_id = #{qna_id}
+        AND q.deleted_at IS NULL
     </select>
 
     <insert id="insertQna" parameterType="com.review.shop.dto.qna.QnaDTO">
@@ -67,7 +68,7 @@
         FROM qna q
         JOIN product p ON q.product_id = p.product_id
         WHERE q.user_id = #{user_id}
-        ORDER BY q.created_at DESC
+        AND q.deleted_at IS NULL  ORDER BY q.created_at DESC
     </select>
 
 </mapper>
