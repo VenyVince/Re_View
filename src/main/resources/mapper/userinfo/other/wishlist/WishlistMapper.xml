@@ -4,48 +4,50 @@
 
 <mapper namespace="com.review.shop.repository.userinfo.user_related.WishlistMapper">
 
-    <!-- 기존 getWishlist 유지 -->
     <select id="getWishlist" parameterType="int" resultType="com.review.shop.dto.userinfo.user_related.wishlist.WishlistDTO">
         SELECT
-            w.WISH_ITEM_ID   AS wish_item_id,
-            w.USER_ID        AS user_id,
-            w.PRODUCT_ID     AS product_id,
-            p.PRD_NAME       AS prd_name,
-            p.PRD_BRAND      AS prd_brand,
-            p.PRICE          AS price
+        w.WISH_ITEM_ID   AS wish_item_id,
+        w.USER_ID        AS user_id,
+        w.PRODUCT_ID     AS product_id,
+        p.PRD_NAME       AS prd_name,
+        p.PRD_BRAND      AS prd_brand,
+        p.PRICE          AS price,
+        pi.IMAGE_URL
         FROM WISH_ITEM w
-                 JOIN PRODUCT p ON w.PRODUCT_ID = p.PRODUCT_ID
+        JOIN PRODUCT p ON w.PRODUCT_ID = p.PRODUCT_ID
+
+        LEFT JOIN PRODUCT_IMAGE pi
+        ON p.PRODUCT_ID = pi.PRODUCT_ID
+        AND pi.IS_THUMBNAIL = 'Y'
+
         WHERE w.USER_ID = #{user_id}
-          and p.deleted_at is null
+        AND p.deleted_at IS NULL
         ORDER BY w.WISH_ITEM_ID DESC
     </select>
 
-    <!-- 이미 찜했는지 확인 -->
     <select id="existsWishlistItem" resultType="boolean">
         SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
         FROM WISH_ITEM w
-                 JOIN PRODUCT p ON p.PRODUCT_ID = w.PRODUCT_ID
+        JOIN PRODUCT p ON p.PRODUCT_ID = w.PRODUCT_ID
         WHERE w.USER_ID = #{user_id}
-          AND w.PRODUCT_ID = #{product_id}
-          AND p.DELETED_AT IS NULL
+        AND w.PRODUCT_ID = #{product_id}
+        AND p.DELETED_AT IS NULL
     </select>
 
-    <!-- 찜 등록 -->
     <insert id="insertWishlistItem">
         INSERT INTO WISH_ITEM (USER_ID, PRODUCT_ID)
         VALUES (#{user_id}, #{product_id})
     </insert>
 
-    <!-- 찜 삭제 -->
     <delete id="deleteWishlistItem">
         DELETE FROM WISH_ITEM w
         WHERE w.USER_ID = #{user_id}
-          AND w.PRODUCT_ID = #{product_id}
-          AND EXISTS (
-            SELECT 1
-            FROM PRODUCT p
-            WHERE p.PRODUCT_ID = w.PRODUCT_ID
-              AND p.DELETED_AT IS NULL
+        AND w.PRODUCT_ID = #{product_id}
+        AND EXISTS (
+        SELECT 1
+        FROM PRODUCT p
+        WHERE p.PRODUCT_ID = w.PRODUCT_ID
+        AND p.DELETED_AT IS NULL
         )
     </delete>
 
