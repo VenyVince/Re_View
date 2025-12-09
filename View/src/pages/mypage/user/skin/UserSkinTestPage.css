@@ -28,29 +28,58 @@
     margin-bottom: 28px;
 }
 
+/* 내부 정렬 */
+.skin-current-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* "나의 바우만 타입" 타이틀 */
 .skin-current-label {
-    font-size: 14px;
-    opacity: 0.8;
-    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
 }
 
-.skin-current-type {
-    font-size: 36px;
-    font-weight: 800;
-    margin-top: 12px;
-    letter-spacing: 0.12em;
+/* 배지 블록을 가운데 배치 */
+.skin-current-main {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
 }
 
+/* 이미지 + 코드 카드 블록 */
+.skin-current-badge-block {
+    display: flex;
+    flex-direction: column;   /* 이미지 위, 텍스트 아래 */
+    align-items: center;
+    justify-content: center;
+    padding: 24px 40px;
+    border-radius: 24px;
+    background-color: #1c1c1c;  /* 살짝 밝은 블록 */
+    gap: 12px;
+}
+
+/* 배지 이미지 크기 */
 .skin-current-badge {
-    height: 60px;
-    margin: 0 auto 12px;
+    width: 80px;
+    object-fit: contain;
 }
 
+/* DRPW 같은 바우만 코드 텍스트 */
+.skin-current-type {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
+/* 설명 문구 */
 .skin-current-desc {
-    font-size: 13px;
-    line-height: 1.7;
-    opacity: 0.9;
-    margin-top: 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ccc;
 }
 
 /* ================================

@@ -42,41 +42,35 @@ export default function UserSkinTestPage() {
     const [surveyIndex, setSurveyIndex] = useState(0);
 
     // === 1. 유저 정보에서 현재 바우만 타입 불러오기 ===
+// === 1. 유저 정보에서 현재 바우만 타입 불러오기 ===
     useEffect(() => {
-        const fetchMe = async () => {
+        const fetchUserType = async () => {
             try {
-                const res = await axios.get("/api/users/me", {
+                const res = await axios.get("/api/auth/my-baumann-type", {
                     withCredentials: true,
                 });
 
-                //console.log("[/api/users/me] 응답:", res.data);  // 🔥 여기 추가
+                console.log("바우만 타입 응답:", res.data);
 
-                const { baumann_id, baumann_type } = res.data;
-
-                let code = null;
-
-                // 1순위: 서버가 코드(DRNT, DSNT...)를 직접 내려주는 경우
-                if (baumann_type) {
-                    code = baumann_type;
-                }
-                // 2순위: id만 내려오는 경우 → 우리가 매핑해서 코드로 변환
-                else if (baumann_id != null && BAUMANN_CODE_BY_ID[baumann_id]) {
-                    code = BAUMANN_CODE_BY_ID[baumann_id];
+                // 서버가 코드(DRNT, DSPT 등)를 문자열로 내려주는 경우
+                if (typeof res.data === "string" && res.data.length > 0) {
+                    setMyType(res.data);
+                    setSelectedType(res.data);
+                } else {
+                    // 응답이 null, 빈문자열, 다른형태일 때
+                    setMyType(null);
+                    setSelectedType(null);
                 }
 
-                console.log("해석된 바우만 코드:", code); // 이 값도 확인
-
-                setMyType(code);
-                setSelectedType(code);
-            } catch (e) {
-                console.error("내 정보 조회 실패 (바우만 타입):", e);
+            } catch (err) {
+                console.error("바우만 타입 조회 실패:", err);
+                setMyType(null);
+                setSelectedType(null);
             }
         };
 
-        fetchMe();
+        fetchUserType();
     }, []);
-
-    // === 2. 설문 질문 펼치기 ===
     const flatQuestions = useMemo(
         () =>
             SECTIONS.flatMap((sec) =>
@@ -182,13 +176,13 @@ export default function UserSkinTestPage() {
                         <h4 className="skin-current-label">나의 바우만 타입</h4>
                         <div className="skin-current-main">
                             {currentBadge && (
-                                <img
-                                    src={currentBadge}
-                                    alt={myType || "바우만 타입"}
-                                    className="skin-current-badge"
-                                />
+                                <div className="skin-current-badge-block">
+                                    <img src={currentBadge} alt={myType || "바우만 타입"} className="skin-current-badge"/>
+                                    <span className="skin-current-type">
+                                        {myType || "미설정"}
+                                    </span>
+                                </div>
                             )}
-                            <span className="skin-current-type">{myType || "미설정"}</span>
                         </div>
                         <p className="skin-current-desc">
                             현재 저장된 피부 타입입니다. 피부 상태가 달라졌다면 아래 테스트를 다시

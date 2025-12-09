@@ -1,0 +1,84 @@
+.point-history-section {
+    margin-top: 16px;
+}
+
+.point-history-summary {
+    padding: 16px 20px;
+    border-radius: 8px;
+    background-color: #f7f7fb;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.point-history-total-label {
+    font-size: 13px;
+    color: #777;
+}
+
+.point-history-total-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111;
+}
+
+.point-history-summary-desc {
+    font-size: 12px;
+    color: #999;
+}
+
+.point-history-message {
+    font-size: 14px;
+    color: #666;
+    padding: 8px 2px;
+}
+
+.point-history-error {
+    color: #d32f2f;
+}
+
+.point-history-table-wrapper {
+    border-radius: 8px;
+    border: 1px solid #e5e5ec;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.point-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.point-history-table thead {
+    background-color: #f3f3f7;
+}
+
+.point-history-table th,
+.point-history-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.point-history-table th {
+    font-weight: 500;
+    color: #555;
+}
+
+.point-history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ph-amount {
+    font-weight: 600;
+}
+
+.ph-amount-use {
+    color: #d32f2f; /* 사용(차감) - 빨간 계열 */
+}
+
+.ph-amount-earn {
+    color: #2e7d32; /* 적립(증가) - 초록 계열 */
+}

@@ -92,24 +92,6 @@ export default function UserMyReviewPage() {
         }
     };
 
-    // 백엔드에 수정/삭제 가능 여부 확인 요청
-    const checkCanUpdate = async (reviewId) => {
-        try {
-            const res = await axios.get("/api/reviews/exists/update", {
-                data: reviewId,
-                withCredentials: true,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            const body = res.data || {};
-            return !!(body.canUpdate ?? body.can_update);
-        } catch (e) {
-            console.error("리뷰 수정/삭제 가능 여부 확인 오류:", e);
-            return false;
-        }
-    };
 
     useEffect(() => {
         // 초기 진입 시 기본 조건으로 한 번 조회
@@ -135,9 +117,8 @@ export default function UserMyReviewPage() {
             return;
         }
 
-        // 백엔드에 실제로 삭제 가능 여부 확인
-        const allowed = await checkCanUpdate(review.review_id);
-        if (!allowed) {
+        // 프론트에서 내려받은 canUpdate 플래그로만 삭제 가능 여부 확인
+        if (!review.canUpdate) {
             alert("이 리뷰는 삭제 권한이 없습니다.");
             return;
         }
@@ -177,9 +158,8 @@ export default function UserMyReviewPage() {
             return;
         }
 
-        // 백엔드에 실제로 수정 가능 여부 확인
-        const allowed = await checkCanUpdate(review.review_id);
-        if (!allowed) {
+        // 프론트에서 내려받은 canUpdate 플래그로만 수정 가능 여부 확인
+        if (!review.canUpdate) {
             alert("이 리뷰는 수정 권한이 없습니다.");
             return;
         }

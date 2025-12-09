@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../../../context/AuthContext";
-import { useNavigate } from "react-router-dom";   // ✅ 추가
+import { useNavigate } from "react-router-dom";
 import "../dashboard/UserDashboard.css";
 
 export default function UserProfileBar() {
     const { auth } = useAuth();
-    const navigate = useNavigate();              // ✅ 추가
+    const navigate = useNavigate();
 
     const [nickname, setNickname] = useState(auth.userId || "회원");
     const [points, setPoints] = useState(0);
@@ -30,10 +30,7 @@ export default function UserProfileBar() {
                 } else if (auth.userId) {
                     setNickname(auth.userId);
                 }
-
-                if (typeof info?.point === "number") {
-                    setPoints(info.point);
-                }
+                // 포인트 계산 로직 제거됨
             } catch (e) {
                 console.error("/api/users/me 조회 실패:", e);
                 if (auth.userId) setNickname(auth.userId);
@@ -41,6 +38,27 @@ export default function UserProfileBar() {
         }
 
         fetchMe();
+    }, [auth.userId]);
+
+    useEffect(() => {
+        async function fetchPoint() {
+            try {
+                const res = await axios.get("/api/users/me/points", {
+                    withCredentials: true,
+                });
+
+                // 컨트롤러가 Integer 하나만 리턴하므로 그대로 사용
+                const totalPoint =
+                    typeof res.data === "number" ? res.data : Number(res.data) || 0;
+
+                setPoints(totalPoint);
+            } catch (e) {
+                console.error("/api/users/me/points 조회 실패:", e);
+                setPoints(0);
+            }
+        }
+
+        fetchPoint();
     }, [auth.userId]);
 
     return (
@@ -55,15 +73,19 @@ export default function UserProfileBar() {
             </div>
 
             <div className="mypage-profile-right">
-                <div className="mypage-profile-point">
-                    <span className="label">보유 포인트</span>
+                <div
+                    className="mypage-profile-point"
+                    onClick={() => navigate("/mypage/points")}
+                >
+                    <span className="label">보유 포인트 </span>
                     <span className="value">
-                        {points.toLocaleString()} <span className="unit">원</span>
+                        {points.toLocaleString()}{""}
+                        <span className="unit">원</span>
                     </span>
                 </div>
                 <button
                     className="mypage-profile-edit-btn"
-                    onClick={() => navigate("/mypage/profile")}   // ✅ 여기만 변경
+                    onClick={() => navigate("/mypage/profile")}
                 >
                     개인정보변경
                 </button>
