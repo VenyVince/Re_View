@@ -9,6 +9,20 @@ import {
     RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,} from "./ReviewWrite.style";
 import ProductSelectModal from "./components/ProductSelectModal";
 
+// 날짜 자르기
+function formatDate(dateString) {
+    if (!dateString) return "";
+
+    const d = new Date(dateString);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
+
 const ReviewWrite = () => {
     const navigate = useNavigate();
     const { product_id } = useParams();
@@ -103,8 +117,6 @@ const ReviewWrite = () => {
         }
     };
 
-
-
     return (
         <Wrap>
             <Inner>
@@ -151,13 +163,13 @@ const ReviewWrite = () => {
                                             <ProductTop>
                                                 <div className="left-info">
                                                     <ProductName>{selectedProduct.product_name}</ProductName>
-                                                    <PriceText>
-                                                        ₩{selectedProduct.product_price.toLocaleString()}
+                                                    <PriceText style={{paddingLeft:"10px"}}>
+                                                        {selectedProduct.product_price.toLocaleString()}원
                                                     </PriceText>
                                                 </div>
 
-                                                <PurchaseDate>
-                                                    구매 날짜 {selectedProduct.purchase_date}
+                                                <PurchaseDate style={{paddingLeft:"10px"}}>
+                                                    구매 날짜 {formatDate(selectedProduct.purchase_date)}
                                                 </PurchaseDate>
                                             </ProductTop>
 

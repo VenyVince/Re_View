@@ -7,13 +7,27 @@ import {
     checkReviewExists,
 } from "../../../api/review/reviewApi";
 
+// 날짜 자르기
+function formatDate(dateString) {
+    if (!dateString) return "";
+
+    const d = new Date(dateString);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
+
 const PAGE_SIZE = 5;
 
 const ProductSelectModal = ({ onClose, onSelect }) => {
     const [items, setItems] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [page, setPage] = useState(1);
-    const [filterType, setFilterType] = useState("ALL"); // ALL | NOT_WRITTEN | DONE
+    const [filterType, setFilterType] = useState("NOT_WRITTEN"); // 미작성만 띄움
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -57,7 +71,7 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
             );
 
             setItems(withStatus);
-            applyFilter(filterType, withStatus);
+            applyFilter(withStatus);
         } catch (error) {
             console.error(error);
             alert("구매한 상품을 불러오지 못했습니다.");
@@ -66,23 +80,16 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
         }
     }
 
-    // 필터 적용
-    const applyFilter = (type, baseList = items) => {
-        let result = baseList;
-
-        if (type === "NOT_WRITTEN") {
-            result = baseList.filter((i) => i.canCreate === true);
-        } else if (type === "DONE") {
-            result = baseList.filter((i) => i.canCreate === false);
-        }
-
+    // 미작성만 남겨두기
+    const applyFilter = (baseList = items) => {
+        const result = baseList.filter((i) => i.canCreate === true); // 미작성만
         setFiltered(result);
         setPage(1);
     };
 
     useEffect(() => {
-        applyFilter(filterType);
-    }, [filterType]);
+        applyFilter();
+    }, []);
 
     const startIndex = (page - 1) * PAGE_SIZE;
     const paginated = filtered.slice(startIndex, startIndex + PAGE_SIZE);
@@ -91,28 +98,6 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
         <div className="modal-backdrop">
             <div className="modal-box">
                 <h2 className="modal-title">구매한 상품 선택</h2>
-
-                {/* 필터 */}
-                <div className="filter-tabs">
-                    <button
-                        className={filterType === "ALL" ? "active" : ""}
-                        onClick={() => setFilterType("ALL")}
-                    >
-                        전체
-                    </button>
-                    <button
-                        className={filterType === "NOT_WRITTEN" ? "active" : ""}
-                        onClick={() => setFilterType("NOT_WRITTEN")}
-                    >
-                        미작성
-                    </button>
-                    <button
-                        className={filterType === "DONE" ? "active" : ""}
-                        onClick={() => setFilterType("DONE")}
-                    >
-                        작성완료
-                    </button>
-                </div>
 
                 {/* 목록 */}
                 <div className="item-list">
@@ -135,7 +120,7 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
                                         ₩{item.product_price.toLocaleString()}
                                     </div>
                                     <div className="date">
-                                        구매 날짜 {item.purchase_date}
+                                        구매 날짜 {formatDate(item.purchase_date)}
                                     </div>
                                 </div>
 
