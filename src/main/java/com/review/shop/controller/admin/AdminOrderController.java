@@ -50,6 +50,7 @@ public class AdminOrderController {
                     content = @Content(schema = @Schema(implementation = OrderAdminDTO.class))
             ),
             @ApiResponse(responseCode = "400", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "404", description = "주문을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
