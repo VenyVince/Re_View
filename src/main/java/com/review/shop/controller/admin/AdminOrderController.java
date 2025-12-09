@@ -40,4 +40,5 @@ public class AdminOrderController {
         adminOrderService.updateOrderStatus(order_id, payload.get("orderStatus"));
         return ResponseEntity.ok("주문 상태가 변경되었습니다");
     }
+
 }
