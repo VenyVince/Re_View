@@ -156,7 +156,7 @@ public class AdminProductController {
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @GetMapping("/products/{product_id}")
+    @GetMapping("/products/find/{product_id}")
     public ResponseEntity<ProductUploadDTO> getProductImages(
             @Parameter(description = "조회할 상품의 ID") @PathVariable int product_id) {
         ProductUploadDTO productImages = adminProductService.getProductInfo(product_id);
