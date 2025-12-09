@@ -64,6 +64,7 @@ public class OrderController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "주문 처리 성공"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "404", description = "자원 없음 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
