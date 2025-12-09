@@ -50,6 +50,8 @@
 .bauman-type-text {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
     gap: 6px;
 }
 
@@ -80,8 +82,10 @@
     background: #f0f0f0;
 }
 
-.bauman-tag-all {
+.bauman-tag-btn.active-tag {
     background: #ffd966;
+    font-weight: 700;
+    color: #222;
 }
 
 /* (예전 아이콘 라인 제거) */
@@ -315,6 +319,10 @@
 }
 
 /* 오버레이 박스 */
+.overlay-container {
+    position: relative;
+}
+
 .overlay-lock {
     position: absolute;
     top: 50%;
@@ -325,7 +333,7 @@
     border-radius: 12px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 10;
+    z-index: 20;
 }
 
 .overlay-btn {
