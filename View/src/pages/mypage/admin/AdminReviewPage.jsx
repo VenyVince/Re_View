@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import {useNavigate} from "react-router-dom";
 import {
     Wrap, Inner, Content, TitleRow, Title, FilterRow, FilterLabel, FilterSelect, SearchInput,
     TableWrapper, ReviewTable, EmptyState, PickBadge, SmallButton, Pagination, PagerBtn, PageInfo,
@@ -21,6 +22,7 @@ export default function AdminReviewPage() {
 
     const [hasNext, setHasNext] = useState(false);
 
+    const navigate = useNavigate();
 
     // 리뷰 가져오기
     useEffect(() => {
@@ -189,7 +191,13 @@ export default function AdminReviewPage() {
                                     <tr key={r.id}>
                                         <td>{r.id}</td>
                                         <td>{r.reviewer}</td>
-                                        <td className="ellipsis">{r.content}</td>
+                                        <td
+                                            className="ellipsis"
+                                            style={{cursor:"pointer", color:"1971c2"}}
+                                            onClick={()=> navigate(`/review/${r.id}`)}
+                                        >
+                                            {r.content}
+                                        </td>
                                         <td>₩{(r.price ?? 0).toLocaleString()}</td>
                                         <td>{r.isPick ? <PickBadge>운영자 픽</PickBadge> : "-"}</td>
                                         <td>
