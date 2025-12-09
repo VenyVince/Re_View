@@ -1,5 +1,6 @@
 package com.review.shop.controller.admin;
 
+import com.review.shop.dto.orders.OrderAdminDTO;
 import com.review.shop.service.admin.AdminOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 @Tag(name = "Admin API", description = "관리자 주문 상태 관리 기능 API")
 @RestController
@@ -39,5 +41,20 @@ public class AdminOrderController {
             @RequestBody @Schema(example = "{\"orderStatus\": \"SHIPPED\"}") Map<String, String> payload) {
         adminOrderService.updateOrderStatus(order_id, payload.get("orderStatus"));
         return ResponseEntity.ok("주문 상태가 변경되었습니다");
+    }
+
+    //주문 조회
+    @Operation(summary = "주문 조회", description = "특정 주문의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "주문 조회 성공",
+                    content = @Content(schema = @Schema(implementation = OrderAdminDTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/getAllOrders")
+    public ResponseEntity<List<OrderAdminDTO>> getAllOrders() {
+        return ResponseEntity.ok(adminOrderService.getAllOrders());
     }
 }

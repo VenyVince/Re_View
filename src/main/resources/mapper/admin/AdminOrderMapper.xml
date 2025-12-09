@@ -8,4 +8,17 @@
         SET ORDER_STATUS = #{orderStatus}
         WHERE ORDER_ID = #{order_id}
     </update>
+    <select id="getAllOrders" resultType="com.review.shop.dto.orders.OrderAdminDTO">
+        SELECT
+            u.name as user_name,
+            o.total_price,
+            o.order_status,
+            o.order_no,
+            o.order_id,
+            o.delivery_num
+        FROM orders o
+                 INNER JOIN user_table u ON o.user_id = u.user_id
+        ORDER BY o.order_no DESC
+    </select>
+
 </mapper>

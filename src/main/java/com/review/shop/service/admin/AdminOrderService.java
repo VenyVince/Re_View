@@ -1,11 +1,14 @@
 package com.review.shop.service.admin;
 
+import com.review.shop.dto.orders.OrderAdminDTO;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminOrderMapper;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -23,5 +26,13 @@ public class AdminOrderService {
         if (affected == 0) {
             throw new ResourceNotFoundException("주문을 찾을 수 없습니다.");
         }
+    }
+
+    public List<OrderAdminDTO> getAllOrders() {
+        List<OrderAdminDTO> result = adminOrderMapper.getAllOrders();
+        if(result == null || result.isEmpty()){
+            throw new ResourceNotFoundException("조회된 주문이 없습니다.");
+        }
+        return result;
     }
 }
