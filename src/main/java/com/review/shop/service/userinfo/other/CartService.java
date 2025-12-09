@@ -4,6 +4,7 @@ import com.review.shop.dto.cart.CartitemRequestDTO;
 import com.review.shop.dto.cart.CartitemResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.userinfo.user_related.CartMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -16,14 +17,25 @@ import java.util.List;
 public class CartService {
 
     private final CartMapper cartMapper;
+    private final ImageService imageService;
 
-    // 장바구니 조회
     public List<CartitemResponseDTO> getCartItems(int user_id) {
         try {
             List<CartitemResponseDTO> cartItems = cartMapper.findCartItemsByUserId(user_id);
+
             if (cartItems.isEmpty()) {
                 throw new ResourceNotFoundException("장바구니에 담긴 상품이 없습니다.");
             }
+
+            for (CartitemResponseDTO item : cartItems) {
+                String objectKey = item.getImage_url();
+
+                if (objectKey != null && !objectKey.isEmpty()) {
+                    String imageUrl = imageService.presignedUrlGet(objectKey);
+                    item.setProduct_thumbnail_url(imageUrl);
+                }
+            }
+
             return cartItems;
         } catch (DataAccessException e) {
             throw new DatabaseException("장바구니 조회 중 DB 오류가 발생했습니다.", e);
