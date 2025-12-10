@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
     Wrap, Inner, Content, TitleRow, Title, FilterRow, LeftFilterGroup,
     RightSearchGroup, SearchInput, FilterSelect, TableWrapper, OrderTable, StatusBadge,
-    ActionButton, PaginationBox} from "./AdminOrderPage.style";
+    ActionButton, PaginationBox, FilterLabel} from "./AdminOrderPage.style";
 import OrderStatusModal from "./OrderStatusModal";
 import { searchOrders, updateOrderStatus } from "../../../api/admin/adminOrderApi";
 
@@ -152,6 +152,7 @@ export default function AdminOrderPage() {
 
                         {/* 왼쪽 : 상태/정렬 */}
                         <LeftFilterGroup>
+                            <FilterLabel>상태</FilterLabel>
                             <FilterSelect value={status} onChange={(e) => { setPage(1); setStatus(e.target.value); }}>
                                 <option value="all">전체</option>
                                 <option value="completed">주문완료</option>
@@ -159,6 +160,7 @@ export default function AdminOrderPage() {
                                 <option value="delivered">배송완료</option>
                             </FilterSelect>
 
+                            <FilterLabel>정렬</FilterLabel>
                             <FilterSelect value={sort} onChange={(e) => { setPage(1); setSort(e.target.value); }}>
                                 <option value="latest">최신순</option>
                                 <option value="oldest">오래된순</option>
@@ -168,7 +170,7 @@ export default function AdminOrderPage() {
                         {/* 오른쪽 : 검색 */}
                         <RightSearchGroup>
                             <SearchInput
-                                placeholder="주문번호 또는 운송장 번호 입력"
+                                placeholder="주문번호 입력"
                                 value={keyword}
                                 onChange={(e) => setKeyword(e.target.value)}
                             />
