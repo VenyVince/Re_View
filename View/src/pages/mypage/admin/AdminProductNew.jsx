@@ -1,15 +1,13 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { createProduct } from "../../../api/admin/adminProductApi"; // JSON 등록 API
-import axiosClient from "../../../api/axiosClient"; // 이미지 업로드에 필요
+import { createProduct } from "../../../api/admin/adminProductApi";
+import axiosClient from "../../../api/axiosClient";
 
 import {
     Wrap, Title, Panel, Row, Cell, Label, Input, Textarea,
     UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost
 } from "./AdminProductNew.style";
 
-
-// Baumann 코드 → ID 매핑표
 const BAUMANN_ID_MAP = {
     DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
     DRPW: 10, DRPT: 11, DRP_: 12, DRNW: 13, DRNT: 14, DRN_: 15, DR_W: 16, DR_T: 17, DR__: 18,
@@ -22,16 +20,15 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
-
 export default function AdminProductNew() {
     const nav = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // form 상태
     const [form, setForm] = useState({
         prdName: "",
         prdBrand: "",
         ingredient: "",
-        description: "",
+        // description 제거됨
         price: "",
         category: "",
         stock: "",
@@ -41,133 +38,150 @@ export default function AdminProductNew() {
     const onChange = (k) => (e) =>
         setForm((s) => ({ ...s, [k]: e.target.value }));
 
-
-    // 이미지 선택 관련
+    // --- 이미지 상태 관리 (대표 1장 / 상세 1장) ---
     const [mainFile, setMainFile] = useState(null);
     const [mainPreview, setMainPreview] = useState(null);
 
-    const [detailFiles, setDetailFiles] = useState([]);
-    const [detailPreviews, setDetailPreviews] = useState([]);
+    // 단일 파일로 관리
+    const [detailFile, setDetailFile] = useState(null);
+    const [detailPreview, setDetailPreview] = useState(null);
 
     const mainRef = useRef(null);
     const detailRef = useRef(null);
 
-
-    /** =========================
-     *   대표 이미지 선택
-     ==========================*/
+    // 대표 이미지 선택
     const onPickMain = () => mainRef.current?.click();
-
     const onMainChange = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setMainFile(file);
-
-        // 기존 미리보기 URL revoke
         if (mainPreview) URL.revokeObjectURL(mainPreview);
-
-        // 새 미리보기
         setMainPreview(URL.createObjectURL(file));
-
         e.target.value = "";
     };
 
-
-    /** =========================
-     *   상세 이미지 선택
-     ==========================*/
+    // 상세 이미지 선택
     const onPickDetail = () => detailRef.current?.click();
-
     const onDetailChange = (e) => {
-        const files = Array.from(e.target.files || []);
-        if (!files.length) return;
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        const key = (f) => `${f.name}-${f.size}-${f.lastModified}`;
-        const existing = new Set(detailFiles.map(key));
-
-        const filtered = files.filter((f) => !existing.has(key(f)));
-
-        setDetailFiles((prev) => [...prev, ...filtered]);
-        setDetailPreviews((prev) => [...prev, ...filtered.map((f) => URL.createObjectURL(f))]);
-
+        setDetailFile(file);
+        if (detailPreview) URL.revokeObjectURL(detailPreview);
+        setDetailPreview(URL.createObjectURL(file));
         e.target.value = "";
     };
 
-    const removeDetail = (idx) => {
-        setDetailFiles((prev) => prev.filter((_, i) => i !== idx));
-        setDetailPreviews((prev) => {
-            URL.revokeObjectURL(prev[idx]);
-            return prev.filter((_, i) => i !== idx);
-        });
-    };
-
-
-    /** =========================
-     *   이미지 업로드 API 호출
-     *   POST /api/images/products
-     ==========================*/
+    /**
+     * 이미지 업로드 로직
+     */
+    /**
+     * 이미지 업로드 로직 (수정됨: 단일 API 호출 방식)
+     */
     const uploadImages = async () => {
-        const fd = new FormData();
-
-        // 대표 이미지
-        if (mainFile) fd.append("images", mainFile);
-
-        // 상세 이미지들
-        detailFiles.forEach((file) => fd.append("images", file));
-
-        const res = await axiosClient.post("/api/images/products", fd);
-        return res.data; // ["url1", "url2", ...]
-    };
-
-
-    /** =========================
-     *   최종 상품 등록
-     *   POST /api/admin/products (JSON)
-     ==========================*/
-    const onSubmit = async (e) => {
-        e.preventDefault();
+        let thumbnailKey = null;
+        let detailKey = null;
 
         try {
-            // 1) Baumann 타입 → ID
-            const type = form.baumannType.trim().toUpperCase();
-            const baumannId = BAUMANN_ID_MAP[type] ?? null;
+            // 1. 대표 이미지 처리
+            if (mainFile) {
 
-            // 2) 이미지 업로드
-            const imageUrls = await uploadImages();
-            // 예: ["/uploads/products/aaa.jpg", "/uploads/products/bbb.jpg"]
+                // 우선 convert-data에 파일명만 보내서 presigned URL과 objectKey 받기
+                const res = await axiosClient.post(
+                    "/api/images/products/convert-data",
+                    { folder: "thumb", fileName: mainFile.name }
+                );
 
-            if (!imageUrls || imageUrls.length === 0) {
-                alert("이미지를 1장 이상 업로드해야 합니다.");
-                return;
+                // dto 형식: { objectKey: string, presignedUrl: string }
+                const { objectKey, presignedUrl } = res.data;
+
+                // 받은 presigned URL로 실제 파일 업로드
+                await fetch(presignedUrl, {
+                    method: "PUT",
+                    body: mainFile,
+                    headers: { "Content-Type": mainFile.type },
+                });
+
+                // db 저장용 key 저장
+                thumbnailKey = objectKey;
             }
 
-            // 대표 이미지 = 첫 번째 이미지
-            const thumbnailUrl = imageUrls[0];
+            // 2. 상세 이미지 처리
+            if (detailFile) {
+                // 위와 동일
+                const res = await axiosClient.post(
+                    "/api/images/products/convert-data",
+                    { folder: "desc", fileName: detailFile.name }
+                );
 
-            // 3) 최종 DTO 생성
+                const { objectKey, presignedUrl } = res.data;
+
+                await fetch(presignedUrl, {
+                    method: "PUT",
+                    body: detailFile,
+                    headers: { "Content-Type": detailFile.type },
+                });
+
+                detailKey = objectKey;
+            }
+
+            return { thumbnailKey, detailKey };
+
+        } catch (err) {
+            console.error("[이미지 업로드 오류]", err);
+            throw err;
+        }
+    };
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+
+        if (!mainFile) {
+            alert("대표 이미지는 필수입니다.");
+            return;
+        }
+        if (!detailFile) {
+            alert("상세 이미지는 필수입니다.");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const type = form.baumannType.trim().toUpperCase();
+            // baumann_id가 int형이므로, 매핑 안 되면 0(또는 기본값)으로 보내야 에러가 안남
+            const baumannId = BAUMANN_ID_MAP[type] ?? 0;
+
+            // 1. 이미지 업로드, key 받기
+            const { thumbnailKey, detailKey } = await uploadImages();
+
+            // 2. DTO 생성
             const dto = {
-                product_images_list: imageUrls, // 전체 이미지 배열
-
                 product: {
-                    product_id: 0,
+                    product_id: 0, // 신규 등록이라 0
                     prd_name: form.prdName.trim(),
                     prd_brand: form.prdBrand.trim(),
                     ingredient: form.ingredient.trim(),
-                    price: Number(form.price || 0),
+                    price: Number(form.price) || 0,
                     category: form.category.trim(),
-                    stock: Number(form.stock || 0),
+                    stock: Number(form.stock) || 0,
                     rating: 3.0,
-                    description: form.description.trim(),
+                    description: "",
                     review_count: 0,
-                    is_sold_out: 0,
                     baumann_id: baumannId,
+                    is_sold_out: 0
                 },
+                // (Java: thumbnail_image)
+                thumbnail_image: thumbnailKey,
 
-                thumbnailUrl: thumbnailUrl,
+                // (Java: detail_image)
+                detail_image: detailKey
             };
 
-            // 4) 상품 등록(JSON)
+            console.log("최종 전송 데이터:", dto); // 콘솔에서 확인 가능
+
             await createProduct(dto);
 
             alert("상품 등록 완료되었습니다.");
@@ -175,58 +189,36 @@ export default function AdminProductNew() {
 
         } catch (err) {
             console.error("[상품 등록 오류]", err);
-            alert("상품 등록에 실패했습니다.");
+            alert("상품 등록에 실패했습니다. (입력값을 확인해주세요)");
+        } finally {
+            setIsSubmitting(false);
         }
     };
-
 
     return (
         <Wrap>
             <Title>상품 등록</Title>
-
             <form onSubmit={onSubmit}>
                 <Panel>
-
-                    {/* 상품명 */}
                     <Row>
                         <Cell>
                             <Label>상품명</Label>
-                            <Input
-                                placeholder="상품명을 입력해주세요."
-                                value={form.prdName}
-                                onChange={onChange("prdName")}
-                            />
+                            <Input value={form.prdName} onChange={onChange("prdName")} />
                         </Cell>
                     </Row>
-
-                    {/* 성분 */}
                     <Row>
                         <Cell>
                             <Label>성분</Label>
-                            <Textarea
-                                placeholder="성분을 입력해주세요."
-                                value={form.ingredient}
-                                onChange={onChange("ingredient")}
-                            />
+                            <Textarea value={form.ingredient} onChange={onChange("ingredient")} />
                         </Cell>
                     </Row>
 
-                    {/* 상세 설명 */}
-                    <Row>
-                        <Cell>
-                            <Label>상세 설명</Label>
-                            <Textarea
-                                placeholder="상세 설명을 입력해주세요."
-                                value={form.description}
-                                onChange={onChange("description")}
-                            />
-                        </Cell>
-                    </Row>
+                    {/* 상세 설명(Description) Row 삭제됨 */}
 
-                    {/* 대표 이미지 */}
+                    {/* 대표 이미지 섹션 */}
                     <Row>
                         <Cell>
-                            <Label>대표 이미지</Label>
+                            <Label>대표 이미지 <span style={{color:'red', fontSize:'12px'}}>(필수)</span></Label>
                             <UploadBox>
                                 <Thumb>
                                     {mainPreview ? (
@@ -249,142 +241,67 @@ export default function AdminProductNew() {
                         </Cell>
                     </Row>
 
-
-                    {/* 상세 이미지 */}
+                    {/* 상세 이미지 섹션 */}
                     <Row>
                         <Cell>
-                            <Label>상세 이미지</Label>
+                            <Label>상세 이미지 <span style={{color:'red', fontSize:'12px'}}>(필수)</span></Label>
                             <UploadBox>
                                 <Thumb>
-                                    {detailPreviews.length
-                                        ? `${detailPreviews.length}장`
-                                        : "상세"}
+                                    {detailPreview ? (
+                                        <img src={detailPreview} alt="상세" style={{
+                                            width: "100%", height: "100%", objectFit: "cover"
+                                        }} />
+                                    ) : "상세"}
                                 </Thumb>
-
                                 <UploadBtn type="button" onClick={onPickDetail}>
                                     상세 사진 첨부 +
                                 </UploadBtn>
-
                                 <input
                                     type="file"
                                     ref={detailRef}
                                     hidden
                                     accept="image/*"
-                                    multiple
                                     onChange={onDetailChange}
                                 />
                             </UploadBox>
-
-                            {detailPreviews.length > 0 && (
-                                <div
-                                    style={{
-                                        display: "grid",
-                                        gridTemplateColumns: "repeat(4, 1fr)",
-                                        gap: 12,
-                                        marginTop: 12,
-                                    }}
-                                >
-                                    {detailPreviews.map((src, i) => (
-                                        <div key={i} style={{ position: "relative" }}>
-                                            <img
-                                                src={src}
-                                                style={{
-                                                    width: "100%",
-                                                    aspectRatio: "1/1",
-                                                    borderRadius: 8,
-                                                    objectFit: "cover",
-                                                }}
-                                            />
-
-                                            <button
-                                                type="button"
-                                                onClick={() => removeDetail(i)}
-                                                style={{
-                                                    position: "absolute",
-                                                    top: 6,
-                                                    right: 6,
-                                                    width: 24,
-                                                    height: 24,
-                                                    borderRadius: "50%",
-                                                    border: "1px solid #ccc",
-                                                    background: "#fff",
-                                                }}
-                                            >
-                                                ✕
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </Cell>
                     </Row>
 
-                    {/* 브랜드 + 카테고리 */}
                     <Row>
                         <Cell>
                             <Label>브랜드</Label>
-                            <Input
-                                value={form.prdBrand}
-                                onChange={onChange("prdBrand")}
-                                placeholder="브랜드명을 입력해주세요."
-                            />
+                            <Input value={form.prdBrand} onChange={onChange("prdBrand")} />
                         </Cell>
                         <Cell>
                             <Label>카테고리</Label>
-                            <Input
-                                value={form.category}
-                                onChange={onChange("category")}
-                                placeholder="예) 크림, 세럼..."
-                            />
+                            <Input value={form.category} onChange={onChange("category")} />
                         </Cell>
                     </Row>
-
-                    {/* 가격 + 재고 */}
                     <Row>
                         <Cell>
                             <Label>가격(원)</Label>
-                            <Input
-                                type="number"
-                                value={form.price}
-                                onChange={onChange("price")}
-                                placeholder="0"
-                            />
+                            <Input type="number" value={form.price} onChange={onChange("price")} />
                         </Cell>
                         <Cell>
                             <Label>재고 수량</Label>
-                            <Input
-                                type="number"
-                                value={form.stock}
-                                onChange={onChange("stock")}
-                                placeholder="0"
-                            />
+                            <Input type="number" value={form.stock} onChange={onChange("stock")} />
                         </Cell>
                     </Row>
-
-                    {/* Baumann 타입 */}
                     <Row>
                         <Cell>
                             <Label>Baumann 타입</Label>
-                            <Input
-                                value={form.baumannType}
-                                onChange={onChange("baumannType")}
-                                placeholder="예) DRNT, DSPW, OSNT..."
-                            />
-                            <p style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>
-                                * Baumann 피부 타입 코드 입력 시 ID로 자동 변환됩니다.
-                            </p>
+                            <Input value={form.baumannType} onChange={onChange("baumannType")} />
                         </Cell>
                     </Row>
-
                 </Panel>
-
                 <Actions>
-                    <Ghost type="button" onClick={() => nav(-1)}>
+                    <Ghost type="button" onClick={() => nav(-1)} disabled={isSubmitting}>
                         취소
                     </Ghost>
-                    <Primary type="submit">상품 등록</Primary>
+                    <Primary type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? "등록 중..." : "상품 등록"}
+                    </Primary>
                 </Actions>
-
             </form>
         </Wrap>
     );

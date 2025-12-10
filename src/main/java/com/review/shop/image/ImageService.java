@@ -1,5 +1,6 @@
 package com.review.shop.image;
 
+import com.review.shop.dto.image.ImageUrlResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.image.minio.MinioProperties;
@@ -75,22 +76,18 @@ public class ImageService {
     }
 
     //전달받은 objectKey 상품 이미지 테이블에 저장하기
-    public void saveProductImageObjectKey(int product_id, List<String> objectKeyList, String thumbnail_objectKey) {
-        if(!objectKeyList.contains(thumbnail_objectKey)){
-            throw new WrongRequestException("썸네일 이미지가 이미지 목록에 포함되어 있지 않습니다.");
-        }
+    public void saveProductImageObjectKey(int product_id, String thumbnail_image, String detail_image) {
+       if(thumbnail_image == null || detail_image == null){
+           throw new WrongRequestException("이미지 정보가 올바르지 않습니다.");
+       }
 
-        for(String objectKey : objectKeyList){
-
-            String isThumbnail = (objectKey.equals(thumbnail_objectKey)) ? "Y" : "N";
-
-            int result = imageMapper.insertProductObjectKey(product_id, objectKey, isThumbnail);
-            if(result == 0){
-                throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
-            }
+        int result = imageMapper.insertProductObjectKey(product_id, thumbnail_image, detail_image);
+        if(result == 0){
+            throw new DatabaseException("이미지 삽입에 실패했습니다.", null);
         }
     }
 
+    //전달받은 objectKey 리뷰 이미지 테이블에 저장하기
     public void saveReviewImageObjectKey(int review_id, List<String> objectKeyList) {
         for(String objectKey : objectKeyList){
             int result = imageMapper.insertReviewObjectKey(review_id, objectKey);
@@ -99,11 +96,7 @@ public class ImageService {
             }
         }
     }
-
-
-
-
-    // presigned post URL 생성
+    // 파일을 업로드하고 FE에 presigned URL과 object key 반환
     private Map<String, Object> presignedUrlPost(String folder, String file_name) {
 
         String ext = "";
@@ -134,6 +127,38 @@ public class ImageService {
         }
     }
 
+    // 위의 코드에서 return 타입을 DTO로 변경한 버전
+    // ImageUrlResponseDTO는 objectKey와 presignedUrl을 멤버로 가지는 DTO
+    public ImageUrlResponseDTO presignedUrlPostWithDTO(String folder, String file_name) {
+
+        String ext = "";
+        int idx = file_name.lastIndexOf(".");
+        if (idx != -1) {
+            ext = file_name.substring(idx);
+        }
+
+        String objectKey = folder + "/" + UUID.randomUUID() + ext;
+
+        try {
+            String url = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.PUT)
+                            .bucket(minioProperties.getBucket())
+                            .object(objectKey)
+                            .expiry(60 * 10) // 10분
+                            .build()
+            );
+
+            return ImageUrlResponseDTO.builder()
+                    .objectKey(objectKey)
+                    .presignedUrl(url)
+                    .build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Presigned URL 생성 실패: " + e.getMessage());
+        }
+    }
+
 
     // 조회 시 objectKey → presigned GET URL 변환
     public String presignedUrlGet(String objectKey) {
@@ -150,4 +175,6 @@ public class ImageService {
             throw new RuntimeException("[Minio] GET URL 생성 실패: " + e.getMessage());
         }
     }
+
+
 }

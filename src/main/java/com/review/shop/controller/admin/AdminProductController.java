@@ -24,7 +24,6 @@ public class AdminProductController {
 
     private final AdminProductService adminProductService;
 
-
     @Operation(summary = "전체 상품 목록 조회 (어드민용)", description = "어드민 페이지에서 사용할 전체 상품 목록을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 목록 조회 성공",
@@ -42,9 +41,7 @@ public class AdminProductController {
     }
 
 
-
-
-    @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다. 12/05 추가 : objectKey키를 모아서 한번에 product_images_list로 reqeust 하시면 됩니다.")
+    @Operation(summary = "상품 등록", description = "새로운 상품을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "상품 등록 성공"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류"),
@@ -63,10 +60,6 @@ public class AdminProductController {
                             name = "상품 등록 예시",
                             value = """
                 {
-                  "product_images_list": [
-                    "/uploads/products/33c01284-8085-4f34-83fe-9a5a0b38780a.jpg",
-                    "/uploads/products/e7ac40e4-44b0-4d1b-90c2-7e4ec095afda.jpg"
-                  ],
                   "product": {
                     "prd_name": "테스트상품입니다1111111111111111111",
                     "prd_brand": "이니스프리",
@@ -78,55 +71,36 @@ public class AdminProductController {
                     "baumann_id": 3,
                     "is_sold_out": "1"
                   },
-                  "thumbnailUrl": "/uploads/products/33c01284-8085-4f34-83fe-9a5a0b38780a.jpg"
+                  "thumbnail_image": "/uploads/products/33c01284-8085-4f34-83fe-9a5a0b38780a.jpg",
+                  "detail_image" : "/uploads/products/33c01284-8085-4f34-83fe-9a5a0b38780a.jpg"
                 }
                 """
                     )
             )
     )@RequestBody ProductUploadDTO productUploadDTO) {
 
-        ProductDetailDTO product = productUploadDTO.getProduct();
+        //상품 데이터만 있는 DTO 추출
+        ProductUpdateOnlyPrdInfoDTO product = productUploadDTO.getProduct();
 
-        // 이미지 리스트 유효성 검사
-        if(productUploadDTO.getProduct_images_list() == null || productUploadDTO.getProduct_images_list().isEmpty()) {
+        // 상세보기 이미지 검사
+        if(productUploadDTO.getDetail_image() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("상품 이미지는 최소 하나 이상 등록되어야 합니다.");
         }
-        // 썸네일 유효성 검사
-        if(productUploadDTO.getThumbnailUrl() == null || productUploadDTO.getThumbnailUrl().isEmpty()) {
+        // 썸네일 이미지 검사
+        if(productUploadDTO.getThumbnail_image() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("썸네일 이미지는 반드시 선택되어야 합니다.");
         }
 
-        // product DTO에 이미지 리스트 설정
-        product.setProduct_images(productUploadDTO.getProduct_images_list());
-
-
-        // product DTO 업로드, 썸네일 이미지 정보도 전송
-        adminProductService.uploadProductAndImages(product,productUploadDTO.getThumbnailUrl());
+        // product DTO 업로드, 상세보기 이미지와 썸네일을 함께 업로드
+        adminProductService.uploadProductAndImages(product,productUploadDTO.getThumbnail_image(),productUploadDTO.getDetail_image());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
-    }
-
-    @Operation(summary = "상품 수정", description = "기존 상품의 정보를 수정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "백엔드 오류")
-            ,
-            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
-                    content = @Content(schema = @Schema(implementation = String.class)))
-    })
-    @PatchMapping("/products/{product_id}")
-    public ResponseEntity<String> updateProduct(
-            @Parameter(description = "수정할 상품의 ID") @PathVariable int product_id,
-            @RequestBody ProductUpdateOnlyPrdInfoDTO product) {
-        adminProductService.updateProduct(product_id, product);
-        return ResponseEntity.ok("상품이 수정되었습니다");
     }
 
     @Operation(summary = "상품 삭제 (논리적)", description = "상품을 논리적으로 삭제합니다. (DELETED_DATE 설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "백엔드 오류")
-            ,
+            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
@@ -137,48 +111,54 @@ public class AdminProductController {
         return ResponseEntity.ok("상품이 삭제되었습니다");
     }
 
-    @Operation (summary = "상품 상세 조회", description = "특정 상품의 상세 정보를 조회합니다.")
+    @Operation(summary = "상품 수정", description = "상품의 정보 및 이미지를 수정합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "상품 상세 조회 성공",
-                    content = @Content(schema = @Schema(implementation = ProductDetailWithThumbnailDTO.class))
+            @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PatchMapping("/products/{product_id}")
+    public ResponseEntity<String> updateProduct(
+            @Parameter(description = "수정할 상품의 ID") @PathVariable int product_id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "수정할 상품 정보 및 이미지 경로",
+                    required = true,
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                {
+                                  "product": { ... },
+                                  "thumbnail_image": "...",
+                                  "detail_image": "..."
+                                }
+                                """)
+                    )
+            )
+            @RequestBody ProductUploadDTO productUploadDTO) {
+
+        // 서비스로직 호출 (서비스에 updateProduct 메서드가 필요합니다)
+        // product_id와 DTO 통째로 넘겨서 서비스에서 처리하도록 위임
+        adminProductService.updateProduct(product_id, productUploadDTO);
+
+        return ResponseEntity.ok("상품이 수정되었습니다.");
+    }
+
+    //이미지 데이터 가져오기
+    @Operation(summary = "상품 데이터 조회", description = "특정 상품의 데이터를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 데이터 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ProductUploadDTO.class))
             ),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "해당 상품을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
-    @GetMapping("/products/{product_id}")
-    public ResponseEntity<?> getProductDetail(
+    @GetMapping("/products/find/{product_id}")
+    public ResponseEntity<ProductUploadDTO> getProductImages(
             @Parameter(description = "조회할 상품의 ID") @PathVariable int product_id) {
-        ProductDetailWithThumbnailDTO detailDTO = adminProductService.getProductDetail(product_id);
-
-        detailDTO.setThumbnail_url(adminProductService.readImage(product_id));
-        return ResponseEntity.ok(detailDTO);
+        ProductUploadDTO productImages = adminProductService.getProductInfo(product_id);
+        return ResponseEntity.ok(productImages);
     }
-
-    //이미지 업데이트 API
-    @Operation(summary = "상품 이미지 업데이트", description = "상품의 이미지를 업데이트합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "상품 이미지 업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "백엔드 오류"),
-            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
-                    content = @Content(schema = @Schema(implementation = String.class)))
-    })
-    @PutMapping("/products/{product_id}/images")
-    public ResponseEntity<String> updateProductImages(
-            @Parameter(description = "이미지를 업데이트할 상품의 ID") @PathVariable int product_id,
-            @RequestBody ProductUpdateOnlyImageDTO productUpdateOnlyImageDTO) {
-        // 이미지 리스트 유효성 검사
-        if(productUpdateOnlyImageDTO.getProduct_images_list() == null || productUpdateOnlyImageDTO.getProduct_images_list().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("상품 이미지는 최소 하나 이상 등록되어야 합니다.");
-        }
-        // 썸네일 유효성 검사
-        if(productUpdateOnlyImageDTO.getThumbnailUrl() == null || productUpdateOnlyImageDTO.getThumbnailUrl().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("썸네일 이미지는 반드시 선택되어야 합니다.");
-        }
-        adminProductService.updateProductImages(product_id, productUpdateOnlyImageDTO.getProduct_images_list(), productUpdateOnlyImageDTO.getThumbnailUrl());
-        return ResponseEntity.ok("상품 이미지가 업데이트되었습니다");
-    }
-
-
 }

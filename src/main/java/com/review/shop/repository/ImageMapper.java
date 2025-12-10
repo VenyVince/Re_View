@@ -7,8 +7,8 @@ public interface ImageMapper {
 
     int insertProductObjectKey(
             @Param("product_id") int product_id,
-            @Param("objectKey") String objectKey,
-            @Param("is_thumbnail") String isThumbnail
+            @Param("thumbnail_image") String thumbnail_image,
+            @Param("detail_image") String detail_image
     );
 
     int insertReviewObjectKey(

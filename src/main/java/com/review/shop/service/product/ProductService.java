@@ -5,6 +5,7 @@ import com.review.shop.dto.common.PageResponse;
 import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.product.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ProductService {
 
     private final ProductMapper productMapper;
+    private final ImageService imageService;
 
     public PageResponse<ProductDTO> getProductList(int page, int size, String sort, String category) {
         // 유효성 검사
@@ -44,6 +46,15 @@ public class ProductService {
                 hasNext = true;
                 products.remove(size); // 확인용으로 가져온 마지막 데이터(21번째)는 삭제
             }
+
+            products = products.stream()
+                    .peek(product -> {
+                        if (product.getImage_url() != null && !product.getImage_url().isEmpty()) {
+                            String presignedUrl = imageService.presignedUrlGet(product.getImage_url());
+                            product.setImage_url(presignedUrl);
+                        }
+                    })
+                    .toList();
 
             // 결과 포장 및 반환
             return PageResponse.<ProductDTO>builder()

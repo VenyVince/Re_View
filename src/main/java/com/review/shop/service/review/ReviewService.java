@@ -6,6 +6,7 @@ import com.review.shop.dto.review.ReviewDetailResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.review.ReviewMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewMapper reviewMapper;
+    private final ImageService imageService;
 
     public PageResponse<ReviewDTO> getReviewList(int page, int size, String sort, String category) {
         // 유효성 검사
@@ -46,6 +48,15 @@ public class ReviewService {
                 hasNext = true;        // 9개가 왔으니 다음 페이지 있음
                 reviews.remove(size);  // 9번째 데이터는 확인했으니 삭제 (8개만 남김)
             }
+
+            reviews = reviews.stream()
+                    .peek(product -> {
+                        if (product.getImage_url() != null && !product.getImage_url().isEmpty()) {
+                            String presignedUrl = imageService.presignedUrlGet(product.getImage_url());
+                            product.setImage_url(presignedUrl);
+                        }
+                    })
+                    .toList();
 
             // 결과 포장 및 반환
             return PageResponse.<ReviewDTO>builder()
