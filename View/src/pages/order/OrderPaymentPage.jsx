@@ -54,7 +54,7 @@ export default function OrderPaymentPage() {
             setPointLoading(false);
         }
     };
-    const [showAddressPanel, setShowAddressPanel] = useState(false); // ✅ 패널 토글
+    const [showAddressPanel, setShowAddressPanel] = useState(false); // 패널 토글
     const [cardValid, setCardValid] = useState(false);
 
     // ======================
