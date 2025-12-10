@@ -1,6 +1,5 @@
 package com.review.shop.controller.admin;
 
-import com.review.shop.dto.qna.QnAListDTO;
 import com.review.shop.dto.qna.QnaAdminDTO;
 import com.review.shop.service.admin.AdminQnAService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -31,7 +31,7 @@ public class AdminQnAController {
             @ApiResponse(responseCode = "200", description = "QnA 목록 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = QnAListDTO.class))
+                            array = @ArraySchema(schema = @Schema(implementation = QnaAdminDTO.class))
                     )
             ),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
@@ -41,7 +41,7 @@ public class AdminQnAController {
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping("/qna")
-    public ResponseEntity<?> getAllQna() {
+    public ResponseEntity<List<QnaAdminDTO>> getAllQna() {
         return ResponseEntity.ok(adminQnAService.getAllQna());
 
     }

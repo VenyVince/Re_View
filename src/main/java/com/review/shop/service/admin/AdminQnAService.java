@@ -32,7 +32,7 @@ public class AdminQnAService {
     }
 
     //getAllQna 구현 - 전체 QnA 목록 조회, repository 실행
-    public List<QnAListDTO> getAllQna() {
+    public List<QnaAdminDTO> getAllQna() {
         return adminQnAMapper.getAllQna();
     }
 
