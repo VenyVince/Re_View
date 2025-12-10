@@ -43,8 +43,6 @@ public class AdminProductService {
         return products;
     }
 
-
-
     // 상품 등록
     public void insertOnlyProduct(ProductUpdateOnlyPrdInfoDTO product) {
         if (product == null) {
@@ -87,6 +85,8 @@ public class AdminProductService {
         imageService.saveProductImageObjectKey(prd_id, thumbnailUrl, detailImageUrl);
     }
 
+
+    //상품 정보 조회
     public ProductUploadDTO getProductInfo(int productId) {
         ProductUploadDTO prdInfo = adminProductMapper.getProductInfo(productId);
 
@@ -104,7 +104,7 @@ public class AdminProductService {
         prdInfo.setThumbnail_image(presignedThumbnailUrl);
 
         //상세보기 변환
-        String detailImageKey = adminProductMapper.readImage(productId);
+        String detailImageKey = prdInfo.getDetail_image();
         if (detailImageKey == null) {
             throw new ResourceNotFoundException("해당 상품의 상세 이미지를 찾을 수 없습니다.");
         }

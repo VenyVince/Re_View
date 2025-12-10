@@ -92,7 +92,7 @@ public class AdminProductController {
         }
 
         // product DTO 업로드, 상세보기 이미지와 썸네일을 함께 업로드
-        adminProductService.uploadProductAndImages(product, productUploadDTO.getDetail_image(), productUploadDTO.getThumbnail_image());
+        adminProductService.uploadProductAndImages(product,productUploadDTO.getThumbnail_image(),productUploadDTO.getDetail_image());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 등록되었습니다");
     }
@@ -110,7 +110,6 @@ public class AdminProductController {
         adminProductService.deleteProduct(product_id);
         return ResponseEntity.ok("상품이 삭제되었습니다");
     }
-
 
     @Operation(summary = "상품 수정", description = "상품의 정보 및 이미지를 수정합니다.")
     @ApiResponses(value = {

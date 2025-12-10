@@ -76,49 +76,54 @@ export default function AdminProductNew() {
     /**
      * 이미지 업로드 로직
      */
+    /**
+     * 이미지 업로드 로직 (수정됨: 단일 API 호출 방식)
+     */
     const uploadImages = async () => {
-        const allFiles = [];
-        if (mainFile) allFiles.push(mainFile);
-        if (detailFile) allFiles.push(detailFile);
-
-        if (allFiles.length === 0) return { thumbnailKey: null, detailKey: null };
+        let thumbnailKey = null;
+        let detailKey = null;
 
         try {
-            // 2. Presigned URL 요청
-            const fileNames = allFiles.map(f => f.name);
-            const urlResponse = await axiosClient.post(
-                "/api/images/products/presigned-urls",
-                fileNames
-            );
-
-            const presignedData = urlResponse.data;
-
-            // 3. MinIO 업로드 (PUT)
-            const uploadPromises = allFiles.map((file, index) => {
-                const data = presignedData[index];
-                return fetch(data.presignedUrl, {
-                    method: "PUT",
-                    body: file,
-                    headers: { "Content-Type": file.type },
-                });
-            });
-
-            const responses = await Promise.all(uploadPromises);
-            responses.forEach((res, idx) => {
-                if (!res.ok) throw new Error(`이미지 업로드 실패: ${allFiles[idx].name}`);
-            });
-
-            // 4. 키 추출
-            const allKeys = presignedData.map(item => item.objectKey);
-
-            let thumbnailKey = null;
-            let detailKey = null;
-
+            // 1. 대표 이미지 처리
             if (mainFile) {
-                thumbnailKey = allKeys[0];
-                if (detailFile) detailKey = allKeys[1];
-            } else {
-                if (detailFile) detailKey = allKeys[0];
+
+                // 우선 convert-data에 파일명만 보내서 presigned URL과 objectKey 받기
+                const res = await axiosClient.post(
+                    "/api/images/products/convert-data",
+                    { folder: "thumb", fileName: mainFile.name }
+                );
+
+                // dto 형식: { objectKey: string, presignedUrl: string }
+                const { objectKey, presignedUrl } = res.data;
+
+                // 받은 presigned URL로 실제 파일 업로드
+                await fetch(presignedUrl, {
+                    method: "PUT",
+                    body: mainFile,
+                    headers: { "Content-Type": mainFile.type },
+                });
+
+                // db 저장용 key 저장
+                thumbnailKey = objectKey;
+            }
+
+            // 2. 상세 이미지 처리
+            if (detailFile) {
+                // 위와 동일
+                const res = await axiosClient.post(
+                    "/api/images/products/convert-data",
+                    { folder: "desc", fileName: detailFile.name }
+                );
+
+                const { objectKey, presignedUrl } = res.data;
+
+                await fetch(presignedUrl, {
+                    method: "PUT",
+                    body: detailFile,
+                    headers: { "Content-Type": detailFile.type },
+                });
+
+                detailKey = objectKey;
             }
 
             return { thumbnailKey, detailKey };
@@ -146,10 +151,10 @@ export default function AdminProductNew() {
 
         try {
             const type = form.baumannType.trim().toUpperCase();
-            // baumann_id가 int형이므로, 매핑 안 되면 0(또는 기본값)으로 보내야 에러가 안 납니다.
+            // baumann_id가 int형이므로, 매핑 안 되면 0(또는 기본값)으로 보내야 에러가 안남
             const baumannId = BAUMANN_ID_MAP[type] ?? 0;
 
-            // 1. 이미지 업로드
+            // 1. 이미지 업로드, key 받기
             const { thumbnailKey, detailKey } = await uploadImages();
 
             // 2. DTO 생성
@@ -163,7 +168,6 @@ export default function AdminProductNew() {
                     category: form.category.trim(),
                     stock: Number(form.stock) || 0,
                     rating: 3.0,
-                    // 상세설명란 지웠으므로 빈 문자열 전송 (null 보내면 에러 가능성 있음)
                     description: "",
                     review_count: 0,
                     baumann_id: baumannId,
@@ -260,22 +264,6 @@ export default function AdminProductNew() {
                                     onChange={onDetailChange}
                                 />
                             </UploadBox>
-
-                            {detailPreview && (
-                                <div style={{ marginTop: 8 }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setDetailFile(null);
-                                            URL.revokeObjectURL(detailPreview);
-                                            setDetailPreview(null);
-                                        }}
-                                        style={{ fontSize: '12px', padding: '4px 8px' }}
-                                    >
-                                        이미지 삭제
-                                    </button>
-                                </div>
-                            )}
                         </Cell>
                     </Row>
 
