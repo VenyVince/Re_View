@@ -265,3 +265,36 @@ export const FilterLabel = styled.span`
   font-size: 14px;
   color: #555;
 `;
+
+export const TableWrapper = styled.div`
+  border-radius: 16px;
+  border: 1px solid #eee;
+  overflow: hidden;
+  background: #fff;
+  margin-top: 10px;
+`;
+
+export const DetailButton = styled.button`
+  padding: 5px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+
+export const Answered = styled.span`
+  color: #0ea5e9;
+  font-weight: 600;
+`;
+
+export const Unanswered = styled.span`
+  color: #b91c1c;
+  font-weight: 600;
+`;
