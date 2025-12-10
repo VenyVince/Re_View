@@ -86,6 +86,8 @@
 
 /* 썸네일 */
 .cart-thumb {
+    cursor: pointer;
+    transition: color 0.15s ease;
     width: 96px;
     height: 96px;
     border-radius: 12px;
@@ -102,6 +104,8 @@
 
 /* 상품 정보 */
 .cart-info {
+    cursor: pointer;
+    transition: color 0.15s ease;
     display: flex;
     flex-direction: column;
     justify-content: center;

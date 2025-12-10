@@ -324,7 +324,7 @@ export default function UserDeliveryPage() {
                 {/* 날짜 필터 (1개월보다 이전 내역 조회용) */}
                 <div className="delivery-order-datefilter">
                     <div className="delivery-order-datefilter-text">
-                        최근 1개월 주문 내역만 기본으로 표시됩니다. 이전 내역은 기간을 선택해 조회할 수 있어요.
+                        *최근 1개월 주문 내역만 기본으로 표시됩니다.
                     </div>
                     <div className="delivery-order-datefilter-controls">
                         <span className="delivery-order-datefilter-label">조회 기간</span>

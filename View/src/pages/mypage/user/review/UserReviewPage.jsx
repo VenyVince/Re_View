@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserReviewPage.css";
+import { useNavigate } from "react-router-dom";
 
 export default function UserMyReviewPage() {
     const [reviews, setReviews] = useState([]);
@@ -20,6 +21,8 @@ export default function UserMyReviewPage() {
     const [keyword, setKeyword] = useState("");
     const [sort, setSort] = useState("latest");
     const [filterRating, setFilterRating] = useState(0);
+
+    const navigate = useNavigate();
 
     // 날짜 포맷 (YYYY-MM-DD)
     const formatDate = (isoString) => {
@@ -311,7 +314,9 @@ export default function UserMyReviewPage() {
                                 {/* 상단: 상품명 + 날짜 + 버튼 */}
                                 <header className="myreview-header">
                                     <div className="myreview-title-block">
-                                        <div className="myreview-product">
+                                        <div className="myreview-product"
+                                             onClick={() => review.review_id && navigate(`/review/${review.review_id}`)
+                                        }>
                                             {review.prd_name}
                                         </div>
                                     </div>

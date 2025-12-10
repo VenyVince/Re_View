@@ -1,10 +1,12 @@
 // src/pages/mypage/user/UserWishPage.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserWishPage.css";
 
 export default function UserWishPage() {
+    const navigate = useNavigate();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -15,7 +17,7 @@ export default function UserWishPage() {
         return price.toLocaleString("ko-KR");
     };
 
-    // ✅ 1. 찜 목록 조회
+    // 찜 목록 조회
     const fetchWishlist = async () => {
         try {
             setLoading(true);
@@ -42,7 +44,6 @@ export default function UserWishPage() {
             } else if (Array.isArray(raw.content)) {
                 list = raw.content;
             } else {
-                console.warn("예상치 못한 wishlist 응답 구조:", raw);
                 list = [];
             }
 
@@ -70,7 +71,6 @@ export default function UserWishPage() {
 
             setItems(mapped);
         } catch (e) {
-            console.error("❌ /api/wishlist 조회 실패:", e);
             setError("찜 목록을 불러오는 중 오류가 발생했어요.");
         } finally {
             setLoading(false);
@@ -81,7 +81,7 @@ export default function UserWishPage() {
         fetchWishlist();
     }, []);
 
-    // ✅ 2. 찜 삭제 (컨트롤러: DELETE /api/wishlist?product_id=)
+    // 찜 삭제 (컨트롤러: DELETE /api/wishlist?product_id=)
     const handleRemove = async (item) => {
         if (!window.confirm("이 상품을 찜 목록에서 삭제할까요?")) return;
 
@@ -101,20 +101,56 @@ export default function UserWishPage() {
                 prev.filter((it) => it.product_id !== item.product_id)
             );
         } catch (e) {
-            console.error("❌ 찜 삭제 실패:", e);
             alert("찜 목록에서 삭제하는 중 오류가 발생했어요.");
         }
     };
 
-    // 🔸 장바구니 담기는 아직 백엔드 스펙 안 받았으니까 더미 알럿 유지
-    const handleAddToCart = (item) => {
+    // 장바구니 담기: /api/cart POST 후, 찜 목록에서 제거
+    const handleAddToCart = async (item) => {
         if (item.is_sold_out) {
             alert("품절된 상품은 장바구니에 담을 수 없습니다.");
             return;
         }
-        alert(
-            `"${item.prd_name}" 상품을 장바구니에 담는 API는 나중에 연동될 예정입니다.`
-        );
+
+        if (!item.product_id) {
+            alert("상품 ID를 찾을 수 없어 장바구니에 담을 수 없습니다.");
+            return;
+        }
+
+        try {
+            // 1) 장바구니에 추가 (quantity는 1로 고정)
+            await axios.post(
+                "/api/cart",
+                {
+                    product_id: item.product_id,
+                    quantity: 1,
+                },
+                { withCredentials: true }
+            );
+
+            // 2) 찜 목록에서 제거
+            await axios.delete("/api/wishlist", {
+                params: { product_id: item.product_id },
+                withCredentials: true,
+            });
+
+            setItems((prev) =>
+                prev.filter((it) => it.product_id !== item.product_id)
+            );
+
+            // 3) 알림 + 장바구니 이동 여부 확인
+            const goCart = window.confirm(
+                "장바구니에 담겼습니다! 장바구니로 이동하시겠습니까?"
+            );
+
+            if (goCart) {
+                // 프로젝트에서 사용하는 장바구니 경로에 맞춰 변경
+                navigate("/mypage/cart");
+            }
+        } catch (e) {
+            console.error("장바구니 담기 오류:", e);
+            alert("장바구니에 담는 중 오류가 발생했습니다.");
+        }
     };
 
     return (
@@ -152,7 +188,13 @@ export default function UserWishPage() {
                                     }`}
                                 >
                                     {/* 썸네일 */}
-                                    <div className="wish-thumb">
+                                    <div
+                                        className="wish-thumb"
+                                        onClick={() =>
+                                            item.product_id &&
+                                            navigate(`/product/${item.product_id}`)
+                                        }
+                                    >
                                         {item.thumbnail_url ? (
                                             <img
                                                 src={item.thumbnail_url}
@@ -172,7 +214,13 @@ export default function UserWishPage() {
                                     </div>
 
                                     {/* 가운데 정보 */}
-                                    <div className="wish-info">
+                                    <div
+                                        className="wish-info"
+                                        onClick={() =>
+                                            item.product_id &&
+                                            navigate(`/product/${item.product_id}`)
+                                        }
+                                    >
                                         <div className="wish-brand">{item.prd_brand}</div>
                                         <div className="wish-name">{item.prd_name}</div>
                                         <div className="wish-category">{item.category}</div>
