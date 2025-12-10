@@ -41,7 +41,7 @@ frontend/node_modules
 
 
 ### etc ###
-.env
+infra/.env
 
 
 # MinIO / DB Data
