@@ -16,7 +16,7 @@ public class CorsConfig {
 
         // 프론트 서버 주소 허용 (CRA)
         config.setAllowedOrigins(
-                List.of("http://localhost:3000")
+                List.of("http://221.143.110.221:3000")
         );
 
         // 허용할 HTTP 메서드
