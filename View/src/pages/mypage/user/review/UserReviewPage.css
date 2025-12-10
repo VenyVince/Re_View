@@ -72,6 +72,8 @@
 }
 
 .myreview-product {
+    cursor: pointer;
+    transition: color 0.15s ease;
     font-size: 16px;
     font-weight: 700;
     color: #222;

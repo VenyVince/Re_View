@@ -18,7 +18,7 @@ export const fetchAdminProducts = async () =>
 /* 단일 상품 조회 */
 export const fetchAdminProduct = async (productId) => {
     const data = await safeRequest(
-        axiosClient.get(`/api/admin/products/${productId}`)
+        axiosClient.get(`/api/admin/products/find/${productId}`)
     );
 
     return {

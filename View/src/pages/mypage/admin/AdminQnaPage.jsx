@@ -2,8 +2,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Wrap, Inner, Content, TitleRow, Title,
-    Pagination, PagerBtn, PageInfo,
-    QnaTable, FilterSelect, FilterRow, SearchInput, FilterLabel
+    Pagination, PagerBtn, PageInfo, DetailButton, Answered, Unanswered,
+    QnaTable, FilterSelect, FilterRow, SearchInput, FilterLabel, TableWrapper
 } from "./adminQnaPage.style";
 import { fetchQnaList } from "../../../api/admin/adminQnaApi";
 
@@ -12,7 +12,7 @@ export default function AdminQnaPage() {
     const [page, setPage] = useState(1);
     const pageSize = 10;
     const navigate = useNavigate();
-    const [filterStatus, setFilterStatus] = useState("ALL"); // ALL / WAITING / ANSWERED
+    const [filterStatus, setFilterStatus] = useState("ALL");
     const [keyword, setKeyword] = useState("");
 
     useEffect(() => {
@@ -29,30 +29,41 @@ export default function AdminQnaPage() {
         load();
     }, []);
 
+    /* 상태 필터 (answer 기준 강화) */
     const filteredList = useMemo(() => {
         let base = [...list];
 
         // 검색
         if (keyword.trim()) {
             const k = keyword.toLowerCase();
-            base = base.filter(q =>
-                q.user_name?.toLowerCase().includes(k) ||
-                q.title?.toLowerCase().includes(k)
+            base = base.filter(
+                q =>
+                    q.user_name?.toLowerCase().includes(k) ||
+                    q.title?.toLowerCase().includes(k)
             );
         }
 
         // 상태 필터
         if (filterStatus === "WAITING") {
-            base = base.filter(q => !q.answer);
+            base = base.filter(
+                q =>
+                    !q.answer ||
+                    q.answer.trim() === "" ||
+                    q.answer === "null"
+            );
         } else if (filterStatus === "ANSWERED") {
-            base = base.filter(q => q.answer);
+            base = base.filter(
+                q =>
+                    q.answer &&
+                    q.answer !== "null" &&
+                    q.answer.trim() !== ""
+            );
         }
 
         return base;
     }, [list, filterStatus, keyword]);
 
-
-    const total = list.length;
+    const total = filteredList.length;
     const maxPage = Math.max(1, Math.ceil(total / pageSize));
 
     const pageList = useMemo(() => {
@@ -63,9 +74,6 @@ export default function AdminQnaPage() {
     const handleRowClick = (q) => {
         navigate(`/admin/qna/${q.qna_id}`, { state: q });
     };
-
-
-
 
     return (
         <Wrap>
@@ -104,37 +112,63 @@ export default function AdminQnaPage() {
 
                     </FilterRow>
 
+                    <TableWrapper>
+                        <QnaTable>
+                            <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>고객</th>
+                                <th>질문 제목</th>
+                                <th>답변 여부</th>
+                                <th>질문 보기</th>
+                            </tr>
+                            </thead>
 
-                    <QnaTable>
-                        <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>고객</th>
-                            <th>질문 제목</th>
-                            <th>답변 여부</th>
-                        </tr>
-                        </thead>
+                            <tbody>
+                            {pageList.map((q, idx) => {
+                                const rowNumber = (page - 1) * pageSize + idx + 1;
 
-                        <tbody>
-                        {pageList.map((q, idx) => {
-                            const rowNumber = (page - 1) * pageSize + idx + 1;
-                            return (
-                                <tr
-                                    key={q.qna_id}
-                                    onClick={() => handleRowClick(q)}
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    <td>{rowNumber}</td>
-                                    <td>{q.user_name}</td>
-                                    <td>{q.title}</td>
-                                    <td style={{ color: q.answer ? "#0ea5e9" : "#b91c1c" }}>
-                                        {q.answer ? "답변완료" : "미답변"}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                        </tbody>
-                    </QnaTable>
+                                /*  답변 여부 판단 */
+                                const isAnswered =
+                                    q.answer &&
+                                    q.answer !== "null" &&
+                                    q.answer.trim() !== "";
+
+                                return (
+                                    <tr
+                                        key={q.qna_id}
+                                        onClick={() => handleRowClick(q)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <td>{rowNumber}</td>
+                                        <td>{q.user_name}</td>
+                                        <td>{q.title}</td>
+
+                                        <td>
+                                            {isAnswered ? (
+                                                <Answered>답변완료</Answered>
+                                            ) : (
+                                                <Unanswered>미답변</Unanswered>
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            <DetailButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/admin/qna/${q.qna_id}`);
+                                                }}
+                                            >
+                                                상세보기
+                                            </DetailButton>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            </tbody>
+
+                        </QnaTable>
+                    </TableWrapper>
 
                     <Pagination>
                         <PagerBtn disabled={page === 1} onClick={() => setPage(p => p - 1)}>

@@ -4,11 +4,9 @@ package com.review.shop.dto.product;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ProductUploadDTO {
-    private List<String> product_images_list;
-    private ProductDetailDTO product;
-    private String thumbnailUrl;
+    private ProductUpdateOnlyPrdInfoDTO product;
+    private String thumbnail_image;
+    private String detail_image;
 }

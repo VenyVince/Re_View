@@ -5,15 +5,27 @@
 <mapper namespace="com.review.shop.repository.ImageMapper">
 
     <insert id="insertProductObjectKey">
-        INSERT INTO product_image (
-            product_id,
-            image_url,
-            is_thumbnail
+        INSERT ALL
+            INTO PRODUCT_IMAGE (
+                PRODUCT_ID,
+                IMAGE_URL,
+                IS_THUMBNAIL
+            ) VALUES (
+        #{product_id},
+        #{thumbnail_image},
+        'Y'
+        )
+
+        INTO PRODUCT_IMAGE (
+        PRODUCT_ID,
+        IMAGE_URL,
+        IS_THUMBNAIL
         ) VALUES (
-                     #{product_id},
-                     #{objectKey},
-                     #{is_thumbnail}
-                 )
+        #{product_id},
+        #{detail_image},
+        'N'
+        )
+        SELECT * FROM DUAL
     </insert>
 
     <insert id="insertReviewObjectKey">
