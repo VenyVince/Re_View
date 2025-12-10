@@ -2,8 +2,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Wrap, Inner, Content, TitleRow, Title,
-    Pagination, PagerBtn, PageInfo,
-    QnaTable, FilterSelect, FilterRow, SearchInput, FilterLabel
+    Pagination, PagerBtn, PageInfo, DetailButton,Answered, Unanswered,
+    QnaTable, FilterSelect, FilterRow, SearchInput, FilterLabel,TableWrapper
 } from "./adminQnaPage.style";
 import { fetchQnaList } from "../../../api/admin/adminQnaApi";
 
@@ -64,9 +64,6 @@ export default function AdminQnaPage() {
         navigate(`/admin/qna/${q.qna_id}`, { state: q });
     };
 
-
-
-
     return (
         <Wrap>
             <Inner>
@@ -104,7 +101,7 @@ export default function AdminQnaPage() {
 
                     </FilterRow>
 
-
+                    <TableWrapper>
                     <QnaTable>
                         <thead>
                         <tr>
@@ -112,12 +109,20 @@ export default function AdminQnaPage() {
                             <th>고객</th>
                             <th>질문 제목</th>
                             <th>답변 여부</th>
+                            <th>질문 보기</th>
                         </tr>
                         </thead>
 
                         <tbody>
                         {pageList.map((q, idx) => {
                             const rowNumber = (page - 1) * pageSize + idx + 1;
+
+                            // 답변 여부 판단 → 추후 answered_at으로 변경해도 여기만 고치면 됨
+                            const isAnswered =
+                                q.answer !== null &&
+                                q.answer !== undefined &&
+                                q.answer.trim() !== "";
+
                             return (
                                 <tr
                                     key={q.qna_id}
@@ -127,14 +132,35 @@ export default function AdminQnaPage() {
                                     <td>{rowNumber}</td>
                                     <td>{q.user_name}</td>
                                     <td>{q.title}</td>
-                                    <td style={{ color: q.answer ? "#0ea5e9" : "#b91c1c" }}>
-                                        {q.answer ? "답변완료" : "미답변"}
+
+                                    {/* 답변 여부 출력 */}
+                                    <td>
+                                        {isAnswered ? (
+                                            <Answered>답변완료</Answered>
+                                        ) : (
+                                            <Unanswered>미답변</Unanswered>
+                                        )}
+                                    </td>
+
+                                    {/* 상세보기 버튼 */}
+                                    <td>
+                                        <DetailButton
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // row 클릭 막기
+                                                navigate(`/admin/qna/${q.qna_id}`);
+                                            }}
+                                        >
+                                            상세보기
+                                        </DetailButton>
                                     </td>
                                 </tr>
                             );
                         })}
                         </tbody>
+
+
                     </QnaTable>
+                    </TableWrapper>
 
                     <Pagination>
                         <PagerBtn disabled={page === 1} onClick={() => setPage(p => p - 1)}>
