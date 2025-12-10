@@ -4,36 +4,48 @@ export const Wrap = styled.div`
     width: 100%;
     display: flex;
     justify-content: center;
+    background: #fafafa;
+    min-height: calc(100vh - 120px);
 `;
 
 export const Inner = styled.div`
     width: 100%;
     max-width: 1200px;
-    padding: 30px 20px;
+    padding: 24px 16px 48px;
 `;
 
 export const Content = styled.div`
     background: #fff;
-    padding: 40px 50px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 24px 24px 32px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 `;
 
 export const TitleRow = styled.div`
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 `;
 
 export const Title = styled.h2`
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: left;
 `;
 
 export const FilterRow = styled.div`
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
 `;
+
+export const FilterLabel = styled.span`
+    font-size: 14px;
+    color: #555;
+    line-height: 1;
+    display: flex;
+    align-items: center; 
+`;
+
 
 export const LeftFilterGroup = styled.div`
     display: flex;
@@ -43,61 +55,98 @@ export const LeftFilterGroup = styled.div`
 export const RightSearchGroup = styled.div`
     display: flex;
     gap: 10px;
+    margin-left: auto;
 `;
 
 export const SearchInput = styled.input`
-    padding: 9px 14px;
-    border-radius: 6px;
+    margin-left: auto;
+    padding: 6px 10px;
+    border-radius: 8px;
     border: 1px solid #ddd;
-    width: 230px;
+    min-width: 220px;
+    font-size: 14px;
 `;
 
 export const FilterSelect = styled.select`
-    padding: 9px 14px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
     border: 1px solid #ddd;
+    font-size: 14px;
+    background: white;
 `;
 
 export const TableWrapper = styled.div`
-    margin-top: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    overflow: hidden;
+    background: #fff;
 `;
 
 export const OrderTable = styled.table`
     width: 100%;
     border-collapse: collapse;
+    font-size: 14px;
+
+    thead {
+        background: #f8f9fb;
+    }
 
     th, td {
-        padding: 14px 10px;
+        padding: 10px 12px;
         border-bottom: 1px solid #eee;
         text-align: left;
-        font-size: 14px;
     }
 
     th {
-        background: #fafafa;
         font-weight: 600;
+        color: #333;
+    }
+
+    tbody tr:hover {
+        background: #fafafa;
     }
 `;
 
 export const StatusBadge = styled.span`
-    padding: 4px 10px;
-    border-radius: 6px;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
     font-size: 12px;
-    color: #fff;
+    font-weight: 600;
 
-    ${({ status }) => status === "completed" && `background:#6c63ff;`}
-    ${({ status }) => status === "in_delivery" && `background:#f5a623;`}
-    ${({ status }) => status === "delivered" && `background:#4caf50;`}
+    ${({ status }) =>
+            status === "completed" &&
+            `
+      background: #e8e7ff;
+      color: #5b4bff;
+    `}
+
+    ${({ status }) =>
+            status === "in_delivery" &&
+            `
+      background: #fff4e5;
+      color: #f08c00;
+    `}
+
+    ${({ status }) =>
+            status === "delivered" &&
+            `
+      background: #e3f7e5;
+      color: #2c9a41;
+    `}
 `;
 
 export const ActionButton = styled.button`
-    background: #111;
-    color: #fff;
-    padding: 7px 12px;
-    border-radius: 6px;
-    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
     cursor: pointer;
     font-size: 13px;
+
+    &:hover {
+        background: #f1f3f5;
+    }
 `;
 
 export const PaginationBox = styled.div`
@@ -127,3 +176,4 @@ export const PaginationBox = styled.div`
         line-height: 1; 
     }
 `;
+
