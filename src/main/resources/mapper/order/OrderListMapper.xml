@@ -25,7 +25,7 @@
         o.created_at,
         o.order_status,
         o.total_price,
-        o.delivery_num,
+        o.used_point,  o.delivery_num,
         a.recipient,
         a.postal_code,
         a.address,

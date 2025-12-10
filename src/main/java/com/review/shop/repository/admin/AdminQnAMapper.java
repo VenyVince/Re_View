@@ -1,7 +1,7 @@
 package com.review.shop.repository.admin;
 
 import com.review.shop.dto.qna.QnAListDTO;
-import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.qna.QnaAdminDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,5 +18,5 @@ public interface AdminQnAMapper {
     List<QnAListDTO> getAllQna();
 
     // QnA  상세보기
-    QnaDTO getQnaDetail(int qna_id);
+    QnaAdminDTO getQnaDetail(int qna_id);
 }
