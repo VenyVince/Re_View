@@ -263,9 +263,35 @@ export default function OrderPaymentPage() {
         };
 
         try {
+            // 1) 주문 생성
             await axios.post("/api/orders", orderPayload, {
                 withCredentials: true,
             });
+
+            // 2) 방금 생성된 주문을 포함한 최신 주문 목록 1건 재조회
+            //    백엔드 /api/orders 가 최신순으로 리턴한다고 가정
+            let latestOrderId = null;
+            let latestOrderNo = null;
+            try {
+                const latestRes = await axios.get("/api/orders", {
+                    params: {
+                        page: 1,
+                        size: 1,
+                    },
+                    withCredentials: true,
+                });
+
+                const latestList = Array.isArray(latestRes.data)
+                    ? latestRes.data
+                    : [];
+
+                if (latestList.length > 0) {
+                    latestOrderId = latestList[0].order_id ?? null;
+                    latestOrderNo = latestList[0].order_no ?? null;
+                }
+            } catch (e) {
+                console.warn("최신 주문 조회 중 오류 (order_id 없이 진행):", e);
+            }
 
             const orderSummary = {
                 amount: totalPayAmount,
@@ -273,6 +299,8 @@ export default function OrderPaymentPage() {
                 firstItemName: items[0]?.prd_name,
                 address,
                 paymentId: selectedPaymentId,
+                order_id: latestOrderId,
+                order_no: latestOrderNo,
             };
 
             navigate("/order/complete", {
