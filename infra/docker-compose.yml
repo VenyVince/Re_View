@@ -34,8 +34,8 @@ services:
         SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
         SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
         MINIO_URL: ${MINIO_URL}
-        MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-        MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+        MINIO_SECRET_KEY: ${MINIO_ROOT_USER}
         MINIO_BUCKET: ${MINIO_BUCKET}
     ports:
       - "8080:8080"
@@ -56,9 +56,3 @@ services:
     depends_on:
       - be
     restart: always
-
-
-
-#volumes:
-#  minio-volume:
-#  oracle-volume:
