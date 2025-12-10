@@ -23,8 +23,6 @@ public interface AdminProductMapper {
 
     List<ProductDetailWithThumbnailDTO> getAllProducts();
 
-    String readImage(int product_id);
-
     // 상품 상세조회
     ProductUploadDTO getProductInfo(int productId);
 }
