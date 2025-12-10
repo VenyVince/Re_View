@@ -245,7 +245,7 @@ export default function UserOrderDetailPage() {
                                 </span>
                             </div>
                             <div className="order-detail-row">
-                                <span className="order-detail-label">배송비</span>
+                                <span className="order-detail-label">배 송 비</span>
                                 <span className="order-detail-value">
                                     {shippingFee > 0
                                         ? `${formatPrice(shippingFee)}원`

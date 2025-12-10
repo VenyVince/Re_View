@@ -48,7 +48,7 @@ export default function UserCartPage() {
                 }))
             );
         } catch (e) {
-            setError("장바구니를 불러오는 중 오류가 발생했어요.");
+            setError("아직 장바구니에 담긴 상품이 없습니다.");
         } finally {
             setLoading(false);
         }
@@ -180,7 +180,6 @@ export default function UserCartPage() {
                 prev.filter((it) => !selected.some((s) => s.cart_items_id === it.cart_items_id))
             );
         } catch (e) {
-            //console.error("선택 삭제 실패:", e);
             alert("선택한 상품 삭제 중 오류가 발생했어요.");
         }
     };
@@ -282,13 +281,25 @@ export default function UserCartPage() {
                                                 }
                                             />
 
-                                            <div className="cart-thumb">
+                                            <div
+                                                className="cart-thumb"
+                                                onClick={() =>
+                                                    item.product_id &&
+                                                    navigate(`/product/${item.product_id}`)
+                                                }
+                                            >
                                                 <span className="cart-thumb-placeholder">
                                                     이미지
                                                 </span>
                                             </div>
 
-                                            <div className="cart-info">
+                                            <div
+                                                className="cart-info"
+                                                onClick={() =>
+                                                    item.product_id &&
+                                                    navigate(`/product/${item.product_id}`)
+                                                }
+                                            >
                                                 <div className="cart-brand">
                                                     {item.prd_brand}
                                                 </div>

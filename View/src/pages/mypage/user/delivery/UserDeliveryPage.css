@@ -385,9 +385,11 @@
 }
 
 .delivery-receipt-item-main {
-    flex: 1;
+    display: flex;
+    flex: 1 1;
     min-width: 0;
     padding-right: 8px;
+    justify-content: space-between;
 }
 
 .delivery-receipt-item-name {
@@ -493,6 +495,7 @@
 .delivery-order-datefilter-text {
     flex: 1;
     line-height: 1.4;
+    text-align: left;
 }
 
 .delivery-order-datefilter-controls {
