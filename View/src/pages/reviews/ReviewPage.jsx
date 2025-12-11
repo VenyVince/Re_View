@@ -33,10 +33,14 @@ export default function ReviewPage() {
 
         const backendCategories = CATEGORY_MAP[selectedCategory];
 
+        // "전체" 카테고리 선택 시
         if (backendCategories === null) {
-            axios.get("/api/reviews", { params: { page: 1, size: 50 } })
+            // [수정] params에서 page, size 제거
+            axios.get("/api/reviews")
                 .then(res => {
-                    setReviews(res.data.content || []);
+                    // [수정] res.data.content -> res.data
+                    // 백엔드가 이제 리스트를 바로 줍니다.
+                    setReviews(res.data || []);
                     setSelectedBrand(null);
                     setLoading(false);
                 })
@@ -47,15 +51,19 @@ export default function ReviewPage() {
             return;
         }
 
+        // 특정 카테고리 선택 시 (여러 하위 카테고리 호출)
         Promise.all(
             backendCategories.map(cat =>
+                // [수정] params에서 page, size 제거
                 axios.get("/api/reviews", {
-                    params: { page: 1, size: 50, category: cat }
-                }).catch(() => ({ data: { content: [] } }))
+                    params: { category: cat }
+                }).catch(() => ({ data: [] })) // [수정] 에러 시 빈 배열 반환 구조 맞춤
             )
         )
             .then(results => {
-                const merged = results.flatMap(res => res.data.content || []);
+                // [수정] res.data.content -> res.data
+                const merged = results.flatMap(res => res.data || []);
+
                 setReviews(merged);
                 setSelectedBrand(null);
                 setLoading(false);
