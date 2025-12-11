@@ -1,6 +1,6 @@
 package com.review.shop.controller.wishlist;
 
-import com.review.shop.Util.Security_Util;
+import com.review.shop.util.Security_Util;
 import com.review.shop.dto.wishlist.WishlistResponseDTO;
 import com.review.shop.service.wishlist.WishlistService;
 import lombok.RequiredArgsConstructor;
