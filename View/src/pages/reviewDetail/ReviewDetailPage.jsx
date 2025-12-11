@@ -15,7 +15,7 @@ export default function ReviewDetailPage() {
     const [review, setReview] = useState(null);
     const [comments, setComments] = useState([]);
 
-    // ⭐ 리뷰 상세 + 댓글 불러오기 (세션 쿠키 포함)
+    // 리뷰 상세 정보와 댓글 조회 (세션 쿠키 포함)
     useEffect(() => {
         axios.get(`/api/reviews/${reviewId}`, { withCredentials: true })
             .then((res) => {
@@ -38,7 +38,7 @@ export default function ReviewDetailPage() {
 
     if (!review) return <div>불러오는 중...</div>;
 
-    // ⭐ 댓글 작성 후 최신 댓글 GET
+    // 댓글 작성 후 최신 댓글 목록 조회
     const handleCommentSubmit = () => {
         axios
             .get(`/api/reviews/${reviewId}`, { withCredentials: true })
@@ -52,7 +52,7 @@ export default function ReviewDetailPage() {
             });
     };
 
-    // ⭐ 댓글 삭제 (반드시 withCredentials 포함)
+    // 댓글 삭제 요청 (본인 여부 및 세션 체크 포함)
     const handleDeleteComment = async (commentId) => {
         if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
 
@@ -62,7 +62,7 @@ export default function ReviewDetailPage() {
                 { withCredentials: true }
             );
 
-            // 삭제 후 댓글 다시 GET
+            // 삭제 후 댓글 목록 재조회
             const res = await axios.get(`/api/reviews/${reviewId}`, {
                 withCredentials: true,
             });
@@ -79,9 +79,10 @@ export default function ReviewDetailPage() {
         }
     };
 
-    // 좋아요
+    // 리뷰 좋아요 요청
     const handleLike = async () => {
         try {
+            // 기존에 싫어요를 눌렀다면 취소 처리
             if (review.user_disliked) {
                 await axios.post(
                     `/api/reviews/${reviewId}/reaction`,
@@ -90,12 +91,14 @@ export default function ReviewDetailPage() {
                 );
             }
 
+            // 좋아요 처리
             await axios.post(
                 `/api/reviews/${reviewId}/reaction`,
                 { is_like: true },
                 { withCredentials: true }
             );
 
+            // 최신 리뷰 데이터 재조회
             const res = await axios.get(`/api/reviews/${reviewId}?t=${Date.now()}`, {
                 withCredentials: true,
             });
@@ -111,15 +114,17 @@ export default function ReviewDetailPage() {
                 price: p.price,
                 category: p.category
             });
+
         } catch (err) {
             if (err.response?.status === 404) alert("로그인이 필요합니다.");
             else console.error(err);
         }
     };
 
-    // 싫어요
+    // 리뷰 싫어요 요청
     const handleDislike = async () => {
         try {
+            // 기존에 좋아요를 눌렀다면 취소 처리
             if (review.user_liked) {
                 await axios.post(
                     `/api/reviews/${reviewId}/reaction`,
@@ -128,12 +133,14 @@ export default function ReviewDetailPage() {
                 );
             }
 
+            // 싫어요 처리
             await axios.post(
                 `/api/reviews/${reviewId}/reaction`,
                 { is_like: false },
                 { withCredentials: true }
             );
 
+            // 최신 리뷰 데이터 재조회
             const res = await axios.get(`/api/reviews/${reviewId}?t=${Date.now()}`, {
                 withCredentials: true,
             });
@@ -176,7 +183,7 @@ export default function ReviewDetailPage() {
 
                 <ReviewCommentList
                     comments={comments}
-                    currentUserNickname={review.nickname}  // 본인 댓글 확인용
+                    currentUserNickname={review.nickname}
                     onDelete={handleDeleteComment}
                 />
 

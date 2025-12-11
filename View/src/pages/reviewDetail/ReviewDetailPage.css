@@ -1,6 +1,30 @@
 /* src/pages/reviewDetail/ReviewDetailPage.css */
 /* 깔끔 · 심플 · 여백 많은 스타일 */
 
+.rd-header-left {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rd-header-left::after {
+    content: "이미지 없음";
+    color: #777;
+    position: absolute;
+    font-size: 14px;
+}
+
+.rd-product-image[src=""] {
+    display: none;
+}
+
 .rd-wrap {
     width: 100%;
     max-width: 1150px;
