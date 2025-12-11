@@ -1,10 +1,10 @@
 // src/pages/order/OrderPaymentPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./OrderPaymentPage.css";
 import OrderCardPaymentSection from "./OrderCardPaymentSection";
 import OrderAddressSelectPanel from "./OrderAddressSelectPanel";
+import axiosClient from "../../api/axiosClient"; // axiosClient로 교체
 
 // 기존 MOCK_DEFAULT_ADDRESS, MOCK_SAVED_CARDS 전부 삭제
 
@@ -31,6 +31,10 @@ export default function OrderPaymentPage() {
     const [usePoint, setUsePoint] = useState(0);
     const [pointLoading, setPointLoading] = useState(true);
     const [pointError, setPointError] = useState("");
+
+    const [showAddressPanel, setShowAddressPanel] = useState(false); // 패널 토글
+    const [cardValid, setCardValid] = useState(false);
+
     // ======================
     //  포인트 조회
     // ======================
@@ -39,12 +43,11 @@ export default function OrderPaymentPage() {
             setPointLoading(true);
             setPointError("");
 
-            const res = await axios.get("/api/users/me/points", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/users/me/points");
 
             // 컨트롤러에서 Integer 하나만 리턴하므로 그대로 사용
-            const totalPoint = typeof res.data === "number" ? res.data : Number(res.data) || 0;
+            const totalPoint =
+                typeof res.data === "number" ? res.data : Number(res.data) || 0;
             setAvailablePoint(totalPoint);
         } catch (e) {
             console.error(e);
@@ -54,8 +57,6 @@ export default function OrderPaymentPage() {
             setPointLoading(false);
         }
     };
-    const [showAddressPanel, setShowAddressPanel] = useState(false); // ✅ 패널 토글
-    const [cardValid, setCardValid] = useState(false);
 
     // ======================
     //  기본 배송지 조회
@@ -65,9 +66,7 @@ export default function OrderPaymentPage() {
             setAddressLoading(true);
             setAddressError("");
 
-            const res = await axios.get("/api/addresses", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/addresses");
 
             const data = Array.isArray(res.data)
                 ? res.data
@@ -90,6 +89,7 @@ export default function OrderPaymentPage() {
 
             setAddress(defaultAddr);
         } catch (e) {
+            console.error(e);
             setAddressError("배송지 정보를 불러오는 중 오류가 발생했습니다.");
         } finally {
             setAddressLoading(false);
@@ -104,9 +104,7 @@ export default function OrderPaymentPage() {
             setCardsLoading(true);
             setCardsError("");
 
-            const res = await axios.get("/api/users/me/payments", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/users/me/payments");
 
             const data = Array.isArray(res.data)
                 ? res.data
@@ -122,6 +120,7 @@ export default function OrderPaymentPage() {
                 setCardValid(false);
             }
         } catch (e) {
+            console.error(e);
             setCardsError("결제수단을 불러오는 중 오류가 발생했습니다.");
             setCardValid(false);
         } finally {
@@ -197,27 +196,24 @@ export default function OrderPaymentPage() {
 
     const handleCreateCard = async (payload) => {
         try {
-            await axios.post("/api/users/me/payments", payload, {
-                withCredentials: true,
-            });
+            await axiosClient.post("/api/users/me/payments", payload);
             await fetchCards();
             alert("결제수단이 추가되었습니다.");
         } catch (e) {
+            console.error(e);
             alert("결제수단 추가 중 오류가 발생했습니다.");
         }
     };
-
 
     const handleDeleteCard = async (paymentId) => {
         if (!window.confirm("해당 결제수단을 삭제하시겠습니까?")) return;
 
         try {
-            await axios.delete(`/api/users/me/payments/${paymentId}`, {
-                withCredentials: true,
-            });
+            await axiosClient.delete(`/api/users/me/payments/${paymentId}`);
             await fetchCards();
             alert("결제수단이 삭제되었습니다.");
         } catch (e) {
+            console.error(e);
             alert("결제수단 삭제 중 오류가 발생했습니다.");
         }
     };
@@ -247,7 +243,6 @@ export default function OrderPaymentPage() {
 
         // OrderCreateDTO.order_list 에 들어갈 OrderDTO 리스트 생성
         // 백엔드 OrderDTO : product_id, buy_quantity
-        // cart 아이템에 product_id 가 없고 prd_id 로만 있다면 prd_id 를 사용
         const orderListPayload = items.map((item) => ({
             product_id: item.product_id || item.prd_id,
             buy_quantity: item.quantity,
@@ -259,13 +254,35 @@ export default function OrderPaymentPage() {
             address_id: address.address_id,
             payment_id: selectedPaymentId,
             total_price: totalPayAmount,
-            // user_id 는 OrderController 에서 Security_Util 로 세팅하므로 여기서 넣지 않음
+            // user_id 는 OrderController 에서 Security_Util 로 세팅
         };
 
         try {
-            await axios.post("/api/orders", orderPayload, {
-                withCredentials: true,
-            });
+            // 1) 주문 생성
+            await axiosClient.post("/api/orders", orderPayload);
+
+            // 2) 방금 생성된 주문을 포함한 최신 주문 목록 1건 재조회
+            let latestOrderId = null;
+            let latestOrderNo = null;
+            try {
+                const latestRes = await axiosClient.get("/api/orders", {
+                    params: {
+                        page: 1,
+                        size: 1,
+                    },
+                });
+
+                const latestList = Array.isArray(latestRes.data)
+                    ? latestRes.data
+                    : [];
+
+                if (latestList.length > 0) {
+                    latestOrderId = latestList[0].order_id ?? null;
+                    latestOrderNo = latestList[0].order_no ?? null;
+                }
+            } catch (e) {
+                console.warn("최신 주문 조회 중 오류 (order_id 없이 진행):", e);
+            }
 
             const orderSummary = {
                 amount: totalPayAmount,
@@ -273,6 +290,8 @@ export default function OrderPaymentPage() {
                 firstItemName: items[0]?.prd_name,
                 address,
                 paymentId: selectedPaymentId,
+                order_id: latestOrderId,
+                order_no: latestOrderNo,
             };
 
             navigate("/order/complete", {
@@ -369,18 +388,21 @@ export default function OrderPaymentPage() {
                             ) : addressError ? (
                                 <p className="order-address-error">{addressError}</p>
                             ) : !address ? (
-                                <p>등록된 배송지가 없습니다. 마이페이지에서 배송지를 추가해 주세요.</p>
+                                <p>
+                                    등록된 배송지가 없습니다. 마이페이지에서 배송지를 추가해
+                                    주세요.
+                                </p>
                             ) : (
                                 <>
                                     <div className="order-address-recipient">
                                         <span className="order-address-name">
-                                          {address.address_name}
+                                            {address.address_name}
                                         </span>
                                         <span className="order-name">
-                                          {address.recipient}
+                                            {address.recipient}
                                         </span>
                                         <span className="order-address-phone">
-                                          {address.phone}
+                                            {address.phone}
                                         </span>
                                         {address.is_default && (
                                             <span className="order-address-badge">
@@ -420,13 +442,17 @@ export default function OrderPaymentPage() {
                         <h2 className="order-card-title">포인트 사용</h2>
 
                         {pointLoading ? (
-                            <p className="order-point-help">포인트를 불러오는 중입니다...</p>
+                            <p className="order-point-help">
+                                포인트를 불러오는 중입니다...
+                            </p>
                         ) : pointError ? (
                             <p className="order-point-help">{pointError}</p>
                         ) : (
                             <>
                                 <div className="order-point-row">
-                                    <span className="order-point-label">보유 포인트</span>
+                                    <span className="order-point-label">
+                                        보유 포인트
+                                    </span>
                                     <span className="order-point-value">
                                         {formatPrice(availablePoint)}P
                                     </span>

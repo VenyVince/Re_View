@@ -1,6 +1,7 @@
 // src/pages/mypage/user/UserDeliveryPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+// import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
 import { useNavigate } from "react-router-dom";
@@ -67,9 +68,7 @@ export default function UserDeliveryPage() {
             setAddrLoading(true);
             setAddrError("");
 
-            const res = await axios.get("/api/addresses", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/addresses");
 
             // 서비스가 List<AddressDTO> 를 바로 리턴한다고 가정
             const raw = Array.isArray(res.data)
@@ -102,12 +101,11 @@ export default function UserDeliveryPage() {
             setOrderLoading(true);
             setOrderError("");
 
-            const res = await axios.get("/api/orders", {
+            const res = await axiosClient.get("/api/orders", {
                 params: {
                     page: pageNo,
                     size: PAGE_SIZE,
                 },
-                withCredentials: true,
             });
 
             // 컨트롤러가 List<OrderListResponseDTO> 를 바로 리턴
@@ -224,9 +222,7 @@ export default function UserDeliveryPage() {
             setReceiptError("");
             setReceiptLoading(true);
 
-            const res = await axios.get(`/api/orders/${orderId}`, {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get(`/api/orders/${orderId}`);
             setReceiptDetail(res.data);
         } catch (e) {
             setReceiptError("영수증 정보를 불러오는 중 오류가 발생했어요.");
@@ -474,8 +470,6 @@ export default function UserDeliveryPage() {
                         })}
                     </div>
                 )}
-
-
             </section>
 
             {/* 배송 조회 모달 */}
