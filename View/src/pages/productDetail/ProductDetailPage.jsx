@@ -26,13 +26,12 @@ export default function ProductDetailPage() {
     const [showMiniBuyBox, setShowMiniBuyBox] = useState(false);
     const [miniActionType, setMiniActionType] = useState("buy");
 
-    // ★ 추가된 부분: 장바구니 팝업 상태
     const [showCartPopup, setShowCartPopup] = useState(false);
 
     const { adjustBottomBarPosition } = useBottomBar();
     const { adjustMiniBoxPosition } = useMiniBuyBox();
 
-    // 상품 상세 조회
+    // 상품 상세 조회 API
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -46,19 +45,19 @@ export default function ProductDetailPage() {
         fetchProduct();
     }, [productId]);
 
-    // product 로딩 확인
+    // product 로딩 여부 확인용 로그
     useEffect(() => {
-        if (product) console.log("🔥 로딩된 product:", product);
+        if (product) console.log("로딩된 product:", product);
     }, [product]);
 
-    // TOP 버튼
+    // 스크롤 위치에 따라 TOP 버튼 표시
     useEffect(() => {
         const onScroll = () => setShowTopBtn(window.scrollY > 300);
         window.addEventListener("scroll", onScroll);
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // 탭 변경 시 위치 보정
+    // 탭 변경 시 하단 UI 위치 보정
     useEffect(() => {
         requestAnimationFrame(() => {
             adjustBottomBarPosition();
@@ -66,7 +65,7 @@ export default function ProductDetailPage() {
         });
     }, [activeTab]);
 
-    // 스크롤/리사이즈 시 하단바 보정
+    // 스크롤 또는 리사이즈 시 위치 보정
     useEffect(() => {
         const onScrollOrResize = () => {
             adjustBottomBarPosition();
@@ -80,7 +79,7 @@ export default function ProductDetailPage() {
         };
     }, [showMiniBuyBox]);
 
-    // 미니박스 열릴 때 보정
+    // 미니 구매 박스 열릴 때 위치 보정
     useEffect(() => {
         if (showMiniBuyBox) {
             requestAnimationFrame(() => {
@@ -98,7 +97,16 @@ export default function ProductDetailPage() {
 
                 <div className="pd-wrap">
                     <div className="pd-left">
-                        <div className="pd-image-placeholder">상품 이미지</div>
+
+                        {/* 상품 대표 이미지 표시 */}
+                        <div className="pd-image-wrapper">
+                            <img
+                                src={product.product_images?.[0] || ""}
+                                alt={product.prd_name}
+                                className="pd-image"
+                            />
+                        </div>
+
                     </div>
 
                     <div className="pd-right">
@@ -123,6 +131,7 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
+                {/* 상품 정보 / 후기 / 문의 탭 */}
                 <div className="pd-bottom-section">
                     <div className="pd-tabs-row">
                         <button
@@ -147,12 +156,14 @@ export default function ProductDetailPage() {
                         </button>
                     </div>
 
+                    {/* 탭에 따라 다른 컴포넌트 렌더링 */}
                     <div className="pd-content-area">
                         {activeTab === "info" && <ProductInfoSection product={product} />}
                         {activeTab === "review" && <ProductReviewSection productId={productId} />}
                         {activeTab === "qna" && <QnaSection productId={productId} />}
                     </div>
 
+                    {/* 미니 구매 박스 */}
                     <MiniBuyBox
                         showMiniBuyBox={showMiniBuyBox}
                         setShowMiniBuyBox={setShowMiniBuyBox}
@@ -160,9 +171,10 @@ export default function ProductDetailPage() {
                         qty={qty}
                         setQty={setQty}
                         miniActionType={miniActionType}
-                        setShowCartPopup={setShowCartPopup}   // ★ 추가
+                        setShowCartPopup={setShowCartPopup}
                     />
 
+                    {/* 하단 고정 구매 영역 */}
                     <BottomBar
                         wish={wish}
                         setWish={setWish}
@@ -174,6 +186,7 @@ export default function ProductDetailPage() {
                     />
                 </div>
 
+                {/* TOP 버튼 */}
                 {showTopBtn && (
                     <button
                         className="pd-top-btn"
@@ -184,14 +197,12 @@ export default function ProductDetailPage() {
                     </button>
                 )}
 
-                {/* ---------------------- */}
-                {/* ★ 장바구니 팝업 UI 추가 */}
-                {/* ---------------------- */}
+                {/* 장바구니 추가 팝업 */}
                 {showCartPopup && (
                     <div className="cart-popup-overlay">
                         <div className="cart-popup">
                             <div className="popup-message">
-                                <p>🛒 장바구니에 담겼습니다!</p>
+                                <p>장바구니에 담겼습니다.</p>
                                 <p>장바구니로 이동하시겠습니까?</p>
                             </div>
 
