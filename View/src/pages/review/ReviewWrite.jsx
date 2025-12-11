@@ -1,44 +1,39 @@
 // src/pages/review/ReviewWrite.jsx
+
 import React, {useEffect, useState} from "react";
 import { useNavigate,useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { createReview, uploadReviewImages } from "../../api/review/reviewApi";
+import { createReview, getPresignedUrls } from "../../api/review/reviewApi";
 import {
     Wrap, Inner, Title, Panel, Row, Label, ProfileBox, Avatar, ProfileName, ProductBox,
     ProductInfo, ProductTop, ProductName, PriceText, RatingSelect, StarButton,
-    RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,} from "./ReviewWrite.style";
+    RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,
+} from "./ReviewWrite.style";
 import ProductSelectModal from "./components/ProductSelectModal";
 
 // 날짜 자르기
 function formatDate(dateString) {
     if (!dateString) return "";
-
     const d = new Date(dateString);
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
     const hh = String(d.getHours()).padStart(2, "0");
     const min = String(d.getMinutes()).padStart(2, "0");
-
     return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
 const ReviewWrite = () => {
     const navigate = useNavigate();
     const { product_id } = useParams();
-
-    // 로그인 사용자 정보 가져옴
     const { auth } = useAuth();
 
     const [content, setContent] = useState("");
     const [rating, setRating] = useState(5);
-
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedOrderItemId, setSelectedOrderItemId] = useState(null);
-
     const [images, setImages] = useState([]);
     const [previews, setPreviews] = useState([]);
-
     const [submitting, setSubmitting] = useState(false);
     const [openModal, setOpenModal] = useState(false);
 
@@ -52,7 +47,6 @@ const ReviewWrite = () => {
         }
 
         const previewUrls = files.map((f) => URL.createObjectURL(f));
-
         setImages((prev) =>[...prev, ...files]);
         setPreviews((prev) => [...prev, ...previewUrls]);
     };
@@ -62,6 +56,49 @@ const ReviewWrite = () => {
         setImages(images.filter((_, i) => i !== idx));
         setPreviews(previews.filter((_, i) => i !== idx));
     }
+
+    // MinIO presigned URL을 이용한 이미지 업로드
+    const uploadImagesToMinIO = async (imageFiles) => {
+        try {
+            // 1. 파일명과 폴더명으로 presigned URL 요청
+            const params = imageFiles.map((file) => ({
+                fileName: file.name,
+                folder: "thumb"
+            }));
+
+            // 백엔드로부터 { presignedUrl, objectKey }[] 받기
+            const presignedDataArray = await getPresignedUrls(params);
+
+            // 2. 각 파일을 presigned URL로 업로드
+            const uploadPromises = imageFiles.map(async (file, index) => {
+                const { presignedUrl, objectKey } = presignedDataArray[index];
+
+                // presigned URL로 이미지 업로드 (PUT)
+                const uploadResponse = await fetch(presignedUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type
+                    }
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error(`이미지 업로드 실패: ${file.name}`);
+                }
+
+                // objectKey 반환 (DB에 저장할 값)
+                return objectKey;
+            });
+
+            // 3. 모든 업로드 완료 후 objectKey 배열 반환
+            const objectKeys = await Promise.all(uploadPromises);
+            return objectKeys;
+
+        } catch (error) {
+            console.error('MinIO 업로드 에러:', error);
+            throw error;
+        }
+    };
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -90,19 +127,19 @@ const ReviewWrite = () => {
 
         try {
             let imageUrls = [];
-            if (images.length > 0) {
-                const formData = new FormData();
-                images.forEach((f) => formData.append("images", f));
 
-                const uploadRes = await uploadReviewImages(formData);
-                imageUrls = uploadRes.data;
+            // MinIO를 통한 이미지 업로드 (objectKey 배열 받기)
+            if (images.length > 0) {
+                imageUrls = await uploadImagesToMinIO(images);
             }
 
+            // 백엔드로 전송할 데이터
+            // imageUrls는 실제로는 objectKey 배열 (예: ["thumb/abc.jpg", "thumb/def.jpg"])
             const body = {
                 content: content.trim(),
                 rating,
-                ["order_item_id"]: selectedOrderItemId,
-                imageUrls,
+                order_item_id: selectedOrderItemId,
+                imageUrls  // Object Key 배열
             };
 
             await createReview(finalProductId, body);
@@ -129,7 +166,6 @@ const ReviewWrite = () => {
                         onSelect={(item) => {
                             setSelectedProduct(item);
                             setSelectedOrderItemId(item.order_item_id);
-                            // url을 /review/write/{product_id} 로 갱신
                             navigate(`/review/write/${item.product_id}`);
                             setOpenModal(false);
                         }}
@@ -225,7 +261,7 @@ const ReviewWrite = () => {
                         {/* 이미지 업로드 */}
                         <Row>
                             <Label>사진 첨부</Label>
-                            <div style={{ display: "flex", gap: 10 }}>
+                            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                                 {previews.map((src, i) => (
                                     <div key={i} style={{ position: "relative" }}>
                                         <img

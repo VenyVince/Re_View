@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,5 +34,22 @@ public class ImageController {
         ImageUrlResponseDTO response = imageService.presignedUrlPostWithDTO(folder, fileName);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/products/convert-datas")
+    public ResponseEntity<List<ImageUrlResponseDTO>> getPresignedUrls(
+            @RequestBody List<Map<String, String>> params
+    ) {
+        List<ImageUrlResponseDTO> responses = new ArrayList<>();
+
+        for (Map<String, String> param : params) {
+            String fileName = param.get("fileName");
+            String folder = param.get("folder");
+
+            ImageUrlResponseDTO response = imageService.presignedUrlPostWithDTO(folder, fileName);
+            responses.add(response);
+        }
+
+        return ResponseEntity.ok(responses);
     }
 }

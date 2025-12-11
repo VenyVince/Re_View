@@ -16,9 +16,4 @@ public interface ImageMapper {
             @Param("objectKey") String objectKey
     );
 
-
-
-
-
-
 }
