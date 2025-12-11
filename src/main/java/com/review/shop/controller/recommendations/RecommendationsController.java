@@ -2,8 +2,8 @@ package com.review.shop.controller.recommendations;
 
 import com.review.shop.dto.product.RecommendationDTO;
 import com.review.shop.dto.recommendations.RecommendationResponseWrapper;
-import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
+import com.review.shop.image.ImageService;
 import com.review.shop.service.recommendations.RecommendationsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,12 +27,12 @@ import java.util.Map;
 public class RecommendationsController {
 
     private final RecommendationsService recommendationsService;
+    private final ImageService imageService;
 
     @Operation(summary = "추천 상품과 리뷰 조회", description = "로그인한 사용자의 바우만 유형을 기반으로 추천 상품을 조회합니다.")
     @PostMapping("/api/recommendations/{type}")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "추천 상품과 리뷰 조회 성공",
-                    content = @Content(schema = @Schema(implementation = RecommendationResponseDTO.class))),
+            @ApiResponse(responseCode = "200", description = "추천 상품과 리뷰 조회 성공"),
             @ApiResponse(responseCode = "400", description = "백엔드 오류",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "자원 없음",
@@ -59,6 +59,11 @@ public class RecommendationsController {
         System.out.println(baumannDTO);
         //바우만 DTO를 기반으로 type에 따른 추천 상품 리스트 가져오기
         List<RecommendationDTO> recommendationsPrdList = recommendationsService.getRecommendedProducts(baumannDTO,type);
+
+        for(RecommendationDTO prd : recommendationsPrdList){
+            String presignedUrl = imageService.presignedUrlGet(prd.getImage_url());
+            prd.setImage_url(presignedUrl);
+        }
 
         Map<String, Object> response = new HashMap<>();
 

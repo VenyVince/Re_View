@@ -4,6 +4,7 @@ import com.review.shop.dto.product.RecommendationDTO;
 import com.review.shop.dto.recommendations.RecommendationAdminPickDTO;
 import com.review.shop.dto.recommendations.RecommendationsUserDTO;
 import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.recommendations.RecommendationsMapper;
 import com.review.shop.util.Security_Util;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class RecommendationsService {
 
     private final RecommendationsMapper recommendationsMapper;
     private final Security_Util security_util;
+    private final ImageService imageService;
 
     // 사용자의 세션 정보를 기반으로 바우만 타입 가져오기
     public Integer getBaumannTypeByUserId(){
@@ -67,7 +69,14 @@ public class RecommendationsService {
     public List<RecommendationAdminPickDTO> getRandomRecommendationAdminPicks(){
         List<RecommendationAdminPickDTO> result = recommendationsMapper.getRandomRecommendationAdminPicks();
 
-        if (result == null || result.isEmpty()) {
+        for(RecommendationAdminPickDTO dto : result){
+            //presigned URL 처리
+            String ObjectKey = dto.getThumbnail_url();
+            String presignedUrl = imageService.presignedUrlGet(ObjectKey);
+            dto.setThumbnail_url(presignedUrl);
+        }
+
+        if (result.isEmpty()) {
             throw new ResourceNotFoundException("어드민 픽 상품이 존재하지 않습니다.");
         }
 
