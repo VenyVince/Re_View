@@ -136,8 +136,8 @@
 }
 
 .product-thumb-inner img {
-    width: 70%;
-    height: 70%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 
@@ -206,12 +206,6 @@
     align-items: center;
     gap: 6px;
     margin-top: 4px;
-}
-
-.product-discount {
-    font-size: 14px;
-    font-weight: 800;
-    color: #ff2f3b;
 }
 
 .product-price {
@@ -363,7 +357,8 @@
     border: 1px solid #eee;
     border-radius: 12px;
     background: #fff;
-    width: 260px;
+    width: 100%;
+    max-width: 260px;
 }
 
 /* 이미지 박스 */
@@ -371,7 +366,8 @@
     position: relative;
     background: #f4f6ff;
     border-radius: 8px;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1/1;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -379,8 +375,8 @@
 }
 
 .review-thumb-inner img {
-    width: 70%;
-    height: 70%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 
@@ -423,6 +419,12 @@
 
 /* 리뷰 내용 */
 .review-content-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 40px;
     margin-top: 8px;
     font-size: 14px;
     color: #444;
