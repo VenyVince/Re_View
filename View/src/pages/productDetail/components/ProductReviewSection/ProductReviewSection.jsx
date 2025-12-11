@@ -6,15 +6,15 @@ export default function ProductReviewSection({ productId }) {
     const [reviewList, setReviewList] = useState([]);
     const [sortType, setSortType] = useState("latest");
 
-    // 리뷰 API 호출
+    // 리뷰 데이터를 불러오는 API 요청
     useEffect(() => {
         fetch(`/api/reviews/${productId}/reviews`)
             .then((res) => res.json())
             .then((data) => {
                 const formatted = data.map((r) => ({
                     ...r,
-                    rating: Math.round(r.rating),       // ★ 별 갯수용 변환
-                    userLiked: false,                    // FE 전용 상태
+                    rating: Math.round(r.rating),   // 별점 계산용 반올림 처리
+                    userLiked: false,               // 프론트 전용 상태
                     userDisliked: false
                 }));
                 setReviewList(formatted);
@@ -22,30 +22,23 @@ export default function ProductReviewSection({ productId }) {
             .catch((e) => console.error("리뷰 불러오기 오류:", e));
     }, [productId]);
 
-    // 정렬
+    // 리뷰 정렬
     const sortedList = [...reviewList].sort((a, b) => {
         if (sortType === "latest") {
             return new Date(b.created_at) - new Date(a.created_at);
         }
-
         if (sortType === "like") {
-            if (b.like_count !== a.like_count) {
-                return b.like_count - a.like_count;
-            }
+            if (b.like_count !== a.like_count) return b.like_count - a.like_count;
             return a.dislike_count - b.dislike_count;
         }
-
         if (sortType === "dislike") {
-            if (b.dislike_count !== a.dislike_count) {
-                return b.dislike_count - a.dislike_count;
-            }
+            if (b.dislike_count !== a.dislike_count) return b.dislike_count - a.dislike_count;
             return b.like_count - a.like_count;
         }
-
         return 0;
     });
 
-    // 좋아요
+    // 좋아요 상태 변경
     const toggleLike = (id) => {
         setReviewList((prev) =>
             prev.map((rev) => {
@@ -55,9 +48,7 @@ export default function ProductReviewSection({ productId }) {
                     return {
                         ...rev,
                         like_count: rev.like_count + 1,
-                        dislike_count: rev.userDisliked
-                            ? rev.dislike_count - 1
-                            : rev.dislike_count,
+                        dislike_count: rev.userDisliked ? rev.dislike_count - 1 : rev.dislike_count,
                         userLiked: true,
                         userDisliked: false
                     };
@@ -72,7 +63,7 @@ export default function ProductReviewSection({ productId }) {
         );
     };
 
-    // 싫어요
+    // 싫어요 상태 변경
     const toggleDislike = (id) => {
         setReviewList((prev) =>
             prev.map((rev) => {
@@ -82,9 +73,7 @@ export default function ProductReviewSection({ productId }) {
                     return {
                         ...rev,
                         dislike_count: rev.dislike_count + 1,
-                        like_count: rev.userLiked
-                            ? rev.like_count - 1
-                            : rev.like_count,
+                        like_count: rev.userLiked ? rev.like_count - 1 : rev.like_count,
                         userDisliked: true,
                         userLiked: false
                     };
@@ -102,7 +91,7 @@ export default function ProductReviewSection({ productId }) {
     return (
         <div className="review-wrapper">
 
-            {/* 정렬 UI */}
+            {/* 정렬 탭 */}
             <div className="review-sort">
                 <span
                     className={sortType === "latest" ? "active" : ""}
@@ -134,7 +123,6 @@ export default function ProductReviewSection({ productId }) {
 
                 {sortedList.map((r) => (
                     <div className="review-card" key={r.review_id}>
-
                         <div className="review-top">
                             <div className="left">
                                 <span className="nickname">{r.nickname}</span>

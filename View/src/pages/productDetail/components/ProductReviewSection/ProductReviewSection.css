@@ -1,10 +1,10 @@
-/******** 리뷰 전체 영역 ********/
+/* 리뷰 전체 영역 */
 .review-wrapper {
     margin-top: 30px;
     margin-bottom: 150px;
 }
 
-/******** 정렬 탭 ********/
+/* 정렬 탭 영역 */
 .review-sort {
     display: flex;
     gap: 16px;
@@ -27,7 +27,7 @@
     padding-bottom: 2px;
 }
 
-/******** 리뷰 없음 안내문 ********/
+/* 리뷰가 없을 때 표시되는 문구 */
 .review-empty {
     width: 100%;
     padding: 40px 0;
@@ -35,7 +35,7 @@
     color: #666;
 }
 
-/******** 리뷰 리스트 (1열 고정) ********/
+/* 리뷰 리스트 컨테이너 (1열 고정) */
 .review-list,
 .review-wrapper .review-list {
     display: flex !important;
@@ -44,7 +44,7 @@
     width: 100%;
 }
 
-/******** 리뷰 카드 ********/
+/* 개별 리뷰 카드 */
 .review-card {
     width: 100% !important;
     padding: 18px;
@@ -55,7 +55,7 @@
     max-width: none !important;
 }
 
-/******** 1줄 - 닉네임 / 바우만 / 좋아요·싫어요 ********/
+/* 닉네임, 바우만 타입, 좋아요/싫어요 영역 */
 .review-top {
     display: flex;
     justify-content: space-between;
@@ -72,7 +72,7 @@
     color: #666;
 }
 
-/* 좋아요 / 싫어요 버튼 */
+/* 좋아요/싫어요 버튼 스타일 */
 .like,
 .dislike {
     display: inline-flex;
@@ -94,7 +94,7 @@
     font-weight: 700;
 }
 
-/******** 2줄 - 별점 ********/
+/* 별점 표시 라인 */
 .rating-line {
     margin-bottom: 6px;
     text-align: left;
@@ -111,7 +111,7 @@
     color: #777;
 }
 
-/******** 3줄 - 내용 + 이미지 + 날짜 ********/
+/* 리뷰 본문, 이미지, 날짜 영역 */
 .review-body {
     display: flex;
     justify-content: space-between;
@@ -127,6 +127,7 @@
     text-align: right;
 }
 
+/* 리뷰 이미지 */
 .review-img {
     width: 75px;
     height: 75px;
