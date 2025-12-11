@@ -50,6 +50,7 @@ infra/db_data
 infra/oracle-data
 infra/oracle_data
 infra/backup/*
-
-xl.meta
+infra/minio_data.tar.gz
+infra/oracle-data.tar.gz
+infra/minio_data/*
 
