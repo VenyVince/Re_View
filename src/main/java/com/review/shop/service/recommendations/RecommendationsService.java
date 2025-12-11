@@ -66,19 +66,12 @@ public class RecommendationsService {
         return recommendedProducts;
     }
 
-    public List<RecommendationAdminPickDTO> getRandomRecommendationAdminPicks(){
-        List<RecommendationAdminPickDTO> result = recommendationsMapper.getRandomRecommendationAdminPicks();
-
-        for(RecommendationAdminPickDTO dto : result){
+    public RecommendationAdminPickDTO getRandomRecommendationAdminPicks(){
+        RecommendationAdminPickDTO result = recommendationsMapper.getRandomRecommendationAdminPicks();
             //presigned URL 처리
-            String ObjectKey = dto.getThumbnail_url();
+            String ObjectKey = result.getThumbnail_url();
             String presignedUrl = imageService.presignedUrlGet(ObjectKey);
-            dto.setThumbnail_url(presignedUrl);
-        }
-
-        if (result.isEmpty()) {
-            throw new ResourceNotFoundException("어드민 픽 상품이 존재하지 않습니다.");
-        }
+            result.setThumbnail_url(presignedUrl);
 
         return result;
     }

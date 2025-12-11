@@ -1,50 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './BestReview.css';
 
-// 데모용 아이템들
-const demoItems = [
-    {
-        id: 1,
-        brand: '라곰(LACOM)',
-        title: '셀럽 마이크로 폼 클렌저',
-        badge: '1.2k 추천',
-        discount: 0,
-        price: 10000,
-        excerpt: '왜 사람들이 극찬하는지 알 것 같은 제품이에요. 세정력이 좋고 마무리도 깔끔…',
-        image: null,
-    },
-    {
-        id: 2,
-        brand: '바이오더마',
-        title: '하이드라비오 토너',
-        badge: 'BEST',
-        discount: 15,
-        price: 38000,
-        excerpt: '수분감이 오래가고 자극이 적어서 데일리 토너로 좋아요.',
-        image: null,
-    },
-];
-
 function formatPrice(n) {
-    try { return Number(n).toLocaleString(); } catch { return n; }
+    try {
+        return Number(n).toLocaleString();
+    } catch {
+        return n;
+    }
 }
 
-/**
- * BestReview
- * - 메인에서는 대표 1개만 보여주되, 필요하면 props.index로 어떤 걸 보여줄지 선택 가능
- */
-export default function BestReview({ items = demoItems, index = 0 }) {
-    const item = items[index] || items[0];
+export default function AdminPick() {
+    const [adminItem, setAdminItem] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchAdminPick = async () => {
+            try {
+                const response = await axios.get('/api/recommendations/admin-pick');
+                const wrapper = response.data;
+
+                if (wrapper.admin_pick) {
+
+                    setAdminItem(wrapper.admin_pick);
+                } else {
+                    setAdminItem(null);
+                }
+            } catch (err) {
+                console.error("Failed to fetch admin pick:", err);
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAdminPick();
+    }, []);
+
+    // Loading State
+    if (loading) {
+        return (
+            <section className="best-review">
+                <h2 className="best-review__title">운영자 Pick 리뷰</h2>
+                <div className="best-review__card" style={{ justifyContent: 'center', padding: '20px' }}>
+                    Loading...
+                </div>
+            </section>
+        );
+    }
+
+    if (error || !adminItem) {
+        return null;
+    }
 
     return (
-        <section className="best-review" aria-label="베스트 리뷰">
-            <h2 className="best-review__title">Best 리뷰</h2>
+        <section className="best-review" aria-label="운영자 추천 상품">
+            <h2 className="best-review__title">운영자 Pick 리뷰</h2>
 
             <article className="best-review__card">
-                {/* 썸네일 */}
+                {/* Thumbnail */}
                 <div className="best-review__thumb">
-                    {item.image ? (
-                        <img src={item.image} alt={item.title} />
+                    {adminItem.thumbnail_url ? (
+                        <img src={adminItem.thumbnail_url} alt={adminItem.product_name} />
                     ) : (
                         <div className="best-review__thumb--placeholder" aria-hidden="true">
                             <svg width="64" height="64" viewBox="0 0 24 24">
@@ -56,23 +74,21 @@ export default function BestReview({ items = demoItems, index = 0 }) {
                     )}
                 </div>
 
-                {/* 내용 */}
                 <div className="best-review__content">
-                    <div className="best-review__brand">{item.brand}</div>
+                    <div className="best-review__brand">{adminItem.product_brand}</div>
 
                     <div className="best-review__row">
-                        <h3 className="best-review__name">{item.title}</h3>
-                        {item.badge && <span className="best-review__badge">{item.badge}</span>}
+                        <h3 className="best-review__name">{adminItem.product_name}</h3>
+                        <span className="best-review__badge">추천 리뷰</span>
                     </div>
 
                     <div className="best-review__price-row">
-                        <span className="best-review__discount">{item.discount}%</span>
                         <span className="best-review__price">
-              {formatPrice(item.price)} <span className="best-review__price-unit">원</span>
-            </span>
+                            {formatPrice(adminItem.price)} <span className="best-review__price-unit">원</span>
+                        </span>
                     </div>
 
-                    <p className="best-review__excerpt">{item.excerpt}</p>
+                    <p className="best-review__excerpt">{adminItem.content}</p>
                 </div>
             </article>
         </section>
