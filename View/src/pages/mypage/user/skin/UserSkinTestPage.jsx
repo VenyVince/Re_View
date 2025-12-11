@@ -1,13 +1,12 @@
 // src/pages/mypage/user/UserSkinTestPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserSkinTestPage.css";
 
 import {
     BAUMANN_BADGES,
-    BAUMANN_CODE_BY_ID,
-    BAUMANN_ID_BY_CODE,   // ✅ 코드 → id 매핑
+    BAUMANN_ID_BY_CODE,
     getBaumannBadge,
 } from "../../../../assets/baumann";
 import {
@@ -46,9 +45,7 @@ export default function UserSkinTestPage() {
     useEffect(() => {
         const fetchUserType = async () => {
             try {
-                const res = await axios.get("/api/auth/my-baumann-type", {
-                    withCredentials: true,
-                });
+                const res = await axiosClient.get("/api/auth/my-baumann-type");
 
                 console.log("바우만 타입 응답:", res.data);
 
@@ -126,7 +123,7 @@ export default function UserSkinTestPage() {
     const handleSelectTypeChange = (e) => {
         const value = e.target.value || null;
         setSelectedType(value);
-        // ❗ myType은 여기서는 그대로, 저장 버튼 누를 때만 변경
+        // myType은 여기서는 그대로, 저장 버튼 누를 때만 변경
     };
 
     // === 5. “피부타입 저장” 버튼 → 서버에 반영 ===
@@ -145,15 +142,9 @@ export default function UserSkinTestPage() {
         }
 
         try {
-            await axios.patch(
+            await axiosClient.patch(
                 "/api/users/me/baumann",
-                baumannId, // @RequestBody int baumann_id 에 맞게 숫자 그대로 전송
-                {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
+                baumannId
             );
 
             setMyType(selectedType); // 이제야 상단 “나의 바우만 타입”이 변경됨

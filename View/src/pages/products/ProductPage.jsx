@@ -9,16 +9,15 @@ import ProductSortSelect from "./components/ProductSortSelect";
 import ProductList from "./components/ProductList";
 
 export default function ProductPage() {
-
-    // 카테고리 및 상태값
     const CATEGORIES = ["스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
     const CATEGORY_MAP = {
         "스킨/토너": ["스킨", "토너"],
         "에센스/세럼/앰플": ["에센스", "세럼", "앰플"],
-        "크림": ["크림", "스킨케어/크림"],
+        "크림": ["크림"],
         "로션": ["로션"],
-        "클렌징": ["클렌징"]
+        "클렌징": ["클렌징"],
     };
+
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [products, setProducts] = useState([]);
     const [sortType, setSortType] = useState("recommend");
@@ -26,7 +25,6 @@ export default function ProductPage() {
     const [loading, setLoading] = useState(false);
     const [brandReady, setBrandReady] = useState(false);
 
-    // 카테고리 변경 시 상품 조회
     useEffect(() => {
         setLoading(true);
         setBrandReady(false);
@@ -37,21 +35,24 @@ export default function ProductPage() {
             try {
                 if (selectedCategory === null) {
                     const res = await fetchProductsByCategory(null);
-                    setProducts(res.data ?? []);
+                    const list = Array.isArray(res.data) ? res.data : (res.data?.content ?? []);
+                    setProducts(list);
                     setBrandReady(true);
                     return;
                 }
 
                 const categoriesToCall = CATEGORY_MAP[selectedCategory] || [];
-
                 const responses = await Promise.all(
-                    categoriesToCall.map(cat => fetchProductsByCategory(cat))
+                    categoriesToCall.map((cat) => fetchProductsByCategory(cat))
                 );
 
-                const merged = responses.flatMap(res => res.data?.content ?? []);
+                // 🔧 이 줄이 핵심 수정!
+                const merged = responses.flatMap((res) =>
+                    Array.isArray(res.data) ? res.data : (res.data?.content ?? [])
+                );
 
                 const unique = Array.from(
-                    new Map(merged.map(item => [item.product_id, item])).values()
+                    new Map(merged.map((item) => [item.product_id, item])).values()
                 );
 
                 setProducts(unique);
@@ -66,7 +67,6 @@ export default function ProductPage() {
         load();
     }, [selectedCategory]);
 
-    // 브랜드 및 정렬 필터 적용
     const filteredProducts = useMemo(() => {
         let items = [...products];
 
@@ -86,17 +86,14 @@ export default function ProductPage() {
         }
     }, [products, selectedBrand, sortType]);
 
-    // 선택 텍스트 생성
     const selectedText = (() => {
         const catLabel = selectedCategory === null ? "전체" : selectedCategory;
         if (selectedBrand) return `${catLabel} · ${selectedBrand}`;
         return catLabel;
     })();
 
-    // UI 렌더링
     return (
         <div className="productPageWrapper">
-
             <div className="selected-info">{selectedText}</div>
 
             <CategoryTabs
@@ -110,10 +107,7 @@ export default function ProductPage() {
             />
 
             <div className="productTitleRow">
-                <ProductSortSelect
-                    sortType={sortType}
-                    setSortType={setSortType}
-                />
+                <ProductSortSelect sortType={sortType} setSortType={setSortType} />
             </div>
 
             {loading ? (

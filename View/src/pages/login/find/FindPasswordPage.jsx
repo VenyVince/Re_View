@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo.png';
 import './Find.css';
-import axios from "axios";
+import axiosClient from "../../../api/axiosClient";
 
 export default function FindPasswordPage() {
     const nav = useNavigate();
@@ -29,7 +29,7 @@ export default function FindPasswordPage() {
 
         setLoading(true);
         try {
-            await axios.post('/api/auth/send-temp-password', { id, email });
+            await axiosClient.post('/api/auth/send-temp-password', { id, email });
             nav('/find/password/done', { state: { email } });
         } catch (err) {
             console.error('API 에러:', err);

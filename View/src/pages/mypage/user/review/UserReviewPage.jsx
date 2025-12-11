@@ -1,6 +1,6 @@
 // src/pages/mypage/user/review/UserReviewPage.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserReviewPage.css";
 import { useNavigate } from "react-router-dom";
@@ -37,21 +37,20 @@ export default function UserMyReviewPage() {
 
     // === 1. 내 리뷰 목록 불러오기 ===
     const fetchMyReviews = async ({
-        keywordValue = keyword,
-        sortValue = sort,
-        filterRatingValue = filterRating,
-    } = {}) => {
+                                      keywordValue = keyword,
+                                      sortValue = sort,
+                                      filterRatingValue = filterRating,
+                                  } = {}) => {
         try {
             setLoading(true);
             setError("");
 
-            const res = await axios.get("/api/users/reviews/search", {
+            const res = await axiosClient.get("/api/users/reviews/search", {
                 params: {
                     keyword: keywordValue,
                     sort: sortValue,
                     filter_rating: filterRatingValue,
                 },
-                withCredentials: true,
             });
 
             // MyPageReviewResponseDTO 래퍼 안에 들어있다고 가정
@@ -95,7 +94,6 @@ export default function UserMyReviewPage() {
         }
     };
 
-
     useEffect(() => {
         // 초기 진입 시 기본 조건으로 한 번 조회
         fetchMyReviews();
@@ -137,9 +135,8 @@ export default function UserMyReviewPage() {
 
         try {
             // DELETE /api/reviews/{product_id}/{review_id}
-            await axios.delete(
-                `/api/reviews/${review.product_id}/${review.review_id}`,
-                { withCredentials: true }
+            await axiosClient.delete(
+                `/api/reviews/${review.product_id}/${review.review_id}`
             );
 
             setReviews((prev) =>
@@ -193,7 +190,6 @@ export default function UserMyReviewPage() {
             return;
         }
 
-        // 🔧 여기 오타 있었던 부분 (editRati...ng -> editRating)
         const ratingNumber = Number(editRating);
         if (Number.isNaN(ratingNumber) || ratingNumber <= 0 || ratingNumber > 5) {
             alert("별점은 1 ~ 5 사이의 숫자로 입력해주세요.");
@@ -202,15 +198,14 @@ export default function UserMyReviewPage() {
 
         try {
             // PATCH /api/reviews/{review_id}
-            await axios.patch(
+            await axiosClient.patch(
                 `/api/reviews/${editingId}`,
                 {
                     content: editContent.trim(),
                     rating: ratingNumber,
                     // 지금은 이미지 수정 UI는 없으니 기존 배열 그대로 보내기
                     imageUrls: target?.imageUrls ?? [],
-                },
-                { withCredentials: true }
+                }
             );
 
             // 프론트 상태 업데이트
@@ -314,9 +309,13 @@ export default function UserMyReviewPage() {
                                 {/* 상단: 상품명 + 날짜 + 버튼 */}
                                 <header className="myreview-header">
                                     <div className="myreview-title-block">
-                                        <div className="myreview-product"
-                                             onClick={() => review.review_id && navigate(`/review/${review.review_id}`)
-                                        }>
+                                        <div
+                                            className="myreview-product"
+                                            onClick={() =>
+                                                review.review_id &&
+                                                navigate(`/review/${review.review_id}`)
+                                            }
+                                        >
                                             {review.prd_name}
                                         </div>
                                     </div>
@@ -394,7 +393,9 @@ export default function UserMyReviewPage() {
                                                     step="0.5"
                                                     className="myreview-edit-rating-input"
                                                     value={editRating}
-                                                    onChange={(e) => setEditRating(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setEditRating(e.target.value)
+                                                    }
                                                 />
                                                 <span className="myreview-edit-rating-max">
                                                     / 5
@@ -473,7 +474,9 @@ export default function UserMyReviewPage() {
                                     type="button"
                                     className={
                                         "myreview-page-btn" +
-                                        (page === currentPage ? " myreview-page-btn--active" : "")
+                                        (page === currentPage
+                                            ? " myreview-page-btn--active"
+                                            : "")
                                     }
                                     onClick={() => handlePageChange(page)}
                                 >

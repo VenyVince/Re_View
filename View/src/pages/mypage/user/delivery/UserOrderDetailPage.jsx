@@ -1,7 +1,9 @@
+// src/pages/mypage/user/UserOrderDetailPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import UserMyPageLayout from "../layout/UserMyPageLayout"; // 경로는 프로젝트 구조에 맞게 조정
+// import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
+import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserOrderDetailPage.css";
 
 export default function UserOrderDetailPage() {
@@ -38,7 +40,7 @@ export default function UserOrderDetailPage() {
         return `**** **** **** ${last4}`;
     };
 
-    // 상품 금액 합계와 배송비 추정 (total_price - 상품합)
+    // 상품 금액 합계 (각 item.total_amount 합)
     const itemsTotal = useMemo(() => {
         if (!order?.order_items) return 0;
         return order.order_items.reduce(
@@ -47,9 +49,10 @@ export default function UserOrderDetailPage() {
         );
     }, [order]);
 
+    // 배송비 추정 (total_price - 상품합)
     const shippingFee = useMemo(() => {
         if (!order) return 0;
-        const diff = order.total_price - itemsTotal;
+        const diff = (order.total_price ?? 0) - itemsTotal;
         return diff > 0 ? diff : 0;
     }, [order, itemsTotal]);
 
@@ -59,10 +62,7 @@ export default function UserOrderDetailPage() {
                 setLoading(true);
                 setError("");
 
-                const res = await axios.get(`/api/orders/${orderId}`, {
-                    withCredentials: true,
-                });
-
+                const res = await axiosClient.get(`/api/orders/${orderId}`);
                 setOrder(res.data);
             } catch (e) {
                 if (e.response?.status === 404) {
@@ -193,43 +193,10 @@ export default function UserOrderDetailPage() {
                             </div>
                         </div>
                     </section>
-                    <h4 className="order-detail-block-title">주문 상품</h4>
-                    <div className="order-detail-items">
-                        {order.order_items && order.order_items.length > 0 ? (
-                            order.order_items.map((item) => (
-                                <div
-                                    key={item.order_item_id}
-                                    className="order-detail-item-row"
-                                >
-                                    <div className="order-detail-item-main">
-                                        <div className="order-detail-item-name">
-                                            {item.product_name}
-                                        </div>
-                                        <div className="order-detail-item-meta">
-                                            수량 {item.quantity}개 · 개당{" "}
-                                            {formatPrice(item.product_price)}원
-                                        </div>
-                                    </div>
-                                    <div className="order-detail-item-price">
-                                        {formatPrice(item.total_amount)}원
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="order-detail-empty">
-                                주문된 상품이 없습니다.
-                            </p>
-                        )}
-                    </div>
 
-                </div>
-
-                {/* 주문 상품 목록 */}
-                <section className="order-detail-block">
-                    <h4 className="order-detail-block-title">결제 정보</h4>
                     {/* 결제 정보 */}
                     <section className="order-detail-block">
-
+                        <h4 className="order-detail-block-title">결제 정보</h4>
                         <div className="order-detail-block-body">
                             <div className="order-detail-row">
                                 <span className="order-detail-label">결제 수단</span>
@@ -260,8 +227,38 @@ export default function UserOrderDetailPage() {
                             </div>
                         </div>
                     </section>
+                </div>
 
-
+                {/* 주문 상품 목록 */}
+                <section className="order-detail-block">
+                    <h4 className="order-detail-block-title">주문 상품</h4>
+                    <div className="order-detail-items">
+                        {order.order_items && order.order_items.length > 0 ? (
+                            order.order_items.map((item) => (
+                                <div
+                                    key={item.order_item_id}
+                                    className="order-detail-item-row"
+                                >
+                                    <div className="order-detail-item-main">
+                                        <div className="order-detail-item-name">
+                                            {item.product_name}
+                                        </div>
+                                        <div className="order-detail-item-meta">
+                                            수량 {item.quantity}개 · 개당{" "}
+                                            {formatPrice(item.product_price)}원
+                                        </div>
+                                    </div>
+                                    <div className="order-detail-item-price">
+                                        {formatPrice(item.total_amount)}원
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="order-detail-empty">
+                                주문된 상품이 없습니다.
+                            </p>
+                        )}
+                    </div>
                 </section>
             </section>
         </UserMyPageLayout>

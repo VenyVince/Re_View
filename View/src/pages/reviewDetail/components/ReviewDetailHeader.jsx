@@ -1,4 +1,3 @@
-// src/pages/reviewDetail/components/ReviewDetailHeader.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import "./ReviewDetailHeader.css";
@@ -7,7 +6,7 @@ export default function ReviewDetailHeader({ review, onLike, onDislike }) {
     return (
         <div className="rd-header">
 
-            {/* 왼쪽: 상품 이미지 영역 */}
+            {/* 왼쪽: 상품 이미지 */}
             <div className="rd-header-left">
                 <img
                     src={review.product_image || ""}
@@ -19,28 +18,19 @@ export default function ReviewDetailHeader({ review, onLike, onDislike }) {
 
             <div className="rd-header-right">
 
-                {/* 브랜드 + 좋아요/싫어요 */}
                 <div className="rd-brand-row">
                     <div className="rd-brand">{review.prd_brand}</div>
 
                     <div className="rd-like-dislike">
                         <button
-                            className={
-                                review.user_liked
-                                    ? "rd-like-btn active-like"
-                                    : "rd-like-btn"
-                            }
+                            className={review.user_liked ? "rd-like-btn active-like" : "rd-like-btn"}
                             onClick={onLike}
                         >
                             👍 {review.like_count}
                         </button>
 
                         <button
-                            className={
-                                review.user_disliked
-                                    ? "rd-dislike-btn active-dislike"
-                                    : "rd-dislike-btn"
-                            }
+                            className={review.user_disliked ? "rd-dislike-btn active-dislike" : "rd-dislike-btn"}
                             onClick={onDislike}
                         >
                             👎 {review.dislike_count}
@@ -61,9 +51,7 @@ export default function ReviewDetailHeader({ review, onLike, onDislike }) {
                             : "rd-rating"
                     }
                 >
-                    {!review.rating
-                        ? "-"
-                        : `${Number(review.rating).toFixed(1)} / 5.0`}
+                    {!review.rating ? "-" : `${Number(review.rating).toFixed(1)} / 5.0`}
                 </div>
 
                 <div className="rd-price">

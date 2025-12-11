@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserProfileBar.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import { useAuth } from "../../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../dashboard/UserDashboard.css";
@@ -15,9 +15,7 @@ export default function UserProfileBar() {
     useEffect(() => {
         async function fetchMe() {
             try {
-                const res = await axios.get("/api/users/me", {
-                    withCredentials: true,
-                });
+                const res = await axiosClient.get("/api/users/me");
 
                 const info = Array.isArray(res.data?.userInfos)
                     ? res.data.userInfos[0]
@@ -43,9 +41,7 @@ export default function UserProfileBar() {
     useEffect(() => {
         async function fetchPoint() {
             try {
-                const res = await axios.get("/api/users/me/points", {
-                    withCredentials: true,
-                });
+                const res = await axiosClient.get("/api/users/me/points");
 
                 // 컨트롤러가 Integer 하나만 리턴하므로 그대로 사용
                 const totalPoint =
