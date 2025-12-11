@@ -1,16 +1,18 @@
 // src/api/review/reviewApi.js
 import axiosClient from "../axiosClient";
+import axios from "axios";
 
-// 리뷰 생성(JSON body)
-export const createReview = (productId, body) => {
-    return axiosClient.post(`/api/reviews/${productId}`, body);
+
+// MinIO Presigned URL 발급
+export const getPresignedUrls = async (params) => {
+    const response = await axios.post('/api/images/products/convert-datas', params);
+    return response.data;
 };
 
-// 리뷰 이미지 업로드(FormData)
-export const uploadReviewImages = (formData) => {
-    return axiosClient.post(`/api/images/reviews`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
+// 리뷰 생성
+export const createReview = async (productId, body) => {
+    const response = await axios.post(`/api/reviews/${productId}`, body);
+    return response.data;
 };
 
 // 주문 목록 조회
