@@ -337,8 +337,6 @@ export default function BaumanProduct() {
                                                 <p className="product-title">{item.name}</p>
 
                                                 <div className="product-price-line">
-                                                    <span className="product-discount">
-                                                        {item.discount.toString().padStart(2, "0")}%</span>
                                                     <span className="product-price">
                                                         {item.price.toLocaleString()}
                                                         <span className="unit"> 원</span>
@@ -409,10 +407,9 @@ export default function BaumanProduct() {
                                                     }
                                                 >
                                                     <div className="review-thumb">
-                                                        <img
-                                                            src={review.imageUrl || dummyData}
-                                                            alt={review.productName}
-                                                        />
+                                                        <div className="review-thumb-inner">
+                                                            <img src={review.imageUrl || dummyData} alt={review.productName} />
+                                                        </div>
                                                     </div>
 
                                                     <div className="review-text-box">
