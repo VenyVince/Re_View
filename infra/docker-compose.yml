@@ -1,23 +1,58 @@
+# .env file 처리 해야함
 services:
   minio:
     container_name: review-minio
     image: quay.io/minio/minio
     ports:
       - "9000:9000"
-      - "9001:9001" #MinIO console UI
-    environment:
-      MINIO_ROOT_USER: review
-      MINIO_ROOT_PASSWORD: pass1234
+      - "9001:9001"
+    env_file:
+      - .env
     volumes:
       - ./minio_data:/data
     command: server /data --console-address ":9001"
+    restart: always
 
   oracle-db:
     image: gvenzl/oracle-xe:latest
     container_name: review-db
     ports:
       - "1521:1521"
-    environment:
-      ORACLE_PASSWORD: ${REVIEW_PW}
+    env_file:
+      - .env
     volumes:
       - ./oracle-data:/opt/oracle/oradata
+    restart: always
+
+  be:
+    container_name: review-be
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+        SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+        SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+        MINIO_URL: ${MINIO_URL}
+        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+        MINIO_SECRET_KEY: ${MINIO_ROOT_USER}
+        MINIO_BUCKET: ${MINIO_BUCKET}
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - minio
+      - oracle-db
+    restart: always
+
+  fe:
+    container_name: review-fe
+    build:
+      context: ../View
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - be
+    restart: always
