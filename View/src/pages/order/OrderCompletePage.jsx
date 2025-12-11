@@ -81,7 +81,7 @@ export default function OrderCompletePage() {
                     <button
                         type="button"
                         className="order-complete-btn order-complete-btn-secondary"
-                        onClick={() => navigate("/mypage/order")}
+                        onClick={() => navigate("/mypage")}
                     >
                         주문배송 조회
                     </button>

@@ -87,6 +87,9 @@ public class OrderService {
                 ));
 
         int calculatedTotalPrice = 0; // 서버에서 계산한 실제 총 상품 금액
+        final int DELIVERY_FEE = 3000; // 고정 배송비
+        final int using_point = orderCreateDTO.getUsing_point(); // 사용자가 적용한 포인트
+
         List<OrderItemDTO> orderItemsToInsert = new ArrayList<>();
 
         for (OrderDTO requestItem : orderDTOList) {
@@ -102,6 +105,9 @@ public class OrderService {
 
             // 총액 누적 계산
             calculatedTotalPrice += realPrice * quantity;
+            calculatedTotalPrice += DELIVERY_FEE; // 배송비 추가
+            calculatedTotalPrice -= using_point; // 사용 포인트 차감
+
 
             // ORDER_ITEM 테이블용 DTO 생성
             OrderItemDTO itemDTO = new OrderItemDTO();

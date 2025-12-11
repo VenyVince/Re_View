@@ -230,7 +230,8 @@ export default function OrderPaymentPage() {
 
     const handleSubmitOrder = async () => {
 
-        console.log("주문 아이템 데이터 확인:", items);
+        // 1. 디버깅을 위해 현재 아이템 구조를 명확히 출력
+        console.log("주문 아이템 데이터 전체 확인:", items);
 
         if (items.length === 0) {
             alert("주문할 상품이 없습니다. 장바구니에서 다시 시도해 주세요.");
@@ -249,13 +250,28 @@ export default function OrderPaymentPage() {
             return;
         }
 
-        // OrderCreateDTO.order_list 에 들어갈 OrderDTO 리스트 생성
-        // 백엔드 OrderDTO : product_id, buy_quantity
-        // cart 아이템에 product_id 가 없고 prd_id 로만 있다면 prd_id 를 사용
-        const orderListPayload = items.map((item) => ({
-            product_id: item.product_id || item.prd_id,
-            buy_quantity: item.quantity,
-        }));
+        // 2. OrderDTO 리스트 생성 (매핑 로직 수정)
+        const orderListPayload = items.map((item) => {
+            // item 안에서 상품 ID가 될만한 키를 모두 찾아봅니다.
+            // (백엔드나 장바구니 로직에 따라 productId, id, product_id, prd_id 등 다양할 수 있음)
+            const pId = item.product_id || item.prd_id || item.productId || item.id;
+
+            // 디버깅: ID가 안 잡히는 경우 로그 출력
+            if (!pId) {
+                console.error("상품 ID를 찾을 수 없습니다. 아이템 데이터:", item);
+            }
+
+            return {
+                product_id: pId,
+                buy_quantity: item.quantity, // quantity도 혹시 모르니 item.buy_quantity 등 확인 필요할 수 있음
+            };
+        });
+
+        // 3. 방어 코드: 상품 ID가 하나라도 없으면 요청을 보내지 않음
+        if (orderListPayload.some(orderItem => !orderItem.product_id)) {
+            alert("상품 정보를 정확히 불러오지 못했습니다. (Product ID Missing)");
+            return;
+        }
 
         const orderPayload = {
             order_list: orderListPayload,
@@ -263,8 +279,10 @@ export default function OrderPaymentPage() {
             address_id: address.address_id,
             payment_id: selectedPaymentId,
             total_price: totalPayAmount,
-            // user_id 는 OrderController 에서 Security_Util 로 세팅하므로 여기서 넣지 않음
         };
+
+        // 최종 전송될 페이로드 확인
+        console.log("최종 전송 Payload:", orderPayload);
 
         try {
             await axios.post("/api/orders", orderPayload, {

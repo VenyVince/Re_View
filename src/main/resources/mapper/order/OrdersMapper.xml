@@ -76,12 +76,13 @@
     </insert>
 
     <insert id="insertOrderItems" parameterType="java.util.List">
-        INSERT ALL
-        <foreach collection="list" item="item">
-            INTO ORDER_ITEM (
+        <foreach collection="list" item="item" open="BEGIN" close="; END;" separator=";">
+            INSERT INTO ORDER_ITEM (
             ORDER_ID,
             PRODUCT_ID,
-            PRODUCT_NAME,  PRODUCT_PRICE, QUANTITY
+            PRODUCT_NAME,
+            PRODUCT_PRICE,
+            QUANTITY
             ) VALUES (
             #{item.order_id},
             #{item.product_id},
@@ -90,7 +91,6 @@
             #{item.quantity}
             )
         </foreach>
-        SELECT * FROM DUAL
     </insert>
 
     <select id="findByOrderNoContainingOrDeliveryNumContaining"
