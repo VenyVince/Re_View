@@ -28,8 +28,9 @@
         SELECT * FROM DUAL
     </insert>
 
+    <!-- ImageMapper.xml -->
     <insert id="insertReviewObjectKey">
-        INSERT INTO review_image (
+        INSERT INTO review_images (
             review_id,
             image_url
         ) VALUES (
