@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import "./UserCartPage.css";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 
 export default function UserCartPage() {
     const navigate = useNavigate();
@@ -21,9 +21,7 @@ export default function UserCartPage() {
             setLoading(true);
             setError("");
 
-            const res = await axios.get("/api/cart", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/cart");
 
             // 응답 스키마:
             // [
@@ -127,14 +125,10 @@ export default function UserCartPage() {
 
             (async () => {
                 try {
-                    await axios.patch(
-                        "/api/cart",
-                        {
-                            product_id: productId,
-                            quantity: newQty,
-                        },
-                        { withCredentials: true }
-                    );
+                    await axiosClient.patch("/api/cart", {
+                        product_id: productId,
+                        quantity: newQty,
+                    });
                 } catch (e) {
                     alert("수량 변경 중 오류가 발생했어요. 다시 시도해 주세요.");
 
@@ -168,9 +162,8 @@ export default function UserCartPage() {
             // 모든 선택 상품에 대해 DELETE 호출
             await Promise.all(
                 selected.map((item) =>
-                    axios.delete("/api/cart", {
+                    axiosClient.delete("/api/cart", {
                         data: { product_id: item.product_id }, // ⭐ Map<String, Integer> request.get("product_id")
-                        withCredentials: true,
                     })
                 )
             );
@@ -189,9 +182,8 @@ export default function UserCartPage() {
         if (!window.confirm("해당 상품을 장바구니에서 삭제하시겠습니까?")) return;
 
         try {
-            await axios.delete("/api/cart", {
+            await axiosClient.delete("/api/cart", {
                 data: { product_id: productId },
-                withCredentials: true,
             });
 
             setItems((prev) =>

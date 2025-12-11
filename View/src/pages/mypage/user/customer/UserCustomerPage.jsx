@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserCustomerPage.css";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import { faqDummy } from "../dummy/customerDummy"; // FAQ 는 더미 그대로 사용
 
 export default function UserCustomerPage() {
@@ -59,9 +59,7 @@ export default function UserCustomerPage() {
             setQnaLoading(true);
             setQnaError(null);
             try {
-                const res = await axios.get("/api/qna/my", {
-                    withCredentials: true,
-                });
+                const res = await axiosClient.get("/api/qna/my");
                 // 스키마: [{ qna_id, prd_name, title, created_at, status, ... }]
                 setInquiries(res.data || []);
             } catch (err) {
@@ -82,9 +80,7 @@ export default function UserCustomerPage() {
         setDetailLoadingId(qnaId);
         setDetailErrorId(null);
         try {
-            const res = await axios.get(`/api/qna/${qnaId}`, {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get(`/api/qna/${qnaId}`);
             // 스키마: { qna_id, product_id, title, content, answer, ... }
             setQnaDetails((prev) => ({
                 ...prev,
@@ -116,10 +112,6 @@ export default function UserCustomerPage() {
         }
     };
 
-    // 문의 작성 버튼 (아직 더미)
-    const handleClickNewInquiry = () => {
-        alert("문의 작성 페이지는 추후 백엔드 연동 시 구현 예정입니다.");
-    };
 
     // FAQ 토글
     const toggleFaq = (id) => {
@@ -172,7 +164,7 @@ export default function UserCustomerPage() {
 
         try {
             // 백엔드 QnaController.updateQna 에 맞춘 호출
-            await axios.put(
+            await axiosClient.put(
                 "/api/qna",
                 {
                     qna_id: editingId,
@@ -181,7 +173,6 @@ export default function UserCustomerPage() {
                     content,
                     // user_id 는 백엔드에서 Security_Util 로 덮어씌움
                 },
-                { withCredentials: true }
             );
 
             // 리스트 갱신
@@ -221,11 +212,7 @@ export default function UserCustomerPage() {
 
         try {
             console.log("[QNA] 삭제 요청 시도:", item.qna_id);
-            await axios({
-                method: "delete",
-                url: `/api/qna/${item.qna_id}`,
-                withCredentials: true,
-            });
+            await axiosClient.delete(`/api/qna/${item.qna_id}`);
 
             console.log("[QNA] 삭제 요청 성공:", item.qna_id);
 

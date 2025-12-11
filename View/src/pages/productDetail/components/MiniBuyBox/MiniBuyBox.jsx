@@ -24,6 +24,7 @@ export default function MiniBuyBox({
             if (miniActionType === "buy") {
                 // OrderPaymentPage가 요구하는 데이터 구조로 직접 전달
                 const orderItem = {
+                    product_id: product.product_id,
                     prd_name: product.prd_name,
                     prd_brand: product.prd_brand,
                     price: product.price,

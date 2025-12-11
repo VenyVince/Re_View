@@ -1,6 +1,6 @@
 // src/pages/order/OrderAddressSelectPanel.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosClient from "../../api/axiosClient";
 
 export default function OrderAddressSelectPanel({
                                                     currentAddress,      // { postal_code, address, detail_address, ... }
@@ -54,9 +54,7 @@ export default function OrderAddressSelectPanel({
     const fetchAddresses = async () => {
         try {
             setLoading(true);
-            const res = await axios.get("/api/addresses", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/addresses");
 
             const list = Array.isArray(res.data) ? res.data : [];
 
@@ -134,9 +132,7 @@ export default function OrderAddressSelectPanel({
         if (!window.confirm("해당 배송지를 삭제하시겠습니까?")) return;
 
         try {
-            await axios.delete(`/api/addresses/${id}`, {
-                withCredentials: true,
-            });
+            await axiosClient.delete(`/api/addresses/${id}`);
 
             // 삭제 후 목록 갱신
             await fetchAddresses();
@@ -170,18 +166,12 @@ export default function OrderAddressSelectPanel({
             if (editingId != null) {
                 // 수정
                 const dto = mapFormToDto(form, { address_id: editingId });
-                await axios.patch(`/api/addresses/${editingId}`, dto, {
-                    withCredentials: true,
-                    headers: { "Content-Type": "application/json" },
-                });
+                await axiosClient.patch(`/api/addresses/${editingId}`, dto);
                 alert("배송지가 수정되었습니다.");
             } else {
                 // 새로 추가
                 const dto = mapFormToDto(form);
-                await axios.post("/api/addresses", dto, {
-                    withCredentials: true,
-                    headers: { "Content-Type": "application/json" },
-                });
+                await axiosClient.post("/api/addresses", dto);
                 alert("새 배송지가 추가되었습니다.");
             }
 
