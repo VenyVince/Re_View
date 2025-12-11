@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosClient from "../../../api/axiosClient";
 import UserMyPageLayout from "./layout/UserMyPageLayout";
 import "./UserPointHistoryPage.css";
 
@@ -25,9 +25,7 @@ export default function UserPointHistoryPage() {
                 setError("");
 
                 // 1) 총 포인트
-                const totalRes = await axios.get("/api/users/me/points", {
-                    withCredentials: true,
-                });
+                const totalRes = await axiosClient.get("/api/users/me/points");
                 const total =
                     typeof totalRes.data === "number"
                         ? totalRes.data
@@ -35,11 +33,8 @@ export default function UserPointHistoryPage() {
                 setTotalPoint(total);
 
                 // 2) 포인트 히스토리
-                const historyRes = await axios.get(
-                    "/api/users/me/points/history",
-                    {
-                        withCredentials: true,
-                    }
+                const historyRes = await axiosClient.get(
+                    "/api/users/me/points/history"
                 );
 
                 const list = Array.isArray(historyRes.data)
@@ -124,7 +119,7 @@ export default function UserPointHistoryPage() {
 
                                 // PointResponseDTO 에는 적용 후 포인트(balance)가 없으므로,
                                 // 이 컬럼은 현재는 표시하지 않고 '-' 로 대체
-                                const afterBalance = null;
+                                // const afterBalance = null;
 
                                 return (
                                     <tr key={id}>
