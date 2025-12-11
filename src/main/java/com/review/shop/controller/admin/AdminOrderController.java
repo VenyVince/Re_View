@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
 @Tag(name = "Admin API", description = "관리자 주문 상태 관리 기능 API")
 @RestController
 @RequestMapping("/api/admin")
@@ -25,19 +26,20 @@ public class AdminOrderController {
     // SECTION: 주문 관리 (Order)
     // =================================================================================
 
-    @Operation(summary = "주문 상태 변경", description = "특정 주문의 상태를 변경합니다.")
+    @Operation(summary = "주문 상태 변경", description = "특정 주문의 상태를 변경합니다. (completed: 주문완료, in_delivery: 배송중, delivered: 배송완료)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "주문 상태 변경 성공"),
-            @ApiResponse(responseCode = "400", description = "백엔드 오류")
-            ,
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (유효하지 않은 주문 상태)"),
+            @ApiResponse(responseCode = "404", description = "주문을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "DB 조회 오류",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PatchMapping("/orders/{order_id}/status")
     public ResponseEntity<String> updateOrderStatus(
             @Parameter(description = "상태 변경할 주문의 ID") @PathVariable int order_id,
-            @RequestBody @Schema(example = "{\"orderStatus\": \"SHIPPED\"}") Map<String, String> payload) {
+            @RequestBody @Schema(example = "{\"orderStatus\": \"in_delivery\"}") Map<String, String> payload) {
         adminOrderService.updateOrderStatus(order_id, payload.get("orderStatus"));
         return ResponseEntity.ok("주문 상태가 변경되었습니다");
     }
+
 }

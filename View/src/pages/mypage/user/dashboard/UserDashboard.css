@@ -519,6 +519,10 @@
     background-color: #000;
 }
 
+.mypage-profile-point {
+    cursor: pointer;
+}
+
 /* 반응형 약간 보정 */
 @media (max-width: 768px) {
     .delivery-default-box {

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axiosClient from "../../../api/axiosClient"; // axiosClient 임포트 추가
 import {
     Wrap, Inner, Title, Panel, Row, Label, Input,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper
 } from "./adminProductEdit.style";
-import { updateProduct, fetchAdminProduct, updateProductImages } from "../../../api/admin/adminProductApi";
+import { updateProduct, fetchAdminProduct } from "../../../api/admin/adminProductApi";
 
-// 바우만 타입 코드
 const BAUMANN_ID_MAP = {
     DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
     DRPW: 10, DRPT: 11, DRP_: 12, DRNW: 13, DRNT: 14, DRN_: 15, DR_W: 16, DR_T: 17, DR__: 18,
@@ -19,16 +19,54 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
-// 역매핑
 const BAUMANN_CODE_BY_ID = Object.fromEntries(
     Object.entries(BAUMANN_ID_MAP).map(([code, id]) => [id, code])
 );
+
+/**
+ * [추가/수정된 함수] 단일 파일을 Presigned URL로 업로드하고 Object Key를 반환합니다.
+ * @param {File} file 업로드할 파일 객체
+ * @returns {string | null} 업로드된 파일의 Object Key
+ */
+const uploadSingleImage = async (file) => {
+    if (!file) return null;
+
+    try {
+        // 1. Presigned URL 발급 요청 (Body에 파일명 전송)
+        // AdminProductNew.js와 동일한 /convert-data 엔드포인트 사용
+        const res = await axiosClient.post(
+            "/api/images/products/convert-data",
+            { fileName: file.name }
+        );
+
+        const { objectKey, presignedUrl } = res.data;
+
+        // 2. MinIO에 실제 파일 업로드 (PUT)
+        const uploadRes = await fetch(presignedUrl, {
+            method: "PUT",
+            body: file,
+            headers: { "Content-Type": file.type },
+        });
+
+        if (!uploadRes.ok) {
+            throw new Error(`이미지 업로드 실패: ${file.name}`);
+        }
+
+        return objectKey;
+
+    } catch (err) {
+        console.error("Presigned URL 이미지 업로드 실패:", err);
+        throw new Error("이미지 업로드 서버 요청에 실패했습니다.");
+    }
+};
 
 export default function AdminProductEdit() {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const [originalBaumannId, setOriginalBaumannId] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false); // 전송 상태 추가
 
     const [form, setForm] = useState({
         prd_name: "",
@@ -39,48 +77,49 @@ export default function AdminProductEdit() {
         stock: "",
         description: "",
         baumannType: "",
-        product_images: [],
-        mainPreview: "",
-        detailPreview: "",
-        mainImage: null,
-        detailImage: null,
+        mainPreview: "", // 기존 키(Key) 또는 임시 URL
+        detailPreview: "", // 기존 키(Key) 또는 임시 URL
+        mainImage: null, // 새 파일 객체
+        detailImage: null, // 새 파일 객체
         rating: 0,
+        review_count: 0,
+        is_sold_out: 0
     });
 
-    const [loading, setLoading] = useState(true);
-
-    // 기존 데이터 가져오기
     useEffect(() => {
         const load = async () => {
             try {
                 const data = await fetchAdminProduct(id);
+                const { product, thumbnail_image, detail_image } = data;
 
-                // 이미지 null-safe 처리
-                const images = Array.isArray(data.product_images)
-                    ? data.product_images
-                    : [];
+                if (!product) {
+                    throw new Error("No product data");
+                }
 
-                // baumann_id 원본 저장
-                setOriginalBaumannId(data.baumann_id);
+                setOriginalBaumannId(product.baumann_id);
 
                 setForm((prev) => ({
                     ...prev,
-                    prd_name: data.prd_name ?? "",
-                    ingredient: data.ingredient ?? "",
-                    prd_brand: data.prd_brand ?? "",
-                    category: data.category ?? "",
-                    price: String(data.price ?? ""),
-                    stock: String(data.stock ?? ""),
-                    description: data.description ?? "",
-                    baumannType: BAUMANN_CODE_BY_ID[data.baumann_id] ?? "",
-                    product_images: images,
-                    mainPreview: images[0] ?? "",
-                    detailPreview: images[1] ?? "",
-                    rating: data.rating ?? 0,
+                    prd_name: product.prd_name ?? "",
+                    ingredient: product.ingredient ?? "",
+                    prd_brand: product.prd_brand ?? "",
+                    category: product.category ?? "",
+                    price: String(product.price ?? ""),
+                    stock: String(product.stock ?? ""),
+                    description: product.description ?? "",
+                    baumannType: BAUMANN_CODE_BY_ID[product.baumann_id] ?? "",
+                    rating: product.rating ?? 0,
+                    review_count: product.review_count ?? 0,
+                    is_sold_out: product.is_sold_out ?? 0,
+                    // 서버에서 받은 Object Key를 Preview로 설정 (Key가 URL 역할도 함)
+                    mainPreview: thumbnail_image ?? "",
+                    detailPreview: detail_image ?? "",
+                    mainImage: null,
+                    detailImage: null
                 }));
             } catch (e) {
                 console.error(e);
-                alert("상품 정보를 불러오지 못했습니다.\n상품 ID: " + id);
+                alert("상품 정보를 불러오지 못했습니다.");
                 navigate("/admin/allproducts");
             } finally {
                 setLoading(false);
@@ -89,7 +128,6 @@ export default function AdminProductEdit() {
         load();
     }, [id, navigate]);
 
-    // input 변경 처리
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({
@@ -98,23 +136,26 @@ export default function AdminProductEdit() {
         }));
     };
 
-    // 이미지 선택 미리보기
     const onPickImage = (key, previewKey) => (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // URL.createObjectURL은 새 파일을 위한 임시 로컬 URL입니다.
         const url = URL.createObjectURL(file);
 
         setForm((prev) => ({
             ...prev,
-            [key]: file,
-            [previewKey]: url
+            [key]: file, // 새 파일 객체 저장
+            [previewKey]: url // 로컬 프리뷰 URL 저장 (기존 키를 덮어씀)
         }));
     };
 
-    // 제출
+
     const onSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
 
         try {
             let baumann_id = originalBaumannId;
@@ -127,28 +168,45 @@ export default function AdminProductEdit() {
                 }
             }
 
-            // 이미지 변경 여부 확인 -> 변경 시 put/ images 호출
-            if (form.mainImage || form.detailImage) {
-                await updateProductImages(id, form.mainImage, form.detailImage);
+            // ==========================================================
+            // [이미지 처리 로직]
+            // 기본값: 기존 키/URL (form.mainPreview는 로드 시 Object Key를 가지고 있음)
+            let finalThumbnailKey = form.mainPreview;
+            let finalDetailKey = form.detailPreview;
+
+            // 1. 대표 이미지 처리: 새 파일이 있다면 업로드하고 새 키를 받습니다.
+            if (form.mainImage) {
+                // uploadSingleImage는 업로드 후 Object Key를 반환합니다.
+                finalThumbnailKey = await uploadSingleImage(form.mainImage);
             }
 
-            // 상품 정보 patch
+            // 2. 상세 이미지 처리: 새 파일이 있다면 업로드하고 새 키를 받습니다.
+            if (form.detailImage) {
+                finalDetailKey = await uploadSingleImage(form.detailImage);
+            }
+            // ==========================================================
+
+
             const payload = {
-                prd_name: form.prd_name,
-                prd_brand: form.prd_brand,
-                ingredient: form.ingredient,
-                category: form.category,
-                price: Number(form.price),
-                stock: Number(form.stock),
-                description: form.description,
-                baumann_id,
-                is_sold_out: form.is_sold_out ?? 0, // 또는 0 고정
-                rating: form.rating ?? 0,
-                review_count: form.review_count ?? 0,
-                product_images: form.product_images ?? [],
+                product: {
+                    product_id: Number(id),
+                    prd_name: form.prd_name,
+                    prd_brand: form.prd_brand,
+                    ingredient: form.ingredient,
+                    category: form.category,
+                    price: Number(form.price),
+                    stock: Number(form.stock),
+                    description: form.description,
+                    baumann_id: baumann_id,
+                    is_sold_out: form.is_sold_out ?? 0,
+                    rating: form.rating ?? 0,
+                    review_count: form.review_count ?? 0
+                },
+                // DB에는 최종 Object Key를 전송합니다. (업로드된 새 키 또는 기존 키)
+                thumbnail_image: finalThumbnailKey,
+                detail_image: finalDetailKey
             };
 
-            console.log("PATCH PAYLOAD", payload);
 
             await updateProduct(id, payload);
 
@@ -156,7 +214,9 @@ export default function AdminProductEdit() {
             navigate("/admin/allproducts");
         } catch (err) {
             console.error(err);
-            alert("상품 수정 중 오류가 발생했습니다.");
+            alert("상품 수정 중 오류가 발생했습니다. (이미지 업로드 실패 혹은 입력값 확인)");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -175,10 +235,8 @@ export default function AdminProductEdit() {
         <Wrap>
             <Inner>
                 <Title>상품 수정</Title>
-
                 <form onSubmit={onSubmit}>
                     <Panel>
-
                         <Row>
                             <Label>상품명</Label>
                             <Input
@@ -186,9 +244,9 @@ export default function AdminProductEdit() {
                                 value={form.prd_name}
                                 onChange={onChange}
                                 placeholder="상품명을 입력해주세요."
+                                disabled={isSubmitting}
                             />
                         </Row>
-
                         <Row>
                             <Label>성분</Label>
                             <TextArea
@@ -196,20 +254,9 @@ export default function AdminProductEdit() {
                                 value={form.ingredient}
                                 onChange={onChange}
                                 placeholder="성분을 입력해주세요."
+                                disabled={isSubmitting}
                             />
                         </Row>
-
-                        <Row>
-                            <Label>상세 설명</Label>
-                            <TextArea
-                                name="description"
-                                value={form.description}
-                                onChange={onChange}
-                                placeholder="상세 설명을 입력해주세요."
-                            />
-                        </Row>
-
-                        {/* 대표 사진 */}
                         <Row>
                             <Label>대표 사진</Label>
                             <ImageBox>
@@ -220,17 +267,16 @@ export default function AdminProductEdit() {
                                         "이미지"
                                     )}
                                 </div>
-                                <UploadBtn htmlFor="mainImg">대표 사진 첨부 +</UploadBtn>
+                                <UploadBtn htmlFor="mainImg" disabled={isSubmitting}>대표 사진 첨부 +</UploadBtn>
                                 <input
                                     id="mainImg"
                                     type="file"
                                     accept="image/*"
                                     onChange={onPickImage("mainImage", "mainPreview")}
+                                    disabled={isSubmitting}
                                 />
                             </ImageBox>
                         </Row>
-
-                        {/* 상세 사진 */}
                         <Row>
                             <Label>상세 사진</Label>
                             <ImageBox>
@@ -241,17 +287,16 @@ export default function AdminProductEdit() {
                                         "이미지"
                                     )}
                                 </div>
-                                <UploadBtn htmlFor="detailImg">상세 사진 첨부 +</UploadBtn>
+                                <UploadBtn htmlFor="detailImg" disabled={isSubmitting}>상세 사진 첨부 +</UploadBtn>
                                 <input
                                     id="detailImg"
                                     type="file"
                                     accept="image/*"
                                     onChange={onPickImage("detailImage", "detailPreview")}
+                                    disabled={isSubmitting}
                                 />
                             </ImageBox>
                         </Row>
-
-                        {/* 브랜드/카테고리 */}
                         <Row>
                             <Label>브랜드 / 카테고리</Label>
                             <div style={{ flex: 1, display: "flex", gap: "12px" }}>
@@ -260,17 +305,17 @@ export default function AdminProductEdit() {
                                     value={form.prd_brand}
                                     onChange={onChange}
                                     placeholder="브랜드명"
+                                    disabled={isSubmitting}
                                 />
                                 <Input
                                     name="category"
                                     value={form.category}
                                     onChange={onChange}
                                     placeholder="예: 크림, 토너"
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </Row>
-
-                        {/* 가격/재고 */}
                         <Row>
                             <Label>가격 / 재고</Label>
                             <div style={{ flex: 1, display: "flex", gap: "12px" }}>
@@ -281,6 +326,7 @@ export default function AdminProductEdit() {
                                     value={form.price}
                                     onChange={onChange}
                                     placeholder="가격(원)"
+                                    disabled={isSubmitting}
                                 />
                                 <Input
                                     type="number"
@@ -289,11 +335,10 @@ export default function AdminProductEdit() {
                                     value={form.stock}
                                     onChange={onChange}
                                     placeholder="재고"
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </Row>
-
-                        {/* 바우만 타입 */}
                         <Row>
                             <Label>Baumann 타입</Label>
                             <div style={{ flex: 1 }}>
@@ -302,6 +347,7 @@ export default function AdminProductEdit() {
                                     value={form.baumannType}
                                     onChange={onChange}
                                     placeholder="예) DRNT, DSPW, OSNT ..."
+                                    disabled={isSubmitting}
                                 />
                                 <Helper>
                                     * Baumann 코드 입력 → 자동으로 baumann_id 변환됩니다.
@@ -309,9 +355,10 @@ export default function AdminProductEdit() {
                             </div>
                         </Row>
                     </Panel>
-
                     <FooterRow>
-                        <SubmitBtn type="submit">상품 수정</SubmitBtn>
+                        <SubmitBtn type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? "수정 중..." : "상품 수정"}
+                        </SubmitBtn>
                     </FooterRow>
                     <Helper>* 저장 시 목록으로 이동합니다.</Helper>
                 </form>

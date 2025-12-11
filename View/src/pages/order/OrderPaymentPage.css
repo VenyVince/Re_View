@@ -586,3 +586,201 @@
     gap: 6px;
     font-size: 13px;
 }
+
+
+/* ===== 결제수단 카드 공통 ===== */
+.order-payment-body {
+    margin-top: 12px;
+}
+
+.order-payment-error {
+    color: #e03131;
+    font-size: 0.875rem;
+}
+
+/* 카드 리스트 */
+.order-payment-card-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-payment-card-item {
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.order-payment-card-item--selected {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
+}
+
+.order-payment-card-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    cursor: pointer;
+}
+
+.order-payment-card-main input[type="radio"] {
+    margin: 0;
+}
+
+.order-payment-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-payment-card-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.order-payment-card-company {
+    color: #111827;
+}
+
+.order-payment-card-badge {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background-color: #eef2ff;
+    color: #3730a3;
+}
+
+.order-payment-card-number {
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.order-payment-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-payment-card-edit-btn,
+.order-payment-card-delete-btn {
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.order-payment-card-edit-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.order-payment-card-delete-btn {
+    color: #e03131;
+}
+
+.order-payment-card-delete-btn:hover {
+    background-color: #fef2f2;
+}
+
+/* 결제수단 폼 */
+.order-payment-form {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-payment-form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.order-payment-form-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-payment-form-field label {
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.order-payment-form-field input {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    padding: 6px 8px;
+    font-size: 0.9rem;
+}
+
+.order-payment-form-field input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25);
+}
+
+.order-payment-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.order-payment-form-reset-btn {
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #6b7280;
+}
+
+.order-payment-form-reset-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.order-payment-form-submit-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #111827;
+    color: #ffffff;
+}
+
+.order-payment-form-submit-btn:hover {
+    background-color: #000000;
+}
+
+/* 결제 예정 금액 표시 */
+.order-payment-amount {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.order-payment-amount-value {
+    font-weight: 700;
+    font-size: 1rem;
+}

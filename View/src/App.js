@@ -45,6 +45,7 @@ import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
 import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
 import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
 import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
+import AdminOrderPage from "./pages/mypage/admin/AdminOrderPage";
 
 import UserProfileEdit from "./pages/mypage/user/profile/UserProfileEdit";
 
@@ -61,6 +62,7 @@ import OrderPaymentPage from "./pages/order/OrderPaymentPage";
 import OrderCompletePage from "./pages/order/OrderCompletePage";
 import UserProtectedRoute from "./components/user/UserProtectedRoute";
 import UserOrderDetailPage from "./pages/mypage/user/delivery/UserOrderDetailPage";
+import UserPointHistoryPage from "./pages/mypage/user/UserPointHistoryPage";
 
 export default function App() {
     return (
@@ -114,6 +116,7 @@ export default function App() {
                         <Route path="qna" element={<AdminQnaPage />} />
                         <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
                         <Route path="users" element={<AdminUserPage />} />
+                        <Route path="orders" element={<AdminOrderPage />} />
                     </Route>
                 </Route>
 
@@ -126,6 +129,7 @@ export default function App() {
 
                     <Route path="/mypage/address" element={<UserAddressPage />} />
                     <Route path="/mypage/profile" element={<UserProfileEdit />} />
+                    <Route path="/mypage/points" element={<UserPointHistoryPage />} />
                     <Route path="/mypage/cart" element={<UserCartPage />} />
                     <Route path="/mypage/wish" element={<UserWishPage />} />
                     <Route path="/mypage/cs" element={<UserCustomerPage />} />

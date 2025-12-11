@@ -271,3 +271,72 @@
     line-height: 1.6;
     text-align: left;
 }
+
+/* ===== 1:1 문의 상세 수정/삭제 UI ===== */
+
+.cs-detail-edit {
+    margin-top: 12px;
+}
+
+.cs-detail-input,
+.cs-detail-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.cs-detail-input:focus,
+.cs-detail-textarea:focus {
+    outline: none;
+    border-color: #111;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+    background: #fff;
+}
+
+.cs-detail-actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.cs-detail-btn {
+    min-width: 88px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cs-detail-btn:hover {
+    background: #f5f5f5;
+}
+
+.cs-detail-btn-primary {
+    border-color: #111;
+    background: #111;
+    color: #fff;
+}
+
+.cs-detail-btn-primary:hover {
+    background: #222;
+}
+
+.cs-detail-btn-danger {
+    border-color: #d32f2f;
+    color: #d32f2f;
+}
+
+.cs-detail-btn-danger:hover {
+    background: #fff4f4;
+}

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function BaumanProduct() {
     const navigate = useNavigate();
+    const [activeTag, setActiveTag] = useState("all");
 
     /* 전체 바우만 타입 리스트 */
     const allTypes = [
@@ -21,7 +22,6 @@ export default function BaumanProduct() {
         return allTypes[Math.floor(Math.random() * allTypes.length)];
     }
 
-    // 로그인 유저의 실제 타입
     const [currentType, setCurrentType] = useState(null);
 
     /* 로그인 여부 + 타입 조회 */
@@ -31,12 +31,12 @@ export default function BaumanProduct() {
                 const res = await axios.get("/api/auth/my-baumann-type");
 
                 if (typeof res.data === "string" && res.data.length > 0) {
-                    setCurrentType(res.data); // 로그인 + 타입 존재
+                    setCurrentType(res.data);
                 } else {
-                    setCurrentType(null); // 타입 없음
+                    setCurrentType(null);
                 }
             } catch (err) {
-                setCurrentType(null); // 비로그인
+                setCurrentType(null);
             }
         };
 
@@ -63,18 +63,13 @@ export default function BaumanProduct() {
         { type: "OSPW", tags: ["지성", "민감성", "색소성", "주름"] }
     ];
 
-    /*
-      UI에 보여줄 타입 결정
-      - 로그인: 유저의 currentType
-      - 비로그인: 랜덤 타입
-    */
     const displayType = currentType || getRandomType();
     const selectedType = skinTypeList.find((t) => t.type === displayType);
 
     /* 탭 */
     const [activeTab, setActiveTab] = useState("product");
 
-    /* 상품 데이터 */
+    /* 상품 API */
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -82,7 +77,6 @@ export default function BaumanProduct() {
     /* 상품 호출 */
     useEffect(() => {
         if (!currentType) {
-            // 비로그인 → 추천상품 API 호출 안 함
             setLoading(false);
             return;
         }
@@ -92,19 +86,6 @@ export default function BaumanProduct() {
                 setLoading(true);
                 setError("");
 
-                /*
-                   first/second/third/fourth 매핑 이유
-                   백엔드 추천 모델은 16가지 Baumann 타입을 그대로 사용하지 않고,
-                   피부 특성축 (S/R, P/N 조합)에 따라 유사한 그룹 4가지로 단순화한다.
-
-                   예:
-                   - DR(N/T) → first 그룹
-                   - DP(N/T) → second 그룹
-                   - DS(N/T) → third 그룹
-                   - DW(N/T) → fourth 그룹
-
-                   즉, 16 타입을 4 타입으로 축약해서 추천 알고리즘 효율을 높이는 구조임.
-                */
                 const typeMap = {
                     DRNT: "first", DRNW: "first",
                     DRPT: "second", DRPW: "second",
@@ -145,7 +126,6 @@ export default function BaumanProduct() {
                 setProducts(mapped);
 
             } catch (err) {
-                console.error(err);
                 setError("추천 상품을 불러오지 못했습니다.");
                 setProducts([]);
             } finally {
@@ -156,7 +136,7 @@ export default function BaumanProduct() {
         fetchRecommendProducts();
     }, [currentType]);
 
-    // 리뷰 모아서 하나의 리스트로 사용
+    /* 리뷰 리스트 */
     const reviewList = products
         .filter((p) => p.topReview)
         .map((p) => ({
@@ -166,42 +146,84 @@ export default function BaumanProduct() {
             imageUrl: p.imageUrl,
         }));
 
-    // 상품 페이지네이션
+    /* 상품 페이지네이션 */
     const [productPage, setProductPage] = useState(1);
     const productPageSize = 16;
-
-    // 리뷰 페이지네이션
-    const [reviewPage, setReviewPage] = useState(1);
-    const reviewPageSize = 16;
-
-    // 페이지 별 데이터 분리
-    // 상품
     const productStart = (productPage - 1) * productPageSize;
     const displayedProducts = products.slice(productStart, productStart + productPageSize);
-
     const productTotalPages = Math.ceil(products.length / productPageSize);
 
-    // 리뷰
+    /* 리뷰 페이지네이션 */
+    const [reviewPage, setReviewPage] = useState(1);
+    const reviewPageSize = 16;
     const reviewStart = (reviewPage - 1) * reviewPageSize;
     const displayedReviews = reviewList.slice(reviewStart, reviewStart + reviewPageSize);
-
     const reviewTotalPages = Math.ceil(reviewList.length / reviewPageSize);
 
-    // 탭 전환 시 페이지 초기화
     useEffect(() => {
-        if (activeTab === "product") {
-            setProductPage(1);
-        } else {
-            setReviewPage(1);
-        }
+        if (activeTab === "product") setProductPage(1);
+        else setReviewPage(1);
     }, [activeTab]);
 
+    /* 태그 클릭 */
+    const mapProducts = (raw) => {
+        return raw.map((p) => ({
+            id: p.product_id,
+            name: p.prd_name,
+            brand: p.prd_brand,
+            imageUrl: p.image_url,
+            price: p.price,
+            rating: p.rating,
+            ratingText: p.rating ? `${p.rating}/5.0` : "-",
+            discount: 0,
+            isBest: p.rating >= 4.5,
+            topReview: p.top_review_content
+                ? {
+                    id: p.top_review_id,
+                    content: p.top_review_content,
+                    rating: p.top_review_rating,
+                    likes: p.top_review_likes,
+                    productName: p.prd_name,
+                }
+                : null,
+        }));
+    };
+
+    const handleTagClick = async (mappedType) => {
+        console.log("🔥 handleTagClick 호출됨:", mappedType);
+        try {
+            setActiveTag(mappedType);
+            setLoading(true);
+            setError("");
+
+            if (mappedType === "all") {
+                const groups = ["first", "second", "third", "fourth"];
+                const results = await Promise.all(
+                    groups.map(group => axios.post(`/api/recommendations/${group}`))
+                );
+
+                const merged = results
+                    .flatMap(res => res.data?.recommended_products || [])
+                    .map((p) => ({ ...mapProducts([p])[0] }));
+
+                const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
+
+                return setProducts(unique);
+            }
+
+            const res = await axios.post(`/api/recommendations/${mappedType}`);
+            setProducts(mapProducts(res.data?.recommended_products || []));
+
+        } catch (error) {
+            setError("추천 상품을 불러오지 못했습니다.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <section className="bauman-section">
-            <h2 className="bauman-title">
-                {displayType}의 추천 상품
-            </h2>
+            <h2 className="bauman-title">{displayType}의 추천 상품</h2>
 
             {/* 탭 */}
             <div className="bauman-tabs">
@@ -221,7 +243,7 @@ export default function BaumanProduct() {
 
             <div className="bauman-box">
 
-                {/* 타입 박스  */}
+                {/* 타입 박스 */}
                 {selectedType && (
                     <div className="bauman-header">
                         <div className="bauman-header-right">
@@ -240,19 +262,46 @@ export default function BaumanProduct() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* 태그 버튼 */}
+                            <div className="bauman-tag-buttons">
+                                <button
+                                    className={`bauman-tag-btn ${activeTag === "all" ? "active-tag" : ""}`}
+                                    onClick={() => handleTagClick("all")}
+                                >
+                                    ALL
+                                </button>
+
+                                {selectedType.tags.map((tag, index) => (
+                                    <button
+                                        key={index}
+                                        className={`bauman-tag-btn ${
+                                            activeTag === ["first", "second", "third", "fourth"][index]
+                                                ? "active-tag"
+                                                : ""
+                                        }`}
+                                        onClick={() =>
+                                            handleTagClick(["first", "second", "third", "fourth"][index])
+                                        }
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* 에러표시 */}
+                {/* 에러 */}
                 {error && currentType !== null && (
                     <p className="bauman-error">{error}</p>
                 )}
 
-                {/* 추천 상품 탭 랜더링*/}
+                {/* ================================
+                     상품 탭
+                ================================= */}
                 {activeTab === "product" && (
-                    <div style={{ position: "relative" }}>
-                        {/* 상품 영역 (비로그인 → blur 처리) */}
+                    <div className="overlay-container">
                         <div className={currentType ? "" : "blur-block"}>
                             <div className="product-grid">
                                 {loading ? (
@@ -266,8 +315,7 @@ export default function BaumanProduct() {
                                             className="product-card"
                                             style={{ cursor: currentType ? "pointer" : "default" }}
                                             onClick={() =>
-                                                currentType &&
-                                                navigate(`/product/${item.id}`)
+                                                currentType && navigate(`/product/${item.id}`)
                                             }
                                         >
                                             <div className="product-thumb">
@@ -286,11 +334,8 @@ export default function BaumanProduct() {
                                                 <p className="product-title">{item.name}</p>
 
                                                 <div className="product-price-line">
-                                                    <span className="product-discount">
-                                                        {item.discount.toString().padStart(2, "0")}%
-                                                    </span>
                                                     <span className="product-price">
-                                        {item.price.toLocaleString()}
+                                                        {item.price.toLocaleString()}
                                                         <span className="unit"> 원</span>
                                                     </span>
                                                 </div>
@@ -299,7 +344,7 @@ export default function BaumanProduct() {
                                     ))
                                 )}
                             </div>
-                            {/* 상품 페이지 네이션*/}
+
                             <div className="pagination">
                                 <button
                                     disabled={productPage === 1}
@@ -307,9 +352,7 @@ export default function BaumanProduct() {
                                 >
                                     이전
                                 </button>
-
                                 <span>{productPage} / {productTotalPages}</span>
-
                                 <button
                                     disabled={productPage === productTotalPages}
                                     onClick={() => setProductPage(productPage + 1)}
@@ -319,9 +362,6 @@ export default function BaumanProduct() {
                             </div>
                         </div>
 
-
-
-                        {/* 비로그인 → 회원가입 유도 오버레이 */}
                         {!currentType && (
                             <div className="overlay-lock">
                                 <p style={{ fontSize: "17px", fontWeight: "700" }}>
@@ -338,76 +378,93 @@ export default function BaumanProduct() {
                     </div>
                 )}
 
-                {/* 리뷰 탭 */}
+                {/* ================================
+                     리뷰 탭 (상품 탭과 구조 동일하게 맞춤)
+                ================================= */}
                 {activeTab === "review" && (
-                    <div className="review-list-area">
-                        {/* 리뷰 없을 때 */}
-                        {reviewList.length === 0 && (
-                            <p style={{ textAlign: "center", marginTop: "40px" }}>
-                                아직 이 타입에 대한 리뷰가 없습니다.
-                            </p>
-                        )}
+                    <div className="overlay-container">
+                        <div className={currentType ? "" : "blur-block"}>
+                            <div className="review-list-area">
 
-                        {/* 리뷰 목록 */}
-                        {reviewList.length > 0 && (
-                            <>
-                                <div className="review-grid">
-                                    {displayedReviews.map((review) => (
-                                        <div
-                                            key={review.id}
-                                            className="review-card-box"
-                                            onClick={() => navigate(`/review/${review.id}`)}
-                                        >
-                                            <div className="review-thumb">
-                                                <img
-                                                    src={review.imageUrl || dummyData}
-                                                    alt={review.productName}
-                                                />
-                                            </div>
+                                {reviewList.length === 0 && (
+                                    <p style={{ textAlign: "center", marginTop: "40px" }}>
+                                        아직 이 타입에 대한 리뷰가 없습니다.
+                                    </p>
+                                )}
 
-                                            <div className="review-text-box">
-                                                <div className="review-text-top">
-                                                    <span className="review-brand">{review.brand}</span>
-                                                    <span className="review-rating">
-                                                        {review.rating?.toFixed(1)} / 5.0
-                                                    </span>
+                                {reviewList.length > 0 && (
+                                    <>
+                                        <div className="review-grid">
+                                            {displayedReviews.map((review) => (
+                                                <div
+                                                    key={review.id}
+                                                    className="review-card-box"
+                                                    onClick={() =>
+                                                        currentType && navigate(`/review/${review.id}`)
+                                                    }
+                                                >
+                                                    <div className="review-thumb">
+                                                        <div className="review-thumb-inner">
+                                                            <img src={review.imageUrl || dummyData} alt={review.productName} />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="review-text-box">
+                                                        <div className="review-text-top">
+                                                            <span className="review-brand">{review.brand}</span>
+                                                            <span className="review-rating">
+                                                                {review.rating?.toFixed(1)} / 5.0
+                                                            </span>
+                                                        </div>
+
+                                                        <p className="review-title">{review.productName}</p>
+
+                                                        <p className="review-content-line">
+                                                            "{review.content}"
+                                                        </p>
+                                                    </div>
                                                 </div>
-
-                                                <p className="review-title">{review.productName}</p>
-
-                                                <p className="review-content-line">
-                                                    "{review.content}"
-                                                </p>
-                                            </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
 
-                                {/* 리뷰 페이지네이션 */}
-                                <div className="pagination">
-                                    <button
-                                        disabled={reviewPage === 1}
-                                        onClick={() => setReviewPage(reviewPage - 1)}
-                                    >
-                                        이전
-                                    </button>
+                                        <div className="pagination">
+                                            <button
+                                                disabled={reviewPage === 1}
+                                                onClick={() => setReviewPage(reviewPage - 1)}
+                                            >
+                                                이전
+                                            </button>
 
-                                    <span>
-                                        {reviewPage} / {reviewTotalPages}
-                                    </span>
+                                            <span>{reviewPage} / {reviewTotalPages}</span>
 
-                                    <button
-                                        disabled={reviewPage === reviewTotalPages}
-                                        onClick={() => setReviewPage(reviewPage + 1)}
-                                    >
-                                        다음
-                                    </button>
-                                </div>
-                            </>
+                                            <button
+                                                disabled={reviewPage === reviewTotalPages}
+                                                onClick={() => setReviewPage(reviewPage + 1)}
+                                            >
+                                                다음
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+
+                            </div>
+                        </div>
+
+                        {!currentType && (
+                            <div className="overlay-lock">
+                                <p style={{ fontSize: "17px", fontWeight: "700" }}>
+                                    회원가입하고 리뷰를 확인해보세요!
+                                </p>
+                                <button
+                                    className="overlay-btn"
+                                    onClick={() => navigate("/register")}
+                                >
+                                    회원가입 하러가기
+                                </button>
+                            </div>
                         )}
                     </div>
                 )}
-
             </div>
         </section>
     );

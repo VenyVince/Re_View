@@ -299,3 +299,10 @@
 .order-detail-items {
     margin-bottom: 24px;
 }
+
+.address-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}

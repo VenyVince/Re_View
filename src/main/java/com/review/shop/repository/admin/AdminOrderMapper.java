@@ -9,4 +9,5 @@ public interface AdminOrderMapper {
     //주문 상태 변경
     int updateOrderStatus(@Param("order_id") int order_id,
                           @Param("orderStatus") String orderStatus);
+
 }

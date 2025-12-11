@@ -13,6 +13,9 @@ public class OrderDetailResponseDTO {
     private String delivery_num;
     private int total_price;
 
+    //유저 사용 포인트
+    private int used_point;
+
     // 배송지 정보 (Address 테이블)
     private String recipient;
     private String postal_code;
@@ -26,4 +29,6 @@ public class OrderDetailResponseDTO {
 
     // 주문 상품 리스트
     private List<OrderItemDetailDTO> order_items;
+
+
 }

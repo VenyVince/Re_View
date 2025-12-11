@@ -4,6 +4,7 @@ import com.review.shop.dto.userinfo.user_related.wishlist.WishlistDTO;
 import com.review.shop.dto.userinfo.user_related.wishlist.WishlistResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.UserIdMapper;
 import com.review.shop.repository.userinfo.user_related.WishlistMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,26 @@ import java.util.List;
 public class WishlistService {
     private final UserIdMapper userIdMapper;
     private final WishlistMapper wishlistMapper;
+    private final ImageService imageService;
 
     public WishlistResponseDTO getWishlist(Integer user_id) {
         try {
+
             List<WishlistDTO> wishlist = wishlistMapper.getWishlist(user_id);
+
+            for (WishlistDTO item : wishlist) {
+                String objectKey = item.getImage_url();
+
+                if (objectKey != null && !objectKey.isEmpty()) {
+                    String imageUrl = imageService.presignedUrlGet(objectKey);
+                    item.setProduct_thumbnail_url(imageUrl);
+                }
+            }
+
             WishlistResponseDTO response = new WishlistResponseDTO();
             response.setWishlist(wishlist);
             return response;
+
         } catch (DataAccessException e) {
             throw new DatabaseException("위시리스트 조회 중 DB 오류가 발생했습니다.", e);
         }

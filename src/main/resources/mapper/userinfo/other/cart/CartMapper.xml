@@ -8,12 +8,24 @@
     <!-- 장바구니 조회 -->
     <select id="findCartItemsByUserId" resultType="com.review.shop.dto.cart.CartitemResponseDTO">
         SELECT
-        c.cart_items_id, c.product_id, c.quantity,
-        p.prd_name, p.prd_brand, p.price, p.category, p.is_sold_out
+        c.cart_items_id,
+        c.product_id,
+        c.quantity,
+        p.prd_name,
+        p.prd_brand,
+        p.price,
+        p.category,
+        p.is_sold_out,
+        pi.image_url
         FROM cart_items c
         JOIN product p ON c.product_id = p.product_id
+
+        LEFT JOIN product_image pi
+        ON p.product_id = pi.product_id
+        AND pi.is_thumbnail = 'Y'
+
         WHERE c.user_id = #{user_id}
-        and p.deleted_at is null
+        AND p.deleted_at IS NULL
     </select>
 
     <!-- 단일 상품 조회 (수량 변경 시 확인용) -->

@@ -151,18 +151,6 @@ public class OrderService {
     }
 
 
-
-    //포인트 차감 메소드
-    public Integer deductUserPoints(int user_id, int pointsToDeduct) {
-        return orderMapper.deductPoints(user_id, pointsToDeduct);
-    }
-
-    // 차감할때 사용할 포인트 히스토리 기록 반영 메소드
-    public Integer addPointHistory(int user_id, int pointsChanged, String reason) {
-        return orderMapper.addPointHistory(user_id, pointsChanged, reason);
-    }
-
-
     //현재 시간 + 랜덤 문자열 조합한 주문 번호 생성 메소드
     public String createOrderNum() {
         String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));

@@ -4,7 +4,7 @@ import {
     TableWrapper, ReportTable, EmptyState, StatusBadge, SmallButton, Pagination, PagerBtn,
     PageInfo,ModalOverlay, ModalBox, ModalTitle, ModalSectionTitle, ModalBoxContent, ModalText,
     ModalButtonRow, ModalPrimaryButton, ModalSecondaryButton,} from "./adminReviewReportPage.style";
-
+import { useNavigate } from "react-router-dom";
 import { fetchReports, updateReportStatus } from "../../../api/admin/adminReportApi";
 
 const PAGE_SIZE = 10;
@@ -15,6 +15,8 @@ export default function AdminReviewReportPage() {
     const [keyword, setKeyword] = useState("");
     const [page, setPage] = useState(1);
     const [selectedReport, setSelectedReport] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadReports();
@@ -179,26 +181,60 @@ export default function AdminReviewReportPage() {
                             <ModalBox onClick={(e) => e.stopPropagation()}>
                                 <ModalTitle>신고 상세</ModalTitle>
 
+                                {/* 리뷰 내용 */}
                                 <ModalSectionTitle>리뷰 내용</ModalSectionTitle>
                                 <ModalBoxContent>{selectedReport.review_content}</ModalBoxContent>
 
+                                {/* 신고 사유 */}
                                 <ModalSectionTitle>신고 사유</ModalSectionTitle>
                                 <ModalBoxContent>{selectedReport.reason}</ModalBoxContent>
 
-                                <ModalText><strong>신고자:</strong> {selectedReport.reporter_nickname}</ModalText>
-                                <ModalText><strong>리뷰 작성자:</strong> {selectedReport.review_writer_nickname}</ModalText>
+                                {/* 신고자 / 리뷰 작성자 한 줄로 배열 */}
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    gap: "20px",
+                                    marginBottom: "6px"
+                                }}>
+                                    <ModalText><strong>신고자:</strong> {selectedReport.reporter_nickname}</ModalText>
+                                    <ModalText><strong>리뷰 작성자:</strong> {selectedReport.review_writer_nickname}</ModalText>
+                                </div>
 
+                                {/* 리뷰 보기 버튼 */}
+                                <div style={{ marginBottom: "20px" }}>
+                                    <button
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: "#636363",
+                                            cursor: "pointer",
+                                            textDecoration: "underline",
+                                            fontSize: "14px",
+                                            padding: 0,
+                                            marginBottom: "6px"
+                                        }}
+                                        onClick={() => navigate(`/review/${selectedReport.review_id}`)}
+                                    >
+                                        리뷰 보기
+                                    </button>
+                                </div>
+
+                                {/* 버튼 3개: 대기 / 처리완료 / 반려 */}
                                 <ModalButtonRow>
-                                    <ModalPrimaryButton
+
+                                    {/* 대기 버튼 */}
+                                    <ModalSecondaryButton
                                         onClick={async () => {
-                                            await updateReportStatus(selectedReport.report_id, "PROCESSED");
+                                            await updateReportStatus(selectedReport.report_id, "PENDING");
                                             loadReports();
                                             setSelectedReport(null);
                                         }}
                                     >
-                                        신고 처리완료
-                                    </ModalPrimaryButton>
+                                        신고 대기
+                                    </ModalSecondaryButton>
 
+                                    {/* 반려 */}
                                     <ModalSecondaryButton
                                         onClick={async () => {
                                             await updateReportStatus(selectedReport.report_id, "REJECTED");
@@ -208,10 +244,23 @@ export default function AdminReviewReportPage() {
                                     >
                                         신고 반려
                                     </ModalSecondaryButton>
+
+                                    {/* 처리완료 */}
+                                    <ModalPrimaryButton
+                                        onClick={async () => {
+                                            await updateReportStatus(selectedReport.report_id, "PROCESSED");
+                                            loadReports();
+                                            setSelectedReport(null);
+                                        }}
+                                    >
+                                        신고 처리
+                                    </ModalPrimaryButton>
+
                                 </ModalButtonRow>
                             </ModalBox>
                         </ModalOverlay>
                     )}
+
 
                 </Content>
             </Inner>

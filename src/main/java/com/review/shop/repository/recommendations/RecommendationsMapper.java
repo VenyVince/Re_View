@@ -42,5 +42,5 @@ public interface RecommendationsMapper {
 
     List<RecommendationDTO> findRecommencementsWithFourth(@Param("userInfo") List<String> userInfo);
 
-    List<RecommendationAdminPickDTO> getRandomRecommendationAdminPicks();
+    RecommendationAdminPickDTO getRandomRecommendationAdminPicks();
 }

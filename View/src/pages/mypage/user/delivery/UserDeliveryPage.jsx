@@ -1,5 +1,5 @@
 // src/pages/mypage/user/UserDeliveryPage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
@@ -19,13 +19,17 @@ export default function UserDeliveryPage() {
     const [orderError, setOrderError] = useState("");
     const [trackingOrder, setTrackingOrder] = useState(null);
 
+    // 주문 내역 날짜 필터 (기본: 최근 1개월)
+    const [filterStart, setFilterStart] = useState("");
+    const [filterEnd, setFilterEnd] = useState("");
+
     // 영수증 팝업 상태
     const [receiptOrderId, setReceiptOrderId] = useState(null);
     const [receiptDetail, setReceiptDetail] = useState(null);
     const [receiptLoading, setReceiptLoading] = useState(false);
     const [receiptError, setReceiptError] = useState("");
 
-    // 페이지네이션 (백엔드 page/size와 맞춰둠)
+    // 페이지네이션 (백엔드 page/size와 맞춰둠) – 지금은 요청용으로만 사용
     const PAGE_SIZE = 10;
 
     const formatPrice = (value) =>
@@ -121,6 +125,59 @@ export default function UserDeliveryPage() {
         fetchOrders(1);
     }, []);
 
+    // 날짜 필터링이 반영된 주문 목록
+    // - filterStart 또는 filterEnd 가 설정되어 있으면: 해당 범위(종료일 포함)에 해당하는 주문만
+    // - 둘 다 비어 있으면: 최근 1개월 내 주문만
+    const filteredOrders = useMemo(() => {
+        if (!orders || orders.length === 0) return [];
+
+        const list = [...orders];
+
+        // 날짜 필터가 하나라도 설정된 경우: 사용자가 지정한 기간 우선
+        if (filterStart || filterEnd) {
+            let start = filterStart ? new Date(filterStart) : null;
+            let end = filterEnd ? new Date(filterEnd) : null;
+
+            if (start) {
+                // 시작일 00:00:00
+                start.setHours(0, 0, 0, 0);
+            }
+            if (end) {
+                // 종료일은 선택한 날짜의 끝까지 포함되도록 다음날 00:00:00 기준으로 비교
+                end.setHours(0, 0, 0, 0);
+                end.setDate(end.getDate() + 1);
+            }
+
+            return list.filter((o) => {
+                if (!o.created_at) return true;
+
+                const created = new Date(o.created_at);
+                if (Number.isNaN(created.getTime())) return true;
+
+                if (start && created < start) return false;
+                if (end && created >= end) return false;
+
+                return true;
+            });
+        }
+
+        // 날짜 필터가 없으면: 최근 1개월 내 주문만
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        return list.filter((o) => {
+            if (!o.created_at) return true;
+
+            const created = new Date(o.created_at);
+            if (Number.isNaN(created.getTime())) return true;
+
+            return created >= oneMonthAgo;
+        });
+    }, [orders, filterStart, filterEnd]);
+
+    // 상태별 전체 카운트는 전체 orders 기준 (필터와 무관)
     const completedCount = orders.filter(
         (o) => getOrderStatusText(o) === "주문완료"
     ).length;
@@ -131,7 +188,8 @@ export default function UserDeliveryPage() {
         (o) => getOrderStatusText(o) === "배송완료"
     ).length;
 
-    const sortedOrders = [...orders].sort((a, b) => {
+    // 화면에 보여줄 목록은 필터링된 주문만 정렬
+    const sortedOrders = [...filteredOrders].sort((a, b) => {
         const orderRank = {
             "주문완료": 0,
             "배송중": 1,
@@ -263,6 +321,27 @@ export default function UserDeliveryPage() {
             <section className="mypage-section delivery-orders-section">
                 <h3 className="mypage-section-title">최근 주문 내역</h3>
 
+                {/* 날짜 필터 (1개월보다 이전 내역 조회용) */}
+                <div className="delivery-order-datefilter">
+                    <div className="delivery-order-datefilter-text">
+                        *최근 1개월 주문 내역만 기본으로 표시됩니다.
+                    </div>
+                    <div className="delivery-order-datefilter-controls">
+                        <span className="delivery-order-datefilter-label">조회 기간</span>
+                        <input
+                            type="date"
+                            value={filterStart}
+                            onChange={(e) => setFilterStart(e.target.value)}
+                        />
+                        <span> ~ </span>
+                        <input
+                            type="date"
+                            value={filterEnd}
+                            onChange={(e) => setFilterEnd(e.target.value)}
+                        />
+                    </div>
+                </div>
+
                 {orderLoading && (
                     <p className="delivery-order-message">주문 내역을 불러오는 중...</p>
                 )}
@@ -274,6 +353,14 @@ export default function UserDeliveryPage() {
                         아직 주문 내역이 없습니다.
                     </p>
                 )}
+                {!orderLoading &&
+                    !orderError &&
+                    orders.length > 0 &&
+                    sortedOrders.length === 0 && (
+                        <p className="delivery-order-message">
+                            선택한 기간에 해당하는 주문 내역이 없습니다.
+                        </p>
+                    )}
 
                 {sortedOrders.length > 0 && (
                     <div className="delivery-order-list">
@@ -387,6 +474,8 @@ export default function UserDeliveryPage() {
                         })}
                     </div>
                 )}
+
+
             </section>
 
             {/* 배송 조회 모달 */}

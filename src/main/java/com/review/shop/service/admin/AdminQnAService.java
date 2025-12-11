@@ -2,7 +2,7 @@ package com.review.shop.service.admin;
 
 
 import com.review.shop.dto.qna.QnAListDTO;
-import com.review.shop.dto.qna.QnaDTO;
+import com.review.shop.dto.qna.QnaAdminDTO;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminQnAMapper;
@@ -32,12 +32,12 @@ public class AdminQnAService {
     }
 
     //getAllQna 구현 - 전체 QnA 목록 조회, repository 실행
-    public List<QnAListDTO> getAllQna() {
+    public List<QnaAdminDTO> getAllQna() {
         return adminQnAMapper.getAllQna();
     }
 
     //getQnaDetail 구현 - QnA 상세 조회, repository 실행
-    public QnaDTO getQnaDetail(Integer qna_id) {
+    public QnaAdminDTO getQnaDetail(Integer qna_id) {
 
         if(qna_id==null){
             throw new ResourceNotFoundException("조회할 QnA를 찾을 수 없습니다.");
