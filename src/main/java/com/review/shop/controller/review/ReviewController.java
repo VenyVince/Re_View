@@ -1,6 +1,5 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.dto.common.PageResponse;
 import com.review.shop.dto.review.ReviewDTO;
 import com.review.shop.dto.review.ReviewDetailResponseDTO;
 import com.review.shop.service.review.ReviewService;
@@ -14,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/reviews")
@@ -26,18 +27,17 @@ public class ReviewController {
     private final Security_Util security_Util;
 
     @GetMapping
-    @Operation(summary = "전체 리뷰 목록 조회", description = "전체 리뷰 목록을 조회합니다.")
+    @Operation(summary = "전체 리뷰 목록 조회", description = "정렬 및 카테고리 조건에 맞는 전체 리뷰 목록을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 목록 조회 성공"),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
-    public ResponseEntity<PageResponse<ReviewDTO>> getReviews(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "8") int size,
+    public ResponseEntity<List<ReviewDTO>> getReviews(
             @RequestParam(value = "sort", defaultValue = "like_count") String sort,
             @RequestParam(value = "category", required = false) String category) {
 
-        PageResponse<ReviewDTO> reviews = reviewService.getReviewList(page, size, sort, category);
+        // page, size 파라미터 제거
+        List<ReviewDTO> reviews = reviewService.getReviewList(sort, category);
 
         return ResponseEntity.ok(reviews);
     }
@@ -51,13 +51,10 @@ public class ReviewController {
     public ResponseEntity<ReviewDetailResponseDTO> getReviewDetail(
             @PathVariable int review_id) {
 
-        // 비로그인 사용자도 볼 수 있다면 userId를 0 또는 null로 처리 (로직에 따라 다름)
-        // 여기서는 로그인 했다고 가정하고 유틸 사용 (비로그인이면 0 리턴하도록 유틸 수정 필요할 수 있음)
         int user_id = 0;
         try {
             user_id = security_Util.getCurrentUserId();
         } catch (Exception e) {
-            // 비로그인 사용자 처리 (userLiked = false 로 나오게 됨)
             user_id = 0;
         }
 
