@@ -1,7 +1,7 @@
 // src/pages/mypage/user/address/UserAddressManager.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import "./UserAddress.css";
 
 export default function UserAddressManager() {
@@ -33,9 +33,7 @@ export default function UserAddressManager() {
             setLoading(true);
             setError("");
 
-            const res = await axios.get("/api/addresses", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/addresses");
 
             const data = Array.isArray(res.data) ? res.data : res.data?.addresses || [];
 
@@ -98,9 +96,7 @@ export default function UserAddressManager() {
                 is_default: "1",
             };
             try {
-                await axios.patch(`/api/addresses/${selected.address_id}`, payload, {
-                    withCredentials: true,
-                });
+                await axiosClient.patch(`/api/addresses/${selected.address_id}`, payload);
                 alert("기본 배송지가 변경되었습니다.");
                 await fetchAddresses();
                 navigate("/mypage");
@@ -129,15 +125,11 @@ export default function UserAddressManager() {
         try {
             if (editingId !== null) {
                 //️ 수정 모드 → PATCH /api/addresses/{address_id}
-                await axios.patch(`/api/addresses/${editingId}`, payload, {
-                    withCredentials: true,
-                });
+                await axiosClient.patch(`/api/addresses/${editingId}`, payload);
                 alert("배송지가 수정되었습니다.");
             } else {
                 // ➕ 새 배송지 추가 → POST /api/addresses
-                await axios.post("/api/addresses", payload, {
-                    withCredentials: true,
-                });
+                await axiosClient.post("/api/addresses", payload);
                 alert("배송지가 추가되었습니다.");
             }
 
@@ -186,9 +178,7 @@ export default function UserAddressManager() {
         if (!window.confirm("해당 배송지를 삭제하시겠습니까?")) return;
 
         try {
-            await axios.delete(`/api/addresses/${id}`, {
-                withCredentials: true,
-            });
+            await axiosClient.delete(`/api/addresses/${id}`);
             setAddresses((prev) => prev.filter((a) => a.address_id !== id));
         } catch (e) {
             alert("배송지 삭제 중 오류가 발생했습니다.");

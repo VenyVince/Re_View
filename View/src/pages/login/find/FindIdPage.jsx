@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo.png';
 import './Find.css';
-import axios from "axios";
+import axiosClient from "../../../api/axiosClient";
 
 export default function FindIdPage() {
     const nav = useNavigate();
@@ -20,7 +20,7 @@ export default function FindIdPage() {
 
             try {
                 // 백엔드 API 호출
-                const response = await axios.post('/api/auth/find-id', {
+                const response = await axiosClient().post('/api/auth/find-id', {
                     name: form.name,
                     phone_number: form.phone
                 });

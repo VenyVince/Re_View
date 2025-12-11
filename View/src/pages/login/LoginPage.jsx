@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import logo from '../../assets/logo.png';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import axiosClient from "../../api/axiosClient";
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
@@ -26,7 +26,7 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 '/api/auth/login',
                 { id, password },
                 {
@@ -40,7 +40,7 @@ export default function LoginPage() {
                 login({ id, nickname: id });
 
                 // 권한 체크
-                const me = await axios.get("/api/auth/me", { withCredentials: true });
+                const me = await axiosClient.get("/api/auth/me", { withCredentials: true });
 
                 if (me.data.role === "ROLE_ADMIN") {
                     navigate('/admin/allproducts');
@@ -54,7 +54,6 @@ export default function LoginPage() {
             // 그 외 정상 응답이 아니면 오류 처리
             setError("로그인 오류가 발생했습니다.");
         } catch (err) {
-            console.error('❌ 로그인 실패:', err);
 
             if (err.response) {
                 const status = err.response.status;
