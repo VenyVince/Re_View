@@ -1,68 +1,83 @@
-import React, { useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import {useNavigate} from "react-router-dom";
 import {
-    Wrap,
-    Inner,
-    TitleRow,
-    Title,
-    Grid,
-    Card,
-    Badge,
-    Thumb,
-    CardBody,
-    Reviewer,
-    ContentText,
-    Price,
-    Actions,
-    Pagination,
-    PagerBtn,
-    PageInfo,
-    ModalOverlay,
-    ModalBox,
-    ModalButtons
+    Wrap, Inner, Content, TitleRow, Title, FilterRow, FilterLabel, FilterSelect, SearchInput,
+    TableWrapper, ReviewTable, EmptyState, PickBadge, SmallButton, Pagination, PagerBtn, PageInfo,
+    ModalOverlay, ModalBox, ModalButtons,
 } from "./adminReviewPage.style";
 
+import { fetchAdminReviews, selectReview, deleteReview } from "../../../api/admin/adminReviewApi";
+
 export default function AdminReviewPage() {
-    // ---------------------
-    // 더미 리뷰 데이터
-    // ---------------------
-    const dummy = [
-        {
-            id: 1,
-            reviewer: "김정명",
-            content: "인생토너 ㅠ",
-            price: 25,
-            isPick: false,
-        },
-        {
-            id: 2,
-            reviewer: "박명정",
-            content: "최고의 브랜드!",
-            price: 25,
-            isPick: true,
-        },
-        {
-            id: 3,
-            reviewer: "오명화",
-            content: "ㄹㅇ 피부 미쳤다잉~",
-            price: 25,
-            isPick: false,
-        },
-    ];
 
-    // ---------------------
-    // 상태
-    // ---------------------
-    const [reviews, setReviews] = useState(dummy);
-    const [page, setPage] = useState(1);
-    const pageSize = 9;
-    const maxPage = Math.ceil(reviews.length / pageSize);
+    const [reviews, setReviews] = useState([]);
+    const [page, setPage] = useState(1);   // 1부터 시작
+    const pageSize = 10;
+    
+    const [filterPick, setFilterPick] = useState("ALL");
+    const [keyword, setKeyword] = useState("");
 
-    const [modalType, setModalType] = useState(null); // "pick" | "delete"
+    const [modalType, setModalType] = useState(null);
     const [selectedId, setSelectedId] = useState(null);
 
-    // ---------------------
-    // 모달 오픈
-    // ---------------------
+    const [hasNext, setHasNext] = useState(false);
+
+    const navigate = useNavigate();
+
+    // 리뷰 가져오기
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const data = await fetchAdminReviews(page, pageSize, "like_count");
+
+                console.log("[ADMIN] fetch response:", data);
+
+                const normalized = data.content.map((r) => ({
+                    id: r.review_id,
+                    reviewer: r.writer,
+                    content: r.content,
+                    price: r.price,
+                    isPick:
+                        r.is_selected === "1"
+                }));
+
+                setReviews(normalized);
+                setHasNext(data.hasNext);
+
+            } catch (e) {
+                console.error("[ADMIN] 리뷰 조회 실패:", e);
+            }
+        };
+        load();
+    }, [page]);
+
+    // 필터 + 검색
+    const filtered = useMemo(() => {
+        let base = [...reviews];
+
+        if (filterPick === "PICK") {
+            base = base.filter((r) => r.isPick);
+        } else if (filterPick === "NORMAL") {
+            base = base.filter((r) => !r.isPick);
+        }
+
+        if (keyword.trim()) {
+            const k = keyword.toLowerCase();
+            base = base.filter(
+                (r) =>
+                    String(r.id).includes(k) || // 리뷰 아이디 검색
+                    r.reviewer.toLowerCase().includes(k) ||
+                    r.content.toLowerCase().includes(k)
+            );
+        }
+
+        return base;
+    }, [reviews, filterPick, keyword]);
+
+    const pageList = filtered;
+    const isEmpty = filtered.length === 0;
+
+    // 모달 열기/닫기
     const openPickModal = (id) => {
         setSelectedId(id);
         setModalType("pick");
@@ -78,82 +93,168 @@ export default function AdminReviewPage() {
         setSelectedId(null);
     };
 
-    // ---------------------
-    // 실제 동작
-    // ---------------------
-    const doPick = () => {
-        setReviews((prev) =>
-            prev.map((r) =>
-                r.id === selectedId ? { ...r, isPick: !r.isPick } : r
-            )
-        );
-        closeModal();
+    // 운영자 픽
+    const doPick = async () => {
+        if (selectedId == null) return;
+
+        const target = reviews.find((r) => r.id === selectedId);
+        if (!target) {
+            closeModal();
+            return;
+        }
+
+        const nextIsPick = !target.isPick;
+
+        try {
+            await selectReview(selectedId, nextIsPick ? 1 : 0);
+            setReviews((prev) =>
+                prev.map((r) =>
+                    r.id === selectedId ? { ...r, isPick: nextIsPick } : r
+                )
+            );
+            alert("운영자 픽 상태가 변경되었습니다.");
+        } catch (error) {
+            console.error("[ADMIN] 운영자 픽 변경 실패:", error);
+            alert("운영자 픽 변경에 실패했습니다.");
+        } finally {
+            closeModal();
+        }
     };
 
-    const doDelete = () => {
-        setReviews((prev) => prev.filter((r) => r.id !== selectedId));
-        closeModal();
-    };
+    // 삭제
+    const doDelete = async () => {
+        if (selectedId == null) return;
 
-    // ---------------------
-    // 페이지 나누기
-    // ---------------------
-    const start = (page - 1) * pageSize;
-    const pageList = reviews.slice(start, start + pageSize);
+        try {
+            await deleteReview(selectedId);
+            setReviews((prev) => prev.filter((r) => r.id !== selectedId));
+            alert("리뷰가 삭제되었습니다.");
+        } catch (error) {
+            console.error("[ADMIN] 리뷰 삭제 실패:", error);
+            alert("리뷰 삭제에 실패했습니다.");
+        } finally {
+            closeModal();
+        }
+    };
 
     return (
         <Wrap>
             <Inner>
-                <TitleRow>
-                    <Title>리뷰 관리</Title>
-                </TitleRow>
+                <Content>
+                    <TitleRow>
+                        <Title>리뷰 관리</Title>
+                    </TitleRow>
 
-                <Grid>
-                    {pageList.map((r) => (
-                        <Card key={r.id}>
-                            {r.isPick && <Badge>운영자픽</Badge>}
+                    {/* 필터 / 검색 */}
+                    <FilterRow>
+                        <FilterLabel>운영자 픽</FilterLabel>
+                        <FilterSelect
+                            value={filterPick}
+                            onChange={(e) => {
+                                setFilterPick(e.target.value);
+                                setPage(1);
+                            }}
+                        >
+                            <option value="ALL">전체</option>
+                            <option value="PICK">운영자 픽만</option>
+                            <option value="NORMAL">일반 리뷰만</option>
+                        </FilterSelect>
 
-                            <Thumb>사진 영역</Thumb>
+                        <SearchInput
+                            placeholder="작성자 / 내용 / 리뷰 아이디 검색"
+                            value={keyword}
+                            onChange={(e) => {
+                                setKeyword(e.target.value);
+                                setPage(1);
+                            }}
+                        />
+                    </FilterRow>
 
-                            <CardBody>
-                                <Reviewer>{r.reviewer}</Reviewer>
-                                <ContentText>{r.content}</ContentText>
-                                <Price>${r.price}</Price>
+                    {/* 테이블 */}
+                    <TableWrapper>
+                        {isEmpty ? (
+                            <EmptyState>조건에 맞는 리뷰가 없습니다.</EmptyState>
+                        ) : (
+                            <ReviewTable>
+                                <thead>
+                                <tr>
+                                    <th>리뷰 ID</th>
+                                    <th>작성자</th>
+                                    <th>내용</th>
+                                    <th>가격</th>
+                                    <th>운영자 픽</th>
+                                    <th>관리</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {pageList.map((r) => (
+                                    <tr key={r.id}>
+                                        <td>{r.id}</td>
+                                        <td>{r.reviewer}</td>
+                                        <td
+                                            className="ellipsis"
+                                            style={{cursor:"pointer", color:"1971c2"}}
+                                            onClick={()=> navigate(`/review/${r.id}`)}
+                                        >
+                                            {r.content}
+                                        </td>
+                                        <td>₩{(r.price ?? 0).toLocaleString()}</td>
+                                        <td>{r.isPick ? <PickBadge>운영자 픽</PickBadge> : "-"}</td>
+                                        <td>
+                                            <SmallButton onClick={() => openPickModal(r.id)}>
+                                                {r.isPick ? "픽 해제" : "픽 설정"}
+                                            </SmallButton>{" "}
+                                            <SmallButton onClick={() => openDeleteModal(r.id)}>
+                                                삭제
+                                            </SmallButton>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </ReviewTable>
+                        )}
+                    </TableWrapper>
 
-                                <Actions>
-                                    <button title="운영자픽" onClick={() => openPickModal(r.id)}>✏️</button>
-                                    <button title="삭제" onClick={() => openDeleteModal(r.id)}>🗑️</button>
-                                </Actions>
-                            </CardBody>
-                        </Card>
-                    ))}
-                </Grid>
+                    {/* 페이지네이션 */}
+                    {!isEmpty && (
+                        <Pagination>
+                            <PagerBtn
+                                disabled={page <= 1}
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            >
+                                {"<"}
+                            </PagerBtn>
 
-                {/* 페이지네이션 */}
-                <Pagination>
-                    <PagerBtn disabled={page === 1} onClick={() => setPage(page - 1)}>{"<"}</PagerBtn>
-                    <PageInfo>{page} / {maxPage}</PageInfo>
-                    <PagerBtn disabled={page === maxPage} onClick={() => setPage(page + 1)}>{">"}</PagerBtn>
-                </Pagination>
+                            <PageInfo>
+                                {page}
+                            </PageInfo>
 
-                {/* 모달 */}
-                {modalType && (
-                    <ModalOverlay>
-                        <ModalBox>
-                            {modalType === "pick" && <h2>운영자 픽으로 설정하겠습니까?</h2>}
-                            {modalType === "delete" && <h2>리뷰를 삭제하시겠습니까?</h2>}
+                            <PagerBtn
+                                disabled={!hasNext}
+                                onClick={() => setPage((p) => p + 1)}
+                            >
+                                {">"}
+                            </PagerBtn>
+                        </Pagination>
+                    )}
 
-                            <ModalButtons>
-                                <button onClick={closeModal}>취소</button>
-                                <button
-                                    onClick={modalType === "pick" ? doPick : doDelete}
-                                >
-                                    예
-                                </button>
-                            </ModalButtons>
-                        </ModalBox>
-                    </ModalOverlay>
-                )}
+                    {/* 모달 */}
+                    {modalType && (
+                        <ModalOverlay>
+                            <ModalBox>
+                                {modalType === "pick" && <h2>운영자 픽으로 설정/해제 하겠습니까?</h2>}
+                                {modalType === "delete" && <h2>리뷰를 삭제하시겠습니까?</h2>}
+
+                                <ModalButtons>
+                                    <button onClick={closeModal}>취소</button>
+                                    <button onClick={modalType === "pick" ? doPick : doDelete}>
+                                        예
+                                    </button>
+                                </ModalButtons>
+                            </ModalBox>
+                        </ModalOverlay>
+                    )}
+                </Content>
             </Inner>
         </Wrap>
     );

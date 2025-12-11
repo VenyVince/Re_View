@@ -1,0 +1,342 @@
+/* ===== 공통 섹션 ===== */
+
+.cs-section {
+    width: 100%;
+    font-family: Pretendard, sans-serif;
+}
+
+
+
+.cs-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.cs-card-sub {
+    font-size: 14px;
+    color: #777;
+}
+
+/* 기본 버튼 */
+
+.cs-primary-btn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #111;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cs-primary-btn:hover {
+    background: #222;
+}
+
+/* 리스트 공통 메시지 */
+
+.cs-list-message {
+    padding: 32px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+}
+
+.cs-list-error {
+    color: #d32f2f;
+}
+
+/* ===== 1:1 문의 내역 ===== */
+
+.cs-qna-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px 28px;
+    margin-bottom: 32px;
+}
+
+.cs-qna-header {
+    text-align: center;      /* 가운데 정렬 */
+    margin-bottom: 28px;
+}
+
+/* 테이블 헤더/바디 */
+
+.cs-table {
+    width: 100%;
+}
+
+.cs-table-head {
+    display: grid;
+    grid-template-columns: 1.2fr 1.6fr 0.9fr 0.7fr;
+    padding: 14px 10px;
+    background: #f9f9f9;
+    border-top: 2px solid #333;
+    border-bottom: 1px solid #ddd;
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+}
+
+.cs-table-body {
+    font-size: 14px;
+}
+
+
+.cs-table-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1.6fr 0.9fr 0.7fr;
+    padding: 16px 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.cs-col-title{
+    text-align: left;
+}
+
+.cs-table-row:hover {
+    background: #f6f8ff;
+}
+
+.cs-table-row-open {
+    background: #f7f9ff;
+    border-bottom-color: #e0e6ff;
+}
+
+/* 공통 컬럼(정렬) */
+
+.cs-col {
+    align-items: center;
+    font-size: 14px;
+}
+
+.cs-col-product {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 문의 제목 줄임(...) 처리 */
+.cs-col-title {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cs-col-date {
+    justify-content: flex-end;
+    color: #777;
+    font-size: 13px;
+}
+
+.cs-col-status {
+    justify-content: center;
+}
+
+/* 상태 뱃지 */
+
+.cs-status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.cs-status-ing {
+    background: #ffeccc;
+    color: #d57d00;
+}
+
+.cs-status-done {
+    background: #dbf7e7;
+    color: #1da66d;
+}
+
+
+/* ===== 상세(문의 내용 / 답변 내용) – 리스트 바로 아래 ===== */
+
+.cs-detail-row {
+    border-bottom: 1px solid #f3f3f3;
+    background: #fdfdfd;
+}
+
+.cs-detail-inner {
+    text-align: left;
+    padding: 18px 24px 20px;
+    background: #fafafa;
+}
+
+.cs-detail-loading,
+.cs-detail-error {
+    font-size: 13px;
+    color: #777;
+}
+
+.cs-detail-error {
+    color: #d32f2f;
+}
+
+.cs-detail-block + .cs-detail-block {
+    margin-top: 16px;
+}
+
+.cs-detail-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.cs-detail-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    white-space: pre-line;
+}
+
+/* ===== FAQ 영역 ===== */
+
+.cs-faq-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px 28px;
+    box-shadow: 0 0 0 1px #f2f2f2;
+}
+
+.cs-faq-header {
+    margin-bottom: 12px;
+}
+
+.cs-faq-list {
+    border-top: 1px solid #eee;
+    margin-top: 8px;
+}
+
+.cs-faq-item {
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.cs-faq-question {
+    width: 100%;
+    padding: 12px 4px;
+    border: none;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cs-faq-question:hover {
+    background: #fafafa;
+}
+
+.cs-faq-category {
+    flex: 0 0 auto;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #f5f5f5;
+    font-size: 12px;
+    color: #666;
+}
+
+.cs-faq-text {
+    flex: 1;
+    text-align: left;
+    color: #333;
+}
+
+.cs-faq-toggle {
+    flex: 0 0 auto;
+    font-size: 18px;
+    line-height: 1;
+    color: #777;
+}
+
+.cs-faq-toggle.open {
+    color: #111;
+}
+
+.cs-faq-answer {
+    padding: 0 4px 12px 4px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+    text-align: left;
+}
+
+/* ===== 1:1 문의 상세 수정/삭제 UI ===== */
+
+.cs-detail-edit {
+    margin-top: 12px;
+}
+
+.cs-detail-input,
+.cs-detail-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.cs-detail-input:focus,
+.cs-detail-textarea:focus {
+    outline: none;
+    border-color: #111;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+    background: #fff;
+}
+
+.cs-detail-actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.cs-detail-btn {
+    min-width: 88px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cs-detail-btn:hover {
+    background: #f5f5f5;
+}
+
+.cs-detail-btn-primary {
+    border-color: #111;
+    background: #111;
+    color: #fff;
+}
+
+.cs-detail-btn-primary:hover {
+    background: #222;
+}
+
+.cs-detail-btn-danger {
+    border-color: #d32f2f;
+    color: #d32f2f;
+}
+
+.cs-detail-btn-danger:hover {
+    background: #fff4f4;
+}

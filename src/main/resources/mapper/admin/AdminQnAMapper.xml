@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.admin.AdminQnAMapper">
+    <update id="updateQnaAnswer">
+        UPDATE QNA
+        SET
+            ANSWER = #{adminAnswer},
+            ANSWERED_AT = SYSDATE
+        WHERE
+            QNA_ID = #{qna_id}
+    </update>
+
+    <select id="getAllQna" resultType="com.review.shop.dto.qna.QnaAdminDTO">
+        SELECT
+            q.QNA_ID       AS qna_id,
+            q.PRODUCT_ID   AS product_id,
+            q.USER_ID      AS user_id,
+            q.TITLE        AS title,
+            q.CONTENT      AS content,
+            q.ANSWER       AS answer,
+            CASE
+                WHEN q.ANSWERED_AT IS NOT NULL THEN '답변완료'
+                ELSE '답변대기'
+                END            AS STATUS,
+            u.NAME         AS user_name,
+            p.PRD_NAME     AS prd_name
+        FROM QNA q
+                 LEFT JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+                 LEFT JOIN PRODUCT p ON q.PRODUCT_ID = p.PRODUCT_ID
+        WHERE q.DELETED_AT IS NULL
+        ORDER BY q.QNA_ID DESC
+    </select>
+
+    <select id="getQnaDetail" parameterType="int" resultType="com.review.shop.dto.qna.QnaAdminDTO">
+        SELECT
+            q.QNA_ID,
+            q.PRODUCT_ID,
+            q.USER_ID,
+            q.TITLE,
+            q.CONTENT,
+            q.ANSWER,
+            CASE
+                WHEN q.ANSWERED_AT IS NOT NULL THEN '답변완료'
+                ELSE '답변대기'
+                END AS STATUS,
+            u.NAME AS USER_NAME,
+            p.PRD_NAME AS PRD_NAME
+        FROM QNA q
+                 LEFT JOIN USER_TABLE u ON q.USER_ID = u.USER_ID
+                 LEFT JOIN PRODUCT p ON q.PRODUCT_ID = p.PRODUCT_ID
+        WHERE q.QNA_ID = #{qna_id}
+    </select>
+</mapper>

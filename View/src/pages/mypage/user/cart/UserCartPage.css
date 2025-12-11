@@ -1,0 +1,266 @@
+/* 전체 섹션 */
+.cart-section {
+    margin-top: 16px;
+}
+
+/* 비어 있을 때 */
+.cart-empty-box {
+    margin-top: 40px;
+    padding: 40px 0;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    color: #777;
+    background-color: #fafafa;
+}
+
+/* ===== 상단 바: 전체선택 / 선택삭제 ===== */
+.cart-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 4px 8px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+}
+
+.cart-top-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.cart-top-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #111;
+    cursor: pointer;
+}
+
+/* 선택삭제 버튼 */
+.cart-delete-btn {
+    border: 1px solid #ddd;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.cart-delete-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ===== 리스트 영역 ===== */
+.cart-list {
+    margin-top: 8px;
+}
+
+/* 한 줄 */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 4px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* 왼쪽: 체크박스 + 이미지 + 텍스트 */
+.cart-item-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+/* 체크박스 */
+.cart-item-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #000;
+    cursor: pointer;
+}
+
+/* 썸네일 */
+.cart-thumb {
+    cursor: pointer;
+    transition: color 0.15s ease;
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    background: #f3f3f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-thumb-placeholder {
+    font-size: 12px;
+    color: #999;
+}
+
+/* 상품 정보 */
+.cart-info {
+    cursor: pointer;
+    transition: color 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    text-align: left;
+}
+
+.cart-brand {
+    font-size: 13px;
+    color: #666;
+}
+
+.cart-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+}
+
+.cart-category {
+    font-size: 13px;
+    color: #999;
+}
+
+/* 품절 라벨 (필요 시) */
+.cart-soldout-label {
+    margin-top: 4px;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid #ff4d4f;
+    color: #ff4d4f;
+    font-size: 11px;
+}
+
+/* ===== 오른쪽: 삭제 + 가격 + 수량 ===== */
+.cart-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 160px;
+}
+
+/* 삭제 버튼 (텍스트) */
+.cart-row-delete {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 13px;
+    color: #999;
+    cursor: pointer;
+}
+
+.cart-row-delete:hover {
+    color: #666;
+}
+
+/* 가격(합계) */
+.cart-subtotal {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111;
+}
+
+/* ===== 수량 조절 박스 (110×30, pill 모양) ===== */
+.cart-qty-box {
+    width: 110px;
+    height: 30px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    display: flex;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* - , + 버튼 */
+.qty-btn {
+    width: 30px;
+    height: 100%;
+    border: none;
+    background: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+}
+
+.qty-btn:hover:not(:disabled) {
+    background: #f3f3f3;
+}
+
+.qty-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* 가운데 숫자 영역 */
+.cart-qty-value {
+    flex: 1;
+    text-align: center;
+    background: #f9f9f9;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 30px;
+}
+
+/* ===== 하단 합계 영역 ===== */
+.cart-bottom-bar {
+    margin-top: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-bottom-left {
+    font-size: 14px;
+    color: #555;
+}
+
+.cart-bottom-left strong {
+    font-weight: 600;
+}
+
+.cart-bottom-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cart-total-label {
+    font-size: 14px;
+    color: #333;
+}
+
+.cart-total-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+}
+
+/* 주문 버튼 */
+.cart-order-btn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #111;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.cart-order-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

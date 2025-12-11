@@ -21,9 +21,15 @@ import FindPasswordPage from './pages/login/find/FindPasswordPage'; // 비밀번
 import FindPasswordReset from './pages/login/find/FindPasswordReset';
 import FindPasswordDone from './pages/login/find/FindPasswordDone';
 import RegisterPage from './pages/register/RegisterPage'; // 회원가입 페이지
+import QnaPage from "./pages/qna/QnaPage";
 import RegisterComplete from "./pages/register/RegisterComplete"; // 회원가입 성공 페이지
 
+import ProductDetailPage from "./pages/productDetail/ProductDetailPage"; //상품 상세 페이지
+import ReviewWrite from "./pages/review/ReviewWrite"; // 리뷰 작성 페이지
+import ProductPage from "./pages/products/ProductPage"; // 상품 페이지
+import ReviewPage from "./pages/reviews/ReviewPage"; //리뷰 페이지
 import { AuthProvider } from "./context/AuthContext"; // 전역 로그인 컨텍스트
+import ReviewDetail from "./pages/reviewDetail/ReviewDetailPage"; //리뷰상세페이지
 
 import SearchPage from './pages/search/SearchPage';
 import Header from "./components/layout/Header/Header";
@@ -34,10 +40,29 @@ import AdminLayout from "./pages/mypage/admin/AdminLayout";
 import AdminProductNew from "./pages/mypage/admin/AdminProductNew";
 import AdminProductEdit from "./pages/mypage/admin/AdminProductEdit";
 import AdminProductDeleteConfirm from "./pages/mypage/admin/AdminProductDeleteConfirm";
+import AdminReviewPage from "./pages/mypage/admin/AdminReviewPage";
+import AdminQnaPage from "./pages/mypage/admin/AdminQnaPage";
+import AdminQnaAnswerPage from "./pages/mypage/admin/AdminQnaAnswerPage";
+import AdminUserPage from "./pages/mypage/admin/AdminUserPage";
+import AdminReviewReportPage from "./pages/mypage/admin/AdminReviewReportPage";
+import AdminOrderPage from "./pages/mypage/admin/AdminOrderPage";
+
+import UserProfileEdit from "./pages/mypage/user/profile/UserProfileEdit";
 
 import TestProduct from "./TestProduct";
+import UserCartPage from "./pages/mypage/user/cart/UserCartPage";
+import UserAddressPage from "./pages/mypage/user/address/UserAddressPage";
+import UserWishPage from "./pages/mypage/user/wish/UserWishPage";
 
-
+import AboutPage from "./pages/about/AboutPage";
+import UserCustomerPage from "./pages/mypage/user/customer/UserCustomerPage";
+import UserSkinTestPage from "./pages/mypage/user/skin/UserSkinTestPage";
+import UserReviewPage from "./pages/mypage/user/review/UserReviewPage";
+import OrderPaymentPage from "./pages/order/OrderPaymentPage";
+import OrderCompletePage from "./pages/order/OrderCompletePage";
+import UserProtectedRoute from "./components/user/UserProtectedRoute";
+import UserOrderDetailPage from "./pages/mypage/user/delivery/UserOrderDetailPage";
+import UserPointHistoryPage from "./pages/mypage/user/UserPointHistoryPage";
 
 export default function App() {
     return (
@@ -66,22 +91,59 @@ export default function App() {
                     <Route path="/survey/intro" element={<SurveyIntro/>}/>
                     <Route path="/survey/baumann" element={<SurveyPage/>}/>
                     <Route path="/survey/result" element={<SurveyResult/>}/>
+                    {/*<Route path="/mypage" element={<MyPage />} />*/}
+                    <Route path="/qna" element={<QnaPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/products" element={<ProductPage />} />
+                    <Route path="/product/:productId" element={<ProductDetailPage />} />
+                    <Route path="/review" element={<ReviewPage />} />
+                    <Route path="/reviews" element={<ReviewPage />} />
+                    <Route path="/review/:reviewId" element={<ReviewDetail />} />
+
+
+                    {/* 리뷰 */}
+                    <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
+
+                {/* 관리자 전용 영역 */}
+                <Route element={<ProtectedRoute requireAdmin />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route path="allproducts" element={<AdminProductPage />} />
+                        <Route path="products/new" element={<AdminProductNew />} />
+                        <Route path="products/:id/edit" element={<AdminProductEdit />} />
+                        <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
+                        <Route path="reviews" element={<AdminReviewPage />} />
+                        <Route path="report" element={<AdminReviewReportPage />} />
+                        <Route path="qna" element={<AdminQnaPage />} />
+                        <Route path="qna/:id" element={<AdminQnaAnswerPage />} />
+                        <Route path="users" element={<AdminUserPage />} />
+                        <Route path="orders" element={<AdminOrderPage />} />
+                    </Route>
+                </Route>
+
+                {/*API 커넥트 예시용*/}
+                <Route path="/test-products" element={<TestProduct />} />
+
+                {/* ----- 유저 전용 보호 라우트 ----- */}
+                <Route element={<UserProtectedRoute />}>
                     <Route path="/mypage" element={<MyPage />} />
 
+                    <Route path="/mypage/address" element={<UserAddressPage />} />
+                    <Route path="/mypage/profile" element={<UserProfileEdit />} />
+                    <Route path="/mypage/points" element={<UserPointHistoryPage />} />
+                    <Route path="/mypage/cart" element={<UserCartPage />} />
+                    <Route path="/mypage/wish" element={<UserWishPage />} />
+                    <Route path="/mypage/cs" element={<UserCustomerPage />} />
+                    <Route path="/mypage/skin" element={<UserSkinTestPage />} />
+                    <Route path="/mypage/review" element={<UserReviewPage />} />
+                    <Route path="/mypage/orders/:orderId" element={<UserOrderDetailPage />} />
 
-                    {/* 관리자 전용 영역 */}
-                    <Route element={<ProtectedRoute requireAdmin />}>
-                        <Route path="/admin" element={<AdminLayout />}>
-                            <Route path="products" element={<AdminProductPage />} />
-                            <Route path="products/new" element={<AdminProductNew />} />
-                            <Route path="products/:id/edit" element={<AdminProductEdit />} />
-                            <Route path="products/:id/delete" element={<AdminProductDeleteConfirm />} />
-                        </Route>
-                    </Route>
-                </Routes>
-                </main>
-                <Footer />
-            </div>
+                    <Route path="/order/payment" element={<OrderPaymentPage />} />
+                    <Route path="/order/complete" element={<OrderCompletePage />} />
+                </Route>
+            </Routes>
+            </main>
+            <Footer />
+        </div>
         </AuthProvider>
 
     );

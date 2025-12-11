@@ -1,0 +1,308 @@
+/* 전체 컨테이너 */
+.address-manager {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 0 80px;
+    font-size: 14px;
+    color: #222;
+}
+
+/* 공통 카드 박스 */
+.address-card {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    padding: 24px 24px;
+    margin-bottom: 24px;
+}
+
+.order-detail-title{
+    text-align: left;
+}
+/* 섹션 타이틀 */
+.address-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* 상단 리스트 헤더 */
+.address-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.address-count {
+    font-size: 13px;
+    color: #888;
+}
+
+.address-count strong {
+    font-weight: 600;
+}
+
+/* 리스트 영역 */
+.address-list {
+    margin-top: 12px;
+}
+
+/* 개별 아이템 */
+.address-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    background-color: #fafafa;
+    min-height: 72px;
+}
+
+.address-item:last-child {
+    margin-bottom: 0;
+}
+
+/* 기본 배송지일 때는 테두리/배경만 강조 (높이는 동일하게 유지) */
+.address-item-default {
+    border-color: #111;
+    background-color: #fdfdfd;
+    box-shadow: 0 0 0 1px #111 inset;
+}
+
+/* 라디오 + 태그 영역 */
+.address-radio-area {
+    width: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+/* 주소 정보 텍스트 */
+.address-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.address-line1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 2px;
+    font-size: 14px;
+    align-items: center;
+}
+
+.address-name {
+    font-weight: 600;
+}
+
+.address-recipient {
+    color: #555;
+}
+
+.address-line2 {
+    font-size: 12px;
+    color: #777;
+    line-height: 1.5;
+}
+
+/* 수정/삭제 버튼 */
+.address-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 12px;
+    align-items: flex-end;
+}
+
+.address-edit-btn,
+.address-delete-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.address-edit-btn {
+    color: #555;
+}
+
+.address-edit-btn:hover {
+    text-decoration: underline;
+}
+
+.address-delete-btn {
+    color: #c0392b;
+}
+
+.address-delete-btn:hover {
+    text-decoration: underline;
+}
+
+/* 폼 영역 */
+.address-form-wrapper {
+    padding-top: 20px;
+}
+
+.address-form {
+    max-width: 880px;
+    margin: 0 auto;
+}
+
+.address-form-title {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* 폼 레이아웃 */
+.address-form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.address-form-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.address-form-field.full-width {
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+.address-form-field label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+/* 인풋 스타일 공통 */
+.address-form input[type="text"],
+.address-form input[type="tel"],
+.address-form input[type="number"],
+.address-form input:not([type="checkbox"]):not([type="radio"]) {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+.address-form input:focus {
+    border-color: #111;
+    box-shadow: 0 0 0 1px #111 inset;
+}
+
+/* 기본배송지 체크박스 */
+.address-default-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 18px;
+    font-size: 13px;
+    color: #555;
+}
+
+.address-default-checkbox input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+}
+
+/* 버튼 영역 */
+.address-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
+}
+
+.address-cancel-btn,
+.address-save-btn {
+    min-width: 96px;
+    height: 38px;
+    border-radius: 999px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+/* 취소 버튼: 테두리만 있는 회색 */
+.address-cancel-btn {
+    background-color: #fff;
+    border-color: #ddd;
+    color: #333;
+}
+
+.address-cancel-btn:hover {
+    border-color: #aaa;
+}
+
+/* 저장 버튼: 검정 배경 */
+.address-save-btn {
+    background-color: #111;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+
+.address-save-btn:hover {
+    background-color: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.16);
+}
+
+.address-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.address-list-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.address-count {
+    font-size: 13px;
+    color: #666;
+}
+
+.address-add-btn {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.address-add-btn:hover {
+    background: #f5f5f5;
+}
+
+.order-detail-items {
+    margin-bottom: 24px;
+}
+
+.address-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}

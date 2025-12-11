@@ -12,4 +12,9 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getUser_role" resultType="string">
+        SELECT role
+        FROM USER_TABLE
+        WHERE id = #{id}
+    </select>
 </mapper>

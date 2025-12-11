@@ -6,89 +6,124 @@ export const Wrap = styled.div`
 `;
 
 export const Inner = styled.div`
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 24px 16px 48px;
 `;
 
-/* 공통 제목 */
-export const Title = styled.h1`
-  font-size: 28px;
+export const Content = styled.section`
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 24px 32px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+`;
+
+export const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+`;
+
+export const Title = styled.h2`
+  font-size: 24px;
   font-weight: 800;
-  margin-bottom: 24px;
 `;
 
-/* ====== 유저 목록 ====== */
-
-export const UserList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid #e5e7eb;
-`;
-
-export const UserRow = styled.li`
+export const FilterRow = styled.div`
   display: flex;
   align-items: center;
-  padding: 18px 8px;
-  border-bottom: 1px solid #e5e7eb;
-`;
-
-export const Avatar = styled.div`
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 16px;
-  font-size: 26px;
-  color: #9ca3af;
-`;
-
-export const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-export const UserName = styled.span`
-  font-size: 16px;
-  font-weight: 700;
-`;
-
-export const UserRole = styled.span`
-  font-size: 13px;
-  color: #6b7280;
-`;
-
-export const UserRight = styled.div`
-  margin-left: auto;
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  margin-bottom: 20px;
 `;
 
-export const WarningText = styled.span`
+export const FilterLabel = styled.span`
   font-size: 14px;
-  color: #b91c1c;
-  font-weight: 600;
+  color: #555;
 `;
 
-export const IconButton = styled.button`
-  border: none;
-  background: transparent;
+export const FilterSelect = styled.select`
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: #fff;
+`;
+
+export const SearchInput = styled.input`
+  margin-left: auto;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  min-width: 240px;
+`;
+
+export const TableWrapper = styled.div`
+  border-radius: 12px;
+  border: 1px solid #eee;
+  overflow: hidden;
+  background: #fff;
+`;
+
+export const UserTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead {
+    background-color: #f8f9fb;
+  }
+
+  th,
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    font-weight: 600;
+    color: #333;
+  }
+
+  tbody tr:hover {
+    background-color: #fafafa;
+  }
+`;
+
+export const EmptyState = styled.div`
+  padding: 40px 0;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+`;
+
+export const SmallButton = styled.button`
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fff;
   cursor: pointer;
-  font-size: 18px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &:hover {
+    background-color: #f1f3f5;
+  }
 `;
 
-/* 페이지네이션 */
 export const Pagination = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 22px;
 `;
 
 export const PagerBtn = styled.button`
@@ -110,193 +145,46 @@ export const PageInfo = styled.span`
   color: #444;
 `;
 
-/* ====== 경고 모달 ====== */
-
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0,0,0,0.45);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 999;
+  align-items: center;
+  z-index: 9999;
 `;
 
 export const ModalBox = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  padding: 40px 60px;
-  min-width: 520px;
-  max-width: 640px;
+  background: white;
+  padding: 32px 36px;
+  border-radius: 12px;
   text-align: center;
-`;
+  min-width: 360px;
 
-export const ModalTitle = styled.h2`
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 24px;
-`;
-
-export const ModalTextarea = styled.textarea`
-  width: 100%;
-  min-height: 220px;
-  border-radius: 16px;
-  border: 1px solid #d1d5db;
-  padding: 18px;
-  font-size: 15px;
-  resize: none;
-  outline: none;
-
-  &::placeholder {
-    color: #9ca3af;
-  }
-`;
-
-export const ModalButtons = styled.div`
-  margin-top: 24px;
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-
-  button {
-    min-width: 120px;
-    padding: 10px 26px;
-    border-radius: 999px;
-    border: 1px solid #000;
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  button:first-child {
-    background: #fff;
-    color: #111;
-  }
-
-  button:last-child {
-    background: #000;
-    color: #fff;
-  }
-`;
-
-/* ====== 경고 결과 화면 ====== */
-
-export const WarnWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 0;
-`;
-
-export const WarnCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 40px;
-`;
-
-export const MainButtonWrap = styled.div`
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-`;
-
-export const MainButton = styled.button`
-  min-width: 180px;
-  padding: 10px 30px;
-  border-radius: 999px;
-  border: 1px solid #000;
-  background: #000;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-`;
-
-/* ====== 유저 상세(주문/배송/결제/포인트) ====== */
-
-export const UserHeader = styled.div`
-  background: #111827;
-  color: #fff;
-  border-radius: 14px 14px 0 0;
-  padding: 18px 24px;
-  display: flex;
-  align-items: center;
-`;
-
-export const UserHeaderInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-export const UserHeaderName = styled.span`
-  font-size: 16px;
-  font-weight: 700;
-`;
-
-export const UserHeaderRole = styled.span`
-  font-size: 13px;
-  opacity: 0.8;
-`;
-
-export const UserHeaderRight = styled.div`
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  font-size: 13px;
-`;
-
-export const HeaderStat = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-
-  span:first-child {
-    opacity: 0.7;
-    margin-bottom: 4px;
-  }
-
-  span:last-child {
+  h2 {
+    margin-bottom: 22px;
+    font-size: 18px;
     font-weight: 700;
   }
 `;
 
-export const DetailBody = styled.div`
-  background: #fff;
-  border-radius: 0 0 14px 14px;
-  border: 1px solid #e5e7eb;
-  border-top: none;
-  overflow: hidden;
-`;
-
-export const DetailSection = styled.section`
-  padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
-
-  &:first-of-type {
-    border-top: none;
-  }
-`;
-
-export const DetailTitle = styled.h3`
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-`;
-
-export const DetailBlock = styled.div`
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  padding: 16px 18px;
-  font-size: 14px;
-  line-height: 1.5;
-`;
-
-export const DetailRow = styled.div`
+export const ModalButtons = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
+  justify-content: center;
+  gap: 12px;
 
-  &:last-child {
-    margin-bottom: 0;
+  button {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 999px;
+    border: 1px solid #111;
+    cursor: pointer;
+    background: #fff;
+  }
+
+  button:last-child {
+    background: #111;
+    color: #fff;
   }
 `;

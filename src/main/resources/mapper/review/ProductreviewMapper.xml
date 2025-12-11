@@ -2,28 +2,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.review.shop.repository.product.ProductReviewMapper">
+<mapper namespace="com.review.shop.repository.review.ProductReviewMapper">
+    <!--분기점 반환 용 -->
+    <select id="selectReviewsByProductAndUser" resultType="com.review.shop.dto.review.ProductReviewDTO">
+        SELECT *
+        FROM review
+        WHERE product_id = #{product_id}
+          AND user_id = #{user_id}
+          AND deleted_at IS NULL
+    </select>
+
+    <!-- 상품 존재 여부 확인 : 널값 포함하게될 수도 있어서 Integer로 처리-->
+    <select id="selectProductById" parameterType="int" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM product
+        WHERE product_id = #{product_id}
+          AND deleted_at IS NULL
+    </select>
 
     <!-- 특정 상품의 리뷰 목록 조회 (이미지 포함, 평탄한 구조) -->
-    <select id="selectReviewsByProduct" resultType="com.review.shop.dto.product.ProductReviewDTO">
+    <select id="selectReviewsByProduct" resultType="com.review.shop.dto.review.ProductReviewDTO">
         SELECT
-        r.review_id,
-        r.content,
-        r.rating,
-        r.like_count,
-        r.dislike_count,
+        r.review_id, r.content, r.rating, r.like_count, r.dislike_count,
         TO_CHAR(r.created_at, 'YYYY-MM-DD') AS created_at,
         COALESCE(r.is_selected, '0') AS is_selected,
-        u.user_id,
-        u.nickname,
-        u.baumann_id,
+        u.user_id, u.nickname,u.baumann_id,
         b.type AS baumann_type,
         ri.image_url
         FROM review r
         JOIN USER_TABLE u ON r.user_id = u.user_id
         LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
         LEFT JOIN review_images ri ON r.review_id = ri.review_id
-        WHERE r.product_id = #{productId}
+        WHERE r.product_id = #{product_id}
         AND r.deleted_at IS NULL
         <choose>
             <when test="sort == 'latest'">
@@ -40,18 +50,18 @@
 
     <!-- 리뷰 생성 -->
     <insert id="insertReview">
-        INSERT INTO review (product_id, user_id, content, rating, created_at)
-        VALUES (#{productId}, #{userId}, #{content}, #{rating}, SYSDATE)
+        INSERT INTO review (product_id, user_id, content, rating, created_at, order_item_id)
+        VALUES (#{product_id}, #{user_id}, #{content}, #{rating}, SYSDATE, #{order_item_id})
     </insert>
 
     <!-- 리뷰 이미지 저장 -->
     <insert id="insertReviewImage">
-        INSERT INTO review_images (review_id, image_url)
-        VALUES (#{reviewId}, #{imageUrl})
+        INSERT INTO review_images (review_image_id, review_id, image_url)
+        VALUES (review_images_seq.NEXTVAL, #{review_id}, #{imageUrl})
     </insert>
 
     <!-- 가장 최근 생성된 리뷰 조회 (첫 번째 행만) -->
-    <select id="selectLastReview" resultType="com.review.shop.dto.product.ProductReviewDTO">
+    <select id="selectLastReview" resultType="com.review.shop.dto.review.ProductReviewDTO">
         SELECT
         r.review_id,
         r.content,
@@ -67,15 +77,15 @@
         FROM review r
         JOIN USER_TABLE u ON r.user_id = u.user_id
         LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
-        WHERE r.product_id = #{productId}
-        AND r.user_id = #{userId}
+        WHERE r.product_id = #{product_id}
+        AND r.user_id = #{user_id}
         AND r.deleted_at IS NULL
         ORDER BY r.review_id DESC
         FETCH FIRST 1 ROWS ONLY
     </select>
 
     <!-- 리뷰 ID로 조회 -->
-    <select id="selectReviewById" parameterType="int" resultType="com.review.shop.dto.product.ProductReviewDTO">
+    <select id="selectReviewById" parameterType="int" resultType="com.review.shop.dto.review.ProductReviewDTO">
         SELECT
         r.review_id,
         r.product_id,
@@ -90,13 +100,71 @@
         TO_CHAR(r.updated_at, 'YYYY-MM-DD') AS updated_at,
         r.deleted_at
         FROM review r
-        WHERE r.review_id = #{reviewId}
+        WHERE r.review_id = #{review_id}
+        and r.deleted_at is null
     </select>
+
+    <!-- 리뷰 수정 -->
+    <update id="updateReview">
+        UPDATE review
+        SET content = #{content},
+            rating = #{rating},
+            updated_at = SYSDATE
+        WHERE review_id = #{review_id}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 기존 리뷰 이미지 삭제 (수정 시 기존 이미지 교체용) -->
+    <delete id="deleteReviewImagesByReviewId">
+        DELETE FROM review_images
+        WHERE review_id = #{review_id}
+    </delete>
+
 
     <!-- 리뷰 삭제 (Soft Delete) -->
     <update id="deleteReview" parameterType="int">
         UPDATE review
         SET deleted_at = SYSDATE
-        WHERE review_id = #{reviewId}
+        WHERE review_id = #{review_id}
+    </update>
+
+    <!--    베스트 리뷰 선정   -->
+    <select id="selectBestReviewIds" resultType="com.review.shop.dto.review.BestReviewDTO">
+        WITH review_stats AS (
+        SELECT
+        r.review_id, r.user_id, r.product_id, r.like_count, r.dislike_count, r.comment_count,
+        p.review_count,
+        -- review_number은 리뷰의 순번. like가 같으면 임의로 순위가 조정되기 때문에 조건을 좀 더만듦.
+        -- (like → dislike → comment 기준)
+        ROW_NUMBER() OVER (
+        PARTITION BY r.product_id
+        ORDER BY r.like_count DESC, r.dislike_count ASC, r.comment_count DESC     -- 댓글 많은 순
+        ) AS review_number
+        FROM review r
+        JOIN product p ON r.product_id = p.product_id
+        WHERE r.like_count > 100
+        AND p.review_count > 100
+        )
+        SELECT review_id, user_id
+        FROM review_stats
+        -- 101개 리뷰의 10퍼센트는 10개로 자름.
+        WHERE review_number &lt;= FLOOR(review_count * 0.1);
+    </select>
+
+    <!-- 기존 is_checked 초기화 -->
+    <update id="resetBestReviews">
+        UPDATE review
+        SET is_checked = 0
+        WHERE is_checked = 1
+    </update>
+
+    <!-- 조회된 리뷰 is_checked 업데이트 -->
+    <update id="updateBestReviews">
+        UPDATE review
+        SET is_checked = 1
+        WHERE review_id IN
+        <foreach item="id" collection="reviewIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </update>
 </mapper>

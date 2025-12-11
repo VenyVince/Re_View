@@ -1,0 +1,21 @@
+name: Deploy Review Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted     # EC2에 설치한 Self-Hosted Runner 사용
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build & deploy containers
+        run: |
+          cd infra
+          docker-compose down
+          docker-compose build --no-cache
+          docker-compose up -d

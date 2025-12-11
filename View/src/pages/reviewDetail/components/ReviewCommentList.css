@@ -1,0 +1,80 @@
+/* src/pages/reviewDetail/components/ReviewCommentList.css */
+
+/* 리스트 스타일 제거 */
+.rd-comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 한 댓글 아이템 */
+.rd-comment-item {
+    border-bottom: 1px solid #eee;
+    padding: 14px 0;
+}
+
+/* 첫 줄: 왼쪽(닉네임/타입) + 오른쪽(날짜) */
+.rd-comment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 닉네임 + 바우만 타입 묶음 */
+.rd-comment-left {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* 닉네임 */
+.rd-comment-user {
+    font-weight: 600;
+    color: #111;
+}
+
+/* 바우만 타입 */
+.rd-comment-baumann {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #374151;
+}
+
+/* 날짜 */
+.rd-comment-date {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* 둘째 줄: 댓글 내용 */
+.rd-comment-text {
+    margin: 6px 3px;
+    font-size: 14px;
+    color: #111;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    text-align: left;
+}
+
+
+/* 댓글 없음 */
+.rd-no-comment {
+    padding: 16px 0;
+    color: #6b7280;
+    font-size: 14px;
+    text-align: center;
+}
+.rd-comment-delete-btn {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    color: #e63946;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.rd-comment-delete-btn:hover {
+    text-decoration: underline;
+}

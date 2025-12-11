@@ -1,108 +1,188 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    Wrap,
-    Inner,
-    Title,
-    SectionTitle,
-    List,
-    Row,
-    IconCircle,
-    TextBlock,
-    QuestionText,
-    Meta,
-    Pagination,
-    PagerBtn,
-    PageInfo,
+    Wrap, Inner, Content, TitleRow, Title,
+    Pagination, PagerBtn, PageInfo, DetailButton, Answered, Unanswered,
+    QnaTable, FilterSelect, FilterRow, SearchInput, FilterLabel, TableWrapper
 } from "./adminQnaPage.style";
-
-const dummyQna = [
-    {
-        id: 1,
-        question: "수분 크림 언제 재입고되나요?",
-        customer: "이연수",
-    },
-    {
-        id: 2,
-        question: "선크림 사용법은 어떤가요?",
-        customer: "김철수",
-    },
-    {
-        id: 3,
-        question: "수분 크림 언제 재입고되나요?",
-        customer: "이연수",
-    },
-    {
-        id: 4,
-        question: "선크림 사용법은 어떤가요?",
-        customer: "김철수",
-    },
-    {
-        id: 5,
-        question: "지성 피부에 맞는 토너 추천해주세요.",
-        customer: "박민지",
-    },
-    {
-        id: 6,
-        question: "트러블 피부도 사용 가능할까요?",
-        customer: "정가영",
-    },
-];
+import { fetchQnaList } from "../../../api/admin/adminQnaApi";
 
 export default function AdminQnaPage() {
-    const [list] = useState(dummyQna);
+    const [list, setList] = useState([]);
     const [page, setPage] = useState(1);
-    const pageSize = 4;
+    const pageSize = 10;
     const navigate = useNavigate();
+    const [filterStatus, setFilterStatus] = useState("ALL");
+    const [keyword, setKeyword] = useState("");
 
-    const total = list.length;
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const res = await fetchQnaList();
+                const items = res.data ?? [];
+                setList(Array.isArray(items) ? items : []);
+            } catch (err) {
+                console.error("[ADMIN] QnA 목록 실패", err);
+                setList([]);
+            }
+        };
+        load();
+    }, []);
+
+    /* 상태 필터 (answer 기준 강화) */
+    const filteredList = useMemo(() => {
+        let base = [...list];
+
+        // 검색
+        if (keyword.trim()) {
+            const k = keyword.toLowerCase();
+            base = base.filter(
+                q =>
+                    q.user_name?.toLowerCase().includes(k) ||
+                    q.title?.toLowerCase().includes(k)
+            );
+        }
+
+        // 상태 필터
+        if (filterStatus === "WAITING") {
+            base = base.filter(
+                q =>
+                    !q.answer ||
+                    q.answer.trim() === "" ||
+                    q.answer === "null"
+            );
+        } else if (filterStatus === "ANSWERED") {
+            base = base.filter(
+                q =>
+                    q.answer &&
+                    q.answer !== "null" &&
+                    q.answer.trim() !== ""
+            );
+        }
+
+        return base;
+    }, [list, filterStatus, keyword]);
+
+    const total = filteredList.length;
     const maxPage = Math.max(1, Math.ceil(total / pageSize));
 
     const pageList = useMemo(() => {
         const s = (page - 1) * pageSize;
-        return list.slice(s, s + pageSize);
-    }, [list, page]);
+        return filteredList.slice(s, s + pageSize);
+    }, [filteredList, page]);
 
-    const handleClickRow = (item) => {
-        // 질문 클릭 시 답변 페이지로 이동 + 상태 전달
-        navigate(`/admin/qna/${item.id}`, { state: item });
+    const handleRowClick = (q) => {
+        navigate(`/admin/qna/${q.qna_id}`, { state: q });
     };
 
     return (
         <Wrap>
             <Inner>
-                <Title>Q&A 관리</Title>
-                <SectionTitle>질문 목록</SectionTitle>
+                <Content>
 
-                <List>
-                    {pageList.map((q) => (
-                        <Row key={q.id} onClick={() => handleClickRow(q)}>
-                            <IconCircle>?</IconCircle>
-                            <TextBlock>
-                                <QuestionText>{q.question}</QuestionText>
-                                <Meta>고객: {q.customer}</Meta>
-                            </TextBlock>
-                        </Row>
-                    ))}
-                </List>
+                    <TitleRow>
+                        <Title>Q&A 관리</Title>
+                    </TitleRow>
 
-                <Pagination>
-                    <PagerBtn
-                        disabled={page === 1}
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    >
-                        {"<"}
-                    </PagerBtn>
-                    <PageInfo>
-                        {page} / {maxPage}
-                    </PageInfo>
-                    <PagerBtn
-                        disabled={page === maxPage}
-                        onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
-                    >
-                        {">"}
-                    </PagerBtn>
-                </Pagination>
+                    <FilterRow>
+
+                        {/* 상태 필터 */}
+                        <FilterLabel>상태</FilterLabel>
+                        <FilterSelect
+                            value={filterStatus}
+                            onChange={(e) => {
+                                setFilterStatus(e.target.value);
+                                setPage(1);
+                            }}
+                        >
+                            <option value="ALL">전체</option>
+                            <option value="WAITING">미답변</option>
+                            <option value="ANSWERED">답변완료</option>
+                        </FilterSelect>
+
+                        {/* 검색창 */}
+                        <SearchInput
+                            placeholder="고객명 / 제목 검색"
+                            value={keyword}
+                            onChange={(e) => {
+                                setKeyword(e.target.value);
+                                setPage(1);
+                            }}
+                        />
+
+                    </FilterRow>
+
+                    <TableWrapper>
+                        <QnaTable>
+                            <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>고객</th>
+                                <th>질문 제목</th>
+                                <th>답변 여부</th>
+                                <th>질문 보기</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {pageList.map((q, idx) => {
+                                const rowNumber = (page - 1) * pageSize + idx + 1;
+
+                                /*  답변 여부 판단 */
+                                const isAnswered =
+                                    q.answer &&
+                                    q.answer !== "null" &&
+                                    q.answer.trim() !== "";
+
+                                return (
+                                    <tr
+                                        key={q.qna_id}
+                                        onClick={() => handleRowClick(q)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <td>{rowNumber}</td>
+                                        <td>{q.user_name}</td>
+                                        <td>{q.title}</td>
+
+                                        <td>
+                                            {isAnswered ? (
+                                                <Answered>답변완료</Answered>
+                                            ) : (
+                                                <Unanswered>미답변</Unanswered>
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            <DetailButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/admin/qna/${q.qna_id}`);
+                                                }}
+                                            >
+                                                상세보기
+                                            </DetailButton>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            </tbody>
+
+                        </QnaTable>
+                    </TableWrapper>
+
+                    <Pagination>
+                        <PagerBtn disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+                            {"<"}
+                        </PagerBtn>
+
+                        <PageInfo>{page} / {maxPage}</PageInfo>
+
+                        <PagerBtn disabled={page === maxPage} onClick={() => setPage(p => p + 1)}>
+                            {">"}
+                        </PagerBtn>
+                    </Pagination>
+
+                </Content>
             </Inner>
         </Wrap>
     );

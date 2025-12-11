@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.ImageMapper">
+
+    <insert id="insertProductObjectKey">
+        INSERT ALL
+            INTO PRODUCT_IMAGE (
+                PRODUCT_ID,
+                IMAGE_URL,
+                IS_THUMBNAIL
+            ) VALUES (
+        #{product_id},
+        #{thumbnail_image},
+        'Y'
+        )
+
+        INTO PRODUCT_IMAGE (
+        PRODUCT_ID,
+        IMAGE_URL,
+        IS_THUMBNAIL
+        ) VALUES (
+        #{product_id},
+        #{detail_image},
+        'N'
+        )
+        SELECT * FROM DUAL
+    </insert>
+
+    <!-- ImageMapper.xml -->
+    <insert id="insertReviewObjectKey">
+        INSERT INTO review_images (
+            review_id,
+            image_url
+        ) VALUES (
+                     #{review_id},
+                     #{objectKey}
+                 )
+    </insert>
+
+</mapper>

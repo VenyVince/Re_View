@@ -1,0 +1,15 @@
+.productListWrapper {
+    width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개 */
+    gap: 20px;
+    padding-bottom: 80px;
+}
+
+.productListEmpty {
+    width: 1200px;
+    margin: 50px auto;
+    text-align: center;
+    color: #777;
+}

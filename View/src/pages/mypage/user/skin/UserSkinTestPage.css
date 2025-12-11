@@ -1,0 +1,287 @@
+/* ================================
+   공통
+================================ */
+
+.skin-section {
+    width: 100%;
+    font-family: Pretendard, sans-serif;
+}
+
+.skin-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px 32px;
+    border: 1px solid #eee;
+    margin-bottom: 28px;
+}
+
+/* ================================
+   상단: 나의 바우만 타입
+================================ */
+
+.skin-current-card {
+    background: #111;
+    color: #fff;
+    border-radius: 18px;
+    text-align: center;
+    padding: 40px 24px;
+    margin-bottom: 28px;
+}
+
+/* 내부 정렬 */
+.skin-current-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* "나의 바우만 타입" 타이틀 */
+.skin-current-label {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+/* 배지 블록을 가운데 배치 */
+.skin-current-main {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+/* 이미지 + 코드 카드 블록 */
+.skin-current-badge-block {
+    display: flex;
+    flex-direction: column;   /* 이미지 위, 텍스트 아래 */
+    align-items: center;
+    justify-content: center;
+    padding: 24px 40px;
+    border-radius: 24px;
+    background-color: #1c1c1c;  /* 살짝 밝은 블록 */
+    gap: 12px;
+}
+
+/* 배지 이미지 크기 */
+.skin-current-badge {
+    width: 80px;
+    object-fit: contain;
+}
+
+/* DRPW 같은 바우만 코드 텍스트 */
+.skin-current-type {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
+/* 설명 문구 */
+.skin-current-desc {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+/* ================================
+   선택된 바우만 타입
+================================ */
+
+.skin-select-card {
+    border: 1px solid #eee;
+    background: #fff;
+    padding: 24px 28px;
+    border-radius: 18px;
+    margin-bottom: 28px;
+}
+
+.skin-select-label {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.skin-select-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    justify-content: center;
+}
+
+.skin-select-badge {
+    width: 56px;
+    height: 56px;
+}
+
+.skin-select-dropdown {
+    min-width: 130px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 0 14px;
+    font-size: 15px;
+}
+
+/* ================================
+   설문 카드
+================================ */
+
+.skin-survey-card {
+    border: 1px solid #eee;
+    border-radius: 18px;
+    padding: 28px 32px;
+    background: #fff;
+}
+
+.skin-survey-title {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.skin-survey-caption {
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+    margin-top: 8px;
+    line-height: 1.6;
+}
+
+/* ================================
+   설문 본문
+================================ */
+
+.inline-survey {
+    margin-top: 28px;
+}
+
+.inline-survey-progress {
+    margin-bottom: 18px;
+}
+
+.inline-survey-step {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.inline-survey-bar {
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: #eaeaea;
+    overflow: hidden;
+}
+
+.inline-survey-bar-fill {
+    height: 100%;
+    background: #111;
+    transition: width 0.25s ease-out;
+}
+
+.inline-survey-section {
+    font-size: 12px;
+    font-weight: 600;
+    color: #777;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.inline-survey-question {
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 선택지 버튼 */
+
+.inline-survey-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inline-survey-option {
+    width: 100%;
+    border-radius: 999px;
+    padding: 14px 20px;
+    border: 1px solid #e2e2e2;
+    background: #fff;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.inline-survey-option:hover {
+    background: #f7f7f7;
+}
+
+.inline-survey-option--active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+/* ================================
+   설문 하단 버튼
+================================ */
+
+.inline-survey-footer {
+    margin-top: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inline-survey-reset {
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.inline-survey-reset:hover {
+    background: #f5f5f5;
+}
+
+.inline-survey-nav-prev {
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.inline-survey-nav-prev:disabled {
+    opacity: 0.4;
+}
+
+/* ================================
+   저장 버튼
+================================ */
+
+.skin-save-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.skin-save-btn {
+    padding: 12px 28px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.skin-save-btn:hover {
+    background: #000;
+}

@@ -4,7 +4,6 @@
 
 <mapper namespace="com.review.shop.repository.review.ReviewMapper">
 
-    <!-- 리뷰 목록 조회 (JOIN 포함) -->
     <select id="selectReviewList" resultType="com.review.shop.dto.review.ReviewDTO">
         SELECT
         r.review_id,
@@ -16,7 +15,9 @@
         COALESCE(r.like_count, 0) AS like_count,
         p.price,
         r.content,
-        r.rating
+        r.rating,
+        r.is_selected,
+        r.is_checked
         FROM review r
         JOIN USER_table u ON r.user_id = u.user_id
         JOIN product p ON r.product_id = p.product_id
@@ -26,6 +27,11 @@
         FROM review_images
         ) ri ON r.review_id = ri.review_id AND ri.rn = 1
         WHERE r.deleted_at IS NULL
+
+        <if test="category != null and category != ''">
+            AND p.category = #{category}
+        </if>
+
         <choose>
             <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
@@ -37,6 +43,60 @@
                 ORDER BY r.like_count DESC, r.created_at DESC
             </otherwise>
         </choose>
-        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <select id="getReviewBase" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$ReviewDetailDTO">
+        SELECT
+        r.review_id,
+        r.product_id,
+        u.nickname,
+        b.type AS baumann_type,
+        r.rating,
+        r.content,
+        TO_CHAR(r.created_at, 'YYYY-MM-DD') as created_at,
+        r.like_count,
+        r.dislike_count
+        FROM review r
+        JOIN USER_TABLE u ON r.user_id = u.user_id
+        LEFT JOIN baumann b ON u.baumann_id = b.baumann_id
+        WHERE r.review_id = #{review_id}
+    </select>
+
+    <select id="getProductByReviewId" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$ProductInfoDTO">
+        SELECT
+        p.product_id,
+        p.prd_name,
+        p.prd_brand,
+        p.price,
+        p.category,
+        (SELECT image_url FROM product_image WHERE product_id = p.product_id AND ROWNUM = 1) as product_image
+        FROM review r
+        JOIN product p ON r.product_id = p.product_id
+        WHERE r.review_id = #{review_id}
+    </select>
+
+    <select id="getReviewImages" resultType="string">
+        SELECT image_url
+        FROM review_images
+        WHERE review_id = #{review_id}
+    </select>
+
+    <select id="getComments" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$CommentDTO">
+        SELECT
+        c.review_comment_id as comment_id,
+        u.nickname,
+        c.content,
+        TO_CHAR(c.created_at, 'YYYY-MM-DD') as created_at
+        FROM review_comment c
+        JOIN USER_TABLE u ON c.user_id = u.user_id
+        WHERE c.review_id = #{review_id}
+        ORDER BY c.created_at ASC
+    </select>
+
+    <select id="getUserReaction" resultType="string">
+        SELECT is_like
+        FROM REVIEW_LIKE
+        WHERE review_id = #{review_id}
+        AND user_id = #{user_id}
     </select>
 </mapper>

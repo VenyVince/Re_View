@@ -1,29 +1,21 @@
 package com.review.shop.dto.qna;
 
+import lombok.Data;
+import java.util.Date;
 
-//QNA_ID
-//PRODUCT_ID
-//USER_ID
-//TITLE
-//CONTENT
-//ANSWER
-//CREATED_AT
-//ANSWERED_AT
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-@Getter
-@AllArgsConstructor
-public class QnADTO {
-    private Long qnaId;
-    private String productName;
-    private String userName;
+@Data
+public class QnaDTO {
+    private int qna_id;
+    private int product_id;
+    private int user_id;
     private String title;
     private String content;
-    private String answer;
-    private String createdAt;
-    private String answeredAt;
+    private String answer;      // 관리자 답변
+    private Date created_at;
+    private Date update_at;
+    private Date deleted_at;
+    private String prd_name; // 상품 이름 (JOIN)
+
+    private String user_name;   // 작성자 이름 (JOIN)
+    private String status;      // '답변대기' or '답변완료'
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.product.ProductMapper">
+
+    <select id="selectProductList" resultType="com.review.shop.dto.product.ProductDTO">
+        SELECT
+        p.product_id,
+        p.prd_name,
+        p.prd_brand,
+        pi.image_url,
+        p.price,
+        p.category,
+        p.rating
+        FROM product p
+        LEFT JOIN product_image pi ON p.product_id = pi.product_id
+        AND pi.is_thumbnail = 'Y'
+        WHERE p.deleted_at IS NULL
+        AND p.is_sold_out = '0'
+
+        <if test="category != null and category != ''">
+            AND p.category = #{category}
+        </if>
+
+        <trim prefix="ORDER BY">
+            <choose>
+                <when test="sort == 'rating'">
+                    p.rating DESC, p.product_id DESC
+                </when>
+                <when test="sort == 'price'">
+                    p.price ASC, p.product_id DESC
+                </when>
+                <otherwise>
+                    p.product_id DESC
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <select id="selectProductCount" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+        WHERE deleted_at IS NULL
+        AND is_sold_out = '0'
+    </select>
+
+    <select id="selectProductDetail" resultType="com.review.shop.dto.product.ProductDetailDTO">
+        SELECT
+        product_id,
+        prd_name,
+        prd_brand,
+        price,
+        category,
+        rating,
+        ingredient,
+        description,
+        stock,
+        review_count,
+        is_sold_out,
+        baumann_id
+        FROM product
+        WHERE product_id = #{product_id}
+        AND deleted_at IS NULL
+    </select>
+
+    <select id="selectProductImages" resultType="string">
+        SELECT image_url
+        FROM product_image
+        WHERE product_id = #{product_id}
+    </select>
+
+</mapper>

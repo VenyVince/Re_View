@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.recommendations.RecommendationsMapper">
+
+    <select id="getBaumannTypeByUserId" parameterType="int" resultType="Integer">
+        SELECT BAUMANN_ID FROM USER_TABLE WHERE user_id = #{user_id}
+    </select>
+
+    <select id="getBaumannDTOWithId" parameterType="integer" resultType="com.review.shop.dto.recommendations.RecommendationsUserDTO">
+        SELECT FIRST, SECOND, THIRD, FOURTH FROM BAUMANN WHERE BAUMANN_ID = #{user_Baumann}
+    </select>
+
+    <sql id="productSelectColumns">
+        p.product_id, p.prd_name, p.prd_brand, p.price, p.rating, p.review_count,
+        (SELECT pi.IMAGE_URL FROM PRODUCT_IMAGE pi WHERE pi.PRODUCT_ID = p.PRODUCT_ID AND pi.IS_THUMBNAIL = 'Y' AND ROWNUM = 1) AS image_url,
+        (SELECT REVIEW_ID FROM (SELECT r.REVIEW_ID FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_id,
+        (SELECT CONTENT FROM (SELECT r.CONTENT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_content,
+        (SELECT LIKE_COUNT FROM (SELECT r.LIKE_COUNT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_like_count,
+        (SELECT RATING FROM (SELECT r.RATING FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_rating
+    </sql>
+
+    <sql id="matchScoreAll">
+        (
+            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
+                (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
+                (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END) +
+                (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
+        ) AS match_score
+    </sql>
+
+    <sql id="matchScoreWithoutFirst">
+        (
+            50 +
+            (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
+        ) AS match_score
+    </sql>
+
+    <sql id="matchScoreWithoutSecond">
+        (
+            50 +
+            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
+        ) AS match_score
+    </sql>
+
+    <sql id="matchScoreWithoutThird">
+        (
+            50 +
+            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
+        ) AS match_score
+    </sql>
+
+    <sql id="matchScoreWithoutFourth">
+        (
+            50 +
+            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
+            (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END)
+        ) AS match_score
+    </sql>
+
+    <sql id="orderByMatchScore">
+        ORDER BY
+        match_score DESC,
+        DBMS_RANDOM.VALUE,
+        review_count DESC
+    </sql>
+
+    <select id="findRecommencementsWithAll" resultType="com.review.shop.dto.product.RecommendationDTO">
+        SELECT * FROM (
+        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreAll"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        )
+        WHERE match_score > 0
+        <include refid="orderByMatchScore"/>
+    </select>
+
+    <select id="findRecommencementsWithFirst" resultType="com.review.shop.dto.product.RecommendationDTO">
+        SELECT * FROM (
+        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutFirst"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE (b.FIRST = #{userInfo[0]} OR b.FIRST IS NULL)
+        )
+        WHERE match_score > 0
+        <include refid="orderByMatchScore"/>
+    </select>
+
+    <select id="findRecommencementsWithSecond" resultType="com.review.shop.dto.product.RecommendationDTO">
+        SELECT * FROM (
+        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutSecond"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE (b.SECOND = #{userInfo[1]} OR b.SECOND IS NULL)
+        )
+        WHERE match_score > 0
+        <include refid="orderByMatchScore"/>
+    </select>
+
+    <select id="findRecommencementsWithThird" resultType="com.review.shop.dto.product.RecommendationDTO">
+        SELECT * FROM (
+        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutThird"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE (b.THIRD = #{userInfo[2]} OR b.THIRD IS NULL)
+        )
+        WHERE match_score > 0
+        <include refid="orderByMatchScore"/>
+    </select>
+
+    <select id="findRecommencementsWithFourth" resultType="com.review.shop.dto.product.RecommendationDTO">
+        SELECT * FROM (
+        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutFourth"/>
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        WHERE (b.FOURTH = #{userInfo[3]} OR b.FOURTH IS NULL)
+        )
+        WHERE match_score > 0
+        <include refid="orderByMatchScore"/>
+    </select>
+
+    <select id="getRandomRecommendationAdminPicks" resultType="com.review.shop.dto.recommendations.RecommendationAdminPickDTO">
+        SELECT
+            p.prd_name      as product_name,
+            p.PRD_BRAND     as product_brand,
+            ri.IMAGE_URL    as thumbnail_url,   p.price,
+            r.content
+        FROM review r
+                 INNER JOIN product p ON r.product_id = p.product_id
+                 LEFT JOIN review_images ri ON r.review_id = ri.review_id
+        WHERE r.IS_SELECTED = '1'
+        ORDER BY DBMS_RANDOM.VALUE
+            FETCH FIRST 1 ROWS ONLY
+    </select>
+
+</mapper>

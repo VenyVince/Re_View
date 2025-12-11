@@ -1,24 +1,30 @@
 .search-page {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 20px;
+    font-family: "Noto Sans KR", sans-serif;
 }
 
 .search-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     text-align: left;
+}
+
+.divider-strong {
+    border: none;
+    border-bottom: 2px solid #111;
+    margin: 12px 0;
+}
+
+.divider-light {
+    border: none;
+    border-bottom: 1px solid #ddd;
+    margin: 6px 0;
 }
 
 .search-filters {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-/* 진한 구분선 */
-.divider-strong {
-    border: none;
-    border-bottom: 2px solid #111;
 }

@@ -1,0 +1,73 @@
+package com.review.shop.service.order;
+
+import com.review.shop.dto.orders.OrderCheckoutProductInfoDTO;
+import com.review.shop.dto.orders.OrderCheckoutResponse;
+import com.review.shop.dto.orders.OrderDTO;
+import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.repository.Orders.OrderMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+// 결제 진행 전 프론트에게 제공할 Preview 서비스
+@Service
+@RequiredArgsConstructor
+public class OrderPreviewService {
+
+    private final OrderMapper orderMapper;
+
+    // 주문서 작성시, 주문할 상품들의 상세 정보를 조회하는 메서드
+    public OrderCheckoutResponse getPrdInfoList(List<OrderDTO> orderList) {
+
+
+        // 원래는 N+1 문제있었는데, 아이디 모으고 쿼리 한번에 가져옴.
+        List<Integer> product_ids = orderList.stream()
+                .map(OrderDTO::getProduct_id)
+                .toList();
+
+        List<OrderCheckoutProductInfoDTO> products = orderMapper.getProductsByIds(product_ids);
+
+        Map<Integer, OrderCheckoutProductInfoDTO> productMap = products.stream()
+                .collect(Collectors.toMap(
+                        OrderCheckoutProductInfoDTO::getProduct_id,
+                        dto -> dto
+                ));
+
+        List<OrderCheckoutProductInfoDTO> finalResultList = new ArrayList<>();
+        int totalPrice = 0;
+
+        for (OrderDTO order : orderList) {
+            int product_id = order.getProduct_id();
+            int quantity = order.getBuy_quantity();
+
+            OrderCheckoutProductInfoDTO product = productMap.get(product_id);
+
+            if (product == null) {
+                throw new ResourceNotFoundException("상품을 찾을 수 없습니다. ID: " + product_id);
+            }
+
+            // 수량 설정된 새로운 DTO 생성
+            OrderCheckoutProductInfoDTO resultDTO = new OrderCheckoutProductInfoDTO(
+                    product.getProduct_id(),
+                    product.getThumbnail_url(),
+                    product.getPrd_name(),
+                    product.getPrice(),
+                    quantity  // 주문 수량 설정
+            );
+
+            int price = quantity * product.getPrice();
+            totalPrice += price;
+            finalResultList.add(resultDTO);
+        }
+
+        return new OrderCheckoutResponse(finalResultList, totalPrice);
+    }
+    // 포인트 불러오기
+    public Integer getUserPoint(int user_id) {
+        return orderMapper.getUserPoint(user_id);
+    }
+}

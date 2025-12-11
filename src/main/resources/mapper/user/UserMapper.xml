@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.review.shop.repository.user.UserMapper">
+    <insert id="insertUser" parameterType="com.review.shop.dto.user.UserInfoDTO">
+        INSERT INTO USER_TABLE (
+            ID, PASSWORD, NAME, EMAIL, NICKNAME, PHONE_NUMBER, BAUMANN_ID, ROLE
+        ) VALUES (
+                     #{id}, #{password}, #{name}, #{email}, #{nickname}, #{phone_number}, #{baumann_id}, #{role}
+                 )
+    </insert>
+
+    <select id="findUserById" resultType="com.review.shop.dto.user.UserInfoDTO">
+        SELECT
+            USER_ID,
+            ID,
+            PASSWORD,
+            NAME,
+            EMAIL,
+            NICKNAME,
+            PHONE_NUMBER,
+            BAUMANN_ID,
+            ROLE,
+            POINT
+        FROM
+            USER_TABLE
+        WHERE ID = #{id}
+    </select>
+
+    <select id="findUserIdById" resultType="int">
+        SELECT USER_ID FROM USER_TABLE WHERE ID = #{id}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE USER_TABLE
+        SET
+            PASSWORD = #{newEncodedPassword}
+        WHERE
+            ID = #{id}
+    </update>
+
+    <select id="findUserIdByNameAndPhoneNumber" resultType="string">
+        SELECT ID
+        FROM USER_TABLE
+        WHERE NAME = #{name}
+          AND PHONE_NUMBER = #{phone_number}
+    </select>
+
+    <select id="findBannedByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM BAN_LIST
+        WHERE user_id = #{id}
+    </select>
+
+    <select id="findEmailById" resultType="string">
+
+        SELECT
+            EMAIL
+        FROM
+            USER_TABLE
+        WHERE
+            id = #{id}
+
+    </select>
+
+    <select id="convertBaumannTypeToInt" parameterType="String" resultType="Integer">
+        SELECT
+            BAUMANN_ID
+        FROM
+            BAUMANN  WHERE
+            TYPE = #{type}
+    </select>
+
+    <select id="findTypeByUserId" resultType="string">
+        SELECT b.TYPE
+        FROM USER_TABLE u
+                 JOIN BAUMANN b ON u.BAUMANN_ID = b.BAUMANN_ID
+        WHERE USER_ID = #{currentId}
+    </select>
+
+</mapper>
+
+

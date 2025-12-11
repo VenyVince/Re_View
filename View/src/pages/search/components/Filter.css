@@ -1,29 +1,22 @@
 /* Filter.css */
 
-/* 공통 라인 구조 */
+/* 공통 구조 */
 .filter-line {
     text-align: left;
-    /* ✅ 상하 모두 1px의 여백을 줍니다. (필터 섹션 자체의 수직 간격 통일) */
-    margin-top:5px;
-    margin-bottom: 5px;
 }
 
 /* 제목 (카테고리, 브랜드) */
 .filter-title {
-
     font-size: 15px;
     font-weight: 600;
     margin-right: 20px;
-    /* ✅ 제목 아래 간격을 1px로 통일합니다. (리스트와 제목 사이 간격 최소화) */
     margin-bottom: 1px;
-
-    /* 제목 너비 고정 (브랜드와 크기 맞춤을 위함) */
     display: inline-block;
     width: 60px;
     text-align: left;
 }
 
-/* 리스트 영역: 가로로 배치 */
+/* 리스트 (가로 배치) */
 .filter-items {
     display: inline-flex;
     align-items: center;
@@ -31,16 +24,56 @@
     font-size: 14px;
     color: #333;
     list-style: none;
-    /* ✅ 상하 여백을 0으로 만들어, 필터 아이템과 줄(divider) 사이 간섭을 최소화 */
     margin: 0;
     padding: 0;
-    line-height: 1.2;
+    line-height: 1;
 }
 
-.divider-light {
-    border: none;
-    border-bottom: 1px solid #ddd;
-    /* ✅ 줄(선) 자체의 상하 여백을 1px로 통일합니다. */
-    /* 이렇게 하면 선 위/아래의 간격이 1px로 고정됩니다. */
-    margin: 1px 0;
+/* 브랜드 라인 */
+.brand-line {
+    margin: 2px;
+}
+
+/* 필터 아이템 */
+.filter-item {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+/* hover */
+.filter-item:hover {
+    color: red;
+}
+
+/* 선택된 항목(active) */
+.filter-item.active {
+    color: red;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* 기존 필터 스타일 유지 + 아래만 추가 */
+
+.more-btn {
+    font-weight: 600;
+    cursor: pointer;
+    color: #333;
+    user-select: none;
+}
+
+.more-btn:hover {
+    color: red;
+}
+
+/* 긴 브랜드 리스트 시 줄넘김 방지용 */
+.filter-items {
+    flex-wrap: wrap;
+    row-gap: 6px;
+}
+
+/* 활성화된 브랜드 강조 */
+.filter-item.active {
+    color: red;
+    font-weight: 600;
+    text-decoration: underline;
 }

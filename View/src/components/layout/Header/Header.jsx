@@ -4,18 +4,17 @@ import { useNavigate, Link } from 'react-router-dom';
 import './Header.css';
 import NavItem from './NavItem';
 import TextInput from '../../ui/TextInput';
-import logo from '../../../assets/logo.png';
+import logo from "../../../assets/logo.png";
 import { useAuth } from '../../../context/AuthContext';
-import axios from 'axios';
 
 export default function Header() {
     const [keyword, setKeyword] = useState('');
     const navigate = useNavigate();
-    const { auth, logout } = useAuth();  // 전역 로그인 상태 + 로그아웃 함수
+    const { auth, logout } = useAuth();  // 🔥 전역 로그인 상태 가져오기
 
     const handleSearch = () => {
         if (keyword.trim() !== '') {
-            navigate(`/search?query=${encodeURIComponent(keyword)}`);
+            navigate(`/search?keyword=${encodeURIComponent(keyword)}`);
         }
     };
 
@@ -25,31 +24,6 @@ export default function Header() {
 
     const handleLogoClick = () => {
         navigate('/');
-    };
-
-    const handleGoLogin = () => {
-        navigate('/login');
-    };
-
-    const handleGoMyPage = () => {
-        navigate('/mypage');
-    };
-
-    const handleLogout = async () => {
-        try {
-            // 서버 세션도 함께 종료
-            await axios.post(
-                '/api/auth/logout',
-                {},
-                { withCredentials: true }
-            );
-        } catch (e) {
-            console.error('로그아웃 요청 중 오류:', e);
-            // 실패해도 클라이언트 쪽 상태는 일단 비워줌
-        } finally {
-            logout();       // 전역 auth 초기화
-            navigate('/');  // 메인으로 이동
-        }
     };
 
     return (
@@ -64,16 +38,17 @@ export default function Header() {
                     onClick={handleLogoClick}
                 />
 
-                {/* 상단 네비게이션 */}
+                {/* 네비 */}
                 <nav className="rv-nav">
-                    <NavItem label="Product" to="/product" />
-                    <NavItem label="Review" to="/review" />
-                    <NavItem label="About" to="/about" />
-                    <NavItem label="Q&A" to="/qna" />
+
+                    <NavItem label="Product" to ="/products" />
+                    <NavItem label="Review" to ="/review" />
+                    <NavItem label="About"  to ="/About" />
+                    <NavItem label="Notice" to="/notice" />
                 </nav>
 
-                {/* 우측 검색 + 로그인/마이페이지 영역 */}
                 <div className="rv-right">
+                    {/* 검색창 */}
                     <TextInput
                         placeholder="Search..."
                         width={232}
@@ -86,42 +61,34 @@ export default function Header() {
                         onIconClick={handleSearch}
                     />
 
-                    {/* 🔹 로그인 상태에 따른 분기 */}
+                    {/* ▼ ▼ ▼ 로그인 여부에 따른 UI 변경 ▼ ▼ ▼ */}
                     {!auth.loggedIn ? (
-                        // 비로그인 상태
-                        <div className="rv-auth-area">
+                        <div className="rv-auth-buttons">
                             <button
-                                type="button"
-                                className="rv-btn rv-btn-primary"
-                                onClick={handleGoLogin}
+                                className="rv-btn-login"
+                                onClick={() => navigate('/login')}
                             >
                                 로그인
                             </button>
-                            <Link to="/register" className="rv-link">
+
+                            <button
+                                className="rv-btn-register"
+                                onClick={() => navigate('/register')}
+                            >
                                 회원가입
-                            </Link>
+                            </button>
                         </div>
                     ) : (
-                        // 로그인 상태
-                        <div className="rv-auth-area">
-                            <span className="rv-user-label">
-                                {auth.userId}
-                                {auth.role === 'ROLE_ADMIN' && (
-                                    <span className="rv-admin-badge">ADMIN</span>
-                                )}
-                                님
-                            </span>
-                            <button
-                                type="button"
-                                className="rv-btn rv-btn-outline"
-                                onClick={handleGoMyPage}
-                            >
+                        <div className="rv-user-menu">
+                            <span className="rv-user-nickname">{auth.userId} 님</span>
+
+                            <Link to="/mypage" className="rv-btn-mypage">
                                 마이페이지
-                            </button>
+                            </Link>
+
                             <button
-                                type="button"
-                                className="rv-btn rv-btn-ghost"
-                                onClick={handleLogout}
+                                className="rv-btn-logout"
+                                onClick={logout}
                             >
                                 로그아웃
                             </button>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.review.shop.repository.userinfo.UserInfoMapper">
+
+
+    <select id="getInfo" resultType="com.review.shop.dto.userinfo.userinfo.GetUserInfoDTO">
+        SELECT
+            name, nickname, phone_number
+        FROM user_table
+        WHERE user_id = #{user_id}
+          AND deleted_at IS NULL
+    </select>
+
+    <update id="updateInfo">
+        UPDATE user_table
+        <set>
+            <if test="updateDTO.nickname != null">nickname = #{updateDTO.nickname},</if>
+            <if test="updateDTO.phone_number != null">phone_number = #{updateDTO.phone_number},</if>
+            updated_at = SYSDATE
+        </set>
+        WHERE USER_ID = #{user_id}
+    </update>
+
+    <update id="deleteInfo">
+        UPDATE user_table
+        SET deleted_at = SYSDATE
+        WHERE user_id = #{user_id}
+    </update>
+
+    <update id="updateBaumann">
+        UPDATE user_table
+            <set>
+        <if test="baumann_id != null">baumann_id = #{baumann_id},</if>
+        updated_at =SYSDATE
+            </set>
+        where user_id = #{user_id}
+    </update>
+
+
+</mapper>

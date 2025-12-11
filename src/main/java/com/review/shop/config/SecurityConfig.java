@@ -12,16 +12,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
-    //사용자 인증 처리 Bean 주입
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    //암호화 용 Bean 주입
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -30,36 +31,69 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                //현재 restful api 방식이므로 formLogin, httpBasic 비활성화(기존은 html form 로그인 방식)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
 
-                // 주의 !!!! CSRF 비활성화 되어있음
-                .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (개발 기간동안)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/search/**","/api/products","/api/reviews").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-
-                // 어드민 제외 모두 해제
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        //어드민만 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
+
+//                        //모두 가능, 프론트 테스트 때문에 임시로 admin 제외 모두 허용
+//                        .requestMatchers(
+//                                "/api/auth/register",
+//                                "/api/auth/login",
+//                                "/api/auth/send-temp-password",
+//                                "/api/auth/check-id",
+//                                "/api/search/**",
+//                                "/api/products",
+//                                "/api/auth/logout",
+//                                "/api/auth/me"
+//
+//                        ).permitAll()
+
+//                        //유저만 가능
+//                        .anyRequest().hasRole("USER")
+//
+                            .anyRequest().permitAll()
                 )
 
-                // 로그아웃 설정
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
+
+                // 접근이 거부되었을 때와 인증이 필요한 경우의 핸들러 설정
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(400);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("접근 권한이 부족합니다.");
                         })
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(400);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("로그인이 필요합니다.");
+                        })
+                ) //
 
+                .logout(logout -> logout
+
+                        .logoutUrl("/api/auth/logout")
+
+                        .deleteCookies("JSESSIONID")
+
+                        .logoutSuccessHandler((request, response, authentication) -> {
+
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.getWriter().write("로그아웃 되었습니다.");
+
+                        })
                 );
-
 
         return http.build();
     }
-
-
 }

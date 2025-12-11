@@ -5,7 +5,7 @@ import logo from '../../../assets/logo.png'; // 경로 주의 (login/find 기준
 
 export default function FindSelect() {
     const nav = useNavigate();
-    const [mode, setMode] = useState('password'); // 기본 선택: 비밀번호 찾기
+    const [mode, setMode] = useState(); 
 
     const onNext = () => {
         if (mode === 'id') nav('/find/id');

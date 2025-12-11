@@ -41,4 +41,15 @@ frontend/node_modules
 
 
 ### etc ###
-.env
+infra/.env
+
+
+# MinIO / DB Data
+infra/minio_data
+infra/db_data
+infra/oracle-data
+infra/oracle_data
+infra/backup/*
+
+xl.meta
+
