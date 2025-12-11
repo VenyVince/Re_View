@@ -190,6 +190,7 @@ export default function BaumanProduct() {
     };
 
     const handleTagClick = async (mappedType) => {
+        console.log("🔥 handleTagClick 호출됨:", mappedType);
         try {
             setActiveTag(mappedType);
             setLoading(true);
@@ -205,7 +206,9 @@ export default function BaumanProduct() {
                     .flatMap(res => res.data?.recommended_products || [])
                     .map((p) => ({ ...mapProducts([p])[0] }));
 
-                return setProducts(merged);
+                const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
+
+                return setProducts(unique);
             }
 
             const res = await axios.post(`/api/recommendations/${mappedType}`);
