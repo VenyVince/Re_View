@@ -60,9 +60,24 @@ public class RecommendationsController {
         //바우만 DTO를 기반으로 type에 따른 추천 상품 리스트 가져오기
         List<RecommendationDTO> recommendationsPrdList = recommendationsService.getRecommendedProducts(baumannDTO,type);
 
+
+        //변환
         for(RecommendationDTO prd : recommendationsPrdList){
+            if (prd.getImage_url() == null || prd.getImage_url().isEmpty()) {
+                continue;
+            }
             String presignedUrl = imageService.presignedUrlGet(prd.getImage_url());
             prd.setImage_url(presignedUrl);
+        }
+
+        for(RecommendationDTO prd : recommendationsPrdList){
+            if (prd.getTop_review_image_url() == null || prd.getTop_review_image_url().isEmpty()) {
+                    continue;
+                }
+
+                String presignedUrl = imageService.presignedUrlGet(prd.getTop_review_image_url());
+                prd.setTop_review_image_url(presignedUrl);
+
         }
 
         Map<String, Object> response = new HashMap<>();

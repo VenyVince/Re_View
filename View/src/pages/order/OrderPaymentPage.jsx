@@ -61,6 +61,7 @@ export default function OrderPaymentPage() {
     //  기본 배송지 조회
     // ======================
     const fetchDefaultAddress = async () => {
+
         try {
             setAddressLoading(true);
             setAddressError("");
@@ -228,6 +229,9 @@ export default function OrderPaymentPage() {
     };
 
     const handleSubmitOrder = async () => {
+
+        console.log("주문 아이템 데이터 확인:", items);
+
         if (items.length === 0) {
             alert("주문할 상품이 없습니다. 장바구니에서 다시 시도해 주세요.");
             navigate("/mypage/cart");

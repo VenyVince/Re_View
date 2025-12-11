@@ -119,6 +119,7 @@ export default function BaumanProduct() {
                             rating: p.top_review_rating,
                             likes: p.top_review_likes,
                             productName: p.prd_name,
+                            reviewImageUrl: p.top_review_image_url // [수정 1] 리뷰 이미지 URL 추가
                         }
                         : null
                 }));
@@ -143,7 +144,8 @@ export default function BaumanProduct() {
             ...p.topReview,
             productName: p.name,
             brand: p.brand,
-            imageUrl: p.imageUrl,
+            // [수정 2] 리뷰 이미지가 있으면 쓰고, 없으면 상품 이미지 사용
+            imageUrl: p.topReview.reviewImageUrl || p.imageUrl,
         }));
 
     /* 상품 페이지네이션 */
@@ -184,6 +186,7 @@ export default function BaumanProduct() {
                     rating: p.top_review_rating,
                     likes: p.top_review_likes,
                     productName: p.prd_name,
+                    reviewImageUrl: p.top_review_image_url // [수정 3] 태그 클릭 시에도 리뷰 이미지 매핑
                 }
                 : null,
         }));
@@ -381,7 +384,7 @@ export default function BaumanProduct() {
                 )}
 
                 {/* ================================
-                     리뷰 탭 (상품 탭과 구조 동일하게 맞춤)
+                     리뷰 탭
                 ================================= */}
                 {activeTab === "review" && (
                     <div className="overlay-container">

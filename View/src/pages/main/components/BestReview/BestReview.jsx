@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // 1. useNavigate 추가
 import './BestReview.css';
 
 function formatPrice(n) {
@@ -11,6 +12,9 @@ function formatPrice(n) {
 }
 
 export default function AdminPick() {
+    // 2. navigate 훅 생성
+    const navigate = useNavigate();
+
     const [adminItem, setAdminItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,7 +26,6 @@ export default function AdminPick() {
                 const wrapper = response.data;
 
                 if (wrapper.admin_pick) {
-
                     setAdminItem(wrapper.admin_pick);
                 } else {
                     setAdminItem(null);
@@ -37,6 +40,15 @@ export default function AdminPick() {
 
         fetchAdminPick();
     }, []);
+
+    // 3. 클릭 핸들러 추가: 요청하신 /product/{product_id} 경로로 이동
+    const handleCardClick = () => {
+        if (adminItem && adminItem.product_id) {
+            navigate(`/product/${adminItem.product_id}`);
+        } else {
+            console.warn("이동할 상품 ID가 없습니다.");
+        }
+    };
 
     // Loading State
     if (loading) {
@@ -58,7 +70,11 @@ export default function AdminPick() {
         <section className="best-review" aria-label="운영자 추천 상품">
             <h2 className="best-review__title">운영자 Pick 리뷰</h2>
 
-            <article className="best-review__card">
+            <article
+                className="best-review__card"
+                onClick={handleCardClick}      // 4. 클릭 이벤트 연결
+                style={{ cursor: 'pointer' }}  // 5. 마우스 커서를 손가락 모양으로 변경
+            >
                 {/* Thumbnail */}
                 <div className="best-review__thumb">
                     {adminItem.thumbnail_url ? (
