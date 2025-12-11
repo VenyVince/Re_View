@@ -37,7 +37,7 @@ export default function ProductPage() {
             try {
                 if (selectedCategory === null) {
                     const res = await fetchProductsByCategory(null);
-                    setProducts(res.data?.content ?? []);
+                    setProducts(res.data ?? []);
                     setBrandReady(true);
                     return;
                 }
