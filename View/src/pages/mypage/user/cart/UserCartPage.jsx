@@ -15,6 +15,32 @@ export default function UserCartPage() {
     const formatPrice = (value) =>
         value.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
 
+    const getThumbnailUrl = (item) => {
+        if (!item) return null;
+
+        // 1순위: 백엔드에서 완성된 썸네일 URL을 내려주는 경우
+        if (item.product_thumbnail_url) {
+            return item.product_thumbnail_url;
+        }
+
+        // 2순위: image_url 이 절대 URL이면 그대로 사용
+        if (item.image_url && /^https?:\/\//.test(item.image_url)) {
+            return item.image_url;
+        }
+
+        // 3순위: image_url 이 상대 경로인 경우 Minio BASE URL 과 조합
+        if (item.image_url) {
+            const base = process.env.REACT_APP_MINIO_BASE_URL || "";
+            if (!base) return item.image_url;
+
+            const trimBase = base.replace(/\/$/, "");
+            const trimPath = String(item.image_url).replace(/^\//, "");
+            return `${trimBase}/${trimPath}`;
+        }
+
+        return null;
+    };
+
     // 장바구니 목록 조회: GET /api/cart
     const fetchCart = async () => {
         try {
@@ -23,19 +49,6 @@ export default function UserCartPage() {
 
             const res = await axiosClient.get("/api/cart");
 
-            // 응답 스키마:
-            // [
-            //   {
-            //     "cart_items_id": 0,
-            //     "product_id": 0,
-            //     "prd_name": "string",
-            //     "prd_brand": "string",
-            //     "price": 0,
-            //     "category": "string",
-            //     "quantity": 0,
-            //     "is_sold_out": true
-            //   }
-            // ]
             const data = Array.isArray(res.data) ? res.data : [];
 
             setItems(
@@ -254,13 +267,16 @@ export default function UserCartPage() {
 
                             {/* 리스트 영역 */}
                             <div className="cart-list">
-                                {items.map((item) => (
-                                    <div
-                                        key={item.cart_items_id}
-                                        className={`cart-item${
-                                            item.is_sold_out ? " cart-item-soldout" : ""
-                                        }`}
-                                    >
+                                {items.map((item) => {
+                                    const thumbUrl = getThumbnailUrl(item);
+
+                                    return (
+                                        <div
+                                            key={item.cart_items_id}
+                                            className={`cart-item${
+                                                item.is_sold_out ? " cart-item-soldout" : ""
+                                            }`}
+                                        >
                                         {/* 왼쪽: 체크박스 + 썸네일 + 상품정보 */}
                                         <div className="cart-item-left">
                                             <input
@@ -280,9 +296,17 @@ export default function UserCartPage() {
                                                     navigate(`/product/${item.product_id}`)
                                                 }
                                             >
-                                                <span className="cart-thumb-placeholder">
-                                                    이미지
-                                                </span>
+                                                {thumbUrl ? (
+                                                    <img
+                                                        src={thumbUrl}
+                                                        alt={item.prd_name || "상품 이미지"}
+                                                        className="cart-thumb-img"
+                                                    />
+                                                ) : (
+                                                    <span className="cart-thumb-placeholder">
+                                                        이미지
+                                                    </span>
+                                                )}
                                             </div>
 
                                             <div
@@ -365,7 +389,8 @@ export default function UserCartPage() {
                                             </div>
                                         </div>
                                     </div>
-                                ))}
+                                );
+                                })}
                             </div>
 
                             {/* 하단 합계 영역 */}
