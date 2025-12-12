@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /home/ubuntu/review/minio_data:/data
+      - ./minio_data:/data
     command: server /data --console-address ":9001"
     restart: always
 
@@ -21,7 +21,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /home/ubuntu/review/oracle-data:/opt/oracle/oradata
+      - ./oracle-data:/opt/oracle/oradata
     restart: always
 
   be:
