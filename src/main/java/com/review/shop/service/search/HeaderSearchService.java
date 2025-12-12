@@ -4,6 +4,7 @@ import com.review.shop.dto.orders.OrderAdminDTO;
 import com.review.shop.dto.search.header.*;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.Orders.OrderMapper;
 import com.review.shop.repository.search.header.HeaderSearchProductMapper;
 import com.review.shop.repository.search.header.HeaderSearchReviewMapper;
@@ -12,6 +13,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,7 @@ public class HeaderSearchService {
 
     private final HeaderSearchProductMapper productMapper;
     private final OrderMapper orderMapper;
+    private final ImageService imageService;
 
     public HeaderSearchDTO search(String keyword, String sort, String filter_brand, String filter_category) {
         try {
@@ -30,6 +33,14 @@ public class HeaderSearchService {
 
             if (products.isEmpty() && reviews.isEmpty()) {
                 throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
+            }
+
+            for (HeaderSearchReviewDTO review : reviews) {
+                convertReviewImages(review);
+            }
+
+            for (HeaderSearchProductDTO product : products) {
+                convertProductThumbnail(product);
             }
 
             HeaderSearchDTO response = new HeaderSearchDTO();
@@ -49,7 +60,11 @@ public class HeaderSearchService {
             if (reviews.isEmpty()) {
                 throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
-            //ListHeaderSearchReviewDTO에 이미지 리턴 추가
+
+            for (HeaderSearchReviewDTO review : reviews) {
+                convertReviewImages(review);
+            }
+
             ListHeaderSearchReviewDTO response = new ListHeaderSearchReviewDTO();
             response.setReviews(reviews);
 
@@ -66,13 +81,37 @@ public class HeaderSearchService {
             if (reviews.isEmpty()) {
                 throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
-            //ListHeaderSearchProductDTO에 대표 이미지 리턴 추가
+
+            for (HeaderSearchProductDTO product : reviews) {
+                convertProductThumbnail(product);
+            }
+
             ListHeaderSearchProductDTO response = new ListHeaderSearchProductDTO();
             response.setProducts(reviews);
 
             return response;
         } catch (DataAccessException e) {
             throw new DatabaseException("DB오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
+        }
+    }
+
+    private void convertReviewImages(HeaderSearchReviewDTO review) {
+        List<String> keys = review.getImage_urls();
+        if (keys != null && !keys.isEmpty()) {
+            List<String> urls = keys.stream()
+                    .map(key -> imageService.presignedUrlGet(key))
+                    .collect(Collectors.toList());
+            review.setImage_urls(urls);
+        } else {
+            review.setImage_urls(new ArrayList<>());
+        }
+    }
+
+    private void convertProductThumbnail(HeaderSearchProductDTO product) {
+        String key = product.getThumbnail_url();
+        if (key != null && !key.isEmpty()) {
+            String url = imageService.presignedUrlGet(key);
+            product.setThumbnail_url(url);
         }
     }
 

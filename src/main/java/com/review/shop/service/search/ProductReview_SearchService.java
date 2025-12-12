@@ -4,18 +4,22 @@ import com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_Search
 import com.review.shop.dto.search.MyPageProductPage.Product.ProductReview_SearchResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.search.MyPageProductPage.ProductReview_SearchMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductReview_SearchService {
 
     private final ProductReview_SearchMapper reviewMapper;
+    private final ImageService imageService;
 
     public ProductReview_SearchResponseDTO search(int product_id, String keyword, String sort, float filter_rating) {
         try {
@@ -25,12 +29,29 @@ public class ProductReview_SearchService {
                 throw new ResourceNotFoundException("검색 결과가 존재하지 않습니다");
             }
 
+            for (ProductReview_SearchDTO review : reviews) {
+                convertReviewImages(review);
+            }
+
             ProductReview_SearchResponseDTO response = new ProductReview_SearchResponseDTO();
             response.setReviews(reviews);
 
             return response;
         } catch (DataAccessException e) {
             throw new DatabaseException("오류가 발생했습니다. 관리자에게 문의해주세요.", e); //DB오류
+        }
+    }
+
+    private void convertReviewImages(ProductReview_SearchDTO review) {
+        List<String> keys = review.getImage_urls();
+
+        if (keys != null && !keys.isEmpty()) {
+            List<String> urls = keys.stream()
+                    .map(key -> imageService.presignedUrlGet(key)) // Key -> URL 변환
+                    .collect(Collectors.toList());
+            review.setImage_urls(urls);
+        } else {
+            review.setImage_urls(new ArrayList<>()); // null 방지용 빈 리스트
         }
     }
 }
