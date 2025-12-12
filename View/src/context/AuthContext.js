@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
 
     const logout = async () => {
         try {
-            await axiosClient.post("/auth/logout");
+            await axiosClient.post("api/auth/logout");
         } finally {
             setAuth({
                 loggedIn: false,
