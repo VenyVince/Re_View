@@ -1,9 +1,8 @@
 // src/pages/review/ReviewWrite.jsx
-
 import React, {useEffect, useState} from "react";
-import { useNavigate,useParams } from "react-router-dom";
+import { useNavigate,useParams,useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { createReview, getPresignedUrls } from "../../api/review/reviewApi";
+import { createReview, getPresignedUrls, fetchOrderDetail,fetchOrders } from "../../api/review/reviewApi";
 import {
     Wrap, Inner, Title, Panel, Row, Label, ProfileBox, Avatar, ProfileName, ProductBox,
     ProductInfo, ProductTop, ProductName, PriceText, RatingSelect, StarButton,
@@ -23,6 +22,39 @@ function formatDate(dateString) {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
+async function fetchOrderDetailByOrderItemId(orderItemId) {
+    const ordersRes = await fetchOrders();
+    const orders = ordersRes.data;
+
+    for (const order of orders) {
+        const detailRes = await fetchOrderDetail(order.order_id);
+        const items = detailRes.data.order_items;
+
+        const matched = items.find(i => String(i.order_item_id) === String(orderItemId));
+        if (matched) {
+            return {
+                product: {
+                    product_id: matched.product_id,
+                    product_name: matched.product_name,
+                    product_price: matched.product_price,
+                    purchase_date: order.created_at
+                }
+            };
+        }
+    }
+
+    return null;
+}
+
+const buttonStyle = {
+    padding: "6px 12px",
+    borderRadius: "8px",
+    border: "1px solid #d1d5db",
+    background: "white",
+    cursor: "pointer",
+    fontSize: "14px"
+};
+
 const ReviewWrite = () => {
     const navigate = useNavigate();
     const { product_id } = useParams();
@@ -36,6 +68,9 @@ const ReviewWrite = () => {
     const [previews, setPreviews] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+
+    const [searchParams] = useSearchParams();
+    const orderItemId = searchParams.get("orderItemId");
 
     // 이미지 추가
     const handleImageChange = (e) => {
@@ -154,6 +189,20 @@ const ReviewWrite = () => {
         }
     };
 
+    useEffect(() => {
+        async function load() {
+            if (!orderItemId) return;
+
+            // orderItemId로 주문상품 정보 불러오기
+            const detail = await fetchOrderDetailByOrderItemId(orderItemId);
+
+            setSelectedProduct(detail.product);
+            setSelectedOrderItemId(orderItemId);
+        }
+
+        load();
+    }, [orderItemId]);
+
     return (
         <Wrap>
             <Inner>
@@ -166,7 +215,6 @@ const ReviewWrite = () => {
                         onSelect={(item) => {
                             setSelectedProduct(item);
                             setSelectedOrderItemId(item.order_item_id);
-                            navigate(`/review/write/${item.product_id}`);
                             setOpenModal(false);
                         }}
                     />
@@ -186,25 +234,27 @@ const ReviewWrite = () => {
                         {/* 상품 정보 */}
                         <Row>
                             <Label>상품 정보</Label>
-                            <div style={{
-                                flex: 1,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "flex-start",
-                                gap: "8px"
-                            }}>
+
+                            <div
+                                style={{
+                                    flex: 1,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: "16px"
+                                }}
+                            >
                                 {selectedProduct ? (
                                     <ProductBox style={{ paddingLeft: 0 }}>
                                         <ProductInfo style={{ paddingLeft: 0 }}>
                                             <ProductTop>
-                                                <div className="left-info">
+                                                <div className="left-info" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                                     <ProductName>{selectedProduct.product_name}</ProductName>
-                                                    <PriceText style={{paddingLeft:"10px"}}>
-                                                        {selectedProduct.product_price.toLocaleString()}원
-                                                    </PriceText>
+                                                    <PriceText>{selectedProduct.product_price.toLocaleString()}원</PriceText>
                                                 </div>
 
-                                                <PurchaseDate style={{paddingLeft:"10px"}}>
+                                                <PurchaseDate  style={{ marginLeft: "10px" }}>
                                                     구매 날짜 {formatDate(selectedProduct.purchase_date)}
                                                 </PurchaseDate>
                                             </ProductTop>
@@ -230,17 +280,10 @@ const ReviewWrite = () => {
 
                                 <button
                                     type="button"
-                                    style={{
-                                        marginTop: 10,
-                                        padding: "6px 12px",
-                                        borderRadius: 8,
-                                        border: "1px solid #d1d5db",
-                                        background: "white",
-                                        cursor: "pointer",
-                                    }}
                                     onClick={() => setOpenModal(true)}
+                                    style={buttonStyle}
                                 >
-                                    구매한 상품 선택하기
+                                    다른 상품 선택하기
                                 </button>
                             </div>
                         </Row>
