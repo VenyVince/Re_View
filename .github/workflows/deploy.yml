@@ -19,6 +19,10 @@ jobs:
         run: |
           cd infra
           echo "${{ secrets.ENV_FILE }}" > .env
+      - name: Create frontend env
+        run: |
+          cd View
+          echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
 
       - name: Stop & remove previous containers
         run: |
