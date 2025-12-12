@@ -1,8 +1,7 @@
-// src/pages/review/ReviewPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
-
 import "./ReviewPage.css";
+
+import axiosClient from "../../api/axiosClient";
 
 import CategoryTabs from "./components/CategoryTabs";
 import ReviewSortSelect from "./components/ReviewSortSelect";
@@ -10,7 +9,7 @@ import ReviewList from "./components/ReviewList";
 
 export default function ReviewPage() {
 
-    // 카테고리 및 상태값
+    // 카테고리 및 매핑
     const CATEGORIES = ["전체", "스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
     const CATEGORY_MAP = {
         "전체": null,
@@ -18,7 +17,7 @@ export default function ReviewPage() {
         "에센스/세럼/앰플": ["에센스", "세럼", "앰플"],
         "크림": ["크림"],
         "로션": ["로션"],
-        "클렌징": ["클렌징"]
+        "클렌징": ["클렌징"],
     };
 
     const [reviews, setReviews] = useState([]);
@@ -26,20 +25,18 @@ export default function ReviewPage() {
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [sortType, setSortType] = useState("popular");
     const [loading, setLoading] = useState(true);
+    const [showTopBtn, setShowTopBtn] = useState(false);
 
-    // 리뷰 API 호출
+    // 리뷰 목록 조회
     useEffect(() => {
         setLoading(true);
 
         const backendCategories = CATEGORY_MAP[selectedCategory];
 
-        // "전체" 카테고리 선택 시
+        // 전체 카테고리
         if (backendCategories === null) {
-            // [수정] params에서 page, size 제거
-            axios.get("/api/reviews")
-                .then(res => {
-                    // [수정] res.data.content -> res.data
-                    // 백엔드가 이제 리스트를 바로 줍니다.
+            axiosClient.get("/api/reviews")
+                .then((res) => {
                     setReviews(res.data || []);
                     setSelectedBrand(null);
                     setLoading(false);
@@ -51,19 +48,16 @@ export default function ReviewPage() {
             return;
         }
 
-        // 특정 카테고리 선택 시 (여러 하위 카테고리 호출)
+        // 하위 카테고리 병렬 조회
         Promise.all(
-            backendCategories.map(cat =>
-                // [수정] params에서 page, size 제거
-                axios.get("/api/reviews", {
-                    params: { category: cat }
-                }).catch(() => ({ data: [] })) // [수정] 에러 시 빈 배열 반환 구조 맞춤
+            backendCategories.map((cat) =>
+                axiosClient.get("/api/reviews", {
+                    params: { category: cat },
+                }).catch(() => ({ data: [] }))
             )
         )
-            .then(results => {
-                // [수정] res.data.content -> res.data
-                const merged = results.flatMap(res => res.data || []);
-
+            .then((results) => {
+                const merged = results.flatMap((res) => res.data || []);
                 setReviews(merged);
                 setSelectedBrand(null);
                 setLoading(false);
@@ -77,16 +71,16 @@ export default function ReviewPage() {
 
     // 브랜드 목록 생성
     const brandList = useMemo(() => {
-        const brands = reviews.map(r => r.brand_name).filter(Boolean);
+        const brands = reviews.map((r) => r.brand_name).filter(Boolean);
         return Array.from(new Set(brands)).sort((a, b) => a.localeCompare(b));
     }, [reviews]);
 
-    // 정렬 및 브랜드 필터 적용
+    // 정렬 및 브랜드 필터
     const filteredReviews = useMemo(() => {
         let list = [...reviews];
 
         if (selectedBrand) {
-            list = list.filter(r => r.brand_name === selectedBrand);
+            list = list.filter((r) => r.brand_name === selectedBrand);
         }
 
         if (sortType === "popular") {
@@ -99,7 +93,9 @@ export default function ReviewPage() {
             list.sort((a, b) => a.rating - b.rating);
         }
         if (sortType === "recent") {
-            list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            list.sort(
+                (a, b) => new Date(b.created_at) - new Date(a.created_at)
+            );
         }
 
         return list;
@@ -111,7 +107,16 @@ export default function ReviewPage() {
         return selectedCategory;
     })();
 
-    // UI 렌더링
+    useEffect(() => {
+        const onScroll = () => {
+            setShowTopBtn(window.scrollY > 300);
+        };
+
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+
     return (
         <div className="reviewPageWrapper">
 
@@ -140,6 +145,17 @@ export default function ReviewPage() {
             ) : (
                 <ReviewList reviews={filteredReviews} />
             )}
+
+            {showTopBtn && (
+                <button
+                    className="pd-top-btn"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    <span className="top-arrow">∧</span>
+                    <span className="top-text">TOP</span>
+                </button>
+            )}
+
         </div>
     );
 }

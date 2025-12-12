@@ -1,36 +1,49 @@
+// src/pages/reviewDetail/components/ReviewDetailHeader.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import "./ReviewDetailHeader.css";
 
 export default function ReviewDetailHeader({ review, onLike, onDislike }) {
     return (
-        <div className="rd-header">
+        <div className="rdh-header">
 
             {/* 왼쪽: 상품 이미지 */}
-            <div className="rd-header-left">
+            <div className="rdh-image-box">
                 <img
                     src={review.product_image || ""}
                     alt={review.prd_name}
-                    className="rd-product-image"
-                    onError={(e) => (e.target.style.display = "none")}
+                    className="rdh-image"
+                    onError={(e) => {
+                        // 이미지 깨지면 숨김 (ReviewCard 방식 그대로)
+                        e.currentTarget.style.display = "none";
+                    }}
                 />
             </div>
 
-            <div className="rd-header-right">
+            {/* 오른쪽 정보 */}
+            <div className="rdh-info">
 
-                <div className="rd-brand-row">
-                    <div className="rd-brand">{review.prd_brand}</div>
+                <div className="rdh-brand-row">
+                    <div className="rdh-brand">{review.prd_brand}</div>
 
-                    <div className="rd-like-dislike">
+                    <div className="rdh-like-box">
                         <button
-                            className={review.user_liked ? "rd-like-btn active-like" : "rd-like-btn"}
+                            className={
+                                review.user_liked
+                                    ? "rdh-like-btn active"
+                                    : "rdh-like-btn"
+                            }
                             onClick={onLike}
                         >
                             👍 {review.like_count}
                         </button>
 
                         <button
-                            className={review.user_disliked ? "rd-dislike-btn active-dislike" : "rd-dislike-btn"}
+                            className={
+                                review.user_disliked
+                                    ? "rdh-dislike-btn active"
+                                    : "rdh-dislike-btn"
+                            }
                             onClick={onDislike}
                         >
                             👎 {review.dislike_count}
@@ -38,25 +51,22 @@ export default function ReviewDetailHeader({ review, onLike, onDislike }) {
                     </div>
                 </div>
 
-                <div className="rd-name">
+                <div className="rdh-name">
                     <Link to={`/product/${review.product_id}`}>
                         {review.prd_name}
                     </Link>
                 </div>
 
-                <div
-                    className={
-                        !review.rating || Number(review.rating) === 0
-                            ? "rd-rating productRatingNone"
-                            : "rd-rating"
-                    }
-                >
-                    {!review.rating ? "-" : `${Number(review.rating).toFixed(1)} / 5.0`}
+                <div className="rdh-rating">
+                    {review.rating
+                        ? `${Number(review.rating).toFixed(1)} / 5.0`
+                        : "-"}
                 </div>
 
-                <div className="rd-price">
+                <div className="rdh-price">
                     {review.price?.toLocaleString()}원
                 </div>
+
             </div>
         </div>
     );

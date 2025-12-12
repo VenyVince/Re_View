@@ -24,6 +24,7 @@
     overflow: hidden;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    margin-bottom: 10px;
 }
 
 /* 이미지 표시 방식 */
@@ -65,12 +66,13 @@
     justify-content: space-between;
     font-size: 14px;
     margin-top: 8px;
+    margin-bottom: 4px;
+    padding: 0 14px;
 }
 
 .productBrand {
     font-weight: bold;
     color: #444;
-    padding-left: 3px;
 }
 
 .productRating {
@@ -89,19 +91,19 @@
     font-size: 14px;
     font-weight: 600;
     color: #333;
-    line-height: 1.3;
     height: 38px;
     overflow: hidden;
     text-align: left;
-    padding-left: 3px;
+    line-height: 1.2;
+    padding: 0 14px;
 }
 
 /* 가격 */
 .productPrice {
     font-size: 16px;
-    font-weight: bold;
     color: #e60023;
     text-align: left;
-    padding-left: 3px;
-    padding-bottom: 5px;
+    padding: 0 14px;
+    margin-bottom: 10px;
+    font-weight: 800;
 }
