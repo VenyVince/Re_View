@@ -30,8 +30,7 @@ export default function UserDeliveryPage() {
     const [receiptLoading, setReceiptLoading] = useState(false);
     const [receiptError, setReceiptError] = useState("");
 
-    // 페이지네이션 (백엔드 page/size와 맞춰둠) – 지금은 요청용으로만 사용
-    const PAGE_SIZE = 10;
+    // 주문 목록은 백엔드에서 전체 내역을 최신순으로 내려줌
 
     const formatPrice = (value) =>
         value?.toLocaleString("ko-KR", { maximumFractionDigits: 0 }) ?? "0";
@@ -96,22 +95,36 @@ export default function UserDeliveryPage() {
     };
 
     // 주문 리스트 불러오기
-    const fetchOrders = async (pageNo = 1) => {
+    const fetchOrders = async () => {
         try {
             setOrderLoading(true);
             setOrderError("");
 
             const res = await axiosClient.get("/api/orders", {
-                params: {
-                    page: pageNo,
-                    size: PAGE_SIZE,
-                },
+                params: { page: 0, size: 1000 },
             });
 
-            // 컨트롤러가 List<OrderListResponseDTO> 를 바로 리턴
-            const list = Array.isArray(res.data) ? res.data : [];
-            setOrders(list);
+            const data = res.data;
+
+            // 1) List<OrderListResponseDTO> 그대로 오는 경우
+            if (Array.isArray(data)) {
+                setOrders(data);
+                return;
+            }
+
+            if (Array.isArray(data?.orderList)) {
+                setOrders(data.orderList);
+                return;
+            }
+            if (Array.isArray(data?.data)) {
+                setOrders(data.data);
+                return;
+            }
+
+            // 알 수 없는 구조면 빈 배열
+            setOrders([]);
         } catch (e) {
+            console.error("주문 내역 조회 오류:", e);
             setOrderError("주문 내역을 불러오는 중 오류가 발생했어요.");
         } finally {
             setOrderLoading(false);
@@ -120,12 +133,12 @@ export default function UserDeliveryPage() {
 
     useEffect(() => {
         fetchDefaultAddress();
-        fetchOrders(1);
+        fetchOrders();
     }, []);
 
     // 날짜 필터링이 반영된 주문 목록
     // - filterStart 또는 filterEnd 가 설정되어 있으면: 해당 범위(종료일 포함)에 해당하는 주문만
-    // - 둘 다 비어 있으면: 최근 1개월 내 주문만
+    // - 둘 다 비어 있으면: 전체 주문 내역 표시
     const filteredOrders = useMemo(() => {
         if (!orders || orders.length === 0) return [];
 
@@ -159,20 +172,8 @@ export default function UserDeliveryPage() {
             });
         }
 
-        // 날짜 필터가 없으면: 최근 1개월 내 주문만
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const oneMonthAgo = new Date(today);
-        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-        return list.filter((o) => {
-            if (!o.created_at) return true;
-
-            const created = new Date(o.created_at);
-            if (Number.isNaN(created.getTime())) return true;
-
-            return created >= oneMonthAgo;
-        });
+        // 날짜 필터가 없으면: 전체 주문 내역 표시
+        return list;
     }, [orders, filterStart, filterEnd]);
 
     // 상태별 전체 카운트는 전체 orders 기준 (필터와 무관)
@@ -320,7 +321,7 @@ export default function UserDeliveryPage() {
                 {/* 날짜 필터 (1개월보다 이전 내역 조회용) */}
                 <div className="delivery-order-datefilter">
                     <div className="delivery-order-datefilter-text">
-                        *최근 1개월 주문 내역만 기본으로 표시됩니다.
+                        *전체 주문 내역이 기본으로 표시됩니다.
                     </div>
                     <div className="delivery-order-datefilter-controls">
                         <span className="delivery-order-datefilter-label">조회 기간</span>
@@ -422,13 +423,9 @@ export default function UserDeliveryPage() {
                                                         type="button"
                                                         className="delivery-order-action-btn delivery-order-review-btn"
                                                         onClick={() =>
-                                                            navigate(
-                                                                `/review/write/${
-                                                                    order.product_id ||
-                                                                    order.main_product_id ||
-                                                                    0
-                                                                }`
-                                                            )
+                                                            navigate(`/review/write?orderId=${order.order_id}`, {
+                                                                state: { orderId: order.order_id },
+                                                            })
                                                         }
                                                     >
                                                         리뷰 작성하기
