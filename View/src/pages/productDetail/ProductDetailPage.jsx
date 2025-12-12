@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./ProductDetailPage.css";
 
+import axiosClient from "../../api/axiosClient";
+
 import ProductInfoSection from "./components/ProductInfoSection/ProductInfoSection";
 import ProductReviewSection from "./components/ProductReviewSection/ProductReviewSection";
 import QnaSection from "./components/QnaSection/QnaSection";
@@ -35,9 +37,8 @@ export default function ProductDetailPage() {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await fetch(`/api/products/${productId}`);
-                const data = await response.json();
-                setProduct(data);
+                const res = await axiosClient.get(`/api/products/${productId}`);
+                setProduct(res.data);
             } catch (err) {
                 console.error("상품 상세 조회 오류:", err);
             }
