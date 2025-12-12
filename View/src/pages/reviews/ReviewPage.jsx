@@ -25,6 +25,7 @@ export default function ReviewPage() {
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [sortType, setSortType] = useState("popular");
     const [loading, setLoading] = useState(true);
+    const [showTopBtn, setShowTopBtn] = useState(false);
 
     // 리뷰 목록 조회
     useEffect(() => {
@@ -106,6 +107,16 @@ export default function ReviewPage() {
         return selectedCategory;
     })();
 
+    useEffect(() => {
+        const onScroll = () => {
+            setShowTopBtn(window.scrollY > 300);
+        };
+
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+
     return (
         <div className="reviewPageWrapper">
 
@@ -134,6 +145,17 @@ export default function ReviewPage() {
             ) : (
                 <ReviewList reviews={filteredReviews} />
             )}
+
+            {showTopBtn && (
+                <button
+                    className="pd-top-btn"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    <span className="top-arrow">∧</span>
+                    <span className="top-text">TOP</span>
+                </button>
+            )}
+
         </div>
     );
 }
