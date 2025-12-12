@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./BaumanProduct.css";
 import dummyData from "../../../../assets/dummyData.png";
 import { getBaumannBadge } from "../../../../assets/baumann";
-import {
-    fetchMyBaumannType,
-    fetchRecommendByGroup
-} from "../../../../api/recommend/recommendApi.js";
+import { fetchMyBaumannType } from "../../../../api/recommend/recommendApi.js";
 import { useNavigate } from "react-router-dom";
 
 export default function BaumanProduct() {
@@ -18,6 +16,10 @@ export default function BaumanProduct() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("product");
+
+    /* 페이지네이션 */
+    const [productPage, setProductPage] = useState(1);
+    const [reviewPage, setReviewPage] = useState(1);
 
     /* 전체 바우만 타입 리스트 */
     const allTypes = [
@@ -38,7 +40,6 @@ export default function BaumanProduct() {
         "민감성": "second",
         "지성": "first",
     };
-
 
     /* 랜덤 타입 뽑기 */
     function getRandomType() {
@@ -64,7 +65,7 @@ export default function BaumanProduct() {
         fetchUserType();
     }, []);
 
-    /* 태그 > raw -> UI map 변환 함수 */
+    /* raw -> UI map 변환 함수 */
     const mapProducts = (raw) => {
         const mapped = raw.map((p) => ({
             id: p.product_id,
@@ -83,6 +84,7 @@ export default function BaumanProduct() {
                     rating: p.top_review_rating,
                     likes: p.top_review_likes,
                     productName: p.prd_name,
+                    reviewImageUrl: p.top_review_image_url
                 }
                 : null,
         }));
@@ -93,22 +95,33 @@ export default function BaumanProduct() {
     };
 
     /* 태그 클릭 시 처리 */
-    const handleTagClick = async (group) => {
+    const handleTagClick = async (mappedType) => {
+        console.log("🔥 handleTagClick 호출됨:", mappedType);
         try {
-            setActiveTag(group);
-
-            // 페이지 초기화
+            setActiveTag(mappedType);
             setProductPage(1);
             setReviewPage(1);
-
             setLoading(true);
             setError("");
 
-            const res = await fetchRecommendByGroup(group);
-            const raw = res.data?.recommended_products || [];
+            if (mappedType === "all") {
+                const groups = ["first", "second", "third", "fourth"];
+                const results = await Promise.all(
+                    groups.map(group => axios.post(`/api/recommendations/${group}`))
+                );
 
-            setProducts(mapProducts(raw));
-        } catch {
+                const merged = results
+                    .flatMap(res => res.data?.recommended_products || [])
+                    .map((p) => mapProducts([p])[0]);
+
+                const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
+
+                setProducts(unique);
+            } else {
+                const res = await axios.post(`/api/recommendations/${mappedType}`);
+                setProducts(mapProducts(res.data?.recommended_products || []));
+            }
+        } catch (err) {
             setError("추천 상품을 불러오지 못했습니다.");
         } finally {
             setLoading(false);
@@ -122,7 +135,6 @@ export default function BaumanProduct() {
             return;
         }
 
-        // 로그인 사용자 → 처음 화면에 들어왔을 때만 실행
         const typeMap = {
             DRNT: "first", DRNW: "first",
             DRPT: "second", DRPW: "second",
@@ -135,11 +147,10 @@ export default function BaumanProduct() {
         };
 
         const mappedType = typeMap[currentType] || "all";
-        setActiveTag(mappedType); // UI 업데이트
-        handleTagClick(mappedType); // 첫 로드 데이터 가져오기
+        setActiveTag(mappedType);
+        handleTagClick(mappedType);
 
     }, [currentType]);
-
 
     /* 화면에 표시될 타입 표시*/
     const displayType = currentType || getRandomType();
@@ -166,24 +177,22 @@ export default function BaumanProduct() {
 
     const selectedType = skinTypeList.find((t) => t.type === displayType);
 
-    /* 리뷰 데이터 변환 */
+    /* 리뷰 리스트 */
     const reviewList = products
         .filter((p) => p.topReview)
         .map((p) => ({
             ...p.topReview,
             productName: p.name,
             brand: p.brand,
-            imageUrl: p.imageUrl,
+            imageUrl: p.topReview.reviewImageUrl || p.imageUrl,
         }));
 
-    /* 페이지네이션 */
-    const [productPage, setProductPage] = useState(1);
+    /* 페이지네이션 설정 */
     const productPageSize = 16;
     const productStart = (productPage - 1) * productPageSize;
     const displayedProducts = products.slice(productStart, productStart + productPageSize);
     const productTotalPages = Math.ceil(products.length / productPageSize);
 
-    const [reviewPage, setReviewPage] = useState(1);
     const reviewPageSize = 16;
     const reviewStart = (reviewPage - 1) * reviewPageSize;
     const displayedReviews = reviewList.slice(reviewStart, reviewStart + reviewPageSize);
@@ -194,7 +203,6 @@ export default function BaumanProduct() {
         else setReviewPage(1);
     }, [activeTab]);
 
-    /* UI 랜더링 */
     return (
         <section className="bauman-section">
             <h2 className="bauman-title">{displayType}의 추천 상품</h2>
@@ -247,17 +255,17 @@ export default function BaumanProduct() {
                                 </button>
 
                                 {selectedType.tags.map((tag, index) => {
-                                        const group = tagToGroup[tag];
-                                        return (
-                                            <button
-                                                key={index}
-                                                className={`bauman-tag-btn ${activeTag === group ? "active-tag" : ""}`}
-                                                onClick={() => handleTagClick(group)}
-                                            >
-                                                {tag}
-                                            </button>
-                                        );
-                                    })}
+                                    const group = tagToGroup[tag];
+                                    return (
+                                        <button
+                                            key={index}
+                                            className={`bauman-tag-btn ${activeTag === group ? "active-tag" : ""}`}
+                                            onClick={() => handleTagClick(group)}
+                                        >
+                                            {tag}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
