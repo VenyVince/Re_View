@@ -105,8 +105,12 @@ const CancelButton = styled.button`
 
 const SaveButton = styled.button`
     padding: 8px 14px;
-    background: #ffcc00;
+    background: #444;
     border-radius: 6px;
     border: none;
     font-weight: 600;
+    color: #f0f0f0;
+    &:hover {
+        background: #333;
+    }
 `;
