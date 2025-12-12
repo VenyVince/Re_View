@@ -24,6 +24,7 @@ export default function ProductPage() {
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [loading, setLoading] = useState(false);
     const [brandReady, setBrandReady] = useState(false);
+    const [showTopBtn, setShowTopBtn] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -92,6 +93,14 @@ export default function ProductPage() {
         return catLabel;
     })();
 
+    useEffect(() => {
+        const onScroll = () => {
+            setShowTopBtn(window.scrollY > 300);
+        };
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
     return (
         <div className="productPageWrapper">
             <div className="selected-info">{selectedText}</div>
@@ -117,6 +126,17 @@ export default function ProductPage() {
             ) : (
                 <ProductList products={filteredProducts} />
             )}
+
+            {showTopBtn && (
+                <button
+                    className="pd-top-btn"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    <span className="top-arrow">∧</span>
+                    <span className="top-text">TOP</span>
+                </button>
+            )}
         </div>
+
     );
 }
