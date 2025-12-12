@@ -7,15 +7,28 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted     # EC2에 설치한 Self-Hosted Runner 사용
+    runs-on: self-hosted  # Use runner on EC2
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build & deploy containers
+      - name: Create .env from secrets
         run: |
           cd infra
-          docker-compose down
-          docker-compose build --no-cache
-          docker-compose up -d
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Stop & remove previous containers
+        run: |
+          cd infra
+          docker compose down || true
+
+      - name: Build new containers
+        run: |
+          cd infra
+          docker compose build --no-cache
+
+      - name: Start containers
+        run: |
+          cd infra
+          docker compose up -d
