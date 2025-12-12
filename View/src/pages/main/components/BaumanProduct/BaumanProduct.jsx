@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./BaumanProduct.css";
 import dummyData from "../../../../assets/dummyData.png";
 import { getBaumannBadge } from "../../../../assets/baumann";
-import {
-    fetchMyBaumannType,
-    fetchRecommendByGroup
-} from "../../../../api/recommend/recommendApi.js";
+import { fetchMyBaumannType } from "../../../../api/recommend/recommendApi.js";
 import { useNavigate } from "react-router-dom";
 
 export default function BaumanProduct() {
     const navigate = useNavigate();
 
+    /* 기본 상태 */
     const [activeTag, setActiveTag] = useState("all");
     const [currentType, setCurrentType] = useState(null);
     const [products, setProducts] = useState([]);
@@ -18,9 +17,11 @@ export default function BaumanProduct() {
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("product");
 
+    /* 페이지네이션 */
     const [productPage, setProductPage] = useState(1);
     const [reviewPage, setReviewPage] = useState(1);
 
+    /* 전체 바우만 타입 리스트 */
     const allTypes = [
         "DRNT","DRNW","DRPT","DRPW",
         "DSNT","DSNW","DSPT","DSPW",
@@ -28,6 +29,7 @@ export default function BaumanProduct() {
         "OSNT","OSNW","OSPT","OSPW"
     ];
 
+    /* 태그 -> 그룹 매핑표 */
     const tagToGroup = {
         "건성": "first",
         "저자극": "second",
@@ -39,10 +41,12 @@ export default function BaumanProduct() {
         "지성": "first",
     };
 
+    /* 랜덤 타입 뽑기 */
     function getRandomType() {
         return allTypes[Math.floor(Math.random() * allTypes.length)];
     }
 
+    /* 로그인 여부 + 타입 조회 */
     useEffect(() => {
         const fetchUserType = async () => {
             try {
@@ -61,6 +65,7 @@ export default function BaumanProduct() {
         fetchUserType();
     }, []);
 
+    /* raw -> UI map 변환 함수 */
     const mapProducts = (raw) => {
         const mapped = raw.map((p) => ({
             id: p.product_id,
@@ -85,28 +90,45 @@ export default function BaumanProduct() {
         }));
 
         mapped.sort((a, b) => a.id - b.id);
+
         return mapped;
     };
 
-    const handleTagClick = async (group) => {
+    /* 태그 클릭 시 처리 */
+    const handleTagClick = async (mappedType) => {
+        console.log("🔥 handleTagClick 호출됨:", mappedType);
         try {
-            setActiveTag(group);
+            setActiveTag(mappedType);
             setProductPage(1);
             setReviewPage(1);
             setLoading(true);
             setError("");
 
-            const res = await fetchRecommendByGroup(group);
-            const raw = res.data?.recommended_products || [];
+            if (mappedType === "all") {
+                const groups = ["first", "second", "third", "fourth"];
+                const results = await Promise.all(
+                    groups.map(group => axios.post(`/api/recommendations/${group}`))
+                );
 
-            setProducts(mapProducts(raw));
-        } catch {
+                const merged = results
+                    .flatMap(res => res.data?.recommended_products || [])
+                    .map((p) => mapProducts([p])[0]);
+
+                const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
+
+                setProducts(unique);
+            } else {
+                const res = await axios.post(`/api/recommendations/${mappedType}`);
+                setProducts(mapProducts(res.data?.recommended_products || []));
+            }
+        } catch (err) {
             setError("추천 상품을 불러오지 못했습니다.");
         } finally {
             setLoading(false);
         }
     };
 
+    /* mappedType 추천 가져오기 */
     useEffect(() => {
         if (!currentType) {
             handleTagClick("all");
@@ -127,10 +149,13 @@ export default function BaumanProduct() {
         const mappedType = typeMap[currentType] || "all";
         setActiveTag(mappedType);
         handleTagClick(mappedType);
+
     }, [currentType]);
 
+    /* 화면에 표시될 타입 표시*/
     const displayType = currentType || getRandomType();
 
+    /* 바우만 타입 태그 리스트 */
     const skinTypeList = [
         { type: "DRNT", tags: ["건성", "저자극", "비색소", "탄력"] },
         { type: "DRNW", tags: ["건성", "저자극", "비색소", "주름"] },
@@ -152,6 +177,7 @@ export default function BaumanProduct() {
 
     const selectedType = skinTypeList.find((t) => t.type === displayType);
 
+    /* 리뷰 리스트 */
     const reviewList = products
         .filter((p) => p.topReview)
         .map((p) => ({
@@ -161,6 +187,7 @@ export default function BaumanProduct() {
             imageUrl: p.topReview.reviewImageUrl || p.imageUrl,
         }));
 
+    /* 페이지네이션 설정 */
     const productPageSize = 16;
     const productStart = (productPage - 1) * productPageSize;
     const displayedProducts = products.slice(productStart, productStart + productPageSize);
@@ -180,6 +207,7 @@ export default function BaumanProduct() {
         <section className="bauman-section">
             <h2 className="bauman-title">{displayType}의 추천 상품</h2>
 
+            {/* 탭 */}
             <div className="bauman-tabs">
                 <button
                     className={activeTab === "product" ? "tab-active" : ""}
@@ -197,6 +225,7 @@ export default function BaumanProduct() {
 
             <div className="bauman-box">
 
+                {/* 타입 박스 */}
                 {selectedType && (
                     <div className="bauman-header">
                         <div className="bauman-header-right">
@@ -216,6 +245,7 @@ export default function BaumanProduct() {
                                 </div>
                             </div>
 
+                            {/* 태그 버튼 */}
                             <div className="bauman-tag-buttons">
                                 <button
                                     className={`bauman-tag-btn ${activeTag === "all" ? "active-tag" : ""}`}
@@ -241,10 +271,12 @@ export default function BaumanProduct() {
                     </div>
                 )}
 
+                {/* 에러 */}
                 {error && currentType !== null && (
                     <p className="bauman-error">{error}</p>
                 )}
 
+                {/* 상품 탭 */}
                 {activeTab === "product" && (
                     <div className="overlay-container">
                         <div className={currentType ? "" : "blur-block"}>
@@ -290,6 +322,7 @@ export default function BaumanProduct() {
                                 )}
                             </div>
 
+                            {/* 페이지네이션 */}
                             <div className="pagination">
                                 <button
                                     disabled={productPage === 1}
@@ -297,7 +330,7 @@ export default function BaumanProduct() {
                                 >
                                     이전
                                 </button>
-                                <span>{productPage} / {productTotalPages || 1}</span>
+                                <span>{productPage} / {productTotalPages}</span>
                                 <button
                                     disabled={productPage === productTotalPages}
                                     onClick={() => setProductPage(productPage + 1)}
@@ -323,6 +356,7 @@ export default function BaumanProduct() {
                     </div>
                 )}
 
+                {/* 리뷰 탭 */}
                 {activeTab === "review" && (
                     <div className="overlay-container">
                         <div className={currentType ? "" : "blur-block"}>
@@ -377,7 +411,7 @@ export default function BaumanProduct() {
                                                 이전
                                             </button>
 
-                                            <span>{reviewPage} / {reviewTotalPages || 1}</span>
+                                            <span>{reviewPage} / {reviewTotalPages}</span>
 
                                             <button
                                                 disabled={reviewPage === reviewTotalPages}
