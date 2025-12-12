@@ -1,23 +1,27 @@
 // src/pages/product/components/ProductCard.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom";   // ← 추가
+import { useNavigate } from "react-router-dom";
 import "./ProductCard.css";
 
 export default function ProductCard({ product }) {
-    const navigate = useNavigate();  // ← 추가
+    const navigate = useNavigate();
+
+    // 이미지 유무에 따라 wrapper 클래스 분리
+    const hasImage = Boolean(product.image_url);
 
     return (
         <div
             className="productCard"
-            onClick={() => navigate(`/product/${product.product_id}`)}   // ← 클릭 시 이동
+            onClick={() => navigate(`/product/${product.product_id}`)}
         >
 
             {/* 이미지 영역 */}
-            <div className="productImageWrapper">
+            <div className={`productImageWrapper ${hasImage ? "hasImage" : "noImage"}`}>
                 <img
-                    src={product.image_url || "/images/no-img.png"}
+                    src={product.image_url || ""}
                     alt={product.prd_name}
                     className="productImage"
+                    onError={(e) => (e.currentTarget.style.display = "none")}
                 />
             </div>
 
@@ -36,8 +40,6 @@ export default function ProductCard({ product }) {
                         ? "-"
                         : `${Number(product.rating).toFixed(1)} / 5.0`}
                 </p>
-
-
             </div>
 
             {/* 상품명 */}

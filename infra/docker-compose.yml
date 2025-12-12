@@ -29,14 +29,6 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-      args:
-        SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-        SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-        SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-        MINIO_URL: ${MINIO_URL}
-        MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-        MINIO_SECRET_KEY: ${MINIO_ROOT_USER}
-        MINIO_BUCKET: ${MINIO_BUCKET}
     ports:
       - "8080:8080"
     env_file:

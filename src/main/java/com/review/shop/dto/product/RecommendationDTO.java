@@ -18,6 +18,7 @@ public class RecommendationDTO {
     private int match_score;
 
     //리뷰 추천 부분
+    private String top_review_image_url;
     private String top_review_id;
     private String top_review_content;
     private int top_review_likes;

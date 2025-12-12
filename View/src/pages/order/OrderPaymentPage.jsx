@@ -1,12 +1,10 @@
 // src/pages/order/OrderPaymentPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./OrderPaymentPage.css";
 import OrderCardPaymentSection from "./OrderCardPaymentSection";
 import OrderAddressSelectPanel from "./OrderAddressSelectPanel";
-
-// 기존 MOCK_DEFAULT_ADDRESS, MOCK_SAVED_CARDS 전부 삭제
+import axiosClient from "../../api/axiosClient";
 
 export default function OrderPaymentPage() {
     const location = useLocation();
@@ -31,6 +29,10 @@ export default function OrderPaymentPage() {
     const [usePoint, setUsePoint] = useState(0);
     const [pointLoading, setPointLoading] = useState(true);
     const [pointError, setPointError] = useState("");
+
+    const [showAddressPanel, setShowAddressPanel] = useState(false);
+    const [cardValid, setCardValid] = useState(false);
+
     // ======================
     //  포인트 조회
     // ======================
@@ -39,12 +41,10 @@ export default function OrderPaymentPage() {
             setPointLoading(true);
             setPointError("");
 
-            const res = await axios.get("/api/users/me/points", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/users/me/points");
 
-            // 컨트롤러에서 Integer 하나만 리턴하므로 그대로 사용
-            const totalPoint = typeof res.data === "number" ? res.data : Number(res.data) || 0;
+            const totalPoint =
+                typeof res.data === "number" ? res.data : Number(res.data) || 0;
             setAvailablePoint(totalPoint);
         } catch (e) {
             console.error(e);
@@ -54,8 +54,6 @@ export default function OrderPaymentPage() {
             setPointLoading(false);
         }
     };
-    const [showAddressPanel, setShowAddressPanel] = useState(false); // ✅ 패널 토글
-    const [cardValid, setCardValid] = useState(false);
 
     // ======================
     //  기본 배송지 조회
@@ -65,9 +63,7 @@ export default function OrderPaymentPage() {
             setAddressLoading(true);
             setAddressError("");
 
-            const res = await axios.get("/api/addresses", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/addresses");
 
             const data = Array.isArray(res.data)
                 ? res.data
@@ -90,6 +86,7 @@ export default function OrderPaymentPage() {
 
             setAddress(defaultAddr);
         } catch (e) {
+            console.error(e);
             setAddressError("배송지 정보를 불러오는 중 오류가 발생했습니다.");
         } finally {
             setAddressLoading(false);
@@ -104,9 +101,7 @@ export default function OrderPaymentPage() {
             setCardsLoading(true);
             setCardsError("");
 
-            const res = await axios.get("/api/users/me/payments", {
-                withCredentials: true,
-            });
+            const res = await axiosClient.get("/api/users/me/payments");
 
             const data = Array.isArray(res.data)
                 ? res.data
@@ -115,13 +110,14 @@ export default function OrderPaymentPage() {
             setCards(data);
 
             if (data.length > 0) {
-                setSelectedPaymentId(data[0].payment_id); // 첫 번째 카드 기본 선택
+                setSelectedPaymentId(data[0].payment_id);
                 setCardValid(true);
             } else {
                 setSelectedPaymentId(null);
                 setCardValid(false);
             }
         } catch (e) {
+            console.error(e);
             setCardsError("결제수단을 불러오는 중 오류가 발생했습니다.");
             setCardValid(false);
         } finally {
@@ -131,8 +127,8 @@ export default function OrderPaymentPage() {
 
     useEffect(() => {
         fetchDefaultAddress();
-        fetchCards(); // 카드도 같이 로딩
-        fetchPoints(); // 사용자 보유 포인트 조회
+        fetchCards();
+        fetchPoints();
     }, []);
 
     const formatPrice = (v) =>
@@ -153,7 +149,6 @@ export default function OrderPaymentPage() {
     const shippingFee = productsAmount >= 50000 ? 0 : 3000;
 
     const safeUsePoint = useMemo(() => {
-        // 배송비까지 포함해서 포인트를 사용할 수 있도록 최대 사용 가능 금액 계산
         const maxByPayable = productsAmount - discountAmount + shippingFee;
         return Math.max(
             0,
@@ -172,7 +167,6 @@ export default function OrderPaymentPage() {
         }
 
         const inputVal = Number(raw);
-        // 상품 금액 + 배송비 기준 최대 사용 가능 포인트
         const maxByPayable = productsAmount - discountAmount + shippingFee;
         const maxUsable = Math.max(
             0,
@@ -183,7 +177,6 @@ export default function OrderPaymentPage() {
     };
 
     const handleUseAllPoint = () => {
-        // 상품 금액 + 배송비 전체를 포인트로 결제할 수 있게 상한 설정
         const maxByPayable = productsAmount - discountAmount + shippingFee;
         const max = Math.min(availablePoint, maxByPayable);
         setUsePoint(max);
@@ -197,37 +190,36 @@ export default function OrderPaymentPage() {
 
     const handleCreateCard = async (payload) => {
         try {
-            await axios.post("/api/users/me/payments", payload, {
-                withCredentials: true,
-            });
+            await axiosClient.post("/api/users/me/payments", payload);
             await fetchCards();
             alert("결제수단이 추가되었습니다.");
         } catch (e) {
+            console.error(e);
             alert("결제수단 추가 중 오류가 발생했습니다.");
         }
     };
-
 
     const handleDeleteCard = async (paymentId) => {
         if (!window.confirm("해당 결제수단을 삭제하시겠습니까?")) return;
 
         try {
-            await axios.delete(`/api/users/me/payments/${paymentId}`, {
-                withCredentials: true,
-            });
+            await axiosClient.delete(`/api/users/me/payments/${paymentId}`);
             await fetchCards();
             alert("결제수단이 삭제되었습니다.");
         } catch (e) {
+            console.error(e);
             alert("결제수단 삭제 중 오류가 발생했습니다.");
         }
     };
 
-    // 기존: 주소 페이지로 이동 → 이제는 패널 토글
     const handleClickChangeAddress = () => {
         setShowAddressPanel((prev) => !prev);
     };
 
     const handleSubmitOrder = async () => {
+        // 1. 디버깅을 위해 현재 아이템 구조를 명확히 출력
+        console.log("주문 아이템 데이터 전체 확인:", items);
+
         if (items.length === 0) {
             alert("주문할 상품이 없습니다. 장바구니에서 다시 시도해 주세요.");
             navigate("/mypage/cart");
@@ -246,12 +238,25 @@ export default function OrderPaymentPage() {
         }
 
         // OrderCreateDTO.order_list 에 들어갈 OrderDTO 리스트 생성
-        // 백엔드 OrderDTO : product_id, buy_quantity
-        // cart 아이템에 product_id 가 없고 prd_id 로만 있다면 prd_id 를 사용
-        const orderListPayload = items.map((item) => ({
-            product_id: item.product_id || item.prd_id,
-            buy_quantity: item.quantity,
-        }));
+        const orderListPayload = items.map((item) => {
+            const pId = item.product_id || item.prd_id;
+
+            // 디버깅: ID가 안 잡히는 경우 로그 출력
+            if (!pId) {
+                console.error("상품 ID를 찾을 수 없습니다. 아이템 데이터:", item);
+            }
+
+            return {
+                product_id: pId,
+                buy_quantity: item.quantity,
+            };
+        });
+
+        // 방어 코드: 상품 ID가 하나라도 없으면 요청을 보내지 않음
+        if (orderListPayload.some(orderItem => !orderItem.product_id)) {
+            alert("상품 정보를 정확히 불러오지 못했습니다. (Product ID Missing)");
+            return;
+        }
 
         const orderPayload = {
             order_list: orderListPayload,
@@ -259,13 +264,37 @@ export default function OrderPaymentPage() {
             address_id: address.address_id,
             payment_id: selectedPaymentId,
             total_price: totalPayAmount,
-            // user_id 는 OrderController 에서 Security_Util 로 세팅하므로 여기서 넣지 않음
         };
 
+        // 최종 전송될 페이로드 확인
+        console.log("최종 전송 Payload:", orderPayload);
+
         try {
-            await axios.post("/api/orders", orderPayload, {
-                withCredentials: true,
-            });
+            // 1) 주문 생성
+            await axiosClient.post("/api/orders", orderPayload);
+
+            // 2) 방금 생성된 주문을 포함한 최신 주문 목록 1건 재조회
+            let latestOrderId = null;
+            let latestOrderNo = null;
+            try {
+                const latestRes = await axiosClient.get("/api/orders", {
+                    params: {
+                        page: 1,
+                        size: 1,
+                    },
+                });
+
+                const latestList = Array.isArray(latestRes.data)
+                    ? latestRes.data
+                    : [];
+
+                if (latestList.length > 0) {
+                    latestOrderId = latestList[0].order_id ?? null;
+                    latestOrderNo = latestList[0].order_no ?? null;
+                }
+            } catch (e) {
+                console.warn("최신 주문 조회 중 오류 (order_id 없이 진행):", e);
+            }
 
             const orderSummary = {
                 amount: totalPayAmount,
@@ -273,6 +302,8 @@ export default function OrderPaymentPage() {
                 firstItemName: items[0]?.prd_name,
                 address,
                 paymentId: selectedPaymentId,
+                order_id: latestOrderId,
+                order_no: latestOrderNo,
             };
 
             navigate("/order/complete", {
@@ -369,18 +400,21 @@ export default function OrderPaymentPage() {
                             ) : addressError ? (
                                 <p className="order-address-error">{addressError}</p>
                             ) : !address ? (
-                                <p>등록된 배송지가 없습니다. 마이페이지에서 배송지를 추가해 주세요.</p>
+                                <p>
+                                    등록된 배송지가 없습니다. 마이페이지에서 배송지를 추가해
+                                    주세요.
+                                </p>
                             ) : (
                                 <>
                                     <div className="order-address-recipient">
                                         <span className="order-address-name">
-                                          {address.address_name}
+                                            {address.address_name}
                                         </span>
                                         <span className="order-name">
-                                          {address.recipient}
+                                            {address.recipient}
                                         </span>
                                         <span className="order-address-phone">
-                                          {address.phone}
+                                            {address.phone}
                                         </span>
                                         {address.is_default && (
                                             <span className="order-address-badge">
@@ -399,7 +433,7 @@ export default function OrderPaymentPage() {
                         </div>
                     </section>
 
-                    {/* 배송지 변경 패널: 배송지 카드 바로 아래에 표시 */}
+                    {/* 배송지 변경 패널 */}
                     {showAddressPanel && (
                         <section className="order-card order-address-panel-wrapper">
                             <OrderAddressSelectPanel
@@ -420,13 +454,17 @@ export default function OrderPaymentPage() {
                         <h2 className="order-card-title">포인트 사용</h2>
 
                         {pointLoading ? (
-                            <p className="order-point-help">포인트를 불러오는 중입니다...</p>
+                            <p className="order-point-help">
+                                포인트를 불러오는 중입니다...
+                            </p>
                         ) : pointError ? (
                             <p className="order-point-help">{pointError}</p>
                         ) : (
                             <>
                                 <div className="order-point-row">
-                                    <span className="order-point-label">보유 포인트</span>
+                                    <span className="order-point-label">
+                                        보유 포인트
+                                    </span>
                                     <span className="order-point-value">
                                         {formatPrice(availablePoint)}P
                                     </span>
@@ -455,7 +493,7 @@ export default function OrderPaymentPage() {
                         )}
                     </section>
 
-                    {/* API 기반 카드 섹션 사용 */}
+                    {/* API 기반 카드 섹션 */}
                     <OrderCardPaymentSection
                         amount={totalPayAmount}
                         cards={cards}

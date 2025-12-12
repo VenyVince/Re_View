@@ -1,7 +1,7 @@
 // src/pages/mypage/user/UserProfileEdit.jsx
 import React, { useEffect, useState } from "react";
 import "../layout/UserProfileEdit.css";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import { useNavigate } from "react-router-dom";
 
 export default function UserProfileEdit() {
@@ -22,9 +22,7 @@ export default function UserProfileEdit() {
     useEffect(() => {
         const fetchMe = async () => {
             try {
-                const res = await axios.get("/api/users/me", {
-                    withCredentials: true,
-                });
+                const res = await axiosClient.get("/api/users/me");
                 console.log("GET /api/users/me 응답:", res.data);
 
                 // 응답 구조: { userInfos: [ {...} ] } 또는 { ... } 둘 다 방어
@@ -66,17 +64,10 @@ export default function UserProfileEdit() {
                 }
 
                 // ✅ 비밀번호 변경 API 호출
-                await axios.post(
-                    "/api/auth/reset-password",
-                    {
-                        currentPassword: oldPassword,
-                        newPassword: newPassword,
-                    },
-                    {
-                        headers: { "Content-Type": "application/json" },
-                        withCredentials: true,
-                    }
-                );
+                await axiosClient.post("/api/auth/reset-password", {
+                    currentPassword: oldPassword,
+                    newPassword: newPassword,
+                });
             }
 
             // 2️⃣ 닉네임 / 전화번호 PATCH (/api/users/me)
@@ -86,10 +77,7 @@ export default function UserProfileEdit() {
                 // baumann_id 는 사용 안함
             };
 
-            await axios.patch("/api/users/me", body, {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-            });
+            await axiosClient.patch("/api/users/me", body);
 
             alert("개인정보가 수정되었습니다.");
             navigate("/mypage");

@@ -12,12 +12,43 @@
     </select>
 
     <sql id="productSelectColumns">
-        p.product_id, p.prd_name, p.prd_brand, p.price, p.rating, p.review_count,
+        p.product_id,
+        p.prd_name,
+        p.prd_brand,
+        p.price,
+        p.rating,
+        p.review_count,
+
+        -- 상품 대표 이미지
         (SELECT pi.IMAGE_URL FROM PRODUCT_IMAGE pi WHERE pi.PRODUCT_ID = p.PRODUCT_ID AND pi.IS_THUMBNAIL = 'Y' AND ROWNUM = 1) AS image_url,
+
+        -- 베스트 리뷰 ID
         (SELECT REVIEW_ID FROM (SELECT r.REVIEW_ID FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_id,
+
+        -- 베스트 리뷰 내용
         (SELECT CONTENT FROM (SELECT r.CONTENT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_content,
-        (SELECT LIKE_COUNT FROM (SELECT r.LIKE_COUNT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_like_count,
-        (SELECT RATING FROM (SELECT r.RATING FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_rating
+
+        -- 베스트 리뷰 좋아요 수 (DTO 필드명: top_review_likes에 맞춰 별칭 수정 권장)
+        (SELECT LIKE_COUNT FROM (SELECT r.LIKE_COUNT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_likes,
+
+        -- 베스트 리뷰 평점
+        (SELECT RATING FROM (SELECT r.RATING FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_rating,
+
+        -- [추가됨] 베스트 리뷰의 이미지 URL
+        (
+            SELECT ri.IMAGE_URL
+            FROM REVIEW_IMAGES ri
+            WHERE ri.REVIEW_ID = (
+                SELECT REVIEW_ID
+                FROM (
+                    SELECT r.REVIEW_ID
+                    FROM REVIEW r
+                    WHERE r.PRODUCT_ID = p.PRODUCT_ID
+                    ORDER BY r.LIKE_COUNT DESC
+                ) WHERE ROWNUM = 1
+            )
+            AND ROWNUM = 1 -- 리뷰 이미지가 여러 개일 경우 하나만 가져옴
+        ) AS top_review_image_url
     </sql>
 
     <sql id="matchScoreAll">
@@ -128,6 +159,7 @@
 
     <select id="getRandomRecommendationAdminPicks" resultType="com.review.shop.dto.recommendations.RecommendationAdminPickDTO">
         SELECT
+            p.product_id   as product_id,
             p.prd_name      as product_name,
             p.PRD_BRAND     as product_brand,
             ri.IMAGE_URL    as thumbnail_url,   p.price,

@@ -6,14 +6,21 @@ import "./ReviewCard.css";
 export default function ReviewCard({ review }) {
     const navigate = useNavigate();
 
+    const hasImage = Boolean(review.image_url);
+
     return (
-        <div className="reviewCard"
-             onClick={() => navigate(`/review/${review.review_id}`)}>
+        <div
+            className="reviewCard"
+            onClick={() => navigate(`/review/${review.review_id}`)}
+        >
+
             {/* 이미지 */}
-            <div className="reviewImageWrap">
+            <div className={`reviewImageWrap ${hasImage ? "hasImage" : "noImage"}`}>
                 <img
-                    src={review.image_url || "/images/no-img.png"}
+                    src={review.image_url || ""}
                     alt={review.product_name}
+                    className={hasImage ? "hasImage" : "noImage"}
+                    onError={(e) => (e.currentTarget.style.display = "none")}  /* 이미지 깨질 때 숨김 */
                 />
             </div>
 
@@ -32,9 +39,7 @@ export default function ReviewCard({ review }) {
                         ? "-"
                         : `${Number(review.rating).toFixed(1)} / 5.0`}
                 </p>
-
             </div>
-
 
             {/* 상품명 */}
             <div className="reviewProductName">{review.product_name}</div>

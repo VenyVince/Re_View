@@ -6,6 +6,7 @@ import lombok.Data;
 public class RecommendationAdminPickDTO {
 
     //상품정보
+    int product_id;
     String product_name;
     String product_brand;
     String thumbnail_url;

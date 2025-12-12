@@ -8,7 +8,7 @@ export default function OrderCompletePage() {
     const navigate = useNavigate();
 
     const orderSummary = location.state?.orderSummary;
-    const items = location.state?.items || [];
+
 
     const formatPrice = (v) =>
         (v ?? 0).toLocaleString("ko-KR", { maximumFractionDigits: 0 });
@@ -81,9 +81,9 @@ export default function OrderCompletePage() {
                     <button
                         type="button"
                         className="order-complete-btn order-complete-btn-secondary"
-                        onClick={() => navigate("/mypage/order")}
+                        onClick={() => navigate("/mypage")}
                     >
-                        주문배송 조회
+                        주문상세
                     </button>
                     <button
                         type="button"
