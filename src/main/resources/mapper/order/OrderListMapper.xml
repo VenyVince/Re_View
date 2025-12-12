@@ -16,7 +16,6 @@
         FROM ORDERS o
         WHERE o.user_id = #{user_id}
         ORDER BY o.created_at DESC
-        OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
     </select>
 
     <select id="findOrderDetailById" resultType="com.review.shop.dto.orders.OrderDetailResponseDTO">
