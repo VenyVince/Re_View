@@ -1,8 +1,8 @@
-// src/pages/productDetail/components/BottomBar.jsx
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BottomBar.css";
+
+import axiosClient from "../../../../api/axiosClient";
 
 export default function BottomBar({
                                       wish,
@@ -14,86 +14,95 @@ export default function BottomBar({
                                       product,
                                   }) {
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // -------------------------------
-    // 1) 찜 상태 조회(GET)
-    // -------------------------------
+    // 로그인 여부 확인
     useEffect(() => {
+        const checkLogin = async () => {
+            try {
+                await axiosClient.get("/api/auth/me");
+                setIsLoggedIn(true);
+            } catch {
+                setIsLoggedIn(false);
+            }
+        };
+        checkLogin();
+    }, []);
+
+    // 찜 상태 조회 (로그인된 경우만)
+    useEffect(() => {
+        if (!isLoggedIn) return;
+
         const productId = product?.product_id;
         if (!productId) return;
 
         const fetchWishState = async () => {
             try {
-                const res = await fetch(`/api/wishlist?product_id=${productId}`, {
-                    method: "GET",
-                    credentials: "include",
-                });
-
-                if (!res.ok) return;
-
-                const data = await res.json();
-                const list = data.wishlist || [];
-
-                // wishlist 배열 안에 현재 product_id가 존재하면 찜 상태 true
-                const isWished = list.some(item => item.product_id === productId);
-
-                setWish(isWished);
-
+                const res = await axiosClient.get("/api/wishlist");
+                const list = res.data?.wishlist || [];
+                setWish(list.some((item) => item.product_id === productId));
             } catch (err) {
                 console.error("찜 상태 조회 실패:", err);
             }
         };
 
         fetchWishState();
-    }, [product, setWish]);
+    }, [product, isLoggedIn, setWish]);
 
-    // -------------------------------
-    // 2) 찜 추가 / 삭제 (POST / DELETE)
-    // -------------------------------
+    // 로그인 필요 알림
+    const requireLogin = () => {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+    };
+
+    // 찜 클릭
     const handleWish = async () => {
-        const productId = product?.product_id;
-
-        if (!productId) {
-            alert("상품 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+        if (!isLoggedIn) {
+            requireLogin();
             return;
         }
 
+        const productId = product?.product_id;
+        if (!productId) return;
+
         try {
-            // UI 먼저 반영
             setWish(!wish);
 
-            const url = `/api/wishlist?product_id=${productId}`;
-            const method = wish ? "DELETE" : "POST";
-
-            const res = await fetch(url, {
-                method,
-                credentials: "include",
-            });
-
-            if (!res.ok) {
-                alert("찜 처리 중 오류가 발생했습니다.");
-                setWish(wish); // 실패 시 원복
-                return;
-            }
-
-            if (!wish) {
-                alert("찜 목록에 추가되었습니다!");
+            if (wish) {
+                await axiosClient.delete("/api/wishlist", {
+                    params: { product_id: productId },
+                });
             } else {
-                alert("찜 목록에서 제거되었습니다.");
+                await axiosClient.post("/api/wishlist", null, {
+                    params: { product_id: productId },
+                });
             }
-
         } catch (err) {
             console.error("찜 처리 오류:", err);
-            alert("서버와 통신 중 문제가 발생했습니다.");
-            setWish(wish); // 실패 시 원복
+            setWish(wish);
         }
+    };
+
+    // 장바구니 / 구매 클릭
+    const handleActionClick = (type) => {
+        if (!isLoggedIn) {
+            requireLogin();
+            return;
+        }
+
+        setMiniActionType(type);
+        setShowMiniBuyBox(true);
+        requestAnimationFrame(() => {
+            adjustBottomBarPosition();
+            adjustMiniBoxPosition();
+        });
     };
 
     return (
         <div className="pd-bottom-bar">
             <div className="pd-bottom-inner">
 
-                {/* 찜 버튼 */}
+                {/* 찜 */}
                 <button
                     className={`pd-btm-btn wish ${wish ? "active" : ""}`}
                     onClick={handleWish}
@@ -101,32 +110,18 @@ export default function BottomBar({
                     {wish ? "♥" : "♡"}
                 </button>
 
-                {/* 장바구니 버튼 */}
+                {/* 장바구니 */}
                 <button
                     className="pd-btm-btn cart"
-                    onClick={() => {
-                        setMiniActionType("cart");
-                        setShowMiniBuyBox(true);
-                        requestAnimationFrame(() => {
-                            adjustBottomBarPosition();
-                            adjustMiniBoxPosition();
-                        });
-                    }}
+                    onClick={() => handleActionClick("cart")}
                 >
                     장바구니
                 </button>
 
-                {/* 구매 버튼 */}
+                {/* 구매하기 */}
                 <button
                     className="pd-btm-btn buy"
-                    onClick={() => {
-                        setMiniActionType("buy");
-                        setShowMiniBuyBox(true);
-                        requestAnimationFrame(() => {
-                            adjustBottomBarPosition();
-                            adjustMiniBoxPosition();
-                        });
-                    }}
+                    onClick={() => handleActionClick("buy")}
                 >
                     구매하기
                 </button>

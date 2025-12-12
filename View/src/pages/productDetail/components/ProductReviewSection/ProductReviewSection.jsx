@@ -1,25 +1,44 @@
-// src/pages/productDetail/components/ProductReviewSection.jsx
 import React, { useState, useEffect } from "react";
 import "./ProductReviewSection.css";
+
+import axiosClient from "../../../../api/axiosClient";
 
 export default function ProductReviewSection({ productId }) {
     const [reviewList, setReviewList] = useState([]);
     const [sortType, setSortType] = useState("latest");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // 리뷰 데이터를 불러오는 API 요청
+    // 로그인 여부 확인
     useEffect(() => {
-        fetch(`/api/reviews/${productId}/reviews`)
-            .then((res) => res.json())
-            .then((data) => {
-                const formatted = data.map((r) => ({
+        const checkLogin = async () => {
+            try {
+                await axiosClient.get("/api/auth/me");
+                setIsLoggedIn(true);
+            } catch {
+                setIsLoggedIn(false);
+            }
+        };
+        checkLogin();
+    }, []);
+
+    // 리뷰 목록 조회
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await axiosClient.get(`/api/reviews/${productId}/reviews`);
+                const formatted = res.data.map((r) => ({
                     ...r,
-                    rating: Math.round(r.rating),   // 별점 계산용 반올림 처리
-                    userLiked: false,               // 프론트 전용 상태
-                    userDisliked: false
+                    rating: Math.round(r.rating),
+                    userLiked: false,
+                    userDisliked: false,
                 }));
                 setReviewList(formatted);
-            })
-            .catch((e) => console.error("리뷰 불러오기 오류:", e));
+            } catch (err) {
+                console.error("리뷰 불러오기 오류:", err);
+            }
+        };
+
+        if (productId) fetchReviews();
     }, [productId]);
 
     // 리뷰 정렬
@@ -38,8 +57,13 @@ export default function ProductReviewSection({ productId }) {
         return 0;
     });
 
-    // 좋아요 상태 변경
+    // 좋아요 토글 (프론트 상태만 변경)
     const toggleLike = (id) => {
+        if (!isLoggedIn) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
         setReviewList((prev) =>
             prev.map((rev) => {
                 if (rev.review_id !== id) return rev;
@@ -50,21 +74,26 @@ export default function ProductReviewSection({ productId }) {
                         like_count: rev.like_count + 1,
                         dislike_count: rev.userDisliked ? rev.dislike_count - 1 : rev.dislike_count,
                         userLiked: true,
-                        userDisliked: false
+                        userDisliked: false,
                     };
                 }
 
                 return {
                     ...rev,
                     like_count: rev.like_count - 1,
-                    userLiked: false
+                    userLiked: false,
                 };
             })
         );
     };
 
-    // 싫어요 상태 변경
+    // 싫어요 토글 (프론트 상태만 변경)
     const toggleDislike = (id) => {
+        if (!isLoggedIn) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
         setReviewList((prev) =>
             prev.map((rev) => {
                 if (rev.review_id !== id) return rev;
@@ -75,14 +104,14 @@ export default function ProductReviewSection({ productId }) {
                         dislike_count: rev.dislike_count + 1,
                         like_count: rev.userLiked ? rev.like_count - 1 : rev.like_count,
                         userDisliked: true,
-                        userLiked: false
+                        userLiked: false,
                     };
                 }
 
                 return {
                     ...rev,
                     dislike_count: rev.dislike_count - 1,
-                    userDisliked: false
+                    userDisliked: false,
                 };
             })
         );
@@ -159,12 +188,17 @@ export default function ProductReviewSection({ productId }) {
 
                             <div className="review-extra">
                                 {r.images?.length > 0 && (
-                                    <img className="review-img" src={r.images[0]} alt="" />
+                                    <img
+                                        className="review-img"
+                                        src={r.images[0]}
+                                        alt=""
+                                    />
                                 )}
-                                <div className="date">{r.created_at.slice(0, 10)}</div>
+                                <div className="date">
+                                    {r.created_at.slice(0, 10)}
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 ))}
             </div>
