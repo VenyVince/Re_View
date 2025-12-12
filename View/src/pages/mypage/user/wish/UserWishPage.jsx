@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserWishPage.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosClient from "../../../../api/axiosClient";
 import { useNavigate } from "react-router-dom";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserWishPage.css";
@@ -10,6 +10,23 @@ export default function UserWishPage() {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const buildImageUrl = (path) => {
+        if (!path) return "";
+        // 이미 절대 URL이면 그대로 사용
+        if (path.startsWith("http://") || path.startsWith("https://")) {
+            return path;
+        }
+
+        const base = process.env.REACT_APP_MINIO_URL || "http://localhost:9000";
+        const bucket = process.env.REACT_APP_MINIO_BUCKET || "reviewhub-image";
+
+        // 앞에 / 가 붙어 있으면 제거
+        const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+
+        return `${base}/${bucket}/${cleanPath}`;
+    };
+
 
     // 공통 가격 포맷
     const formatPrice = (price) => {
@@ -23,7 +40,7 @@ export default function UserWishPage() {
             setLoading(true);
             setError("");
 
-            const res = await axios.get("/api/wishlist", {
+            const res = await axiosClient.get("/api/wishlist", {
                 withCredentials: true,
             });
 
@@ -63,6 +80,7 @@ export default function UserWishPage() {
                 price: it.price ?? 0,
                 is_sold_out: it.is_sold_out ?? it.sold_out ?? false,
                 thumbnail_url:
+                    it.product_thumbnail_url ??
                     it.thumbnail_url ??
                     it.image_url ??
                     it.thumbnailUrl ??
@@ -91,7 +109,7 @@ export default function UserWishPage() {
         }
 
         try {
-            await axios.delete("/api/wishlist", {
+            await axiosClient.delete("/api/wishlist", {
                 params: { product_id: item.product_id },
                 withCredentials: true,
             });
@@ -119,7 +137,7 @@ export default function UserWishPage() {
 
         try {
             // 1) 장바구니에 추가 (quantity는 1로 고정)
-            await axios.post(
+            await axiosClient.post(
                 "/api/cart",
                 {
                     product_id: item.product_id,
@@ -129,7 +147,7 @@ export default function UserWishPage() {
             );
 
             // 2) 찜 목록에서 제거
-            await axios.delete("/api/wishlist", {
+            await axiosClient.delete("/api/wishlist", {
                 params: { product_id: item.product_id },
                 withCredentials: true,
             });
@@ -180,7 +198,9 @@ export default function UserWishPage() {
                 {!loading && !error && items.length > 0 && (
                     <div className="wish-card">
                         <div className="wish-list">
-                            {items.map((item) => (
+                            {items.map((item) => {
+                                const thumbUrl = buildImageUrl(item.thumbnail_url);
+                                return (
                                 <article
                                     key={item.wish_id ?? item.product_id}
                                     className={`wish-item ${
@@ -197,7 +217,7 @@ export default function UserWishPage() {
                                     >
                                         {item.thumbnail_url ? (
                                             <img
-                                                src={item.thumbnail_url}
+                                                src={thumbUrl}
                                                 alt={item.prd_name}
                                             />
                                         ) : (
@@ -250,7 +270,8 @@ export default function UserWishPage() {
                                         </button>
                                     </div>
                                 </article>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}
