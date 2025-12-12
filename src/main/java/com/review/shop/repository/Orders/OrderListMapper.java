@@ -12,14 +12,9 @@ import java.util.Optional;
 @Mapper
 public interface OrderListMapper {
 
-    // 주문 목록 조회
-    List<OrderListResponseDTO> findOrderListByUserId(
-            @Param("user_id") int user_id,
-            @Param("offset") int offset,
-            @Param("limit") int limit
-    );
+    List<OrderListResponseDTO> findOrderListByUserId(@Param("user_id") int user_id);
 
-    // 주문 상세 기본 정보 (본인 확인 포함)
+    // 주문 상세 기본 정보
     Optional<OrderDetailResponseDTO> findOrderDetailById(
             @Param("order_id") int order_id,
             @Param("user_id") int user_id

@@ -19,12 +19,10 @@ public class OrderListService {
 
     private final OrderListMapper orderListMapper;
 
-    // 내 주문 내역 조회
     @Transactional(readOnly = true)
-    public List<OrderListResponseDTO> getMyOrderList(int user_id, int page, int size) {
+    public List<OrderListResponseDTO> getMyOrderList(int user_id) {
         try {
-            int offset = (page - 1) * size;
-            return orderListMapper.findOrderListByUserId(user_id, offset, size);
+            return orderListMapper.findOrderListByUserId(user_id);
         } catch (DataAccessException e) {
             throw new DatabaseException("주문 목록 조회 중 DB 오류가 발생했습니다.", e);
         }
@@ -35,16 +33,16 @@ public class OrderListService {
     public OrderDetailResponseDTO getOrderDetail(int order_id, int user_id) {
         try {
             // 기본 정보 조회
-            OrderDetailResponseDTO OrderItemDetailDTO = orderListMapper.findOrderDetailById(order_id, user_id)
+            OrderDetailResponseDTO orderDetail = orderListMapper.findOrderDetailById(order_id, user_id)
                     .orElseThrow(() -> new ResourceNotFoundException("주문 정보를 찾을 수 없거나 접근 권한이 없습니다."));
 
             // 상품 목록 조회
             List<OrderItemDetailDTO> items = orderListMapper.findOrderItemsByOrderId(order_id);
 
             // DTO 결합
-            OrderItemDetailDTO.setOrder_items(items);
+            orderDetail.setOrder_items(items);
 
-            return OrderItemDetailDTO;
+            return orderDetail;
         } catch (DataAccessException e) {
             throw new DatabaseException("주문 상세 조회 중 DB 오류가 발생했습니다.", e);
         }
