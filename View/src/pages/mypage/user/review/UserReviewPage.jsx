@@ -5,7 +5,7 @@ import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserReviewPage.css";
 import { useNavigate } from "react-router-dom";
 
-// ✅ ReviewWrite.jsx에서 쓰던 presigned url 발급 API를 그대로 재사용한다고 가정
+
 // (프로젝트 경로가 다르면 이 import만 맞춰주면 됨)
 import { getPresignedUrls } from "../../../../api/review/reviewApi";
 
@@ -23,10 +23,10 @@ export default function UserMyReviewPage() {
     const [editContent, setEditContent] = useState("");
     const [editRating, setEditRating] = useState(0);
 
-    // ✅ 기존(서버에 이미 저장된) 이미지 objectKey 목록
+    // 기존(서버에 이미 저장된) 이미지 objectKey 목록
     const [editExistingImageKeys, setEditExistingImageKeys] = useState([]);
 
-    // ✅ 새로 추가한 이미지 파일 + 미리보기
+    // 새로 추가한 이미지 파일 + 미리보기
     const [editNewFiles, setEditNewFiles] = useState([]); // File[]
     const [editNewPreviews, setEditNewPreviews] = useState([]); // string[]
 
@@ -41,7 +41,7 @@ export default function UserMyReviewPage() {
         return axiosClient?.defaults?.baseURL || "http://localhost:8080";
     }, []);
 
-    // ✅ MinIO 직접 접근 URL (백엔드 이미지 프록시가 없거나(현재 404/500) 동작이 불안정할 때를 대비)
+
     // - CRA: REACT_APP_MINIO_URL / REACT_APP_MINIO_BUCKET
     // - Vite: VITE_MINIO_URL / VITE_MINIO_BUCKET
     const MINIO_URL =
@@ -53,7 +53,7 @@ export default function UserMyReviewPage() {
         (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_MINIO_BUCKET) ||
         "";
 
-    // ✅ (선택) 백엔드 이미지 프록시가 따로 있을 때만 지정해서 사용
+
     // - 예: http://localhost:8080/api/images?objectKey=...
     // - 현재 로그상 `/api/images`가 정적 리소스로 처리되며(NoResourceFoundException) 동작하지 않아서,
     //   이 값이 없으면 프록시는 절대 사용하지 않도록 처리합니다.
@@ -73,7 +73,7 @@ export default function UserMyReviewPage() {
         return Number(rating).toFixed(1);
     };
 
-    // ⚠️ objectKey → 실제 이미지 URL 변환
+    // objectKey → 실제 이미지 URL 변환
     //  - objectKey 예: review/xxxx.png, thumb/xxxx.jpg
     //  - MinIO 직접 URL:  http://<MINIO_HOST>:9000/<BUCKET>/<objectKey>
     //  - (선택) 프록시 URL: <IMAGE_PROXY_BASE>?objectKey=<objectKey>
@@ -81,26 +81,42 @@ export default function UserMyReviewPage() {
         if (!keyOrUrl) return "";
         const s = String(keyOrUrl);
 
-        // 이미 절대 URL이면 그대로 사용
+        // 0) 이미 절대 URL이면 그대로 사용
         if (s.startsWith("http://") || s.startsWith("https://")) return s;
 
+        // 1) 백엔드가 이미 내려준 상대 경로(/api/... 또는 api/...)면
+        //    빌드 환경(프록시 없음)에서도 동작하도록 baseURL을 붙여 절대경로로 만든다.
+        //    예) /api/images?objectKey=...  ->  http://localhost:8080/api/images?objectKey=...
+        if (s.startsWith("/api/") || s.startsWith("api/")) {
+            const path = s.startsWith("/") ? s : `/${s}`;
+            const base = String(apiBase || "").replace(/\/$/, "");
+            return base ? `${base}${path}` : path;
+        }
+
+        // 2) objectKey 처리 (앞의 / 제거)
         const key = s.replace(/^\/+/, "");
 
-        // 1) MinIO 직접 URL (권장)
+        // 2-1) MinIO 직접 URL (권장)
         if (MINIO_URL && MINIO_BUCKET) {
             const base = String(MINIO_URL).replace(/\/$/, "");
             return `${base}/${MINIO_BUCKET}/${key}`;
         }
 
-        // 2) (선택) 백엔드 프록시가 있을 때만 사용
+        // 2-2) (선택) 백엔드 이미지 프록시가 따로 있을 때만 사용
         if (IMAGE_PROXY_BASE) {
             const proxy = String(IMAGE_PROXY_BASE).replace(/\?$/, "");
-            // IMAGE_PROXY_BASE를 `http://localhost:8080/api/images` 처럼 넣는다고 가정
             return `${proxy}?objectKey=${encodeURIComponent(key)}`;
         }
 
-        // 3) 설정이 없으면 깨진 URL로 요청하지 않도록 빈 값 반환
-        //    (콘솔에 원인 힌트 남김)
+        // 3) 마지막 fallback: 빌드 환경에서 프록시가 없으면 상대 경로로는 깨질 수 있으니
+        //    baseURL + /api/images 로 한 번 더 시도한다. (백엔드에 해당 컨트롤러가 있을 때)
+        //    ※ 현재 프로젝트 로그에는 /api/images가 정적 리소스로 처리되는 케이스가 있어
+        //      이 fallback은 "있으면" 쓰이는 정도로만 둔다.
+        {
+            const base = String(apiBase || "").replace(/\/$/, "");
+            if (base) return `${base}/api/images?objectKey=${encodeURIComponent(key)}`;
+        }
+
         if (typeof window !== "undefined") {
             // eslint-disable-next-line no-console
             console.warn(
@@ -151,16 +167,59 @@ export default function UserMyReviewPage() {
                 ...review,
                 product_id: review.product_id ?? review.productId,
                 review_id: review.review_id ?? review.reviewId,
-                // 🔥 MyPageReviewDTO.image_urls (objectKey list) 기준
+                // MyPageReviewDTO.image_urls (objectKey list) 기준
                 imageUrls:
+                    review.images ??
                     review.image_urls ??
                     review.imageUrls ??
                     (review.image_url ? [review.image_url] : []),
                 canUpdate: review.canUpdate ?? review.can_update ?? true,
             }));
 
+            // 1차: 목록 응답 그대로 세팅
             setReviews(normalized);
             setCurrentPage(1);
+
+            // 2차: 각 리뷰 상세에서 이미지 URL(또는 objectKey 리스트)을 다시 받아서 보정
+            // ReviewDetailPage에서는 이미지가 정상 노출되므로 그 응답 구조를 우선 신뢰
+            try {
+                const enriched = await Promise.all(
+                    normalized.map(async (item) => {
+                        // 이미지가 아예 없으면 스킵
+                        const cur = Array.isArray(item.imageUrls) ? item.imageUrls : [];
+                        if (cur.length === 0) return item;
+
+                        // 이미 절대 URL/상대 API URL이 들어있다면 굳이 재조회하지 않음
+                        const alreadyRenderable = cur.some((v) => {
+                            const s = String(v || "");
+                            return s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/api/") || s.startsWith("api/");
+                        });
+                        if (alreadyRenderable) return item;
+
+                        // review_id가 없으면 스킵
+                        if (!item.review_id) return item;
+
+                        // 리뷰 상세 재조회
+                        const res2 = await axiosClient.get(`/api/reviews/${item.review_id}`);
+                        const r2 = res2?.data?.review;
+
+                        const nextImages =
+                            r2?.images ??
+                            r2?.image_urls ??
+                            r2?.imageUrls ??
+                            (r2?.image_url ? [r2.image_url] : cur);
+
+                        return {
+                            ...item,
+                            imageUrls: Array.isArray(nextImages) ? nextImages : cur,
+                        };
+                    })
+                );
+
+                setReviews(enriched);
+            } catch (enrichErr) {
+                console.warn("[UserReviewPage] 리뷰 상세 기반 이미지 보정 실패:", enrichErr);
+            }
         } catch (e) {
             console.error("내 리뷰 목록 조회 오류:", e);
             setError("작성한 후기를 불러오는 중 오류가 발생했어요.");
@@ -225,10 +284,10 @@ export default function UserMyReviewPage() {
         setEditContent(review.content || "");
         setEditRating(Number(review.rating || 0));
 
-        // ✅ 기존 이미지(objectKey) 세팅
+        // 기존 이미지(objectKey) 세팅
         setEditExistingImageKeys(Array.isArray(review.imageUrls) ? review.imageUrls : []);
 
-        // ✅ 새로 추가한 파일/미리보기 초기화
+        // 새로 추가한 파일/미리보기 초기화
         editNewPreviews.forEach((u) => URL.revokeObjectURL(u));
         setEditNewFiles([]);
         setEditNewPreviews([]);
@@ -246,12 +305,12 @@ export default function UserMyReviewPage() {
         setEditNewPreviews([]);
     };
 
-    // ✅ 기존 이미지 삭제(서버에 남길 목록에서 제외)
+    // 기존 이미지 삭제(서버에 남길 목록에서 제외)
     const handleRemoveExistingImage = (index) => {
         setEditExistingImageKeys((prev) => prev.filter((_, i) => i !== index));
     };
 
-    // ✅ 새 이미지 추가(파일 선택)
+    // 새 이미지 추가(파일 선택)
     const handleNewImageFilesChange = (e) => {
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
@@ -272,7 +331,7 @@ export default function UserMyReviewPage() {
         e.target.value = "";
     };
 
-    // ✅ 새 이미지 삭제(업로드 예정 목록에서 제거)
+    // 새 이미지 삭제(업로드 예정 목록에서 제거)
     const handleRemoveNewImage = (index) => {
         setEditNewFiles((prev) => prev.filter((_, i) => i !== index));
         setEditNewPreviews((prev) => {
@@ -284,7 +343,7 @@ export default function UserMyReviewPage() {
         });
     };
 
-    // ✅ MinIO presigned URL 방식 업로드 (ReviewWrite.jsx 방식)
+    //  MinIO presigned URL 방식 업로드 (ReviewWrite.jsx 방식)
     //  - 팀/브랜치마다 presigned 발급 엔드포인트가 다를 수 있어서 404면 fallback 시도
     const uploadImagesToMinIO = async (imageFiles) => {
         if (!imageFiles || imageFiles.length === 0) return [];
@@ -397,13 +456,13 @@ export default function UserMyReviewPage() {
         }
 
         try {
-            // ✅ 새 파일이 있으면 업로드 → objectKey 배열 받기
+            //  새 파일이 있으면 업로드 → objectKey 배열 받기
             let newObjectKeys = [];
             if (editNewFiles.length > 0) {
                 newObjectKeys = await uploadImagesToMinIO(editNewFiles);
             }
 
-            // ✅ 최종 imageUrls(objectKey) = 기존 남길 것 + 새로 업로드된 것
+            //  최종 imageUrls(objectKey) = 기존 남길 것 + 새로 업로드된 것
             const finalImageUrls = [...(editExistingImageKeys || []), ...(newObjectKeys || [])];
 
             // PATCH /api/reviews/{review_id}
@@ -594,7 +653,7 @@ export default function UserMyReviewPage() {
                                             placeholder="상품을 사용해 본 느낌을 자세히 적어주세요."
                                         />
 
-                                        {/* ✅ 이미지 수정 UI (ReviewWrite 방식) */}
+                                        {/* 이미지 수정 UI (ReviewWrite 방식) */}
                                         <div className="myreview-edit-images">
                                             <div className="myreview-edit-images-header">
                                                 <span className="myreview-edit-label">이미지</span>
