@@ -1,3 +1,4 @@
+/* --- Modal Background --- */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -11,62 +12,59 @@
     z-index: 5000;
 }
 
+/* --- Modal Box --- */
 .modal-box {
-    width: 420px;
+    width: 440px;
     max-height: 80vh;
     background: #fff;
     border-radius: 16px;
-    padding: 20px;
+    padding: 24px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
 }
 
 .modal-title {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     text-align: center;
 }
 
+/* --- Item List --- */
 .item-list {
     overflow-y: auto;
     flex: 1;
     padding-right: 4px;
 }
 
-.item-box {
-    display: flex;
-    gap: 12px;
-    padding: 14px;
-    border-bottom: 1px solid #e5e7eb;
+/* --- Card style item --- */
+.item-card {
+    padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 12px;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, box-shadow 0.15s;
 }
 
-.item-box:hover {
+.item-card:hover {
     background: #f9fafb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.thumb {
-    width: 50px;
-    height: 50px;
-    background: #f3f4f6;
-    border-radius: 8px;
-    font-size: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
+/* --- Text layout --- */
 .item-info {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
 .name {
     font-size: 15px;
     font-weight: 600;
+    color: #111827;
 }
 
 .price {
@@ -79,65 +77,43 @@
     color: #9ca3af;
 }
 
+/* --- Pagination --- */
 .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 14px;
-    margin: 12px 0;
+    margin-top: 5px;
+    margin-bottom: 10px;
 }
 
 .pagination button {
     border: 1px solid #d1d5db;
     background: white;
-    padding: 4px 10px;
+    padding: 6px 14px;
     border-radius: 8px;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: #f3f4f6;
 }
 
 .pagination button:disabled {
-    opacity: 0.3;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
+/* --- Close Button --- */
 .close-btn {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border-radius: 10px;
     background: #111827;
     color: white;
     border: none;
     cursor: pointer;
-}
-
-/* 필터 탭 */
-.filter-tabs {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 12px;
-    gap: 6px;
-}
-
-.filter-tabs button {
-    flex: 1;
-    padding: 8px 0;
-    border: none;
-    background: #f3f4f6;
-    cursor: pointer;
-    border-radius: 8px;
-    margin: 0 4px;
-    font-size: 14px;
-}
-
-.filter-tabs button.active {
-    background: #111827;
-    color: white;
-}
-
-/* 체크 아이콘 */
-.check-icon {
-    margin-left: auto;
-    font-size: 20px;
-    color: #10b981; /* 초록 체크 */
-    font-weight: 700;
+    font-size: 15px;
+    margin-top: 6px;
 }
