@@ -423,9 +423,13 @@ export default function UserDeliveryPage() {
                                                         type="button"
                                                         className="delivery-order-action-btn delivery-order-review-btn"
                                                         onClick={() =>
-                                                            navigate(`/review/write?orderId=${order.order_id}`, {
-                                                                state: { orderId: order.order_id },
-                                                            })
+                                                            navigate(
+                                                                `/review/write?orderId=${order.order_id}&order_id=${order.order_id}`,
+                                                                {
+                                                                    //navigate state: { orderId: 123, order_id: 123 }
+                                                                    state: { orderId: order.order_id, order_id: order.order_id },
+                                                                }
+                                                            )
                                                         }
                                                     >
                                                         리뷰 작성하기
