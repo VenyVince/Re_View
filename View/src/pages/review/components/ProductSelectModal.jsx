@@ -27,7 +27,6 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
     const [items, setItems] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [page, setPage] = useState(1);
-    const [filterType, setFilterType] = useState("NOT_WRITTEN"); // 미작성만 띄움
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -41,7 +40,6 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
 
             let allItems = [];
 
-            // 주문 상세 불러오기
             for (const order of orders) {
                 const detail = await fetchOrderDetail(order.order_id);
                 const orderItems = detail.data.order_items.map((item) => ({
@@ -51,21 +49,16 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
                 allItems.push(...orderItems);
             }
 
-            // 리뷰 존재 여부 확인
             const withStatus = await Promise.all(
                 allItems.map(async (item) => {
                     try {
                         const r = await checkReviewExists(item.order_item_id);
-
                         return {
                             ...item,
-                            canCreate: r.data.canCreate, // true = 작성 가능
+                            canCreate: r.data.canCreate,
                         };
-                    } catch (e) {
-                        return {
-                            ...item,
-                            canCreate: null, // 오류 시 null 처리
-                        };
+                    } catch {
+                        return { ...item, canCreate: null };
                     }
                 })
             );
@@ -80,16 +73,11 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
         }
     }
 
-    // 미작성만 남겨두기
     const applyFilter = (baseList = items) => {
-        const result = baseList.filter((i) => i.canCreate === true); // 미작성만
+        const result = baseList.filter((i) => i.canCreate === true);
         setFiltered(result);
         setPage(1);
     };
-
-    useEffect(() => {
-        applyFilter();
-    }, []);
 
     const startIndex = (page - 1) * PAGE_SIZE;
     const paginated = filtered.slice(startIndex, startIndex + PAGE_SIZE);
@@ -99,7 +87,6 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
             <div className="modal-box">
                 <h2 className="modal-title">구매한 상품 선택</h2>
 
-                {/* 목록 */}
                 <div className="item-list">
                     {loading ? (
                         <div className="empty">⏳ 불러오는 중...</div>
@@ -109,11 +96,9 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
                         paginated.map((item) => (
                             <div
                                 key={item.order_item_id}
-                                className="item-box"
+                                className="item-card"
                                 onClick={() => onSelect(item)}
                             >
-                                <div className="thumb">🛒</div>
-
                                 <div className="item-info">
                                     <div className="name">{item.product_name}</div>
                                     <div className="price">
@@ -123,22 +108,13 @@ const ProductSelectModal = ({ onClose, onSelect }) => {
                                         구매 날짜 {formatDate(item.purchase_date)}
                                     </div>
                                 </div>
-
-                                {/* 체크 아이콘 (리뷰 작성 완료) */}
-                                {item.canCreate === false && (
-                                    <div className="check-icon">✔</div>
-                                )}
                             </div>
                         ))
                     )}
                 </div>
 
-                {/* 페이지네이션 */}
                 <div className="pagination">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(page - 1)}
-                    >
+                    <button disabled={page === 1} onClick={() => setPage(page - 1)}>
                         이전
                     </button>
                     <span>{page}</span>
