@@ -182,7 +182,8 @@ export const ModalBox = styled.div`
   text-align: center;
   min-width: 320px;
 
-  h2 {
+  h3 {
+      margin-bottom: 20px;
     margin-bottom: 24px;
     font-size: 18px;
   }
