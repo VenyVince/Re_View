@@ -2,12 +2,10 @@ package com.review.shop.controller.image;
 
 import com.review.shop.dto.image.ImageUrlResponseDTO;
 import com.review.shop.image.ImageService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +49,13 @@ public class ImageController {
         }
 
         return ResponseEntity.ok(responses);
+    }
+
+    //모든 배너이미지 받기
+    @Operation (summary = "배너 이미지들 가져오기", description = "배너 이미지들의 URL을 리스트로 반환합니다.")
+    @GetMapping("/banners")
+    public ResponseEntity<List<String>> getBannerImages() {
+        List<String> bannerImageUrls = imageService.getBannerImageUrls();
+        return ResponseEntity.ok(bannerImageUrls);
     }
 }

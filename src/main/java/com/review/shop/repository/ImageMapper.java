@@ -2,6 +2,8 @@ package com.review.shop.repository;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface ImageMapper {
 
 
@@ -16,4 +18,5 @@ public interface ImageMapper {
             @Param("objectKey") String objectKey
     );
 
+    List<String> getBannerImageObjectKeys();
 }
