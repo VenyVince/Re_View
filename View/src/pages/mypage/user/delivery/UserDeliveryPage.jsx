@@ -6,6 +6,7 @@ import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
 import { useNavigate } from "react-router-dom";
 
+
 export default function UserDeliveryPage() {
     const navigate = useNavigate();
 
@@ -36,8 +37,13 @@ export default function UserDeliveryPage() {
     const formatPrice = (value) =>
         value?.toLocaleString("ko-KR", { maximumFractionDigits: 0 }) ?? "0";
 
-    const formatDate = (iso) => (iso ? iso.slice(0, 10) : "");
-
+    const formatDate = (iso) => {
+        if (!iso) return "";
+        const date = new Date(iso);
+        date.setHours(date.getHours() + 9);
+        return date.toISOString().slice(0, 10);
+    };
+    
     const getOrderStatusText = (order) =>
         (order.order_status || order.status || "").trim();
 
