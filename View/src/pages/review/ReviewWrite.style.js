@@ -15,9 +15,16 @@ export const Inner = styled.div`
 
 export const Title = styled.h1`
   font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 32px;
-  text-align: left;
+  font-weight: 900;
+    margin: 0 0 4px;
+    text-align: center;
+`;
+
+export const SubTitle = styled.p`
+    margin: 0 0 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
 `;
 
 export const Panel = styled.div`
@@ -144,31 +151,45 @@ export const PurchaseDate = styled.div`
 `;
 
 export const TextArea = styled.textarea`
-  width: 100%;
-  min-height: 220px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  padding: 14px 16px;
-  font-size: 14px;
-  line-height: 1.6;
-  resize: none;
-  outline: none;
-  background: #f9fafb;
+    width: 100%;
+    min-height: 180px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: none;
 
-  &:focus {
-    border-color: #111827;
-    background: #ffffff;
-  }
+    background-color: #fefefe;
+    color: #2f2f2f;
 
-  &::placeholder {
-    color: #d1d5db;
-  }
+    border-radius: 12px;
+    border: 1px solid #e5e1dc;
+
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    &::placeholder {
+        color: #9a948c;
+    }
+
+    &:hover {
+        border-color: #fcfcfc;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #c7c1ba;
+        background-color: #ffffff;
+    }
 `;
 
 export const Helper = styled.p`
   margin-top: 6px;
   font-size: 12px;
-  color: #9ca3af;
+    color: ${({ $valid, $warning }) =>
+            $valid 
+                    ? "#6b7280" // 충족
+                    : $warning 
+                            ? "#6b7280"  // 입력 유도
+                            : "#dc2626"}; // 진짜 에러
 `;
 
 export const FooterRow = styled.div`

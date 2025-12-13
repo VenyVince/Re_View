@@ -6,9 +6,12 @@ import { createReview, getPresignedUrls, fetchOrderDetail,fetchOrders } from "..
 import {
     Wrap, Inner, Title, Panel, Row, Label, ProfileBox, Avatar, ProfileName, ProductBox,
     ProductInfo, ProductTop, ProductName, PriceText, RatingSelect, StarButton,
-    RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,
+    RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,SubTitle
 } from "./ReviewWrite.style";
 import ProductSelectModal from "./components/ProductSelectModal";
+
+// 최소 글자 수
+const MIN_LENGTH = 20;
 
 // 날짜 자르기
 function formatDate(dateString) {
@@ -71,6 +74,11 @@ const ReviewWrite = () => {
 
     const [searchParams] = useSearchParams();
     const orderItemId = searchParams.get("orderItemId");
+
+    // 리뷰 길이 상태
+    const trimmedContent = content.trim();
+    const contentLength = trimmedContent.length;
+    const isContentValid = contentLength >= MIN_LENGTH;
 
     // 이미지 추가
     const handleImageChange = (e) => {
@@ -153,8 +161,15 @@ const ReviewWrite = () => {
             return;
         }
 
-        if (!content.trim()) {
+        const trimmedContent = content.trim();
+
+        if (!trimmedContent) {
             alert("리뷰 내용을 입력해 주세요.");
+            return;
+        }
+
+        if (trimmedContent.length < 20) {
+            alert("리뷰는 20자 이상 작성해 주세요.");
             return;
         }
 
@@ -207,6 +222,9 @@ const ReviewWrite = () => {
         <Wrap>
             <Inner>
                 <Title>리뷰 작성</Title>
+                <SubTitle>
+                    사용 후 느낀 점을 솔직하게 남겨주세요.
+                </SubTitle>
 
                 {/* 상품 선택 모달 */}
                 {openModal && (
@@ -297,7 +315,18 @@ const ReviewWrite = () => {
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
                                 />
-                                <Helper>※ 포인트 적립을 위해 20자 이상 작성해 주세요.</Helper>
+                                <Helper
+                                    $valid={isContentValid}
+                                    $warning={contentLength === 0}
+                                >
+                                    {contentLength === 0 && "리뷰를 작성해 주세요."}
+
+                                    {contentLength > 0 && !isContentValid &&
+                                        `글자 수가 부족합니다. (현재 ${contentLength}자 / 최소 20자)`
+                                    }
+
+                                    {isContentValid && "작성 조건을 충족했습니다."}
+                                </Helper>
                             </div>
                         </Row>
 
