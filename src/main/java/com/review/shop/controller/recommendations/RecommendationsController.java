@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,7 +32,7 @@ public class RecommendationsController {
             @ApiResponse(responseCode = "404", description = "추천 결과 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @GetMapping("/api/recommendations/baumann")
+    @PostMapping("/api/recommendations/all")
     public ResponseEntity<RecommendationResponseDTO> getRecommendations() {
 
         // 사용자 바우만 타입 조회

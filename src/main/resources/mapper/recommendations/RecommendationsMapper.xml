@@ -132,5 +132,18 @@
         like_count DESC
         FETCH FIRST 16 ROWS ONLY
     </select>
-    <select id="getRandomRecommendationAdminPicks"/>
+    <select id="getRandomRecommendationAdminPicks" resultType="com.review.shop.dto.recommendations.RecommendationAdminPickDTO">
+        SELECT
+            p.product_id   as product_id,
+            p.prd_name      as product_name,
+            p.PRD_BRAND     as product_brand,
+            ri.IMAGE_URL    as thumbnail_url,   p.price,
+            r.content
+        FROM review r
+                 INNER JOIN product p ON r.product_id = p.product_id
+                 LEFT JOIN review_images ri ON r.review_id = ri.review_id
+        WHERE r.IS_SELECTED = '1'
+        ORDER BY DBMS_RANDOM.VALUE
+            FETCH FIRST 1 ROWS ONLY
+    </select>
 </mapper>
