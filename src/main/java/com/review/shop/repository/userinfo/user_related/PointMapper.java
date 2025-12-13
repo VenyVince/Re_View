@@ -26,4 +26,4 @@ public interface PointMapper {
                                  @Param("review_id") int review_id,
                                  @Param("amount") int amount,
                                  @Param("type") String type);
-}
+    }

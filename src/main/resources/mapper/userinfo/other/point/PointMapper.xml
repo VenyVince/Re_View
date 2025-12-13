@@ -47,7 +47,7 @@
     </select>
 
     <!--    베스트 리뷰 중복 지급 방지   -->
-    <select id="existsBestReviewPoint" resultType="boolean">
+    <select id="checkBestReviewPoint" resultType="boolean">
         SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
         FROM point_history
         WHERE user_id = #{user_id}
