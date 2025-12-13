@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper {
+
+    String getUserNickName(@Param("user_id")int user_id);
+
     // 사용자 등록 메서드
     int insertUser(UserInfoDTO userDTO);
     // 사용자 검색 메서드
