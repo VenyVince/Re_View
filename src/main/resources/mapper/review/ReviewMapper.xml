@@ -36,8 +36,17 @@
             <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
             </when>
-            <when test="sort == 'rating'">
-                ORDER BY r.rating DESC, r.created_at DESC
+            <when test="sort == 'rating_highest'">
+                ORDER BY r.rating DESC
+            </when>
+            <when test="sort == 'rating_lowest'">
+                ORDER BY r.rating ASC
+            </when>
+            <when test="sort == 'likes'">
+                ORDER BY r.like_count DESC
+            </when>
+            <when test="sort == 'dislikes'">
+                ORDER BY r.dislike_count DESC
             </when>
             <otherwise>
                 ORDER BY r.like_count DESC, r.created_at DESC

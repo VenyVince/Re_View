@@ -43,9 +43,9 @@ export default function LoginPage() {
                 const me = await axiosClient.get("/api/auth/me", { withCredentials: true });
 
                 if (me.data.role === "ROLE_ADMIN") {
-                    navigate('/admin/allproducts');
+                    navigate('/');
                 } else {
-                    navigate('/mypage');
+                    navigate('/');
                 }
 
                 return;
