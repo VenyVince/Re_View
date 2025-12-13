@@ -1,8 +1,8 @@
 // src/pages/main/MainPage.jsx
 import React, { useEffect, useState } from 'react';
 import BannerSlider from './components/MainSection/BannerSlider';
-import BestReview from "./components/BestReview/BestReview";
-import BaumanProduct from "./components/BaumanProduct/BaumanProduct";
+import BestReview from "./components/adminPickReview/AdminPickReview";
+import BaumannProduct from "./components/BaumannProduct/BaumannProduct";
 
 export default function MainPage() {
     const [showTopBtn, setShowTopBtn] = useState(false);
@@ -22,7 +22,7 @@ export default function MainPage() {
                 {/* 베스트 제품 섹션 */}
                 <BestReview />
                 {/* 바우만 테스트 추천 상품*/}
-                <BaumanProduct />
+                <BaumannProduct />
             </main>
 
             {showTopBtn && (

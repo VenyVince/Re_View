@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./BaumanProduct.css";
+import "./BaumannProduct.css";
 import dummyData from "../../../../assets/dummyData.png";
 import { getBaumannBadge } from "../../../../assets/baumann";
 import {
@@ -8,7 +8,7 @@ import {
 } from "../../../../api/recommend/recommendApi.js";
 import { useNavigate } from "react-router-dom";
 
-export default function BaumanProduct() {
+export default function BaumannProduct() {
     const navigate = useNavigate();
 
     const [activeTag, setActiveTag] = useState("all");
