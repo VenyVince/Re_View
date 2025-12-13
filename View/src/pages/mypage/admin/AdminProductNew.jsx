@@ -5,7 +5,7 @@ import axiosClient from "../../../api/axiosClient";
 
 import {
     Wrap, Title, Panel, Row, Cell, Label, Input, Textarea,
-    UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost
+    UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost, Select
 } from "./AdminProductNew.style";
 
 const BAUMANN_ID_MAP = {
@@ -290,7 +290,14 @@ export default function AdminProductNew() {
                     <Row>
                         <Cell>
                             <Label>Baumann 타입</Label>
-                            <Input value={form.baumannType} onChange={onChange("baumannType")} />
+                            <Select value={form.baumannType} onChange={onChange("baumannType")}>
+                                <option value="">선택하세요</option>
+                                {Object.keys(BAUMANN_ID_MAP).map((type) => (
+                                    <option key={type} value={type}>
+                                        {type}
+                                    </option>
+                                ))}
+                            </Select>
                         </Cell>
                     </Row>
                 </Panel>
