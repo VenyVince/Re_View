@@ -19,26 +19,47 @@ export default function ReviewPage() {
     const [loading, setLoading] = useState(true);
     const [showTopBtn, setShowTopBtn] = useState(false);
 
-    // 리뷰 목록 조회
+    // 카테고리 변경 시
     useEffect(() => {
         setLoading(true);
-        // 전체 카테고리
-            axiosClient.get("/api/reviews", {
+        setSelectedBrand(null); // 카테고리 바뀔 때만 초기화
+
+        axiosClient.get("/api/reviews", {
             params: {
                 sort: sortType || "like_count",
                 category: selectedCategory === "전체" ? "" : selectedCategory,
             },
         })
-                .then((res) => {
-                    setReviews(res.data || []);
-                    setSelectedBrand(null);
-                    setLoading(false);
-                })
-                .catch(() => {
-                    setReviews([]);
-                    setLoading(false);
-                });
-    }, [selectedCategory, sortType]);
+            .then((res) => {
+                setReviews(res.data || []);
+                setLoading(false);
+            })
+            .catch(() => {
+                setReviews([]);
+                setLoading(false);
+            });
+    }, [selectedCategory]);
+
+// 정렬 변경 시
+    useEffect(() => {
+        setLoading(true);
+
+        axiosClient.get("/api/reviews", {
+            params: {
+                sort: sortType || "like_count",
+                category: selectedCategory === "전체" ? "" : selectedCategory,
+            },
+        })
+            .then((res) => {
+                setReviews(res.data || []);
+                setLoading(false);
+            })
+            .catch(() => {
+                setReviews([]);
+                setLoading(false);
+            });
+    }, [sortType]);
+
 
     // 브랜드 목록 생성
     const brandList = useMemo(() => {
