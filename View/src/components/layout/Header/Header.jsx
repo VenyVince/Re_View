@@ -51,7 +51,7 @@ export default function Header() {
                 <div className="rv-right">
                     {/* 검색창 */}
                     <TextInput
-                        placeholder="Search..."
+                        placeholder="성분/상품명/사용자명 등..."
                         width={232}
                         height={43}
                         withIcon

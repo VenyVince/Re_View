@@ -5,6 +5,12 @@ export default function ReviewCard({ review }) {
     const navigate = useNavigate();   // 🔥 최상단
 
     if (!review) return null;
+    const truncateText = (text, maxLength = 120) => {
+        if (!text) return "";
+        return text.length > maxLength
+            ? text.slice(0, maxLength) + "…"
+            : text;
+    };
 
     const hasImage =
         review.image_url && review.image_url.trim() !== "";
@@ -44,7 +50,7 @@ export default function ReviewCard({ review }) {
             <p className="card-name">{review.prd_name}</p>
 
             <p className="card-review-content">
-                {review.content}
+                {truncateText(review.content, 70)}
             </p>
         </li>
     );
