@@ -34,20 +34,23 @@
             AND p.category = #{filter_category}
         </if>
         <choose>
-            <when test="sort == 'latest'">
+            <when test="sort == 'latest'"> <!-- 신상품 순 -->
                 ORDER BY r.created_at DESC
             </when>
             <when test="sort == 'oldest'">
                 ORDER BY r.created_at ASC
             </when>
-            <when test="sort == 'rating_highest'">
+            <when test="sort == 'high_rating'">
                 ORDER BY r.rating DESC
             </when>
-            <when test="sort == 'rating_lowest'">
+            <when test="sort == 'low_rating'">
                 ORDER BY r.rating ASC
             </when>
             <when test="sort == 'likes'">
                 order by r.like_count DESC
+            </when>
+            <when test="sort == 'popular'">
+                order by p.review_count DESC, r.like_count DESC, r.dislike_count ASC
             </when>
             <otherwise>
                 ORDER BY r.created_at DESC

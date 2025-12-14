@@ -3,20 +3,35 @@ import React, { useState } from "react";
 import "./SearchBar.css";
 
 export default function SearchBar({ mode, setMode, setSortType }) {
-    const [sort, setSort] = useState("인기순");
+    const [sort, setSort] = useState("최신순");
 
     const handleSortChange = (e) => {
-        const val = e.target.value;
-        setSort(val);
+        const label = e.target.value;
+        setSort(label);
 
-        if (val === "인기순") setSortType("popular");
-        if (val === "최신순") setSortType("latest");
+        const sortMap = mode === "product"
+            ? PRODUCT_SORT_MAP
+            : REVIEW_SORT_MAP;
 
-        if (val === "가격 낮은순") setSortType("price_low");
-        if (val === "가격 높은순") setSortType("price_high");
+        setSortType(sortMap[label]);
+    };
+    const PRODUCT_SORT_MAP = {
+        "오래된순": "oldest",
+        "최신순": "latest",
+        "평균 별점 높은순": "high_rating",
+        "평균 별점 낮은순": "low_rating",
+        "가격 낮은순": "low_price",
+        "가격 높은순": "high_price",
+        "리뷰 많은순": "reviews",
+    };
 
-        if (val === "별점 높은순") setSortType("rating_high");
-        if (val === "별점 낮은순") setSortType("rating_low");
+    const REVIEW_SORT_MAP = {
+        "최신순": "latest",
+        "오래된순": "oldest",
+        "별점 높은순": "high_rating",
+        "별점 낮은순": "low_rating",
+        "좋아요순": "likes",
+        "인기순": "popular",
     };
 
     return (
@@ -42,18 +57,24 @@ export default function SearchBar({ mode, setMode, setSortType }) {
                 <div className="sort-select">
                     <label>정렬</label>
                     <select value={sort} onChange={handleSortChange}>
-                        <option>인기순</option>
-                        <option>최신순</option>
-
                         {mode === "product" ? (
                             <>
+                                <option>최신순</option>
+                                <option>리뷰 많은순</option>
+                                <option>오래된순</option>
+                                <option>평균 별점 높은순</option>
+                                <option>평균 별점 낮은순</option>
                                 <option>가격 낮은순</option>
                                 <option>가격 높은순</option>
                             </>
                         ) : (
                             <>
-                                <option>별점 낮은순</option>
+                                <option>최신순</option>
+                                <option>좋아요순</option>
+                                <option>인기순</option>
+                                <option>오래된순</option>
                                 <option>별점 높은순</option>
+                                <option>별점 낮은순</option>
                             </>
                         )}
                     </select>
