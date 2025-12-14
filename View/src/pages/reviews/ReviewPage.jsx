@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./ReviewPage.css";
 
-import axiosClient from "../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 import CategoryTabs from "./components/CategoryTabs";
 import ReviewSortSelect from "./components/ReviewSortSelect";

@@ -1,6 +1,6 @@
 // src/pages/reviewDetail/components/ReviewCommentWriteBox.jsx
 import React, { useState } from "react";
-import axios from "axios";
+import axiosClient from "api/axiosClient";
 import "./ReviewCommentWriteBox.css";
 
 export default function ReviewCommentWriteBox({ reviewId, onSubmit }) {
@@ -9,7 +9,7 @@ export default function ReviewCommentWriteBox({ reviewId, onSubmit }) {
     const handleSubmit = () => {
         if (!text.trim()) return;
 
-        axios
+        axiosClient
             .post(`/api/reviews/${reviewId}/comments`, {
                 content: text
             })

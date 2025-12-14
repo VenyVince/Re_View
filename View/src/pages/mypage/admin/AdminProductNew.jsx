@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../../api/admin/adminProductApi";
-import axiosClient from "../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 import {
     Wrap, Title, Panel, Row, Cell, Label, Input, Textarea,

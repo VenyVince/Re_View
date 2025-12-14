@@ -1,4 +1,4 @@
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 // 전체 qna 목록 조회
 export const fetchQnaList = () =>

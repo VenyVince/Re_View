@@ -1,4 +1,4 @@
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 // 신고 목록 조회
 export const fetchReports = async (status) => {

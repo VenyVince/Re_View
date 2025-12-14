@@ -1,7 +1,6 @@
 // src/pages/mypage/user/UserDeliveryPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
-// import axios from "axios";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
 import { useNavigate } from "react-router-dom";

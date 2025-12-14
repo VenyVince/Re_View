@@ -1,5 +1,5 @@
 // src/api/admin/adminUserApi.js
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 // 전체 회원 목록 조회
 export const fetchMembers = () => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axiosClient from "../../../api/axiosClient"; // axiosClient 임포트 추가
+import axiosClient from "api/axiosClient"; // axiosClient 임포트 추가
 import {
     Wrap, Inner, Title, Panel, Row, Label, Input, Select,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper

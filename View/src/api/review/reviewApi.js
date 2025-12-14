@@ -1,5 +1,5 @@
 // src/api/review/reviewApi.js
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 
 // MinIO Presigned URL 발급

@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserWishPage.jsx
 import React, { useEffect, useState } from "react";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import { useNavigate } from "react-router-dom";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserWishPage.css";

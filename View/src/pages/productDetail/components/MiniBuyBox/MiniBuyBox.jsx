@@ -4,7 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./MiniBuyBox.css";
 
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 /**
  * 상품 상세 페이지 하단 미니 구매 박스

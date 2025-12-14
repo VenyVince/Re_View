@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./OrderPaymentPage.css";
 import OrderCardPaymentSection from "./OrderCardPaymentSection";
 import OrderAddressSelectPanel from "./OrderAddressSelectPanel";
-import axiosClient from "../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 export default function OrderPaymentPage() {
     const location = useLocation();

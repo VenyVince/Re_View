@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axiosClient from "../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import UserMyPageLayout from "./layout/UserMyPageLayout";
 import "./UserPointHistoryPage.css";
 
