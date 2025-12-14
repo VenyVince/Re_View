@@ -241,7 +241,7 @@ public class ProductReviewService {
         return productReviewMapper.selectBestReviewIds();
     }
 
-    // 스케쥴러용 베스트 리뷰 갱신
+    // 베스트 리뷰 갱신
     @Transactional
     public void updateBestReviews() {
         productReviewMapper.resetBestReviews();
