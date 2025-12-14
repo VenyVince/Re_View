@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./ProductDetailPage.css";
 
-import axiosClient from "../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 import ProductInfoSection from "./components/ProductInfoSection/ProductInfoSection";
 import ProductReviewSection from "./components/ProductReviewSection/ProductReviewSection";

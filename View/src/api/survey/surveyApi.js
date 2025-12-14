@@ -1,4 +1,4 @@
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 // POST /api/survey/baumann
 export const submitBaumannSurvey = ({ userId, answers }) =>

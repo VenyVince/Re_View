@@ -1,7 +1,7 @@
 // src/pages/mypage/user/address/UserAddressManager.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import "./UserAddress.css";
 
 export default function UserAddressManager() {

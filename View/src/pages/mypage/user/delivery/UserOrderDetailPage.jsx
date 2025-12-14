@@ -1,8 +1,7 @@
 // src/pages/mypage/user/UserOrderDetailPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// import axios from "axios";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserOrderDetailPage.css";
 

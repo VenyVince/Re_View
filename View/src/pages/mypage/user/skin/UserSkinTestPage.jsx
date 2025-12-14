@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserSkinTestPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserSkinTestPage.css";
 

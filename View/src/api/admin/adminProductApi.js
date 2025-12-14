@@ -1,4 +1,4 @@
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 /* 공통 에러 핸들러 */
 async function safeRequest(promise) {

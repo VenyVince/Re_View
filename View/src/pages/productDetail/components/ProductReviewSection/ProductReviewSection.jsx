@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./ProductReviewSection.css";
 
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 export default function ProductReviewSection({ productId }) {
     const [reviewList, setReviewList] = useState([]);

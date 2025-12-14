@@ -1,7 +1,7 @@
 // src/pages/search/SearchPage.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "api/axiosClient";
 import "./SearchPage.css";
 import CategoryFilter from "./components/CategoryFilter";
 import BrandFilter from "./components/BrandFilter";
@@ -44,7 +44,7 @@ export default function SearchPage() {
             }
 
             try {
-                const res = await axios.get("/api/search", {
+                const res = await axiosClient.get("/api/search", {
                     params: {
                         keyword,
                         sort: "latest",
