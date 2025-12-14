@@ -1,4 +1,5 @@
 {
+  "_comment": "src 기준 절대경로 별칭으로 설정해놨습니다. 앞으로 axiosClient사용하실 때 import axiosClient from 'api/axiosClient' 로 사용하시면 됩니다.",
   "compilerOptions": {
     "baseUrl": "src"
   }
