@@ -38,7 +38,6 @@ public class ReviewController {
             @RequestParam(value = "page", defaultValue = "0") int page
             ){
 
-
         //한 페이지에는 100개의 리뷰가 들어갑니다.
         List<ReviewDTO> reviews = reviewService.getReviewList(sort, category, page, 100);
 
