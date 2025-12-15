@@ -208,6 +208,7 @@ export default function UserCartPage() {
     };
 
     // 주문하기 → 결제 페이지로 선택된 상품 전달
+    // 주문하기 버튼 핸들러
     const handleOrder = () => {
         const selectedItems = items.filter(
             (it) => it.checked && !it.is_sold_out
@@ -217,10 +218,14 @@ export default function UserCartPage() {
             alert("주문할 상품을 선택해주세요.");
             return;
         }
+        const simpleOrderList = selectedItems.map((item) => ({
+            product_id: item.product_id,
+            buy_quantity: item.quantity,
+        }));
 
         navigate("/order/payment", {
             state: {
-                items: selectedItems,
+                checkoutItems: simpleOrderList,
             },
         });
     };

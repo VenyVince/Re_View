@@ -4,6 +4,7 @@ import com.review.shop.dto.orders.OrderCheckoutProductInfoDTO;
 import com.review.shop.dto.orders.OrderCheckoutResponse;
 import com.review.shop.dto.orders.OrderCreateDTO;
 import com.review.shop.dto.orders.OrderDTO;
+import com.review.shop.image.ImageService;
 import com.review.shop.service.order.OrderPreviewService;
 import com.review.shop.service.order.OrderService;
 import com.review.shop.util.Security_Util;
@@ -29,6 +30,7 @@ public class OrderController {
     private final OrderPreviewService orderPreviewService;
     private final OrderService orderService;
     private final Security_Util security_util;
+    private final ImageService imageService;
 
     // 주문 미리보기 엔드포인트
     @Operation (summary = "주문 미리보기", description = "주문할 상품들의 정보와 총 가격, 사용자의 포인트를 조회합니다.")
@@ -45,6 +47,13 @@ public class OrderController {
 
         // 상품 정보와 총 가격 조회
         OrderCheckoutResponse checkoutResponse = orderPreviewService.getPrdInfoList(orderList);
+
+        List<OrderCheckoutProductInfoDTO> prd_info = checkoutResponse.getProducts();
+
+        for(OrderCheckoutProductInfoDTO prd : prd_info) {
+            String presignedUrl = imageService.presignedUrlGet(prd.getThumbnail_url());
+            prd.setThumbnail_url(presignedUrl);
+        }
 
         int user_id = security_util.getCurrentUserId();
 
