@@ -115,9 +115,9 @@ export default function AdminPick() {
                         className="best-review__more"
                         onClick={(e) => {
                             e.stopPropagation(); // 카드 클릭 방지
-                            navigate(`/review/${adminItem.review_id}`);
+                            navigate(`/reviews`);
                         }}
-                        aria-label="리뷰 상세 더보기"
+                        aria-label="다른 리뷰 더보기"
                     >
                          more >>
                     </button>
