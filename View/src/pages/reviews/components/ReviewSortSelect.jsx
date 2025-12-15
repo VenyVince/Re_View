@@ -8,10 +8,12 @@ export default function ReviewSortSelect({ sortType, setSortType }) {
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
         >
-            <option value="popular">인기순</option>
-            <option value="rating_high">평점 높은 순</option>
-            <option value="rating_low">평점 낮은 순</option>
-            <option value="recent">최신순</option>
+            <option value="likes">좋아요 순</option>
+            <option value="dislikes">싫어요 순</option>
+            <option value="high_rating">평점 높은 순</option>
+            <option value="low_rating">평점 낮은 순</option>
+            <option value="latest">최신순</option>
+            <option value="oldest">오래된순</option>
         </select>
     );
 }

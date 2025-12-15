@@ -17,7 +17,12 @@
         r.content,
         r.rating,
         r.is_selected,
-        r.is_checked
+        r.is_checked,
+        (SELECT image_url
+        FROM product_image
+        WHERE product_id = p.product_id
+        AND is_thumbnail = 'Y'
+        AND ROWNUM = 1) AS product_image
         FROM review r
         JOIN USER_table u ON r.user_id = u.user_id
         JOIN product p ON r.product_id = p.product_id
@@ -36,8 +41,20 @@
             <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
             </when>
-            <when test="sort == 'rating'">
-                ORDER BY r.rating DESC, r.created_at DESC
+            <when test="sort == 'oldest'">
+                ORDER BY r.created_at ASC
+            </when>
+            <when test="sort == 'high_rating'">
+                ORDER BY r.rating DESC
+            </when>
+            <when test="sort == 'low_rating'">
+                ORDER BY r.rating ASC
+            </when>
+            <when test="sort == 'likes'">
+                ORDER BY r.like_count DESC
+            </when>
+            <when test="sort == 'dislikes'">
+                ORDER BY r.dislike_count DESC
             </when>
             <otherwise>
                 ORDER BY r.like_count DESC, r.created_at DESC

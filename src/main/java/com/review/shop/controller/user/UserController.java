@@ -112,6 +112,7 @@ public class UserController  {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "로그인 성공");
         response.put("user_id", loginDto.getId());
+        response.put("role", security_util.getCurrentUserRole());
         return ResponseEntity.ok(response);
     }
 
@@ -146,15 +147,16 @@ public class UserController  {
     public ResponseEntity<?> getMyInfo(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-
         if (userDetails != null) {
+            int user_id = security_util.getCurrentUserId();
             String id = userDetails.getUsername();
             String role = userDetails.getAuthorities().iterator().next().getAuthority();
-            String password = userDetails.getPassword();
+            String nickname = userService.getUserNickName(user_id);
 
             Map<String, String> userInfo = new HashMap<>();
             userInfo.put("id", id);
             userInfo.put("role", role);
+            userInfo.put("nickname", nickname);
 
             return ResponseEntity.ok(userInfo);
         } else {

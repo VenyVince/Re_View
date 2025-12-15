@@ -1,5 +1,5 @@
 // src/api/admin/adminOrderApi.js
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 // 주문 검색
 export const searchOrders = (keyword, status, sort = "latest") => {

@@ -39,4 +39,9 @@
                  )
     </insert>
 
+    <select id="getBannerImageObjectKeys" resultType="String">
+        SELECT OBJECT_KEY
+        FROM BANNER_IMAGE
+    </select>
+
 </mapper>

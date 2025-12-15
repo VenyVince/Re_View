@@ -7,7 +7,7 @@ export default function ProductCard({ product }) {
     if (!product) return null;
 
     const hasImage =
-        product.image_url && product.image_url.trim() !== "";
+        product.thumbnail_url && product.thumbnail_url.trim() !== "";
 
     return (
         <li
@@ -18,7 +18,7 @@ export default function ProductCard({ product }) {
             <div className="img-wrapper">
                 {hasImage ? (
                     <img
-                        src={product.image_url}
+                        src={product.thumbnail_url}
                         alt={product.prd_name}
                         onError={(e) => {
                             e.target.style.display = "none";

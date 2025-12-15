@@ -16,4 +16,8 @@ public class ReviewScheduler {
     public void updateBestReviewMonthly() {
         productReviewService.updateBestReviews();
     }
+
+    public void runUpdateBestReviewsNow() {
+        productReviewService.updateBestReviews();
+    }
 }

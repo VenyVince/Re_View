@@ -1,6 +1,6 @@
 // src/pages/mypage/user/review/UserReviewPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserReviewPage.css";
 import { useNavigate } from "react-router-dom";

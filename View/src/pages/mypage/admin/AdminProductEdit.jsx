@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axiosClient from "../../../api/axiosClient"; // axiosClient 임포트 추가
+import axiosClient from "api/axiosClient"; // axiosClient 임포트 추가
 import {
-    Wrap, Inner, Title, Panel, Row, Label, Input,
+    Wrap, Inner, Title, Panel, Row, Label, Input, Select,
     TextArea, ImageBox, UploadBtn, FooterRow, SubmitBtn, Helper
 } from "./adminProductEdit.style";
 import { updateProduct, fetchAdminProduct } from "../../../api/admin/adminProductApi";
@@ -18,6 +18,14 @@ const BAUMANN_ID_MAP = {
     _RPW: 64, _RPT: 65, _RP_: 66, _RNW: 67, _RNT: 68, _RN_: 69, _R_W: 70, _R_T: 71, _R__: 72,
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
+
+const CATEGORY_OPTIONS = [
+    "로션",
+    "앰플",
+    "토너",
+    "크림",
+    "클렌징",
+];
 
 const BAUMANN_CODE_BY_ID = Object.fromEntries(
     Object.entries(BAUMANN_ID_MAP).map(([code, id]) => [id, code])
@@ -307,13 +315,19 @@ export default function AdminProductEdit() {
                                     placeholder="브랜드명"
                                     disabled={isSubmitting}
                                 />
-                                <Input
+                                <Select
                                     name="category"
                                     value={form.category}
                                     onChange={onChange}
-                                    placeholder="예: 크림, 토너"
                                     disabled={isSubmitting}
-                                />
+                                >
+                                    <option value="">선택하세요</option>
+                                    {CATEGORY_OPTIONS.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </Select>
                             </div>
                         </Row>
                         <Row>
@@ -341,18 +355,19 @@ export default function AdminProductEdit() {
                         </Row>
                         <Row>
                             <Label>Baumann 타입</Label>
-                            <div style={{ flex: 1 }}>
-                                <Input
-                                    name="baumannType"
-                                    value={form.baumannType}
-                                    onChange={onChange}
-                                    placeholder="예) DRNT, DSPW, OSNT ..."
-                                    disabled={isSubmitting}
-                                />
-                                <Helper>
-                                    * Baumann 코드 입력 → 자동으로 baumann_id 변환됩니다.
-                                </Helper>
-                            </div>
+                            <Select
+                                name="baumannType"
+                                value={form.baumannType}
+                                onChange={onChange}
+                                disabled={isSubmitting}
+                            >
+                                <option value="">선택하세요</option>
+                                {Object.keys(BAUMANN_ID_MAP).map((type) => (
+                                    <option key={type} value={type}>
+                                        {type}
+                                    </option>
+                                ))}
+                            </Select>
                         </Row>
                     </Panel>
                     <FooterRow>

@@ -177,4 +177,10 @@ public class ImageService {
     }
 
 
+    public List<String> getBannerImageUrls() {
+        List<String> objectKeys = imageMapper.getBannerImageObjectKeys();
+        return objectKeys.stream()
+                .map(this::presignedUrlGet)
+                .toList();
+    }
 }

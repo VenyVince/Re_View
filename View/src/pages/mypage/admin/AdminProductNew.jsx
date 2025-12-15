@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../../api/admin/adminProductApi";
-import axiosClient from "../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 import {
     Wrap, Title, Panel, Row, Cell, Label, Input, Textarea,
-    UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost
+    UploadBox, Thumb, UploadBtn, Actions, Primary, Ghost, Select
 } from "./AdminProductNew.style";
 
 const BAUMANN_ID_MAP = {
@@ -19,6 +19,14 @@ const BAUMANN_ID_MAP = {
     _RPW: 64, _RPT: 65, _RP_: 66, _RNW: 67, _RNT: 68, _RN_: 69, _R_W: 70, _R_T: 71, _R__: 72,
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
+
+const CATEGORY_OPTIONS = [
+    "로션",
+    "앰플",
+    "토너",
+    "크림",
+    "클렌징",
+];
 
 export default function AdminProductNew() {
     const nav = useNavigate();
@@ -274,7 +282,14 @@ export default function AdminProductNew() {
                         </Cell>
                         <Cell>
                             <Label>카테고리</Label>
-                            <Input value={form.category} onChange={onChange("category")} />
+                            <Select value={form.category} onChange={onChange("category")}>
+                                <option value="">선택하세요</option>
+                                {CATEGORY_OPTIONS.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </Select>
                         </Cell>
                     </Row>
                     <Row>
@@ -290,7 +305,14 @@ export default function AdminProductNew() {
                     <Row>
                         <Cell>
                             <Label>Baumann 타입</Label>
-                            <Input value={form.baumannType} onChange={onChange("baumannType")} />
+                            <Select value={form.baumannType} onChange={onChange("baumannType")}>
+                                <option value="">선택하세요</option>
+                                {Object.keys(BAUMANN_ID_MAP).map((type) => (
+                                    <option key={type} value={type}>
+                                        {type}
+                                    </option>
+                                ))}
+                            </Select>
                         </Cell>
                     </Row>
                 </Panel>

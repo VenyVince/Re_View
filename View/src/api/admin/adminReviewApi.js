@@ -1,4 +1,4 @@
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 // 관리자용 전체 리뷰 목록 조회
 export const fetchAdminReviews = async (page = 1, size = 10, sort = "like_count") => {

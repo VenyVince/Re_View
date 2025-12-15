@@ -3,7 +3,6 @@ package com.review.shop.dto.search.header;
 import lombok.Data;
 
 import java.sql.Date;
-import java.util.List;
 
 @Data
 public class HeaderSearchReviewDTO {
@@ -28,5 +27,5 @@ public class HeaderSearchReviewDTO {
     private String category;
 
     //     Review_Image 테이블
-    private List<String> image_urls;
+    private String image_url;
 }
