@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class RecommendationsUserDTO {
+public class BaumannDTO {
     private String first;
     private String second;
     private String third;

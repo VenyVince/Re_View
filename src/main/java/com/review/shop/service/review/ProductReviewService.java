@@ -61,7 +61,7 @@ public class ProductReviewService {
     /**
      * 특정 상품의 리뷰 목록 조회
      */
-    public List<ProductReviewDTO> getProductReviews(int product_id, String sort) {
+    public List<ProductReviewDTO> getProductReviews(int product_id, String sort, int user_id) {
 
         // 상품 존재 여부 체크
         if (productReviewMapper.selectProductById(product_id) == null) {
@@ -72,18 +72,17 @@ public class ProductReviewService {
             sort = "like_count";
         }
 
-        // DB에서 조회 (image_url에는 Object Key가 들어있음)
-        List<ProductReviewDTO> reviewsWithImages = productReviewMapper.selectReviewsByProduct(product_id, sort);
+        // 매퍼에 user_id 전달
+        List<ProductReviewDTO> reviewsWithImages = productReviewMapper.selectReviewsByProduct(product_id, sort, user_id);
 
-        // 리뷰를 review_id로 그룹핑해서 이미지 배열 생성
+        // 리뷰 그룹핑 및 이미지 처리 로직
         Map<Integer, ProductReviewDTO> groupedReviews = new LinkedHashMap<>();
         for (ProductReviewDTO review : reviewsWithImages) {
             groupedReviews.putIfAbsent(review.getReview_id(), review);
 
-            // [변경] 이미지가 있으면 Key를 URL로 변환하여 추가
             String objectKey = review.getImage_url();
             if (objectKey != null && !objectKey.isEmpty()) {
-                String presignedUrl = imageService.presignedUrlGet(objectKey); // Key -> URL 변환
+                String presignedUrl = imageService.presignedUrlGet(objectKey);
                 groupedReviews.get(review.getReview_id()).getImages().add(presignedUrl);
             }
         }
