@@ -193,15 +193,23 @@
 
     <select id="getRandomRecommendationAdminPicks" resultType="com.review.shop.dto.recommendations.RecommendationAdminPickDTO">
         SELECT
-            p.product_id   as product_id,
-            p.prd_name      as product_name,
-            p.PRD_BRAND     as product_brand,
-            ri.IMAGE_URL    as thumbnail_url,   p.price,
-            r.content
+            p.product_id AS product_id, p.prd_name AS product_name, p.prd_brand AS product_brand, p.price,
+            ri.image_url AS thumbnail_url,
+            r.content, r.review_id,
+            u.nickname, u.baumann_id
         FROM review r
-                 INNER JOIN product p ON r.product_id = p.product_id
-                 LEFT JOIN review_images ri ON r.review_id = ri.review_id
-        WHERE r.IS_SELECTED = '1'
+                 INNER JOIN product p
+                            ON r.product_id = p.product_id
+                 INNER JOIN user_table u
+                            ON r.user_id = u.user_id
+                 LEFT JOIN LATERAL (
+            SELECT image_url
+            FROM review_images ri
+            WHERE ri.review_id = r.review_id
+            ORDER BY ri.review_image_id ASC
+                FETCH FIRST 1 ROWS ONLY
+                ) ri ON 1 = 1
+        WHERE r.is_selected = '1'
         ORDER BY DBMS_RANDOM.VALUE
             FETCH FIRST 1 ROWS ONLY
     </select>

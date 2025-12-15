@@ -48,14 +48,69 @@
 
 /* 본문 */
 .best-review__content {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
+.best-review__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+/* 작성자 */
+.best-review__author {
+    font-weight: 700;
+    color: #111827;
+}
+
+/* 바우만 타입 칩 */
+.best-review__baumann {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background-color: #eef2ff;   /* 연한 인디고 */
+    color: #1F2937;
+}
+/* more 버튼 */
+.best-review__more {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #374151;
+    background-color: #f9fafb;        /* 거의 흰색 */
+    border: 1px solid #e5e7eb;         /* 연한 테두리 */
+    border-radius: 999px;
+
+    padding: 4px 10px;
+    cursor: pointer;
+
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: all 0.15s ease;
+}
+
+/* hover */
+.best-review__more:hover {
+    background-color: #ffffff;
+    border-color: #d1d5db;
+    color: #111827;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+}
 .best-review__brand {
     text-align: left;
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 15px;
+    color: #374151;
 }
 
 .best-review__row {
@@ -93,8 +148,7 @@
     font-weight: 700;
 }
 .best-review__price-unit {
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 18px;
 }
 
 .best-review__excerpt {
