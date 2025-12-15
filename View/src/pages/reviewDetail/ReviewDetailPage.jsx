@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./ReviewDetailPage.css";
 
-import axiosClient from "../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 import ReviewDetailHeader from "./components/ReviewDetailHeader";
 import ReviewDetailContent from "./components/ReviewDetailContent";

@@ -23,7 +23,8 @@ export default function Header() {
     };
 
     const handleLogoClick = () => {
-        navigate('/');
+        logout();
+        navigate('/', { replace: true });
     };
 
     return (
@@ -50,7 +51,7 @@ export default function Header() {
                 <div className="rv-right">
                     {/* 검색창 */}
                     <TextInput
-                        placeholder="Search..."
+                        placeholder="성분/상품명/사용자명 등..."
                         width={232}
                         height={43}
                         withIcon
@@ -80,12 +81,18 @@ export default function Header() {
                         </div>
                     ) : (
                         <div className="rv-user-menu">
-                            <span className="rv-user-nickname">{auth.userId} 님</span>
+                            <span className="rv-user-nickname">{auth.nickname} 님</span>
 
-                            <Link to="/mypage" className="rv-btn-mypage">
-                                마이페이지
-                            </Link>
-
+                            {/* role에 따라 링크 분기 */}
+                            {auth.role === "ROLE_ADMIN" ? (
+                                <Link to="/admin/allproducts" className="rv-btn-mypage">
+                                    관리자 페이지
+                                </Link>
+                            ) : (
+                                <Link to="/mypage" className="rv-btn-mypage">
+                                    마이페이지
+                                </Link>
+                            )}
                             <button
                                 className="rv-btn-logout"
                                 onClick={logout}

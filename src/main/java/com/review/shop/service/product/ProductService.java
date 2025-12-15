@@ -2,7 +2,6 @@ package com.review.shop.service.product;
 
 import com.review.shop.dto.product.ProductDTO;
 import com.review.shop.exception.DatabaseException;
-import com.review.shop.exception.WrongRequestException;
 import com.review.shop.image.ImageService;
 import com.review.shop.repository.product.ProductMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +23,6 @@ public class ProductService {
 
         // 정렬 옵션 기본값 처리 및 검증
         if (sort == null || sort.isEmpty()) sort = "latest";
-        if (!sort.equals("latest") && !sort.equals("rating") && !sort.equals("price")) {
-            throw new WrongRequestException("정렬 옵션이 올바르지 않습니다.");
-        }
 
         try {
             // Mapper 호출 (페이징 변수 없이 호출)

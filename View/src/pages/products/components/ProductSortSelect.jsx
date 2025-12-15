@@ -23,10 +23,13 @@ export default function ProductSortSelect({
                 }
             }}
         >
-            <option value="recommend">인기순</option>
-            <option value="price_low">낮은 가격순</option>
-            <option value="price_high">높은 가격순</option>
+            <option value="popular">인기순</option>
+            <option value="latest">최신순</option>
+            <option value="low_price">낮은 가격순</option>
+            <option value="high_price">높은 가격순</option>
             <option value="name">상품명순</option>
+            <option value="high_rating">평점 높은 순</option>
+            <option value="low_rating">평점 낮은 순</option>
         </select>
     );
 }

@@ -63,16 +63,10 @@
     <!-- 가장 최근 생성된 리뷰 조회 (첫 번째 행만) -->
     <select id="selectLastReview" resultType="com.review.shop.dto.review.ProductReviewDTO">
         SELECT
-        r.review_id,
-        r.content,
-        r.rating,
-        r.like_count,
-        r.dislike_count,
+        r.review_id, r.content, r.rating, r.like_count, r.dislike_count,
         TO_CHAR(r.created_at, 'YYYY-MM-DD') AS created_at,
         COALESCE(r.is_selected, '0') AS is_selected,
-        u.user_id,
-        u.nickname,
-        u.baumann_id,
+        u.user_id, u.nickname, u.baumann_id,
         b.type AS baumann_type
         FROM review r
         JOIN USER_TABLE u ON r.user_id = u.user_id
@@ -87,15 +81,7 @@
     <!-- 리뷰 ID로 조회 -->
     <select id="selectReviewById" parameterType="int" resultType="com.review.shop.dto.review.ProductReviewDTO">
         SELECT
-        r.review_id,
-        r.product_id,
-        r.user_id,
-        r.content,
-        r.rating,
-        r.like_count,
-        r.dislike_count,
-        r.is_checked,
-        r.is_selected,
+        r.review_id, r.product_id, r.user_id, r.content, r.rating, r.like_count, r.dislike_count, r.is_checked, r.is_selected,
         TO_CHAR(r.created_at, 'YYYY-MM-DD') AS created_at,
         TO_CHAR(r.updated_at, 'YYYY-MM-DD') AS updated_at,
         r.deleted_at
@@ -130,26 +116,33 @@
 
     <!--    베스트 리뷰 선정   -->
     <select id="selectBestReviewIds" resultType="com.review.shop.dto.review.BestReviewDTO">
-        WITH review_stats AS (
-        SELECT
-        r.review_id, r.user_id, r.product_id, r.like_count, r.dislike_count, r.comment_count,
-        p.review_count,
-        -- review_number은 리뷰의 순번. like가 같으면 임의로 순위가 조정되기 때문에 조건을 좀 더만듦.
-        -- (like → dislike → comment 기준)
-        ROW_NUMBER() OVER (
-        PARTITION BY r.product_id
-        ORDER BY r.like_count DESC, r.dislike_count ASC, r.comment_count DESC     -- 댓글 많은 순
-        ) AS review_number
-        FROM review r
-        JOIN product p ON r.product_id = p.product_id
-        WHERE r.like_count > 100
-        AND p.review_count > 100
-        )
         SELECT review_id, user_id
-        FROM review_stats
+        FROM (
+                 WITH review_stats AS (
+                     SELECT
+                         r.review_id, r.user_id, r.product_id, r.like_count, r.dislike_count,
+                         (SELECT COUNT(*) FROM REVIEW_COMMENT rc WHERE rc.REVIEW_ID = r.REVIEW_ID) AS comment_count,
+                         p.review_count,
+                         -- review_number은 리뷰의 순번. like가 같으면 임의로 순위가 조정되기 때문에 조건을 좀 더만듦.
+                         -- (like → dislike → comment 기준)
+                         ROW_NUMBER() OVER (
+                    PARTITION BY r.product_id
+                    ORDER BY r.like_count DESC, r.dislike_count ASC,
+                             (SELECT COUNT(*) FROM REVIEW_COMMENT rc WHERE rc.REVIEW_ID = r.REVIEW_ID) DESC
+                ) AS review_number
+                     FROM review r
+                              JOIN product p ON r.product_id = p.product_id
+                     WHERE r.like_count > 20
+                       AND p.review_count > 30
+                 )
+                 SELECT review_id, user_id, review_number, review_count
+                 FROM review_stats
+             )
         -- 101개 리뷰의 10퍼센트는 10개로 자름.
-        WHERE review_number &lt;= FLOOR(review_count * 0.1);
+        WHERE review_number &lt;= FLOOR(review_count * 0.1)
     </select>
+
+
 
     <!-- 기존 is_checked 초기화 -->
     <update id="resetBestReviews">
@@ -163,7 +156,7 @@
         UPDATE review
         SET is_checked = 1
         WHERE review_id IN
-        <foreach item="id" collection="reviewIds" open="(" separator="," close=")">
+        <foreach item="id" collection="review_ids" open="(" separator="," close=")">
             #{id}
         </foreach>
     </update>

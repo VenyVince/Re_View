@@ -21,28 +21,23 @@ public class OrderListController {
     private final Security_Util securityUtil;
     private final OrderListService orderListService;
 
-    @Operation(summary = "내 주문 내역 조회", description = "로그인한 사용자의 주문 내역을 최신순으로 조회합니다.")
+    @Operation(summary = "내 주문 내역 조회", description = "로그인한 사용자의 전체 주문 내역을 최신순으로 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "401", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping
-    public ResponseEntity<List<OrderListResponseDTO>> getMyOrders(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+    public ResponseEntity<List<OrderListResponseDTO>> getMyOrders() {
         int user_id = securityUtil.getCurrentUserId();
 
-        if (page < 1) page = 1;
-
-        return ResponseEntity.ok(orderListService.getMyOrderList(user_id, page, size));
+        return ResponseEntity.ok(orderListService.getMyOrderList(user_id));
     }
 
     @Operation(summary = "주문 상세 조회", description = "주문 ID로 상세 정보를 조회합니다. (본인 주문만 가능)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "백엔드 오류"),
+            @ApiResponse(responseCode = "404", description = "주문 없음"),
             @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
     })
     @GetMapping("/{order_id}")

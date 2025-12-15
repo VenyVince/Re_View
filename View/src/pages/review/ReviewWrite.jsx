@@ -1,15 +1,17 @@
 // src/pages/review/ReviewWrite.jsx
-
 import React, {useEffect, useState} from "react";
-import { useNavigate,useParams } from "react-router-dom";
+import { useNavigate,useParams,useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { createReview, getPresignedUrls } from "../../api/review/reviewApi";
+import { createReview, getPresignedUrls, fetchOrderDetail,fetchOrders } from "../../api/review/reviewApi";
 import {
     Wrap, Inner, Title, Panel, Row, Label, ProfileBox, Avatar, ProfileName, ProductBox,
     ProductInfo, ProductTop, ProductName, PriceText, RatingSelect, StarButton,
-    RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,
+    RatingValue, PurchaseDate, TextArea, Helper, FooterRow, SubmitBtn,SubTitle
 } from "./ReviewWrite.style";
 import ProductSelectModal from "./components/ProductSelectModal";
+
+// 최소 글자 수
+const MIN_LENGTH = 20;
 
 // 날짜 자르기
 function formatDate(dateString) {
@@ -22,6 +24,39 @@ function formatDate(dateString) {
     const min = String(d.getMinutes()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
+
+async function fetchOrderDetailByOrderItemId(orderItemId) {
+    const ordersRes = await fetchOrders();
+    const orders = ordersRes.data;
+
+    for (const order of orders) {
+        const detailRes = await fetchOrderDetail(order.order_id);
+        const items = detailRes.data.order_items;
+
+        const matched = items.find(i => String(i.order_item_id) === String(orderItemId));
+        if (matched) {
+            return {
+                product: {
+                    product_id: matched.product_id,
+                    product_name: matched.product_name,
+                    product_price: matched.product_price,
+                    purchase_date: order.created_at
+                }
+            };
+        }
+    }
+
+    return null;
+}
+
+const buttonStyle = {
+    padding: "6px 12px",
+    borderRadius: "8px",
+    border: "1px solid #d1d5db",
+    background: "white",
+    cursor: "pointer",
+    fontSize: "14px"
+};
 
 const ReviewWrite = () => {
     const navigate = useNavigate();
@@ -36,6 +71,14 @@ const ReviewWrite = () => {
     const [previews, setPreviews] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+
+    const [searchParams] = useSearchParams();
+    const orderItemId = searchParams.get("orderItemId");
+
+    // 리뷰 길이 상태
+    const trimmedContent = content.trim();
+    const contentLength = trimmedContent.length;
+    const isContentValid = contentLength >= MIN_LENGTH;
 
     // 이미지 추가
     const handleImageChange = (e) => {
@@ -118,8 +161,15 @@ const ReviewWrite = () => {
             return;
         }
 
-        if (!content.trim()) {
+        const trimmedContent = content.trim();
+
+        if (!trimmedContent) {
             alert("리뷰 내용을 입력해 주세요.");
+            return;
+        }
+
+        if (trimmedContent.length < 20) {
+            alert("리뷰는 20자 이상 작성해 주세요.");
             return;
         }
 
@@ -154,10 +204,27 @@ const ReviewWrite = () => {
         }
     };
 
+    useEffect(() => {
+        async function load() {
+            if (!orderItemId) return;
+
+            // orderItemId로 주문상품 정보 불러오기
+            const detail = await fetchOrderDetailByOrderItemId(orderItemId);
+
+            setSelectedProduct(detail.product);
+            setSelectedOrderItemId(orderItemId);
+        }
+
+        load();
+    }, [orderItemId]);
+
     return (
         <Wrap>
             <Inner>
                 <Title>리뷰 작성</Title>
+                <SubTitle>
+                    사용 후 느낀 점을 솔직하게 남겨주세요.
+                </SubTitle>
 
                 {/* 상품 선택 모달 */}
                 {openModal && (
@@ -166,7 +233,6 @@ const ReviewWrite = () => {
                         onSelect={(item) => {
                             setSelectedProduct(item);
                             setSelectedOrderItemId(item.order_item_id);
-                            navigate(`/review/write/${item.product_id}`);
                             setOpenModal(false);
                         }}
                     />
@@ -186,25 +252,27 @@ const ReviewWrite = () => {
                         {/* 상품 정보 */}
                         <Row>
                             <Label>상품 정보</Label>
-                            <div style={{
-                                flex: 1,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "flex-start",
-                                gap: "8px"
-                            }}>
+
+                            <div
+                                style={{
+                                    flex: 1,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: "16px"
+                                }}
+                            >
                                 {selectedProduct ? (
                                     <ProductBox style={{ paddingLeft: 0 }}>
                                         <ProductInfo style={{ paddingLeft: 0 }}>
                                             <ProductTop>
-                                                <div className="left-info">
+                                                <div className="left-info" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                                     <ProductName>{selectedProduct.product_name}</ProductName>
-                                                    <PriceText style={{paddingLeft:"10px"}}>
-                                                        {selectedProduct.product_price.toLocaleString()}원
-                                                    </PriceText>
+                                                    <PriceText>{selectedProduct.product_price.toLocaleString()}원</PriceText>
                                                 </div>
 
-                                                <PurchaseDate style={{paddingLeft:"10px"}}>
+                                                <PurchaseDate  style={{ marginLeft: "10px" }}>
                                                     구매 날짜 {formatDate(selectedProduct.purchase_date)}
                                                 </PurchaseDate>
                                             </ProductTop>
@@ -230,17 +298,10 @@ const ReviewWrite = () => {
 
                                 <button
                                     type="button"
-                                    style={{
-                                        marginTop: 10,
-                                        padding: "6px 12px",
-                                        borderRadius: 8,
-                                        border: "1px solid #d1d5db",
-                                        background: "white",
-                                        cursor: "pointer",
-                                    }}
                                     onClick={() => setOpenModal(true)}
+                                    style={buttonStyle}
                                 >
-                                    구매한 상품 선택하기
+                                    다른 상품 선택하기
                                 </button>
                             </div>
                         </Row>
@@ -254,7 +315,18 @@ const ReviewWrite = () => {
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
                                 />
-                                <Helper>※ 포인트 적립을 위해 20자 이상 작성해 주세요.</Helper>
+                                <Helper
+                                    $valid={isContentValid}
+                                    $warning={contentLength === 0}
+                                >
+                                    {contentLength === 0 && "리뷰를 작성해 주세요."}
+
+                                    {contentLength > 0 && !isContentValid &&
+                                        `글자 수가 부족합니다. (현재 ${contentLength}자 / 최소 20자)`
+                                    }
+
+                                    {isContentValid && "작성 조건을 충족했습니다."}
+                                </Helper>
                             </div>
                         </Row>
 

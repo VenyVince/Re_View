@@ -31,11 +31,20 @@
             <when test="sort == 'oldest'">
                 ORDER BY p.created_at ASC
             </when>
-            <when test="sort == 'rating_highest'">
+            <when test="sort == 'high_rating'">
                 ORDER BY p.rating DESC
             </when>
-            <when test="sort == 'rating_lowest'">
+            <when test="sort == 'low_rating'">
                 ORDER BY p.rating ASC
+            </when>
+            <when test="sort == 'low_price'">
+                ORDER BY p.price ASC
+            </when>
+            <when test="sort == 'high_price'">
+                ORDER BY p.price DESC
+            </when>
+            <when test="sort == 'reviews'">
+                order by p.review_count DESC
             </when>
             <otherwise>
                 ORDER BY p.created_at DESC

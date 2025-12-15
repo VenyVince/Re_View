@@ -4,7 +4,6 @@ import com.review.shop.dto.review.ReviewDTO;
 import com.review.shop.dto.review.ReviewDetailResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.exception.WrongRequestException;
 import com.review.shop.image.ImageService;
 import com.review.shop.repository.review.ReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +25,7 @@ public class ReviewService {
 
     public List<ReviewDTO> getReviewList(String sort, String category) {
         // 정렬 옵션 기본값 및 검증
-        if (sort == null || sort.isEmpty()) sort = "like_count";
-        if (!sort.equals("latest") && !sort.equals("rating") && !sort.equals("like_count")) {
-            throw new WrongRequestException("정렬 옵션이 올바르지 않습니다.");
-        }
+        if (sort == null || sort.isEmpty()) sort = "latest";
 
         try {
             List<ReviewDTO> reviews = reviewMapper.selectReviewList(sort, category);

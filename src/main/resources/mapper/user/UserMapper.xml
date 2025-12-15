@@ -11,6 +11,11 @@
                  )
     </insert>
 
+    <select id="getUserNickName" resultType="String">
+        Select nickname
+        from user_table
+        where user_id = #{user_id}
+    </select>
     <select id="findUserById" resultType="com.review.shop.dto.user.UserInfoDTO">
         SELECT
             USER_ID,

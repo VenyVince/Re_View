@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './RegisterPage.css';
 import logo from '../../assets/logo.png';
 import { BAUMANN_BADGES, getBaumannBadge } from '../../assets/baumann';
-import axios from 'axios';
+import axiosClient from 'api/axiosClient';
 import InlineBaumannSurvey from './InlineBaumannSurvey';
 
 const REQUIRED_TERMS = [
@@ -130,7 +130,7 @@ export default function RegisterPage() {
         console.log('[REGISTER PAYLOAD]', payload);
 
         try {
-            const res = await axios.post('/api/auth/register', payload, {
+            const res = await axiosClient.post('/api/auth/register', payload, {
                 headers: { 'Content-Type': 'application/json' },
             });
 

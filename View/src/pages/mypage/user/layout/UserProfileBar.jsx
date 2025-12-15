@@ -1,6 +1,6 @@
 // src/pages/mypage/user/UserProfileBar.jsx
 import React, { useEffect, useState } from "react";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import { useAuth } from "../../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../dashboard/UserDashboard.css";

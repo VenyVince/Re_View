@@ -1,5 +1,6 @@
 // src/pages/product/ProductPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
+import axiosClient from "api/axiosClient";
 import { fetchProductsByCategory } from "../../api/products/productApi";
 
 import "./ProductPage.css";
@@ -9,88 +10,77 @@ import ProductSortSelect from "./components/ProductSortSelect";
 import ProductList from "./components/ProductList";
 
 export default function ProductPage() {
-    const CATEGORIES = ["스킨/토너", "에센스/세럼/앰플", "크림", "로션", "클렌징"];
-    const CATEGORY_MAP = {
-        "스킨/토너": ["스킨", "토너"],
-        "에센스/세럼/앰플": ["에센스", "세럼", "앰플"],
-        "크림": ["크림"],
-        "로션": ["로션"],
-        "클렌징": ["클렌징"],
-    };
+    const CATEGORIES = ["전체", "토너", "앰플", "크림", "로션", "클렌징"];
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [products, setProducts] = useState([]);
-    const [sortType, setSortType] = useState("recommend");
+    const [sortType, setSortType] = useState("latest");
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [loading, setLoading] = useState(false);
     const [brandReady, setBrandReady] = useState(false);
+    const [showTopBtn, setShowTopBtn] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-        setBrandReady(false);
-        setProducts([]);
-        setSelectedBrand(null);
+        setSelectedBrand(null); // 카테고리 바뀔 때만 초기화
 
-        async function load() {
-            try {
-                if (selectedCategory === null) {
-                    const res = await fetchProductsByCategory(null);
-                    const list = Array.isArray(res.data) ? res.data : (res.data?.content ?? []);
-                    setProducts(list);
-                    setBrandReady(true);
-                    return;
-                }
-
-                const categoriesToCall = CATEGORY_MAP[selectedCategory] || [];
-                const responses = await Promise.all(
-                    categoriesToCall.map((cat) => fetchProductsByCategory(cat))
-                );
-
-                // 🔧 이 줄이 핵심 수정!
-                const merged = responses.flatMap((res) =>
-                    Array.isArray(res.data) ? res.data : (res.data?.content ?? [])
-                );
-
-                const unique = Array.from(
-                    new Map(merged.map((item) => [item.product_id, item])).values()
-                );
-
-                setProducts(unique);
-                setBrandReady(true);
-            } catch (err) {
-                console.error("상품 조회 오류:", err);
-            } finally {
+        axiosClient.get("/api/products", {
+            params: {
+                sort: sortType,
+                category: selectedCategory === "전체" ? "" : selectedCategory,
+            },
+        })
+            .then((res) => {
+                setProducts(res.data || []);
                 setLoading(false);
-            }
-        }
-
-        load();
+            })
+            .catch(() => {
+                setProducts([]);
+                setLoading(false);
+            });
     }, [selectedCategory]);
 
+    // 정렬 변경 시
+    useEffect(() => {
+        setLoading(true);
+
+        axiosClient.get("/api/products", {
+            params: {
+                sort: sortType,
+                category: selectedCategory === "전체" ? "" : selectedCategory,
+            },
+        })
+            .then((res) => {
+                setProducts(res.data || []);
+                setLoading(false);
+            })
+            .catch(() => {
+                setProducts([]);
+                setLoading(false);
+            });
+    }, [sortType]);
+
+    const brandList = useMemo(() => {
+        const brands = products.map(p => p.prd_brand).filter(Boolean);
+        return Array.from(new Set(brands)).sort((a, b) => a.localeCompare(b));
+    }, [products]);
+
     const filteredProducts = useMemo(() => {
-        let items = [...products];
-
-        if (selectedBrand) {
-            items = items.filter((p) => p.prd_brand === selectedBrand);
-        }
-
-        switch (sortType) {
-            case "price_low":
-                return items.sort((a, b) => a.price - b.price);
-            case "price_high":
-                return items.sort((a, b) => b.price - a.price);
-            case "name":
-                return items.sort((a, b) => a.prd_name.localeCompare(b.prd_name));
-            default:
-                return items;
-        }
-    }, [products, selectedBrand, sortType]);
+        if (!selectedBrand) return products;
+        return products.filter(p => p.prd_brand === selectedBrand);
+    }, [products, selectedBrand]);
 
     const selectedText = (() => {
         const catLabel = selectedCategory === null ? "전체" : selectedCategory;
         if (selectedBrand) return `${catLabel} · ${selectedBrand}`;
         return catLabel;
     })();
+
+    useEffect(() => {
+        const onScroll = () => setShowTopBtn(window.scrollY > 300);
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
 
     return (
         <div className="productPageWrapper">
@@ -117,6 +107,17 @@ export default function ProductPage() {
             ) : (
                 <ProductList products={filteredProducts} />
             )}
+
+            {showTopBtn && (
+                <button
+                    className="pd-top-btn"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    <span className="top-arrow">∧</span>
+                    <span className="top-text">TOP</span>
+                </button>
+            )}
         </div>
+
     );
 }

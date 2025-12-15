@@ -39,7 +39,6 @@ public class ProductReview_SearchController {
             @Parameter(description = "평점 필터 (0~5)", example = "4.5")
             @RequestParam(required = false, defaultValue = "0") float filter_rating
     ){
-
         return ResponseEntity.ok(searchService.search(product_id, keyword, sort, filter_rating));
     }
 }

@@ -40,3 +40,25 @@
     margin-bottom: 16px;
     color: #111;
 }
+
+/* TOP 버튼 (상품 페이지용) */
+.pd-top-btn {
+    position: fixed;
+    right: 60px;
+    bottom: 120px;
+    width: 52px;
+    height: 52px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    z-index: 4000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}

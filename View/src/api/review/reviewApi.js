@@ -1,17 +1,16 @@
 // src/api/review/reviewApi.js
-import axiosClient from "../axiosClient";
-import axios from "axios";
+import axiosClient from "api/axiosClient";
 
 
 // MinIO Presigned URL 발급
 export const getPresignedUrls = async (params) => {
-    const response = await axios.post('/api/images/products/convert-datas', params);
+    const response = await axiosClient.post('/api/images/products/convert-datas', params);
     return response.data;
 };
 
 // 리뷰 생성
 export const createReview = async (productId, body) => {
-    const response = await axios.post(`/api/reviews/${productId}`, body);
+    const response = await axiosClient.post(`/api/reviews/${productId}`, body);
     return response.data;
 };
 
