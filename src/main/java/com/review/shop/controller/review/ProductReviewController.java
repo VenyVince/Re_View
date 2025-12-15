@@ -41,8 +41,13 @@ public class ProductReviewController {
     public ResponseEntity<List<ProductReviewDTO>> getProductReviews(
             @PathVariable int product_id,
             @RequestParam(value = "sort", defaultValue = "like_count") String sort) {
-
-            List<ProductReviewDTO> reviews = productReviewService.getProductReviews(product_id, sort);
+            int user_id = 0;
+            try {
+                user_id = security_Util.getCurrentUserId();
+            } catch (Exception e) {
+                user_id = 0;
+            }
+            List<ProductReviewDTO> reviews = productReviewService.getProductReviews(product_id, sort, user_id);
             return ResponseEntity.ok(reviews);
     }
 

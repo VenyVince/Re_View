@@ -18,7 +18,8 @@ public interface ProductReviewMapper {
      */
     List<ProductReviewDTO> selectReviewsByProduct(
             @Param("product_id") int product_id,
-            @Param("sort") String sort
+            @Param("sort") String sort,
+            @Param("user_id") int user_id
     );
 
     /**
