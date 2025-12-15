@@ -21,7 +21,7 @@ export default function ProductReviewSection({ productId }) {
         checkLogin();
     }, []);
 
-    // 리뷰 조회 (새로고침 시 상태 유지)
+    // 리뷰 목록 조회
     useEffect(() => {
         const fetchReviews = async () => {
             try {
@@ -46,17 +46,17 @@ export default function ProductReviewSection({ productId }) {
         if (productId) fetchReviews();
     }, [productId, sortType]);
 
-    // 👍 좋아요
+    // 좋아요 처리
     const toggleLike = async (id) => {
         if (!isLoggedIn) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        const target = reviewList.find(r => r.review_id === id);
+        const target = reviewList.find((r) => r.review_id === id);
         if (!target) return;
 
-        // 👎 상태에서 👍 클릭 → 경고만
+        // 싫어요 상태에서 좋아요 클릭 시 차단
         if (target.userDisliked) {
             alert("현재 선택을 취소한 뒤 다시 눌러주세요.");
             return;
@@ -67,11 +67,10 @@ export default function ProductReviewSection({ productId }) {
                 is_like: true,
             });
 
-            setReviewList(prev =>
-                prev.map(r => {
+            setReviewList((prev) =>
+                prev.map((r) => {
                     if (r.review_id !== id) return r;
 
-                    // 👍 취소
                     if (r.userLiked) {
                         return {
                             ...r,
@@ -80,7 +79,6 @@ export default function ProductReviewSection({ productId }) {
                         };
                     }
 
-                    // 👍 선택
                     return {
                         ...r,
                         like_count: r.like_count + 1,
@@ -93,17 +91,17 @@ export default function ProductReviewSection({ productId }) {
         }
     };
 
-    // 👎 싫어요
+    // 싫어요 처리
     const toggleDislike = async (id) => {
         if (!isLoggedIn) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        const target = reviewList.find(r => r.review_id === id);
+        const target = reviewList.find((r) => r.review_id === id);
         if (!target) return;
 
-        // 👍 상태에서 👎 클릭 → 경고만
+        // 좋아요 상태에서 싫어요 클릭 시 차단
         if (target.userLiked) {
             alert("현재 선택을 취소한 뒤 다시 눌러주세요.");
             return;
@@ -114,11 +112,10 @@ export default function ProductReviewSection({ productId }) {
                 is_like: false,
             });
 
-            setReviewList(prev =>
-                prev.map(r => {
+            setReviewList((prev) =>
+                prev.map((r) => {
                     if (r.review_id !== id) return r;
 
-                    // 👎 취소
                     if (r.userDisliked) {
                         return {
                             ...r,
@@ -127,7 +124,6 @@ export default function ProductReviewSection({ productId }) {
                         };
                     }
 
-                    // 👎 선택
                     return {
                         ...r,
                         dislike_count: r.dislike_count + 1,
