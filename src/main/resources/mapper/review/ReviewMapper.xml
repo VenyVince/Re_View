@@ -17,7 +17,12 @@
         r.content,
         r.rating,
         r.is_selected,
-        r.is_checked
+        r.is_checked,
+        (SELECT image_url
+        FROM product_image
+        WHERE product_id = p.product_id
+        AND is_thumbnail = 'Y'
+        AND ROWNUM = 1) AS product_image
         FROM review r
         JOIN USER_table u ON r.user_id = u.user_id
         JOIN product p ON r.product_id = p.product_id

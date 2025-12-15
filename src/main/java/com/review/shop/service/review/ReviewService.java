@@ -30,11 +30,19 @@ public class ReviewService {
         try {
             List<ReviewDTO> reviews = reviewMapper.selectReviewList(sort, category);
 
-            // 이미지 Presigned URL 처리
-            reviews.forEach(product -> {
-                if (product.getImage_url() != null && !product.getImage_url().isEmpty()) {
-                    String presignedUrl = imageService.presignedUrlGet(product.getImage_url());
-                    product.setImage_url(presignedUrl);
+            // 이미지 Presigned URL 처리 (리뷰 이미지 + 상품 썸네일)
+            reviews.forEach(review -> {
+
+                // 리뷰 이미지 변환
+                if (review.getImage_url() != null && !review.getImage_url().isEmpty()) {
+                    String presignedUrl = imageService.presignedUrlGet(review.getImage_url());
+                    review.setImage_url(presignedUrl);
+                }
+
+                // 2. 상품 썸네일 변환
+                if (review.getProduct_image() != null && !review.getProduct_image().isEmpty()) {
+                    String productUrl = imageService.presignedUrlGet(review.getProduct_image());
+                    review.setProduct_image(productUrl);
                 }
             });
 
