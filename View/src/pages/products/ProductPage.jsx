@@ -1,7 +1,6 @@
 // src/pages/product/ProductPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import axiosClient from "api/axiosClient";
-import { fetchProductsByCategory } from "../../api/products/productApi";
 
 import "./ProductPage.css";
 
@@ -17,17 +16,26 @@ export default function ProductPage() {
     const [sortType, setSortType] = useState("latest");
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [brandReady, setBrandReady] = useState(false);
     const [showTopBtn, setShowTopBtn] = useState(false);
 
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category);
+        setSelectedBrand(null);
+
+        setProducts([]);      // 카테고리 변경 즉시 초기화
+        setLoading(true);
+    };
+
     useEffect(() => {
         setLoading(true);
-        setSelectedBrand(null); // 카테고리 바뀔 때만 초기화
 
         axiosClient.get("/api/products", {
             params: {
                 sort: sortType,
-                category: selectedCategory === "전체" ? "" : selectedCategory,
+                category:
+                    selectedCategory === null || selectedCategory === "전체"
+                        ? ""
+                        : selectedCategory,
             },
         })
             .then((res) => {
@@ -38,36 +46,11 @@ export default function ProductPage() {
                 setProducts([]);
                 setLoading(false);
             });
-    }, [selectedCategory]);
-
-    // 정렬 변경 시
-    useEffect(() => {
-        setLoading(true);
-
-        axiosClient.get("/api/products", {
-            params: {
-                sort: sortType,
-                category: selectedCategory === "전체" ? "" : selectedCategory,
-            },
-        })
-            .then((res) => {
-                setProducts(res.data || []);
-                setLoading(false);
-            })
-            .catch(() => {
-                setProducts([]);
-                setLoading(false);
-            });
-    }, [sortType]);
-
-    const brandList = useMemo(() => {
-        const brands = products.map(p => p.prd_brand).filter(Boolean);
-        return Array.from(new Set(brands)).sort((a, b) => a.localeCompare(b));
-    }, [products]);
+    }, [selectedCategory, sortType]);
 
     const filteredProducts = useMemo(() => {
         if (!selectedBrand) return products;
-        return products.filter(p => p.prd_brand === selectedBrand);
+        return products.filter((p) => p.prd_brand === selectedBrand);
     }, [products, selectedBrand]);
 
     const selectedText = (() => {
@@ -89,7 +72,7 @@ export default function ProductPage() {
             <CategoryTabs
                 categories={CATEGORIES}
                 selected={selectedCategory}
-                onSelect={setSelectedCategory}
+                onSelect={handleCategorySelect}
                 products={products}
                 selectedBrand={selectedBrand}
                 onBrandSelect={setSelectedBrand}
@@ -97,7 +80,10 @@ export default function ProductPage() {
             />
 
             <div className="productTitleRow">
-                <ProductSortSelect sortType={sortType} setSortType={setSortType} />
+                <ProductSortSelect
+                    sortType={sortType}
+                    setSortType={setSortType}
+                />
             </div>
 
             {loading ? (
@@ -111,13 +97,14 @@ export default function ProductPage() {
             {showTopBtn && (
                 <button
                     className="pd-top-btn"
-                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    onClick={() =>
+                        window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                 >
                     <span className="top-arrow">∧</span>
                     <span className="top-text">TOP</span>
                 </button>
             )}
         </div>
-
     );
 }
