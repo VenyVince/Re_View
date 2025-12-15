@@ -82,10 +82,10 @@
     <!-- 리뷰 바우만 매칭 점수 -->
     <sql id="reviewBaumannScore">
         (
-            (CASE WHEN rb.FIRST  = #{userInfo[0]} THEN 25 ELSE 0 END) +
-                (CASE WHEN rb.SECOND = #{userInfo[1]} THEN 25 ELSE 0 END) +
-                (CASE WHEN rb.THIRD  = #{userInfo[2]} THEN 25 ELSE 0 END) +
-                (CASE WHEN rb.FOURTH = #{userInfo[3]} THEN 25 ELSE 0 END)
+            (CASE WHEN r.FIRST  = #{userInfo[0]} THEN 25 ELSE 0 END) +
+            (CASE WHEN r.SECOND = #{userInfo[1]} THEN 25 ELSE 0 END) +
+            (CASE WHEN r.THIRD  = #{userInfo[2]} THEN 25 ELSE 0 END) +
+            (CASE WHEN r.FOURTH = #{userInfo[3]} THEN 25 ELSE 0 END)
         )
     </sql>
     <!-- 리뷰 ResultMap -->
@@ -118,7 +118,7 @@
             FROM REVIEW r
             JOIN PRODUCT p ON r.product_id = p.product_id
             JOIN USER_TABLE u ON r.user_id = u.user_id
-            JOIN BAUMANN rb ON u.baumann_id = rb.baumann_id
+            JOIN BAUMANN rb ON u.baumann_id = r.baumann_id
             <!-- 리뷰 대표 이미지 1장 -->
             LEFT JOIN LATERAL (
                 SELECT image_url FROM REVIEW_IMAGES ri

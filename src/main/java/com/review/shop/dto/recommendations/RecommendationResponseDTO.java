@@ -13,8 +13,8 @@ public class RecommendationResponseDTO {
     private String message;
 
     @Schema(description = "추천 상품 리스트")
-    private List<RecommendProductDTO> recommended_products;
+    private List<RecommendProductDTO> products;
 
     @Schema(description = "추천 리뷰 리스트")
-    private List<RecommendReviewDTO> recommended_reviews;
+    private List<RecommendReviewDTO> reviews;
 }

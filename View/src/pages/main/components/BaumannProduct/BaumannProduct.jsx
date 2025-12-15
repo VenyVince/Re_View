@@ -8,12 +8,16 @@ import {
 } from "../../../../api/recommend/recommendApi.js";
 import { useNavigate } from "react-router-dom";
 
-export default function BaumannProduct() {
+export default function BaumannProduct({}) {
+    // 리뷰 이미지가 없을 때 할당할 이미지(상품 이미지 할당할거면 나중에 상품 이미지 url 할당시키면 됨.
+    const DEFAULT_REVIEW_IMAGE = "이미지 없음";
+
+    
     const navigate = useNavigate();
 
-    const [activeTag, setActiveTag] = useState("all");
-    const [currentType, setCurrentType] = useState(null);
     const [products, setProducts] = useState([]);
+    const [reviews, setReviews] = useState([]);
+    const [currentType, setCurrentType] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("product");
@@ -61,45 +65,52 @@ export default function BaumannProduct() {
         fetchUserType();
     }, []);
 
-    const mapProducts = (raw) => {
-        const mapped = raw.map((p) => ({
+    const mapProducts = (rawProducts) => {
+        return rawProducts.map((p) => ({
             id: p.product_id,
             name: p.prd_name,
             brand: p.prd_brand,
-            imageUrl: p.image_url,
+            imageUrl: p.product_image_url,
             price: p.price,
             rating: p.rating,
             ratingText: p.rating ? `${p.rating}/5.0` : "-",
-            discount: 0,
-            isBest: p.rating >= 4.5,
-            topReview: p.top_review_content
-                ? {
-                    id: p.top_review_id,
-                    content: p.top_review_content,
-                    rating: p.top_review_rating,
-                    likes: p.top_review_likes,
-                    productName: p.prd_name,
-                    reviewImageUrl: p.top_review_image_url
-                }
-                : null,
+            isBest: p.rating >= 4.5 //나중에 best리뷰이면 best띄우기
         }));
-
-        mapped.sort((a, b) => a.id - b.id);
-        return mapped;
     };
+
+    const mapReviews = (rawReviews) => {
+        return rawReviews.map(r => ({
+            id: r.review_id,
+            content: r.content,
+            rating: r.review_rating,
+            likes: r.like_count,
+            productId: r.product_id,
+            productName: r.prd_name,
+            imageUrl: r.review_image_url || DEFAULT_REVIEW_IMAGE,
+        }));
+    };
+
+    const productPageSize = 8;
+    const productStart = (productPage - 1) * productPageSize;
+    const displayedProducts = products.slice(productStart, productStart + productPageSize);
+    const productTotalPages = Math.ceil(products.length / productPageSize);
+
+    const reviewPageSize = 8;
+    const reviewStart = (reviewPage - 1) * reviewPageSize;
+    const displayedReviews = reviews.slice(reviewStart, reviewStart + reviewPageSize);
+    const reviewTotalPages = Math.ceil(reviews.length / reviewPageSize);
 
     const handleTagClick = async (group) => {
         try {
-            setActiveTag(group);
             setProductPage(1);
             setReviewPage(1);
             setLoading(true);
             setError("");
 
             const res = await fetchRecommendByGroup(group);
-            const raw = res.data?.recommended_products || [];
 
-            setProducts(mapProducts(raw));
+            setProducts(mapProducts(res.data?.products || []));
+            setReviews(mapReviews(res.data?.reviews || []));
         } catch {
             setError("추천 상품을 불러오지 못했습니다.");
         } finally {
@@ -107,7 +118,7 @@ export default function BaumannProduct() {
         }
     };
 
-    useEffect(() => {
+    useEffect((all) => {
         if (!currentType) {
             handleTagClick("all");
             return;
@@ -125,7 +136,6 @@ export default function BaumannProduct() {
         };
 
         const mappedType = typeMap[currentType] || "all";
-        setActiveTag(mappedType);
         handleTagClick(mappedType);
     }, [currentType]);
 
@@ -152,28 +162,11 @@ export default function BaumannProduct() {
 
     const selectedType = skinTypeList.find((t) => t.type === displayType);
 
-    const reviewList = products
-        .filter((p) => p.topReview)
-        .map((p) => ({
-            ...p.topReview,
-            productName: p.name,
-            brand: p.brand,
-            imageUrl: p.topReview.reviewImageUrl || p.imageUrl,
-        }));
 
-    const productPageSize = 16;
-    const productStart = (productPage - 1) * productPageSize;
-    const displayedProducts = products.slice(productStart, productStart + productPageSize);
-    const productTotalPages = Math.ceil(products.length / productPageSize);
-
-    const reviewPageSize = 16;
-    const reviewStart = (reviewPage - 1) * reviewPageSize;
-    const displayedReviews = reviewList.slice(reviewStart, reviewStart + reviewPageSize);
-    const reviewTotalPages = Math.ceil(reviewList.length / reviewPageSize);
 
     useEffect(() => {
-        if (activeTab === "product") setProductPage(1);
-        else setReviewPage(1);
+        if (activeTab === "review") setReviewPage(1);
+        else setProductPage(1);
     }, [activeTab]);
 
     return (
@@ -182,16 +175,16 @@ export default function BaumannProduct() {
 
             <div className="bauman-tabs">
                 <button
-                    className={activeTab === "product" ? "tab-active" : ""}
-                    onClick={() => setActiveTab("product")}
-                >
-                    추천상품
-                </button>
-                <button
                     className={activeTab === "review" ? "tab-active" : ""}
                     onClick={() => setActiveTab("review")}
                 >
                     리뷰
+                </button>
+                <button
+                    className={activeTab === "product" ? "tab-active" : ""}
+                    onClick={() => setActiveTab("product")}
+                >
+                    상품
                 </button>
             </div>
 
@@ -214,28 +207,6 @@ export default function BaumannProduct() {
                                         ))}
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="bauman-tag-buttons">
-                                <button
-                                    className={`bauman-tag-btn ${activeTag === "all" ? "active-tag" : ""}`}
-                                    onClick={() => handleTagClick("all")}
-                                >
-                                    맞춤
-                                </button>
-
-                                {selectedType.tags.map((tag, index) => {
-                                    const group = tagToGroup[tag];
-                                    return (
-                                        <button
-                                            key={index}
-                                            className={`bauman-tag-btn ${activeTag === group ? "active-tag" : ""}`}
-                                            onClick={() => handleTagClick(group)}
-                                        >
-                                            {tag}
-                                        </button>
-                                    );
-                                })}
                             </div>
                         </div>
                     </div>
@@ -328,13 +299,13 @@ export default function BaumannProduct() {
                         <div className={currentType ? "" : "blur-block"}>
                             <div className="review-list-area">
 
-                                {reviewList.length === 0 && (
+                                {reviews.length === 0 && (
                                     <p style={{ textAlign: "center", marginTop: "40px" }}>
                                         아직 이 타입에 대한 리뷰가 없습니다.
                                     </p>
                                 )}
 
-                                {reviewList.length > 0 && (
+                                {reviews.length > 0 && (
                                     <>
                                         <div className="review-grid">
                                             {displayedReviews.map((review) => (

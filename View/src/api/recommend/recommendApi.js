@@ -7,6 +7,6 @@ export const fetchMyBaumannType = () => {
 };
 
 // 개별 그룹 추천 (first, second, third, fourth, all까지 포함)
-export const fetchRecommendByGroup = (group) => {
-    return axiosClient.post(`/api/recommendations/${group}`);
+export const fetchRecommendByGroup = () => {
+    return axiosClient.post("/api/recommendations/all");
 };

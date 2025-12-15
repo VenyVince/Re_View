@@ -79,9 +79,8 @@ public class RecommendationsService {
 
         RecommendationResponseDTO response = new RecommendationResponseDTO();
         response.setMessage("추천 상품 및 리뷰 조회에 성공했습니다.");
-        response.setRecommended_products(products.stream().limit(16).toList());
-        response.setRecommended_reviews(reviews.stream().limit(16).toList());
-
+        response.setProducts(products.stream().limit(16).toList());
+        response.setReviews(reviews.stream().limit(16).toList());
         return response;
     }
 
