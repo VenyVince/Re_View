@@ -450,9 +450,6 @@ export default function UserDeliveryPage() {
 
                 {/* 날짜 필터 (1개월보다 이전 내역 조회용) */}
                 <div className="delivery-order-datefilter">
-                    <div className="delivery-order-datefilter-text">
-                        *기본 화면에서는 주문완료/배송중/배송완료(리뷰 미작성)만 표시됩니다.
-                    </div>
                     <div className="delivery-order-datefilter-controls">
                         <span className="delivery-order-datefilter-label">조회 기간</span>
                         <input
@@ -760,6 +757,7 @@ export default function UserDeliveryPage() {
                     </div>
                 </div>
             )}
+
             {/* 리뷰 작성 선택 모달 (주문 내 작성 가능한 상품 목록) */}
             {reviewSelectOpen && (
                 <div className="delivery-modal-backdrop" onClick={closeReviewSelectModal}>
@@ -779,58 +777,27 @@ export default function UserDeliveryPage() {
                         )}
 
                         {!reviewSelectLoading && !reviewSelectError && reviewSelectItems.length > 0 && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
+                            <div className="review-select-list">
                                 {reviewSelectItems.map((item) => (
                                     <div
                                         key={item.order_item_id}
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "space-between",
-                                            gap: 12,
-                                            padding: "12px 14px",
-                                            border: "1px solid #eee",
-                                            borderRadius: 12,
-                                            background: "#fff",
-                                        }}
+                                        className="review-select-item"
                                     >
-                                        <div
-                                            style={{
-                                                flex: 1,
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                alignItems: "center",
-                                                textAlign: "center",
-                                                overflow: "hidden",
-                                            }}
-                                        >
-                                            <div
-                                                style={{
-                                                    fontWeight: 700,
-                                                    width: "100%",
-                                                    whiteSpace: "nowrap",
-                                                    overflow: "hidden",
-                                                    textOverflow: "ellipsis",
-                                                }}
-                                            >
+                                        <div className="review-select-info">
+                                            <div className="review-select-name">
                                                 {item.product_name || item.prd_name || "상품"}
                                             </div>
-                                            <div style={{ fontSize: 13, color: "#777" }}>
-                                                주문상품번호 {item.order_item_id}
+                                            <div className="review-select-sub">
+                                                {item.quantity ? `구매 수량 ${item.quantity}개` : null}
                                             </div>
                                         </div>
 
                                         <button
                                             type="button"
-                                            className="delivery-order-action-btn"
+                                            className="review-select-btn"
                                             onClick={() => {
                                                 closeReviewSelectModal();
-                                                navigate(`/review/write/${item.product_id}`, {
-                                                    // state: {
-                                                    //     orderItemId: item.order_item_id,
-                                                    //     orderId: reviewSelectOrderId,
-                                                    // },
-                                                });
+                                                navigate(`/review/write/${item.order_item_id}`);
                                             }}
                                         >
                                             리뷰 작성
@@ -839,6 +806,7 @@ export default function UserDeliveryPage() {
                                 ))}
                             </div>
                         )}
+
 
                         <div className="delivery-modal-actions" style={{ marginTop: 16 }}>
                             <button type="button" className="delivery-modal-close-btn" onClick={closeReviewSelectModal}>

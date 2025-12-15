@@ -1,6 +1,6 @@
 // src/pages/review/ReviewWrite.jsx
 import React, {useEffect, useState} from "react";
-import { useNavigate,useParams,useSearchParams } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { createReview, getPresignedUrls, fetchOrderDetail,fetchOrders } from "../../api/review/reviewApi";
 import {
@@ -72,8 +72,7 @@ const ReviewWrite = () => {
     const [submitting, setSubmitting] = useState(false);
     const [openModal, setOpenModal] = useState(false);
 
-    const [searchParams] = useSearchParams();
-    const orderItemId = searchParams.get("orderItemId");
+    const { orderItemId } = useParams();
 
     // 리뷰 길이 상태
     const trimmedContent = content.trim();
