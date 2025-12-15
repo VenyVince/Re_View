@@ -18,6 +18,7 @@
         r.rating,
         r.is_selected,
         r.is_checked,
+        -- 상품 썸네일 가져오기 (서브쿼리)
         (SELECT image_url
         FROM product_image
         WHERE product_id = p.product_id
@@ -26,6 +27,7 @@
         FROM review r
         JOIN USER_table u ON r.user_id = u.user_id
         JOIN product p ON r.product_id = p.product_id
+        -- 리뷰 이미지 중 첫 번째 것만 가져오기 (1:1 매핑 효과)
         LEFT JOIN (
         SELECT review_id, image_url,
         ROW_NUMBER() OVER (PARTITION BY review_id ORDER BY review_image_id) AS rn
@@ -60,6 +62,9 @@
                 ORDER BY r.like_count DESC, r.created_at DESC
             </otherwise>
         </choose>
+
+        OFFSET #{offset} ROWS
+        FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="getReviewBase" resultType="com.review.shop.dto.review.ReviewDetailResponseDTO$ReviewDetailDTO">
