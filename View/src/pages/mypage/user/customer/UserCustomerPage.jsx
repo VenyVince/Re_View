@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserCustomerPage.css";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import { faqDummy } from "../dummy/customerDummy"; // FAQ 는 더미 그대로 사용
 
 export default function UserCustomerPage() {

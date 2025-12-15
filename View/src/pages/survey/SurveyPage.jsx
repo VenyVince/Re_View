@@ -51,7 +51,7 @@ export default function SurveyPage() {
         // 2) 로컬 저장
         localStorage.setItem("surveyResult", JSON.stringify({ type, score: tally }));
 
-        // 3) 서버 제출 (axios 연동)
+        // 3) 서버 제출 (axios(axiosClient) 연동)
         try {
             const userId = localStorage.getItem("userId") || "user123";
             const answers = selectionsToAnswerArray(selections); // [0,2,1,...]

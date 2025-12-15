@@ -63,6 +63,7 @@ import OrderCompletePage from "./pages/order/OrderCompletePage";
 import UserProtectedRoute from "./components/user/UserProtectedRoute";
 import UserOrderDetailPage from "./pages/mypage/user/delivery/UserOrderDetailPage";
 import UserPointHistoryPage from "./pages/mypage/user/UserPointHistoryPage";
+import ReviewDetailPage from "./pages/reviewDetail/ReviewDetailPage";
 
 export default function App() {
     return (
@@ -139,6 +140,10 @@ export default function App() {
 
                     <Route path="/order/payment" element={<OrderPaymentPage />} />
                     <Route path="/order/complete" element={<OrderCompletePage />} />
+
+                    <Route path="/review/write" element={<ReviewWrite />} />
+                    <Route path="/review/write/:product_id" element={<ReviewWrite />} />
+                    <Route path="/review/:reviewId" element={<ReviewDetailPage />} />
                 </Route>
             </Routes>
             </main>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosClient from "api/axiosClient"
 import { useNavigate } from 'react-router-dom'; // 1. useNavigate 추가
 import './BestReview.css';
 
@@ -22,7 +22,7 @@ export default function AdminPick() {
     useEffect(() => {
         const fetchAdminPick = async () => {
             try {
-                const response = await axios.get('/api/recommendations/admin-pick');
+                const response = await axiosClient.get('/api/recommendations/admin-pick');
                 const wrapper = response.data;
 
                 if (wrapper.admin_pick) {

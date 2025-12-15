@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import logo from '../../assets/logo.png';
 import { useNavigate, Link } from 'react-router-dom';
-import axiosClient from "../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
@@ -43,9 +43,9 @@ export default function LoginPage() {
                 const me = await axiosClient.get("/api/auth/me", { withCredentials: true });
 
                 if (me.data.role === "ROLE_ADMIN") {
-                    navigate('/admin/allproducts');
+                    navigate('/');
                 } else {
-                    navigate('/mypage');
+                    navigate('/');
                 }
 
                 return;

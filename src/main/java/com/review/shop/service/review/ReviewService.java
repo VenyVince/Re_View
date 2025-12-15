@@ -4,7 +4,6 @@ import com.review.shop.dto.review.ReviewDTO;
 import com.review.shop.dto.review.ReviewDetailResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.ResourceNotFoundException;
-import com.review.shop.exception.WrongRequestException;
 import com.review.shop.image.ImageService;
 import com.review.shop.repository.review.ReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +25,24 @@ public class ReviewService {
 
     public List<ReviewDTO> getReviewList(String sort, String category) {
         // 정렬 옵션 기본값 및 검증
-        if (sort == null || sort.isEmpty()) sort = "like_count";
-        if (!sort.equals("latest") && !sort.equals("rating") && !sort.equals("like_count")) {
-            throw new WrongRequestException("정렬 옵션이 올바르지 않습니다.");
-        }
+        if (sort == null || sort.isEmpty()) sort = "latest";
 
         try {
             List<ReviewDTO> reviews = reviewMapper.selectReviewList(sort, category);
 
-            // 이미지 Presigned URL 처리
-            reviews.forEach(product -> {
-                if (product.getImage_url() != null && !product.getImage_url().isEmpty()) {
-                    String presignedUrl = imageService.presignedUrlGet(product.getImage_url());
-                    product.setImage_url(presignedUrl);
+            // 이미지 Presigned URL 처리 (리뷰 이미지 + 상품 썸네일)
+            reviews.forEach(review -> {
+
+                // 리뷰 이미지 변환
+                if (review.getImage_url() != null && !review.getImage_url().isEmpty()) {
+                    String presignedUrl = imageService.presignedUrlGet(review.getImage_url());
+                    review.setImage_url(presignedUrl);
+                }
+
+                // 2. 상품 썸네일 변환
+                if (review.getProduct_image() != null && !review.getProduct_image().isEmpty()) {
+                    String productUrl = imageService.presignedUrlGet(review.getProduct_image());
+                    review.setProduct_image(productUrl);
                 }
             });
 

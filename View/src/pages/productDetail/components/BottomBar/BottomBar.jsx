@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BottomBar.css";
 
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 export default function BottomBar({
                                       wish,

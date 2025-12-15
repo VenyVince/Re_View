@@ -1,7 +1,7 @@
 // src/pages/search/SearchPage.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "api/axiosClient";
 import "./SearchPage.css";
 import CategoryFilter from "./components/CategoryFilter";
 import BrandFilter from "./components/BrandFilter";
@@ -44,10 +44,10 @@ export default function SearchPage() {
             }
 
             try {
-                const res = await axios.get("/api/search", {
+                const res = await axiosClient.get("/api/search", {
                     params: {
                         keyword,
-                        sort: "latest",
+                        sort: sortType,
                         filter_rating: 0
                     }
                 });
@@ -95,16 +95,6 @@ export default function SearchPage() {
 
                 setBrands(sortedBrands);
 
-                /** -------------------------------------------
-                 * 4) 리뷰 모드 자동 전환
-                 ------------------------------------------- */
-                if (filteredReviews.length > 0 && filteredProducts.length === 0) {
-                    setMode("review");
-                } else {
-                    setMode("product");
-                }
-
-                setError("");
 
             } catch {
                 setError("검색 결과를 불러오지 못했습니다.");
@@ -117,7 +107,7 @@ export default function SearchPage() {
         };
 
         fetchSearch();
-    }, [keyword, selectedCategory]);
+    }, [keyword, selectedCategory, sortType, mode, selectedBrand]);
 
     return (
         <section className="search-page">

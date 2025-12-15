@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./QnaSection.css";
 
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 export default function QnaSection({ productId }) {
     const [openId, setOpenId] = useState(null);

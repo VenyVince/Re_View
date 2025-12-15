@@ -6,13 +6,8 @@
 
     <select id="selectProductList" resultType="com.review.shop.dto.product.ProductDTO">
         SELECT
-        p.product_id,
-        p.prd_name,
-        p.prd_brand,
-        pi.image_url,
-        p.price,
-        p.category,
-        p.rating
+        p.product_id,p.prd_name, p.prd_brand, p.price, p.category, p.rating,
+        pi.image_url
         FROM product p
         LEFT JOIN product_image pi ON p.product_id = pi.product_id
         AND pi.is_thumbnail = 'Y'
@@ -25,11 +20,26 @@
 
         <trim prefix="ORDER BY">
             <choose>
-                <when test="sort == 'rating'">
+                <when test="sort == 'low_rating'">
+                    p.rating ASC, p.product_id DESC
+                </when>
+                <when test="sort == 'high_rating'">
                     p.rating DESC, p.product_id DESC
                 </when>
-                <when test="sort == 'price'">
+                <when test="sort == 'low_price'">
+                p.price ASC, p.product_id DESC
+                </when>
+                <when test="sort == 'high_price'">
                     p.price ASC, p.product_id DESC
+                </when>
+                <when test="sort == 'name'">
+                    p.prd_name ASC
+                </when>
+                <when test="sort == 'popular'">
+                    p.review_count ASC, p.product_id DESC
+                </when>
+                <when test="sort == 'latest'">
+                    p.created_at DESC, p.product_id DESC
                 </when>
                 <otherwise>
                     p.product_id DESC

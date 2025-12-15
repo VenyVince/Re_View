@@ -22,4 +22,6 @@ public class ReviewDTO {
     private float rating;           // 평점
     private String is_selected;     // 베스트 리뷰 선정 여부 ('0' or '1')
     private String is_checked;      // 관리자 확인 여부 ('0' or '1')
+    private String product_image;   //상품 썸네일 이미지 (리뷰 사진 없을 때 보여줄 용도)
+
 }

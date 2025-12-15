@@ -1,6 +1,6 @@
 // src/pages/mypage/user/review/UserReviewPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserReviewPage.css";
 import { useNavigate } from "react-router-dom";
@@ -46,11 +46,11 @@ export default function UserMyReviewPage() {
     // - Vite: VITE_MINIO_URL / VITE_MINIO_BUCKET
     const MINIO_URL =
         (typeof process !== "undefined" && process.env && process.env.REACT_APP_MINIO_URL) ||
-        (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_MINIO_URL) ||
+        // (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_MINIO_URL) ||
         "";
     const MINIO_BUCKET =
         (typeof process !== "undefined" && process.env && process.env.REACT_APP_MINIO_BUCKET) ||
-        (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_MINIO_BUCKET) ||
+        // (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_MINIO_BUCKET) ||
         "";
 
 
@@ -59,7 +59,7 @@ export default function UserMyReviewPage() {
     //   이 값이 없으면 프록시는 절대 사용하지 않도록 처리합니다.
     const IMAGE_PROXY_BASE =
         (typeof process !== "undefined" && process.env && process.env.REACT_APP_IMAGE_PROXY_BASE) ||
-        (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_IMAGE_PROXY_BASE) ||
+        // (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_IMAGE_PROXY_BASE) ||
         "";
 
     // 날짜 포맷 (YYYY-MM-DD)

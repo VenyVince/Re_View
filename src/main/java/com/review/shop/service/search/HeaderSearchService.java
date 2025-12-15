@@ -11,9 +11,8 @@ import com.review.shop.repository.search.header.HeaderSearchReviewMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import java.util.Comparator;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,14 +95,13 @@ public class HeaderSearchService {
     }
 
     private void convertReviewImages(HeaderSearchReviewDTO review) {
-        List<String> keys = review.getImage_urls();
-        if (keys != null && !keys.isEmpty()) {
-            List<String> urls = keys.stream()
-                    .map(key -> imageService.presignedUrlGet(key))
-                    .collect(Collectors.toList());
-            review.setImage_urls(urls);
+        String key = review.getImage_url();
+
+        if (key != null && !key.isEmpty()) {
+            String url = imageService.presignedUrlGet(key);
+            review.setImage_url(url);
         } else {
-            review.setImage_urls(new ArrayList<>());
+            review.setImage_url(null);
         }
     }
 

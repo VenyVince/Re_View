@@ -1,7 +1,7 @@
 // src/pages/mypage/user/UserProfileEdit.jsx
 import React, { useEffect, useState } from "react";
 import "../layout/UserProfileEdit.css";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 import { useNavigate } from "react-router-dom";
 
 export default function UserProfileEdit() {

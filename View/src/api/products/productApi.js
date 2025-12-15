@@ -1,5 +1,5 @@
 // src/api/products/productApi.js
-import axiosClient from "../axiosClient";
+import axiosClient from "api/axiosClient";
 
 export const fetchProductsByCategory = async (category) => {
     return axiosClient.get("/api/products", {

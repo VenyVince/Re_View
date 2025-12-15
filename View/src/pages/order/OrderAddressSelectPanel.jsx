@@ -1,6 +1,6 @@
 // src/pages/order/OrderAddressSelectPanel.jsx
 import React, { useEffect, useState } from "react";
-import axiosClient from "../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 export default function OrderAddressSelectPanel({
                                                     currentAddress,      // { postal_code, address, detail_address, ... }

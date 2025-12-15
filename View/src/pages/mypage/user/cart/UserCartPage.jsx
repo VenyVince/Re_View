@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import "./UserCartPage.css";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import { useNavigate } from "react-router-dom";
-import axiosClient from "../../../../api/axiosClient";
+import axiosClient from "api/axiosClient";
 
 export default function UserCartPage() {
     const navigate = useNavigate();
