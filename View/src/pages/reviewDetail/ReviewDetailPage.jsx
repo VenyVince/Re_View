@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./ReviewDetailPage.css";
-
 import axiosClient from "api/axiosClient";
 
 import ReviewDetailHeader from "./components/ReviewDetailHeader";
@@ -14,141 +13,84 @@ export default function ReviewDetailPage() {
 
     const [review, setReview] = useState(null);
     const [comments, setComments] = useState([]);
+    const [pending, setPending] = useState(false);
 
-    // 리뷰 상세 + 댓글 조회
+    const fetchReview = async () => {
+        const res = await axiosClient.get(`/api/reviews/${reviewId}?t=${Date.now()}`);
+        const r = res.data.review;
+        const p = res.data.product;
+        setReview({
+            ...r,
+            prd_brand: p.prd_brand,
+            prd_name: p.prd_name,
+            product_image: p.product_image,
+            price: p.price,
+            category: p.category,
+        });
+        setComments(res.data.comments || []);
+    };
+
     useEffect(() => {
-        axiosClient.get(`/api/reviews/${reviewId}`)
-            .then((res) => {
-                const r = res.data.review;
-                const p = res.data.product;
-
-                setReview({
-                    ...r,
-                    prd_brand: p.prd_brand,
-                    prd_name: p.prd_name,
-                    product_image: p.product_image,
-                    price: p.price,
-                    category: p.category,
-                });
-
-                setComments(res.data.comments || []);
-            })
-            .catch((err) => {
-                console.error("리뷰 상세 조회 오류:", err);
-            });
+        fetchReview().catch((err) => console.error("리뷰 상세 조회 오류:", err));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reviewId]);
 
     if (!review) return <div>불러오는 중...</div>;
 
-    // 댓글 작성 후 재조회
     const handleCommentSubmit = async () => {
         try {
-            const res = await axiosClient.get(`/api/reviews/${reviewId}`);
+            const res = await axiosClient.get(`/api/reviews/${reviewId}?t=${Date.now()}`);
             setComments(res.data.comments || []);
         } catch (err) {
-            if (err.response?.status === 401) {
-                alert("로그인이 필요합니다.");
-            } else {
-                console.error(err);
-            }
+            if (err.response?.status === 401) alert("로그인이 필요합니다.");
+            else console.error(err);
         }
     };
 
-    // 댓글 삭제
     const handleDeleteComment = async (commentId) => {
         if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
-
         try {
             await axiosClient.delete(`/api/reviews/comments/${commentId}`);
-
-            const res = await axiosClient.get(`/api/reviews/${reviewId}`);
+            const res = await axiosClient.get(`/api/reviews/${reviewId}?t=${Date.now()}`);
             setComments(res.data.comments || []);
         } catch (err) {
-            if (err.response?.status === 401) {
-                alert("로그인이 필요합니다.");
-            } else if (err.response?.status === 403) {
-                alert("본인 댓글만 삭제할 수 있습니다.");
-            } else {
-                console.error(err);
-            }
+            if (err.response?.status === 401) alert("로그인이 필요합니다.");
+            else if (err.response?.status === 403) alert("본인 댓글만 삭제할 수 있습니다.");
+            else console.error(err);
         }
     };
 
-    // 리뷰 좋아요
     const handleLike = async () => {
+        if (pending) return;
+        setPending(true);
         try {
             if (review.user_disliked) {
-                await axiosClient.post(
-                    `/api/reviews/${reviewId}/reaction`,
-                    { is_like: false }
-                );
+                await axiosClient.post(`/api/reviews/${reviewId}/reaction`, { is_like: false });
             }
-
-            await axiosClient.post(
-                `/api/reviews/${reviewId}/reaction`,
-                { is_like: true }
-            );
-
-            const res = await axiosClient.get(
-                `/api/reviews/${reviewId}?t=${Date.now()}`
-            );
-
-            const r = res.data.review;
-            const p = res.data.product;
-
-            setReview({
-                ...r,
-                prd_brand: p.prd_brand,
-                prd_name: p.prd_name,
-                product_image: p.product_image,
-                price: p.price,
-                category: p.category,
-            });
+            await axiosClient.post(`/api/reviews/${reviewId}/reaction`, { is_like: true });
+            await fetchReview();
         } catch (err) {
-            if (err.response?.status === 401) {
-                alert("로그인이 필요합니다.");
-            } else {
-                console.error(err);
-            }
+            if (err.response?.status === 401) alert("로그인이 필요합니다.");
+            else console.error(err);
+        } finally {
+            setPending(false);
         }
     };
 
-    // 리뷰 싫어요
     const handleDislike = async () => {
+        if (pending) return;
+        setPending(true);
         try {
             if (review.user_liked) {
-                await axiosClient.post(
-                    `/api/reviews/${reviewId}/reaction`,
-                    { is_like: true }
-                );
+                await axiosClient.post(`/api/reviews/${reviewId}/reaction`, { is_like: true });
             }
-
-            await axiosClient.post(
-                `/api/reviews/${reviewId}/reaction`,
-                { is_like: false }
-            );
-
-            const res = await axiosClient.get(
-                `/api/reviews/${reviewId}?t=${Date.now()}`
-            );
-
-            const r = res.data.review;
-            const p = res.data.product;
-
-            setReview({
-                ...r,
-                prd_brand: p.prd_brand,
-                prd_name: p.prd_name,
-                product_image: p.product_image,
-                price: p.price,
-                category: p.category,
-            });
+            await axiosClient.post(`/api/reviews/${reviewId}/reaction`, { is_like: false });
+            await fetchReview();
         } catch (err) {
-            if (err.response?.status === 401) {
-                alert("로그인이 필요합니다.");
-            } else {
-                console.error(err);
-            }
+            if (err.response?.status === 401) alert("로그인이 필요합니다.");
+            else console.error(err);
+        } finally {
+            setPending(false);
         }
     };
 
@@ -159,6 +101,7 @@ export default function ReviewDetailPage() {
                     review={review}
                     onLike={handleLike}
                     onDislike={handleDislike}
+                    pending={pending}
                 />
                 <ReviewDetailContent review={review} />
             </section>

@@ -1,6 +1,6 @@
+// src/pages/productDetail/components/ProductReviewSection.jsx
 import React, { useState, useEffect } from "react";
 import "./ProductReviewSection.css";
-
 import axiosClient from "api/axiosClient";
 
 export default function ProductReviewSection({ productId }) {
@@ -21,102 +21,127 @@ export default function ProductReviewSection({ productId }) {
         checkLogin();
     }, []);
 
-    // 리뷰 목록 조회 (정렬은 백엔드에서 처리)
+    // 리뷰 조회 (새로고침 시 상태 유지)
     useEffect(() => {
         const fetchReviews = async () => {
             try {
                 const res = await axiosClient.get(
                     `/api/reviews/${productId}/reviews`,
-                    {
-                        params: {
-                            sort: sortType,
-                        },
-                    }
+                    { params: { sort: sortType } }
                 );
 
                 const formatted = res.data.map((r) => ({
                     ...r,
                     rating: Math.round(r.rating),
-                    userLiked: false,
-                    userDisliked: false,
+                    userLiked: r.user_liked,
+                    userDisliked: r.user_disliked,
                 }));
 
                 setReviewList(formatted);
             } catch (err) {
-                console.error("리뷰 불러오기 오류:", err);
+                console.error(err);
             }
         };
 
         if (productId) fetchReviews();
     }, [productId, sortType]);
 
-    // 좋아요 토글 (프론트 상태만 변경)
-    const toggleLike = (id) => {
+    // 👍 좋아요
+    const toggleLike = async (id) => {
         if (!isLoggedIn) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        setReviewList((prev) =>
-            prev.map((rev) => {
-                if (rev.review_id !== id) return rev;
+        const target = reviewList.find(r => r.review_id === id);
+        if (!target) return;
 
-                if (!rev.userLiked) {
+        // 👎 상태에서 👍 클릭 → 경고만
+        if (target.userDisliked) {
+            alert("현재 선택을 취소한 뒤 다시 눌러주세요.");
+            return;
+        }
+
+        try {
+            await axiosClient.post(`/api/reviews/${id}/reaction`, {
+                is_like: true,
+            });
+
+            setReviewList(prev =>
+                prev.map(r => {
+                    if (r.review_id !== id) return r;
+
+                    // 👍 취소
+                    if (r.userLiked) {
+                        return {
+                            ...r,
+                            like_count: r.like_count - 1,
+                            userLiked: false,
+                        };
+                    }
+
+                    // 👍 선택
                     return {
-                        ...rev,
-                        like_count: rev.like_count + 1,
-                        dislike_count: rev.userDisliked
-                            ? rev.dislike_count - 1
-                            : rev.dislike_count,
+                        ...r,
+                        like_count: r.like_count + 1,
                         userLiked: true,
-                        userDisliked: false,
                     };
-                }
-
-                return {
-                    ...rev,
-                    like_count: rev.like_count - 1,
-                    userLiked: false,
-                };
-            })
-        );
+                })
+            );
+        } catch (err) {
+            console.error("좋아요 처리 실패", err);
+        }
     };
 
-    // 싫어요 토글 (프론트 상태만 변경)
-    const toggleDislike = (id) => {
+    // 👎 싫어요
+    const toggleDislike = async (id) => {
         if (!isLoggedIn) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        setReviewList((prev) =>
-            prev.map((rev) => {
-                if (rev.review_id !== id) return rev;
+        const target = reviewList.find(r => r.review_id === id);
+        if (!target) return;
 
-                if (!rev.userDisliked) {
+        // 👍 상태에서 👎 클릭 → 경고만
+        if (target.userLiked) {
+            alert("현재 선택을 취소한 뒤 다시 눌러주세요.");
+            return;
+        }
+
+        try {
+            await axiosClient.post(`/api/reviews/${id}/reaction`, {
+                is_like: false,
+            });
+
+            setReviewList(prev =>
+                prev.map(r => {
+                    if (r.review_id !== id) return r;
+
+                    // 👎 취소
+                    if (r.userDisliked) {
+                        return {
+                            ...r,
+                            dislike_count: r.dislike_count - 1,
+                            userDisliked: false,
+                        };
+                    }
+
+                    // 👎 선택
                     return {
-                        ...rev,
-                        dislike_count: rev.dislike_count + 1,
-                        like_count: rev.userLiked
-                            ? rev.like_count - 1
-                            : rev.like_count,
+                        ...r,
+                        dislike_count: r.dislike_count + 1,
                         userDisliked: true,
-                        userLiked: false,
                     };
-                }
-
-                return {
-                    ...rev,
-                    dislike_count: rev.dislike_count - 1,
-                    userDisliked: false,
-                };
-            })
-        );
+                })
+            );
+        } catch (err) {
+            console.error("싫어요 처리 실패", err);
+        }
     };
 
     return (
         <div className="review-wrapper">
-            {/* 정렬 탭 */}
             <div className="review-sort">
                 <span
                     className={sortType === "latest" ? "active" : ""}
@@ -124,14 +149,12 @@ export default function ProductReviewSection({ productId }) {
                 >
                     최신순
                 </span>
-
                 <span
                     className={sortType === "rating" ? "active" : ""}
                     onClick={() => setSortType("rating")}
                 >
                     평점순
                 </span>
-
                 <span
                     className={sortType === "like" ? "active" : ""}
                     onClick={() => setSortType("like")}
@@ -140,7 +163,6 @@ export default function ProductReviewSection({ productId }) {
                 </span>
             </div>
 
-            {/* 리뷰 리스트 */}
             <div className="review-list">
                 {reviewList.length === 0 && (
                     <div className="review-empty">
@@ -153,30 +175,26 @@ export default function ProductReviewSection({ productId }) {
                         <div className="review-top">
                             <div className="left">
                                 <span className="nickname">{r.nickname}</span>
-                                <span className="baumann">
-                                    {r.baumann_type}
-                                </span>
+                                <span className="baumann">{r.baumann_type}</span>
                             </div>
 
                             <div className="right">
                                 <span
-                                    className={`like ${
-                                        r.userLiked ? "active" : ""
-                                    }`}
-                                    onClick={() =>
-                                        toggleLike(r.review_id)
-                                    }
+                                    className={`like ${r.userLiked ? "active" : ""}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleLike(r.review_id);
+                                    }}
                                 >
                                     👍 {r.like_count}
                                 </span>
 
                                 <span
-                                    className={`dislike ${
-                                        r.userDisliked ? "active" : ""
-                                    }`}
-                                    onClick={() =>
-                                        toggleDislike(r.review_id)
-                                    }
+                                    className={`dislike ${r.userDisliked ? "active" : ""}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleDislike(r.review_id);
+                                    }}
                                 >
                                     👎 {r.dislike_count}
                                 </span>
@@ -188,16 +206,11 @@ export default function ProductReviewSection({ productId }) {
                                 {"★".repeat(r.rating)}
                                 {"☆".repeat(5 - r.rating)}
                             </span>
-                            <span className="rating-num">
-                                {r.rating}/5
-                            </span>
+                            <span className="rating-num">{r.rating}/5</span>
                         </div>
 
                         <div className="review-body">
-                            <div className="review-content">
-                                {r.content}
-                            </div>
-
+                            <div className="review-content">{r.content}</div>
                             <div className="review-extra">
                                 {r.images?.length > 0 && (
                                     <img
