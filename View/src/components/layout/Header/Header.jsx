@@ -23,7 +23,6 @@ export default function Header() {
     };
 
     const handleLogoClick = () => {
-        logout();
         navigate('/', { replace: true });
     };
 
