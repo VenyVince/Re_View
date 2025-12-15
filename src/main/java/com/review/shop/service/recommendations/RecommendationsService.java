@@ -29,10 +29,9 @@ public class RecommendationsService {
         return baumannId;
     }
 
-    public RecommendationsUserDTO getBaumannDTOWithId(Integer baumannId) {
-        RecommendationsUserDTO dto =
-                recommendationsMapper.getBaumannDTOWithId(baumannId);
-
+    public BaumannDTO getBaumannDTOWithId(Integer baumann_id) {
+        BaumannDTO dto =
+                recommendationsMapper.getBaumannDTOWithId(baumann_id);
         if (dto == null) {
             throw new ResourceNotFoundException("해당 바우만 타입이 존재하지 않습니다.");
         }
@@ -40,7 +39,7 @@ public class RecommendationsService {
     }
 
     // 추천 로직
-    public RecommendationResponseDTO getRecommendations(RecommendationsUserDTO baumannDTO) {
+    public RecommendationResponseDTO getRecommendations(BaumannDTO baumannDTO) {
 
         List<String> userInfo = List.of(
                 baumannDTO.getFirst(),
@@ -78,7 +77,6 @@ public class RecommendationsService {
         }
 
         RecommendationResponseDTO response = new RecommendationResponseDTO();
-        response.setMessage("추천 상품 및 리뷰 조회에 성공했습니다.");
         response.setProducts(products.stream().limit(16).toList());
         response.setReviews(reviews.stream().limit(16).toList());
         return response;

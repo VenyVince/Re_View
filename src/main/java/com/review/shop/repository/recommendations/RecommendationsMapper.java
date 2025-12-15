@@ -15,7 +15,7 @@ public interface RecommendationsMapper {
 
     Integer getBaumannTypeByUserId(@Param("user_id") int user_id);
 
-    RecommendationsUserDTO getBaumannDTOWithId(
+    BaumannDTO getBaumannDTOWithId(
             @Param("user_Baumann") Integer user_Baumann
     );
 

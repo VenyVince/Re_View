@@ -8,10 +8,6 @@ import java.util.List;
 
 @Getter @Setter
 public class RecommendationResponseDTO {
-
-    @Schema(description = "응답 메시지", example = "추천 상품 및 리뷰 조회에 성공했습니다.")
-    private String message;
-
     @Schema(description = "추천 상품 리스트")
     private List<RecommendProductDTO> products;
 

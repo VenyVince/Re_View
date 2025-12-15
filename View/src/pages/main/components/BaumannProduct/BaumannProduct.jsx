@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function BaumannProduct({}) {
     // 리뷰 이미지가 없을 때 할당할 이미지(상품 이미지 할당할거면 나중에 상품 이미지 url 할당시키면 됨.
-    const DEFAULT_REVIEW_IMAGE = "이미지 없음";
+    const DEFAULT_REVIEW_IMAGE = "이미지 없을 때 할당할 이미지 나중에 url할당.";
 
     
     const navigate = useNavigate();
@@ -31,17 +31,6 @@ export default function BaumannProduct({}) {
         "ORNT","ORNW","ORPT","ORPW",
         "OSNT","OSNW","OSPT","OSPW"
     ];
-
-    const tagToGroup = {
-        "건성": "first",
-        "저자극": "second",
-        "비색소": "third",
-        "탄력": "fourth",
-        "주름": "fourth",
-        "색소성": "third",
-        "민감성": "second",
-        "지성": "first",
-    };
 
     function getRandomType() {
         return allTypes[Math.floor(Math.random() * allTypes.length)];
@@ -86,6 +75,7 @@ export default function BaumannProduct({}) {
             likes: r.like_count,
             productId: r.product_id,
             productName: r.prd_name,
+            nickname: r.nickname,
             imageUrl: r.review_image_url || DEFAULT_REVIEW_IMAGE,
         }));
     };
@@ -118,7 +108,7 @@ export default function BaumannProduct({}) {
         }
     };
 
-    useEffect((all) => {
+    useEffect(() => {
         if (!currentType) {
             handleTagClick("all");
             return;
@@ -324,7 +314,7 @@ export default function BaumannProduct({}) {
 
                                                     <div className="review-text-box">
                                                         <div className="review-text-top">
-                                                            <span className="review-brand">{review.brand}</span>
+                                                            <span className="review-nickname">{review.nickname}</span>
                                                             <span className="review-rating">
                                                                 {review.rating?.toFixed(1)} / 5.0
                                                             </span>

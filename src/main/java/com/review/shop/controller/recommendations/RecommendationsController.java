@@ -2,7 +2,7 @@ package com.review.shop.controller.recommendations;
 
 import com.review.shop.dto.recommendations.RecommendationResponseDTO;
 import com.review.shop.dto.recommendations.RecommendationResponseWrapper;
-import com.review.shop.dto.recommendations.RecommendationsUserDTO;
+import com.review.shop.dto.recommendations.BaumannDTO;
 import com.review.shop.service.recommendations.RecommendationsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,9 +36,9 @@ public class RecommendationsController {
     public ResponseEntity<RecommendationResponseDTO> getRecommendations() {
 
         // 사용자 바우만 타입 조회
-        Integer baumannId = recommendationsService.getBaumannTypeByUserId();
-        RecommendationsUserDTO baumannDTO =
-                recommendationsService.getBaumannDTOWithId(baumannId);
+        Integer baumann_id = recommendationsService.getBaumannTypeByUserId();
+        BaumannDTO baumannDTO =
+                recommendationsService.getBaumannDTOWithId(baumann_id);
 
         // 추천 조회
         RecommendationResponseDTO response =
