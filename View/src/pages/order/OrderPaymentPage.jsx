@@ -137,25 +137,11 @@ export default function OrderPaymentPage() {
     const getThumbnailUrl = (item) => {
         if (!item) return null;
 
-        // 1순위: 백엔드에서 완성된 썸네일 URL을 내려주는 경우
+        // 백엔드에서 완성된 썸네일 URL을 내려주는 경우
         if (item.product_thumbnail_url) {
             return item.product_thumbnail_url;
         }
 
-        // 2순위: image_url 이 절대 URL이면 그대로 사용
-        if (item.image_url && /^https?:\/\//.test(item.image_url)) {
-            return item.image_url;
-        }
-
-        // 3순위: image_url 이 상대 경로인 경우 Minio BASE URL 과 조합
-        if (item.image_url) {
-            const base = process.env.REACT_APP_MINIO_BASE_URL || "";
-            if (!base) return item.image_url;
-
-            const trimBase = base.replace(/\/$/, "");
-            const trimPath = String(item.image_url).replace(/^\//, "");
-            return `${trimBase}/${trimPath}`;
-        }
 
         return null;
     };
