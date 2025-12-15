@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./BannerSlider.css";
 import dummyData from "../../../../assets/dummyData.png";
+import axiosClient from "api/axiosClient";
 
 function BannerSlider() {
     const [images, setImages] = useState([]);
@@ -11,15 +12,12 @@ function BannerSlider() {
     useEffect(() => {
         const fetchBanners = async () => {
             try {
-                const response = await fetch("/api/images/banners");
-                if (!response.ok) throw new Error("Failed to fetch banners");
+                const response = await axiosClient.get("/api/images/banners");
 
-                const data = await response.json();
-
-                // 배열로 직접 받아서 처리
-                const formattedImages = data.map((src, index) => ({
+                // axios는 자동으로 JSON 파싱하므로 response.data 사용
+                const formattedImages = response.data.map((src, index) => ({
                     id: index + 1,
-                    src: src, // API에서 받은 이미지 URL
+                    src: src,
                     alt: `배너${index + 1}`
                 }));
 
@@ -38,6 +36,8 @@ function BannerSlider() {
 
         fetchBanners();
     }, []);
+
+    // ... 나머지 코드는 동일
 
     // 자동 슬라이드
     useEffect(() => {
