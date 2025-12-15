@@ -20,9 +20,9 @@ export default function FindIdPage() {
 
             try {
                 // 백엔드 API 호출
-                const response = await axiosClient().post('/api/auth/find-id', {
+                const response = await axiosClient.post('/api/auth/find-id', {
                     name: form.name,
-                    phone_number: form.phone
+                    phone_number: form.phone,
                 });
 
                 // 결과값 result로 state로 전달
