@@ -103,7 +103,7 @@ export default function App() {
 
 
                     {/* 리뷰 */}
-                    <Route path="/review/write/:productId" element={<ReviewWrite />} /> {/* 리뷰 작성 */}
+                    <Route path="/review/write/:orderItemId" element={<ReviewWrite />} />{/* 리뷰 작성 */}
 
                 {/* 관리자 전용 영역 */}
                 <Route element={<ProtectedRoute requireAdmin />}>
@@ -141,8 +141,6 @@ export default function App() {
                     <Route path="/order/payment" element={<OrderPaymentPage />} />
                     <Route path="/order/complete" element={<OrderCompletePage />} />
 
-                    <Route path="/review/write" element={<ReviewWrite />} />
-                    <Route path="/review/write/:product_id" element={<ReviewWrite />} />
                     <Route path="/review/:reviewId" element={<ReviewDetailPage />} />
                 </Route>
             </Routes>
