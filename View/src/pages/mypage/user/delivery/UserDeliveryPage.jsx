@@ -1,10 +1,10 @@
 // src/pages/mypage/user/UserDeliveryPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import axiosClient from "api/axiosClient";
+// import axiosClient from "api/axiosClient";
+import axiosClient from "../../../../api/axiosClient";
 import UserMyPageLayout from "../layout/UserMyPageLayout";
 import "./UserDeliveryPage.css";
 import { useNavigate } from "react-router-dom";
-
 
 export default function UserDeliveryPage() {
     const navigate = useNavigate();
@@ -20,9 +20,12 @@ export default function UserDeliveryPage() {
     const [orderError, setOrderError] = useState("");
     const [trackingOrder, setTrackingOrder] = useState(null);
 
-    // 주문 내역 날짜 필터 (기본: 최근 1개월)
+    // 주문 내역 날짜 필터 (기본: 전체 내역)
     const [filterStart, setFilterStart] = useState("");
     const [filterEnd, setFilterEnd] = useState("");
+
+    // "더보기" 로 노출할 (배송완료 + 리뷰작성완료) 주문 개수
+    const [extraShown, setExtraShown] = useState(0);
 
     // 영수증 팝업 상태
     const [receiptOrderId, setReceiptOrderId] = useState(null);
@@ -30,7 +33,15 @@ export default function UserDeliveryPage() {
     const [receiptLoading, setReceiptLoading] = useState(false);
     const [receiptError, setReceiptError] = useState("");
 
-    // 주문 목록은 백엔드에서 전체 내역을 최신순으로 내려줌
+    // 리뷰 작성 모달(주문 내 order_item 선택)
+    const [reviewSelectOpen, setReviewSelectOpen] = useState(false);
+    const [reviewSelectOrderId, setReviewSelectOrderId] = useState(null);
+    const [reviewSelectItems, setReviewSelectItems] = useState([]);
+    const [reviewSelectLoading, setReviewSelectLoading] = useState(false);
+    const [reviewSelectError, setReviewSelectError] = useState("");
+
+    // 페이지네이션 (백엔드 page/size와 맞춰둠) – 지금은 요청용으로만 사용
+    const PAGE_SIZE = 10;
 
     const formatPrice = (value) =>
         value?.toLocaleString("ko-KR", { maximumFractionDigits: 0 }) ?? "0";
@@ -42,7 +53,6 @@ export default function UserDeliveryPage() {
         return date.toISOString().slice(0, 10);
     };
 
-    
     const getOrderStatusText = (order) =>
         (order.order_status || order.status || "").trim();
 
@@ -100,37 +110,121 @@ export default function UserDeliveryPage() {
         }
     };
 
+    // 주문 상세에서 리뷰 작성 가능 여부 및 가능한 order_item_id 목록 조회
+    const fetchReviewWritableInfoForOrder = async (orderId) => {
+        try {
+            const res = await axiosClient.get(`/api/orders/${orderId}`);
+            const orderDetail = res.data || {};
+            const items = Array.isArray(orderDetail.order_items) ? orderDetail.order_items : [];
+
+            const checkResults = await Promise.all(
+                items.map(async (item) => {
+                    try {
+                        const resp = await axiosClient.get("/api/reviews/exists/create", {
+                            params: { order_item_id: item.order_item_id },
+                        });
+                        return {
+                            order_item_id: item.order_item_id,
+                            canCreate:
+                                resp.data && typeof resp.data.canCreate === "boolean"
+                                    ? resp.data.canCreate
+                                    : false,
+                        };
+                    } catch {
+                        return { order_item_id: item.order_item_id, canCreate: false };
+                    }
+                })
+            );
+
+            const writableOrderItemIds = checkResults
+                .filter((r) => r.canCreate)
+                .map((r) => r.order_item_id);
+
+            return {
+                canCreateAny: writableOrderItemIds.length > 0,
+                writableOrderItemIds,
+            };
+        } catch {
+            return { canCreateAny: false, writableOrderItemIds: [] };
+        }
+    };
+
+    // 리뷰 작성 모달 열기: 해당 주문의 리뷰 작성 가능한 order_item 목록을 불러온다.
+    const openReviewSelectModal = async (orderId) => {
+        try {
+            setReviewSelectOpen(true);
+            setReviewSelectOrderId(orderId);
+            setReviewSelectItems([]);
+            setReviewSelectError("");
+            setReviewSelectLoading(true);
+
+            // 주문 상세에서 order_items를 가져오고, 각 item별 리뷰 작성 가능 여부를 확인
+            const detailRes = await axiosClient.get(`/api/orders/${orderId}`);
+            const orderDetail = detailRes.data || {};
+            const items = Array.isArray(orderDetail.order_items) ? orderDetail.order_items : [];
+
+            const withCanCreate = await Promise.all(
+                items.map(async (item) => {
+                    try {
+                        const resp = await axiosClient.get("/api/reviews/exists/create", {
+                            params: { order_item_id: item.order_item_id },
+                        });
+                        const canCreate =
+                            resp.data && typeof resp.data.canCreate === "boolean"
+                                ? resp.data.canCreate
+                                : false;
+                        return { ...item, canCreate };
+                    } catch {
+                        return { ...item, canCreate: false };
+                    }
+                })
+            );
+
+            const writable = withCanCreate.filter((i) => i.canCreate === true);
+            setReviewSelectItems(writable);
+        } catch (e) {
+            setReviewSelectError("리뷰 작성 가능한 상품 목록을 불러오지 못했습니다.");
+        } finally {
+            setReviewSelectLoading(false);
+        }
+    };
+
+    const closeReviewSelectModal = () => {
+        setReviewSelectOpen(false);
+        setReviewSelectOrderId(null);
+        setReviewSelectItems([]);
+        setReviewSelectError("");
+        setReviewSelectLoading(false);
+    };
+
     // 주문 리스트 불러오기
-    const fetchOrders = async () => {
+    const fetchOrders = async (pageNo = 1) => {
         try {
             setOrderLoading(true);
             setOrderError("");
 
             const res = await axiosClient.get("/api/orders", {
-                params: { page: 0, size: 1000 },
+                // params: {
+                //     page: pageNo,
+                //     size: PAGE_SIZE,
+                // },
             });
 
-            const data = res.data;
-
-            // 1) List<OrderListResponseDTO> 그대로 오는 경우
-            if (Array.isArray(data)) {
-                setOrders(data);
-                return;
-            }
-
-            if (Array.isArray(data?.orderList)) {
-                setOrders(data.orderList);
-                return;
-            }
-            if (Array.isArray(data?.data)) {
-                setOrders(data.data);
-                return;
-            }
-
-            // 알 수 없는 구조면 빈 배열
-            setOrders([]);
+            // 컨트롤러가 List<OrderListResponseDTO> 를 바로 리턴
+            const list = Array.isArray(res.data) ? res.data : [];
+            // 주문별로 리뷰 작성 가능 정보 추가
+            const enriched = await Promise.all(
+                list.map(async (o) => {
+                    const info = await fetchReviewWritableInfoForOrder(o.order_id);
+                    return {
+                        ...o,
+                        review_can_create_any: info.canCreateAny,
+                        review_writable_order_item_ids: info.writableOrderItemIds,
+                    };
+                })
+            );
+            setOrders(enriched);
         } catch (e) {
-            console.error("주문 내역 조회 오류:", e);
             setOrderError("주문 내역을 불러오는 중 오류가 발생했어요.");
         } finally {
             setOrderLoading(false);
@@ -139,12 +233,12 @@ export default function UserDeliveryPage() {
 
     useEffect(() => {
         fetchDefaultAddress();
-        fetchOrders();
+        fetchOrders(1);
     }, []);
 
     // 날짜 필터링이 반영된 주문 목록
     // - filterStart 또는 filterEnd 가 설정되어 있으면: 해당 범위(종료일 포함)에 해당하는 주문만
-    // - 둘 다 비어 있으면: 전체 주문 내역 표시
+    // - 둘 다 비어 있으면: 전체 주문 내역만
     const filteredOrders = useMemo(() => {
         if (!orders || orders.length === 0) return [];
 
@@ -178,9 +272,14 @@ export default function UserDeliveryPage() {
             });
         }
 
-        // 날짜 필터가 없으면: 전체 주문 내역 표시
+        // 날짜 필터가 없으면: 전체 주문 내역을 그대로 표시
         return list;
     }, [orders, filterStart, filterEnd]);
+
+    // 필터가 바뀌면 더보기 초기화
+    useEffect(() => {
+        setExtraShown(0);
+    }, [filterStart, filterEnd]);
 
     // 상태별 전체 카운트는 전체 orders 기준 (필터와 무관)
     const completedCount = orders.filter(
@@ -189,8 +288,9 @@ export default function UserDeliveryPage() {
     const shippingCount = orders.filter(
         (o) => getOrderStatusText(o) === "배송중"
     ).length;
+    // 배송완료 카운트는 "리뷰 미작성(작성 가능)" 만 포함
     const deliveredCount = orders.filter(
-        (o) => getOrderStatusText(o) === "배송완료"
+        (o) => getOrderStatusText(o) === "배송완료" && o.review_can_create_any === true
     ).length;
 
     // 화면에 보여줄 목록은 필터링된 주문만 정렬
@@ -212,6 +312,30 @@ export default function UserDeliveryPage() {
         // 같은 상태일 때는 최신 주문이 위로 오도록 날짜 기준 정렬
         return (b.created_at || "").localeCompare(a.created_at || "");
     });
+
+    // 날짜 필터 활성 여부
+    const isDateFilterActive = Boolean(filterStart || filterEnd);
+
+    // 기본 노출: 주문완료 / 배송중 / 배송완료(리뷰 미작성)
+    const baseOrders = sortedOrders.filter((o) => {
+        const status = getOrderStatusText(o);
+        if (status === "배송완료") {
+            return o.review_can_create_any === true; // 리뷰 미작성(작성 가능)만
+        }
+        return status === "주문완료" || status === "배송중";
+    });
+
+    // 더보기 대상: 배송완료(리뷰 작성 완료)
+    const extraOrders = sortedOrders.filter((o) => {
+        const status = getOrderStatusText(o);
+        return status === "배송완료" && o.review_can_create_any !== true;
+    });
+
+    // 날짜 필터가 켜져있으면: 조건(배송완료/리뷰작성여부)과 무관하게 해당 기간 주문을 전부 보여준다.
+    // 날짜 필터가 없으면: 기본 노출 + (배송완료/리뷰작성완료는 더보기로 10개씩)
+    const visibleOrders = isDateFilterActive
+        ? sortedOrders
+        : [...baseOrders, ...extraOrders.slice(0, extraShown)];
 
     const openTrackingModal = (order) => {
         setTrackingOrder(order);
@@ -356,15 +480,15 @@ export default function UserDeliveryPage() {
                 {!orderLoading &&
                     !orderError &&
                     orders.length > 0 &&
-                    sortedOrders.length === 0 && (
+                    visibleOrders.length === 0 && (
                         <p className="delivery-order-message">
                             선택한 기간에 해당하는 주문 내역이 없습니다.
                         </p>
                     )}
 
-                {sortedOrders.length > 0 && (
+                {visibleOrders.length > 0 && (
                     <div className="delivery-order-list">
-                        {sortedOrders.map((order) => {
+                        {visibleOrders.map((order) => {
                             const statusText = getOrderStatusText(order) || "주문완료";
                             const totalCount = getTotalItemCount(order);
                             const mainName = getRepProductName(order);
@@ -422,21 +546,24 @@ export default function UserDeliveryPage() {
                                         <div className="delivery-order-right">
                                             {statusText === "배송완료" ? (
                                                 <>
-                                                    <button
-                                                        type="button"
-                                                        className="delivery-order-action-btn delivery-order-review-btn"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/review/write?orderId=${order.order_id}&order_id=${order.order_id}`,
-                                                                {
-                                                                    //navigate state: { orderId: 123, order_id: 123 }
-                                                                    state: { orderId: order.order_id, order_id: order.order_id },
-                                                                }
-                                                            )
-                                                        }
-                                                    >
-                                                        리뷰 작성하기
-                                                    </button>
+                                                    {order.review_can_create_any === true ? (
+                                                        <button
+                                                            type="button"
+                                                            className="delivery-order-action-btn delivery-order-review-btn"
+                                                            onClick={() => openReviewSelectModal(order.order_id)}
+                                                        >
+                                                            리뷰 작성하기
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className="delivery-order-action-btn delivery-order-review-btn"
+                                                            disabled
+                                                            style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                                                        >
+                                                            리뷰 작성 완료
+                                                        </button>
+                                                    )}
                                                     <button
                                                         type="button"
                                                         className="delivery-order-action-btn"
@@ -472,6 +599,19 @@ export default function UserDeliveryPage() {
                                 </article>
                             );
                         })}
+                    </div>
+                )}
+
+                {/* 더보기: 배송완료(리뷰 작성 완료) 주문을 10개씩 추가 노출 */}
+                {!isDateFilterActive && !orderLoading && !orderError && extraOrders.length > extraShown && (
+                    <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                        <button
+                            type="button"
+                            className="delivery-order-action-btn"
+                            onClick={() => setExtraShown((prev) => prev + 10)}
+                        >
+                            더보기
+                        </button>
                     </div>
                 )}
             </section>
