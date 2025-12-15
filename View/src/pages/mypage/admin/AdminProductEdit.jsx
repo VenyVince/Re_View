@@ -19,6 +19,14 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
+const CATEGORY_OPTIONS = [
+    "로션",
+    "앰플",
+    "토너",
+    "크림",
+    "클렌징",
+];
+
 const BAUMANN_CODE_BY_ID = Object.fromEntries(
     Object.entries(BAUMANN_ID_MAP).map(([code, id]) => [id, code])
 );
@@ -307,13 +315,19 @@ export default function AdminProductEdit() {
                                     placeholder="브랜드명"
                                     disabled={isSubmitting}
                                 />
-                                <Input
+                                <Select
                                     name="category"
                                     value={form.category}
                                     onChange={onChange}
-                                    placeholder="예: 크림, 토너"
                                     disabled={isSubmitting}
-                                />
+                                >
+                                    <option value="">선택하세요</option>
+                                    {CATEGORY_OPTIONS.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </Select>
                             </div>
                         </Row>
                         <Row>
