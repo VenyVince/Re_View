@@ -34,10 +34,12 @@ public class ReviewController {
     })
     public ResponseEntity<List<ReviewDTO>> getReviews(
             @RequestParam(value = "sort", defaultValue = "like_count") String sort,
-            @RequestParam(value = "category", required = false) String category) {
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "page", defaultValue = "0") int page
+            ){
 
-        // page, size 파라미터 제거
-        List<ReviewDTO> reviews = reviewService.getReviewList(sort, category);
+        //한 페이지에는 100개의 리뷰가 들어갑니다.
+        List<ReviewDTO> reviews = reviewService.getReviewList(sort, category, page, 100);
 
         return ResponseEntity.ok(reviews);
     }

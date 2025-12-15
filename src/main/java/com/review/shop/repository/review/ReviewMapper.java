@@ -13,7 +13,9 @@ public interface ReviewMapper {
 
     List<ReviewDTO> selectReviewList(
             @Param("sort") String sort,
-            @Param("category") String category
+            @Param("category") String category,
+            @Param("offset") int offset,
+            @Param("size") int size
     );
 
     ReviewDetailResponseDTO.ReviewDetailDTO getReviewBase(int review_id);

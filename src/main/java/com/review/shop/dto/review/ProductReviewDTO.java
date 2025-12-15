@@ -17,6 +17,9 @@ public class ProductReviewDTO {
     private int is_selected;
     private int order_item_id;
 
+    private boolean user_liked;     // 내가 좋아요 눌렀는지
+    private boolean user_disliked;  // 내가 싫어요 눌렀는지
+
     @JsonIgnore  // JSON 응답에서 제외
     private String image_url;  // DB에서만 사용
 
