@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from "api/axiosClient"
 import { useNavigate } from 'react-router-dom'; // 1. useNavigate 추가
-import './BestReview.css';
+import './AdminPickReview.css';
 
 function formatPrice(n) {
     try {

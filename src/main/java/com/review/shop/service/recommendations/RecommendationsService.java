@@ -1,8 +1,6 @@
 package com.review.shop.service.recommendations;
 
-import com.review.shop.dto.product.RecommendationDTO;
-import com.review.shop.dto.recommendations.RecommendationAdminPickDTO;
-import com.review.shop.dto.recommendations.RecommendationsUserDTO;
+import com.review.shop.dto.recommendations.*;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.image.ImageService;
 import com.review.shop.repository.recommendations.RecommendationsMapper;
@@ -20,58 +18,78 @@ public class RecommendationsService {
     private final Security_Util security_util;
     private final ImageService imageService;
 
-    // 사용자의 세션 정보를 기반으로 바우만 타입 가져오기
-    public Integer getBaumannTypeByUserId(){
-        Integer user_Baumann =  recommendationsMapper.getBaumannTypeByUserId(security_util.getCurrentUserId());
-        if(user_Baumann==null){
+    // 사용자의 바우만 타입 체크
+    public Integer getBaumannTypeByUserId() {
+        Integer baumannId =
+                recommendationsMapper.getBaumannTypeByUserId(security_util.getCurrentUserId());
+
+        if (baumannId == null) {
             throw new ResourceNotFoundException("해당 사용자의 바우만 타입이 존재하지 않습니다.");
         }
-        return user_Baumann;
+        return baumannId;
     }
 
-    //바우만 아이디를 기반으로 바우만 타입 가져오기 (FIRST, SECOND, THIRD, FOURTH)
-    public RecommendationsUserDTO getBaumannDTOWithId(Integer user_Baumann){
-
-        RecommendationsUserDTO baumannDTO = recommendationsMapper.getBaumannDTOWithId(user_Baumann);
-        if (baumannDTO==null){
+    public BaumannDTO getBaumannDTOWithId(Integer baumann_id) {
+        BaumannDTO dto =
+                recommendationsMapper.getBaumannDTOWithId(baumann_id);
+        if (dto == null) {
             throw new ResourceNotFoundException("해당 바우만 타입이 존재하지 않습니다.");
         }
-        return baumannDTO;
+        return dto;
     }
 
+    // 추천 로직
+    public RecommendationResponseDTO getRecommendations(BaumannDTO baumannDTO) {
 
-    //바우만 타입에 따른 추천 상품 필터링 메서드들
-    public List<RecommendationDTO> getRecommendedProducts(RecommendationsUserDTO baumannDTO, String type){
-        //사용자의 바우만 타입 정보를 리스트로 변환
         List<String> userInfo = List.of(
                 baumannDTO.getFirst(),
                 baumannDTO.getSecond(),
                 baumannDTO.getThird(),
                 baumannDTO.getFourth()
         );
-        List<RecommendationDTO> recommendedProducts = switch (type) {
-            case "all" ->
-                    recommendationsMapper.findRecommencementsWithAll(userInfo);
-            case "first" -> recommendationsMapper.findRecommencementsWithFirst(userInfo);
-            case "second" -> recommendationsMapper.findRecommencementsWithSecond(userInfo);
-            case "third" -> recommendationsMapper.findRecommencementsWithThird(userInfo);
-            case "fourth" -> recommendationsMapper.findRecommencementsWithFourth(userInfo);
-            default -> throw new IllegalArgumentException("잘못된 타입입니다: " + type);
-        };
 
-        if (recommendedProducts == null || recommendedProducts.isEmpty()) {
-            throw new ResourceNotFoundException(type + " 타입 추천 상품이 존재하지 않습니다.");
+        List<RecommendProductDTO> products =
+                recommendationsMapper.findRecommendProducts(userInfo);
+
+        List<RecommendReviewDTO> reviews =
+                recommendationsMapper.findRecommendReviews(userInfo);
+
+        if (products.isEmpty() && reviews.isEmpty()) {
+            throw new ResourceNotFoundException("추천 결과가 없습니다.");
         }
 
-        return recommendedProducts;
+        // 상품 이미지 presignedURL 변환
+        for (RecommendProductDTO p : products) {
+            if (p.getProduct_image_url() != null && !p.getProduct_image_url().isEmpty()) {
+                p.setProduct_image_url(
+                        imageService.presignedUrlGet(p.getProduct_image_url())
+                );
+            }
+        }
+
+        // 리뷰 이지미 presignedURL 변환
+        for (RecommendReviewDTO r : reviews) {
+            if (r.getReview_image_url() != null && !r.getReview_image_url().isEmpty()) {
+                r.setReview_image_url(
+                        imageService.presignedUrlGet(r.getReview_image_url())
+                );
+            }
+        }
+
+        RecommendationResponseDTO response = new RecommendationResponseDTO();
+        response.setProducts(products.stream().limit(16).toList());
+        response.setReviews(reviews.stream().limit(16).toList());
+        return response;
     }
 
-    public RecommendationAdminPickDTO getRandomRecommendationAdminPicks(){
-        RecommendationAdminPickDTO result = recommendationsMapper.getRandomRecommendationAdminPicks();
-            //presigned URL 처리
-            String ObjectKey = result.getThumbnail_url();
-            String presignedUrl = imageService.presignedUrlGet(ObjectKey);
-            result.setThumbnail_url(presignedUrl);
+    // 관리자픽 로직
+    public RecommendationAdminPickDTO getRandomRecommendationAdminPicks() {
+        RecommendationAdminPickDTO result =
+                recommendationsMapper.getRandomRecommendationAdminPicks();
+
+        result.setThumbnail_url(
+                imageService.presignedUrlGet(result.getThumbnail_url())
+        );
 
         return result;
     }
