@@ -2,12 +2,12 @@ package com.review.shop.dto.orders;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class OrderCheckoutProductInfoDTO {
     private int product_id;
     private String thumbnail_url;

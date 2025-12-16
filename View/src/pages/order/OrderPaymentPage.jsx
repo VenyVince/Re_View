@@ -10,21 +10,27 @@ export default function OrderPaymentPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // 장바구니에서 넘어온 선택 상품들 (cartDummy 스키마)
-    const cartItems = location.state?.items || [];
+    // 1. 이전 페이지(장바구니/상세)에서 넘겨준 ID와 수량 정보
+    // 예: [{ product_id: 1, buy_quantity: 2 }, ...]
+    const checkoutItems = location.state?.checkoutItems || [];
 
-    const [items] = useState(cartItems);
+    // items: 화면에 보여줄 상세 상품 정보 (API로 받아옴)
+    const [items, setItems] = useState([]);
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
+    const [checkoutError, setCheckoutError] = useState("");
+
     // 배송지: 기본 배송지를 API에서 조회
     const [address, setAddress] = useState(null);
     const [addressLoading, setAddressLoading] = useState(true);
     const [addressError, setAddressError] = useState("");
 
-    // 결제수단(카드) 목록 상태 추가
+    // 결제수단(카드) 목록 상태
     const [cards, setCards] = useState([]);
     const [cardsLoading, setCardsLoading] = useState(true);
     const [cardsError, setCardsError] = useState("");
     const [selectedPaymentId, setSelectedPaymentId] = useState(null);
 
+    // 포인트 관련 상태
     const [availablePoint, setAvailablePoint] = useState(0);
     const [usePoint, setUsePoint] = useState(0);
     const [pointLoading, setPointLoading] = useState(true);
@@ -34,17 +40,59 @@ export default function OrderPaymentPage() {
     const [cardValid, setCardValid] = useState(false);
 
     // ======================
+    //  1. 체크아웃 데이터 조회 (핵심 변경 사항)
+    // ======================
+    const fetchCheckoutData = async () => {
+        // 넘겨받은 데이터가 없으면 중단
+        if (checkoutItems.length === 0) return;
+
+        try {
+            setCheckoutLoading(true);
+            setCheckoutError("");
+
+            console.log("체크아웃 API 요청 Payload:", checkoutItems);
+
+            // POST /api/orders/checkout
+            const res = await axiosClient.post("/api/orders/checkout", checkoutItems);
+
+            console.log("체크아웃 API 응답:", res.data);
+
+            const fetchedProducts = res.data.products || [];
+
+            // API 응답을 화면 UI에 맞는 구조로 변환
+            const normalizedItems = fetchedProducts.map((p) => ({
+                cart_items_id: `checkout_${p.product_id}`, // 고유 키 생성
+                product_id: p.product_id,
+                prd_id: p.product_id,
+                prd_name: p.prd_name,
+                prd_brand: p.prd_brand || "", // 브랜드가 없다면 빈 문자열
+                price: p.price,
+                quantity: p.buy_quantity, // 응답의 buy_quantity를 UI의 quantity로 매핑
+
+                // 썸네일 URL 매핑 (절대 경로로 옴)
+                product_thumbnail_url: p.thumbnail_url,
+                image_url: p.thumbnail_url,
+            }));
+
+            setItems(normalizedItems);
+
+        } catch (e) {
+            console.error("체크아웃 정보 조회 실패:", e);
+            setCheckoutError("상품 정보를 불러오는 중 오류가 발생했습니다.");
+        } finally {
+            setCheckoutLoading(false);
+        }
+    };
+
+    // ======================
     //  포인트 조회
     // ======================
     const fetchPoints = async () => {
         try {
             setPointLoading(true);
             setPointError("");
-
             const res = await axiosClient.get("/api/users/me/points");
-
-            const totalPoint =
-                typeof res.data === "number" ? res.data : Number(res.data) || 0;
+            const totalPoint = typeof res.data === "number" ? res.data : Number(res.data) || 0;
             setAvailablePoint(totalPoint);
         } catch (e) {
             console.error(e);
@@ -62,14 +110,9 @@ export default function OrderPaymentPage() {
         try {
             setAddressLoading(true);
             setAddressError("");
-
             const res = await axiosClient.get("/api/addresses");
+            const data = Array.isArray(res.data) ? res.data : res.data?.addresses || [];
 
-            const data = Array.isArray(res.data)
-                ? res.data
-                : res.data?.addresses || [];
-
-            // 백엔드 응답을 결제 페이지에서 사용하는 키로 변환
             const normalized = data.map((a) => ({
                 address_id: a.address_id,
                 address_name: a.address_name,
@@ -81,9 +124,7 @@ export default function OrderPaymentPage() {
                 is_default: a.is_default === "1",
             }));
 
-            const defaultAddr =
-                normalized.find((a) => a.is_default) || normalized[0] || null;
-
+            const defaultAddr = normalized.find((a) => a.is_default) || normalized[0] || null;
             setAddress(defaultAddr);
         } catch (e) {
             console.error(e);
@@ -100,13 +141,8 @@ export default function OrderPaymentPage() {
         try {
             setCardsLoading(true);
             setCardsError("");
-
             const res = await axiosClient.get("/api/users/me/payments");
-
-            const data = Array.isArray(res.data)
-                ? res.data
-                : res.data?.payments || [];
-
+            const data = Array.isArray(res.data) ? res.data : res.data?.payments || [];
             setCards(data);
 
             if (data.length > 0) {
@@ -125,51 +161,60 @@ export default function OrderPaymentPage() {
         }
     };
 
+    // 초기 데이터 로딩
     useEffect(() => {
+        // checkoutItems가 있을 때만 API 호출
+        if (checkoutItems.length > 0) {
+            fetchCheckoutData();
+        }
+
         fetchDefaultAddress();
         fetchCards();
         fetchPoints();
-    }, []);
+    }, []); // 빈 배열: 마운트 시 1회 실행
 
-    const formatPrice = (v) =>
-        v.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
+    const formatPrice = (v) => v.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
 
     const getThumbnailUrl = (item) => {
         if (!item) return null;
 
-        // 백엔드에서 완성된 썸네일 URL을 내려주는 경우
+        // 1순위: 백엔드에서 받은 완성된 썸네일 URL (fetchCheckoutData에서 매핑함)
         if (item.product_thumbnail_url) {
             return item.product_thumbnail_url;
         }
 
+        // 2순위: image_url이 절대 경로인 경우
+        if (item.image_url && /^https?:\/\//.test(item.image_url)) {
+            return item.image_url;
+        }
+
+        // 3순위: 상대 경로인 경우 MinIO Base URL 조합
+        if (item.image_url) {
+            const base = process.env.REACT_APP_MINIO_BASE_URL || "";
+            if (!base) return item.image_url;
+            const trimBase = base.replace(/\/$/, "");
+            const trimPath = String(item.image_url).replace(/^\//, "");
+            return `${trimBase}/${trimPath}`;
+        }
 
         return null;
     };
 
-    // 상품 금액 합계
+    // 상품 금액 합계 (API response의 total_price를 써도 되지만, 포인트 차감 로직 연동을 위해 재계산 권장)
     const productsAmount = useMemo(
-        () =>
-            items.reduce(
-                (sum, item) => sum + item.price * item.quantity,
-                0
-            ),
+        () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
         [items]
     );
 
     const discountAmount = 0;
-
-    const shippingFee = productsAmount >= 50000 ? 0 : 3000;
+    const shippingFee = 3000;
 
     const safeUsePoint = useMemo(() => {
         const maxByPayable = productsAmount - discountAmount + shippingFee;
-        return Math.max(
-            0,
-            Math.min(usePoint || 0, availablePoint, maxByPayable)
-        );
+        return Math.max(0, Math.min(usePoint || 0, availablePoint, maxByPayable));
     }, [usePoint, availablePoint, productsAmount, discountAmount, shippingFee]);
 
-    const totalPayAmount =
-        productsAmount - discountAmount + shippingFee - safeUsePoint;
+    const totalPayAmount = productsAmount - discountAmount + shippingFee - safeUsePoint;
 
     const handlePointChange = (e) => {
         const raw = e.target.value.replace(/[^0-9]/g, "");
@@ -177,14 +222,9 @@ export default function OrderPaymentPage() {
             setUsePoint(0);
             return;
         }
-
         const inputVal = Number(raw);
         const maxByPayable = productsAmount - discountAmount + shippingFee;
-        const maxUsable = Math.max(
-            0,
-            Math.min(inputVal, availablePoint, maxByPayable)
-        );
-
+        const maxUsable = Math.max(0, Math.min(inputVal, availablePoint, maxByPayable));
         setUsePoint(maxUsable);
     };
 
@@ -194,7 +234,7 @@ export default function OrderPaymentPage() {
         setUsePoint(max);
     };
 
-    // ===== 결제수단(카드) 관련 핸들러 =====
+    // ===== 결제수단 관련 핸들러 =====
     const handleChangeSelectedCard = (paymentId) => {
         setSelectedPaymentId(paymentId);
         setCardValid(!!paymentId);
@@ -213,7 +253,6 @@ export default function OrderPaymentPage() {
 
     const handleDeleteCard = async (paymentId) => {
         if (!window.confirm("해당 결제수단을 삭제하시겠습니까?")) return;
-
         try {
             await axiosClient.delete(`/api/users/me/payments/${paymentId}`);
             await fetchCards();
@@ -229,16 +268,11 @@ export default function OrderPaymentPage() {
     };
 
     const handleSubmitOrder = async () => {
-        // 1. 디버깅을 위해 현재 아이템 구조를 명확히 출력
-        console.log("주문 아이템 데이터 전체 확인:", items);
-
         if (items.length === 0) {
-            alert("주문할 상품이 없습니다. 장바구니에서 다시 시도해 주세요.");
-            navigate("/mypage/cart");
+            alert("주문할 상품 정보가 없습니다.");
             return;
         }
 
-        // 선택된 카드 검증
         if (!cardValid || !selectedPaymentId) {
             alert("결제할 카드를 선택하거나 카드 정보를 정확히 입력해 주세요.");
             return;
@@ -249,26 +283,11 @@ export default function OrderPaymentPage() {
             return;
         }
 
-        // OrderCreateDTO.order_list 에 들어갈 OrderDTO 리스트 생성
-        const orderListPayload = items.map((item) => {
-            const pId = item.product_id || item.prd_id;
-
-            // 디버깅: ID가 안 잡히는 경우 로그 출력
-            if (!pId) {
-                console.error("상품 ID를 찾을 수 없습니다. 아이템 데이터:", item);
-            }
-
-            return {
-                product_id: pId,
-                buy_quantity: item.quantity,
-            };
-        });
-
-        // 방어 코드: 상품 ID가 하나라도 없으면 요청을 보내지 않음
-        if (orderListPayload.some(orderItem => !orderItem.product_id)) {
-            alert("상품 정보를 정확히 불러오지 못했습니다. (Product ID Missing)");
-            return;
-        }
+        // 주문 요청 데이터 생성
+        const orderListPayload = items.map((item) => ({
+            product_id: item.product_id,
+            buy_quantity: item.quantity,
+        }));
 
         const orderPayload = {
             order_list: orderListPayload,
@@ -278,34 +297,25 @@ export default function OrderPaymentPage() {
             total_price: totalPayAmount,
         };
 
-        // 최종 전송될 페이로드 확인
         console.log("최종 전송 Payload:", orderPayload);
 
         try {
-            // 1) 주문 생성
             await axiosClient.post("/api/orders", orderPayload);
 
-            // 2) 방금 생성된 주문을 포함한 최신 주문 목록 1건 재조회
+            // 최신 주문 정보 확인 (Order ID 확보용)
             let latestOrderId = null;
             let latestOrderNo = null;
             try {
                 const latestRes = await axiosClient.get("/api/orders", {
-                    params: {
-                        page: 1,
-                        size: 1,
-                    },
+                    params: { page: 1, size: 1 },
                 });
-
-                const latestList = Array.isArray(latestRes.data)
-                    ? latestRes.data
-                    : [];
-
+                const latestList = Array.isArray(latestRes.data) ? latestRes.data : [];
                 if (latestList.length > 0) {
                     latestOrderId = latestList[0].order_id ?? null;
                     latestOrderNo = latestList[0].order_no ?? null;
                 }
             } catch (e) {
-                console.warn("최신 주문 조회 중 오류 (order_id 없이 진행):", e);
+                console.warn("최신 주문 조회 중 오류:", e);
             }
 
             const orderSummary = {
@@ -319,10 +329,7 @@ export default function OrderPaymentPage() {
             };
 
             navigate("/order/complete", {
-                state: {
-                    orderSummary,
-                    items,
-                },
+                state: { orderSummary, items },
             });
         } catch (e) {
             console.error(e);
@@ -330,8 +337,41 @@ export default function OrderPaymentPage() {
         }
     };
 
-    // 장바구니에서 안 거치고 바로 들어온 경우 방어
-    if (!location.state || !cartItems.length) {
+    // 로딩 화면
+    if (checkoutLoading) {
+        return (
+            <div className="order-page">
+                <div className="order-layout">
+                    <div className="order-main">
+                        <div className="order-card">
+                            <p>주문 상품 정보를 불러오는 중입니다...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // 에러 발생 시
+    if (checkoutError) {
+        return (
+            <div className="order-page">
+                <div className="order-layout">
+                    <div className="order-main">
+                        <div className="order-card">
+                            <p>{checkoutError}</p>
+                            <button className="order-submit-btn" onClick={() => navigate(-1)}>
+                                뒤로가기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // 장바구니/바로구매 데이터 없이 접근한 경우 방어
+    if (!location.state || checkoutItems.length === 0) {
         return (
             <div className="order-page">
                 <div className="order-layout">
@@ -362,11 +402,8 @@ export default function OrderPaymentPage() {
                         <h2 className="order-card-title">주문 상품</h2>
 
                         <div className="order-items">
-                            {items.map((item) => (
-                                <div
-                                    key={item.cart_items_id}
-                                    className="order-item-row"
-                                >
+                            {items.map((item, index) => (
+                                <div key={item.cart_items_id || index} className="order-item-row">
                                     <div className="order-item-thumb">
                                         {getThumbnailUrl(item) ? (
                                             <img
@@ -421,8 +458,7 @@ export default function OrderPaymentPage() {
                                 <p className="order-address-error">{addressError}</p>
                             ) : !address ? (
                                 <p>
-                                    등록된 배송지가 없습니다. 마이페이지에서 배송지를 추가해
-                                    주세요.
+                                    등록된 배송지가 없습니다. 마이페이지에서 배송지를 추가해 주세요.
                                 </p>
                             ) : (
                                 <>
@@ -474,17 +510,13 @@ export default function OrderPaymentPage() {
                         <h2 className="order-card-title">포인트 사용</h2>
 
                         {pointLoading ? (
-                            <p className="order-point-help">
-                                포인트를 불러오는 중입니다...
-                            </p>
+                            <p className="order-point-help">포인트를 불러오는 중입니다...</p>
                         ) : pointError ? (
                             <p className="order-point-help">{pointError}</p>
                         ) : (
                             <>
                                 <div className="order-point-row">
-                                    <span className="order-point-label">
-                                        보유 포인트
-                                    </span>
+                                    <span className="order-point-label">보유 포인트</span>
                                     <span className="order-point-value">
                                         {formatPrice(availablePoint)}P
                                     </span>
@@ -540,9 +572,7 @@ export default function OrderPaymentPage() {
                             <div className="order-summary-row">
                                 <span>배송비</span>
                                 <span>
-                                    {shippingFee === 0
-                                        ? "무료"
-                                        : `${formatPrice(shippingFee)}원`}
+                                    {shippingFee === 0 ? "무료" : `${formatPrice(shippingFee)}원`}
                                 </span>
                             </div>
                             <div className="order-summary-row">

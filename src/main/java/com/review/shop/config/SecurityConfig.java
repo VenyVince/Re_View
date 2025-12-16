@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler; // ★ 필수 import
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -30,10 +32,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName(null);
+
         http
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
+
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(requestHandler)
+                        .ignoringRequestMatchers("/api/auth/login")
+                )
+
                 .cors(withDefaults())
 
                 .authorizeHttpRequests(auth -> auth
@@ -42,31 +53,11 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-
-                        //어드민만 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-//                        //모두 가능, 프론트 테스트 때문에 임시로 admin 제외 모두 허용
-//                        .requestMatchers(
-//                                "/api/auth/register",
-//                                "/api/auth/login",
-//                                "/api/auth/send-temp-password",
-//                                "/api/auth/check-id",
-//                                "/api/search/**",
-//                                "/api/products",
-//                                "/api/auth/logout",
-//                                "/api/auth/me"
-//
-//                        ).permitAll()
-
-//                        //유저만 가능
-//                        .anyRequest().hasRole("USER")
-//
-                            .anyRequest().permitAll()
+                        .requestMatchers("/api/mypage/**").hasRole("USER")
+                        .anyRequest().permitAll()
                 )
 
-
-                // 접근이 거부되었을 때와 인증이 필요한 경우의 핸들러 설정
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(400);
@@ -78,19 +69,14 @@ public class SecurityConfig {
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("로그인이 필요합니다.");
                         })
-                ) //
+                )
 
                 .logout(logout -> logout
-
                         .logoutUrl("/api/auth/logout")
-
-                        .deleteCookies("JSESSIONID")
-
+                        .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                         .logoutSuccessHandler((request, response, authentication) -> {
-
                             response.setStatus(HttpServletResponse.SC_OK);
                             response.getWriter().write("로그아웃 되었습니다.");
-
                         })
                 );
 
