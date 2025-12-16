@@ -28,7 +28,7 @@ public class CartService {
             }
 
             for (CartitemResponseDTO item : cartItems) {
-                String objectKey = item.getProduct_thumbnail_url();
+                String objectKey = item.getImage_url();
 
                 if (objectKey != null && !objectKey.isEmpty()) {
                     String imageUrl = imageService.presignedUrlGet(objectKey);
