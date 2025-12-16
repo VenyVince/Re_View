@@ -15,6 +15,7 @@ public class ProductReviewDTO {
     private int dislike_count;
     private String created_at;
     private int is_selected;
+    private int is_checked;
     private int order_item_id;
 
     private boolean user_liked;     // 내가 좋아요 눌렀는지

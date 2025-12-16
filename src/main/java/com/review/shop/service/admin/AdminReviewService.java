@@ -1,5 +1,6 @@
 package com.review.shop.service.admin;
 
+import com.review.shop.dto.review.ReviewAdminDTO;
 import com.review.shop.exception.ResourceNotFoundException;
 import com.review.shop.exception.WrongRequestException;
 import com.review.shop.repository.admin.AdminReviewMapper;
@@ -8,6 +9,8 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -42,5 +45,9 @@ public class AdminReviewService {
         //리뷰 작성자의 user_id 반환
         int user_id = adminReviewMapper.findReviewer(review_id);
         pointService.addSelectedReviewPoint(user_id, review_id);
+    }
+
+    public List<ReviewAdminDTO> getAllReviews() {
+        return adminReviewMapper.getAllReviews();
     }
 }

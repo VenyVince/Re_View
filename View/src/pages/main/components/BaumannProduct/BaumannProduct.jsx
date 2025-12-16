@@ -20,7 +20,7 @@ export default function BaumannProduct({}) {
     const [currentType, setCurrentType] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [activeTab, setActiveTab] = useState("product");
+    const [activeTab, setActiveTab] = useState("review");
 
     const [productPage, setProductPage] = useState(1);
     const [reviewPage, setReviewPage] = useState(1);
