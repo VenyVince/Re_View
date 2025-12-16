@@ -52,9 +52,8 @@ public class ProductReviewService {
         if (review == null) return false;
         if (review.getUser_id() != user_id) return false;
         if (review.getLike_count() >= 100) return false;
-        if (review.getIs_selected() >= 1) return false;
-
-        return true;
+        if (review.getIs_checked() != 0) return false;
+        return review.getIs_selected() == 0;
     }
 
 
@@ -183,6 +182,7 @@ public class ProductReviewService {
         // 유효성 검사
         if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
         if (rating < 1 || rating > 5) throw new WrongRequestException("평점은 1~5 사이여야 합니다");
+        if (!canUpdate(review_id, user_id)) throw new WrongRequestException("수정할 수 없는 리뷰입니다.");
 
         // 리뷰 내용 수정
         int updatedRows = productReviewMapper.updateReview(review_id, content, rating);
