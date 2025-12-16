@@ -134,7 +134,7 @@ export default function UserMyReviewPage() {
     };
 
     // === 권한(수정/삭제 가능 여부) 조회 ===
-    // ⚠️ 백엔드가 GET에 body를 받는 형태면 브라우저에서 body가 누락될 수 있습니다.
+    // 백엔드가 GET에 body를 받는 형태면 브라우저에서 body가 누락될 수 있습니다.
     // "GET 유지(쿼리)" 버전으로 맞추기 위해 아래처럼 review_id를 query param 으로 호출합니다.
 
     // 중복 호출 방지용(리뷰 수가 많으면 네트워크 폭주 방지)
@@ -154,7 +154,7 @@ export default function UserMyReviewPage() {
         };
 
         try {
-            // ✅ GET /api/reviews/exists/update?review_id=123
+            // GET /api/reviews/exists/update?review_id=123
             const res = await axiosClient.get("/api/reviews/exists/update", {
                 params: { review_id: rid },
             });
@@ -220,9 +220,20 @@ export default function UserMyReviewPage() {
                 canUpdate: review.canUpdate ?? review.can_update ?? null,
             }));
 
+            // 별점 필터: 선택한 점수만 보이게 (예: 4점 선택 시 4.0 ~ 4.9)
+            const selectedStar = Number(filterRatingValue) || 0;
+            const filteredNormalized = selectedStar > 0
+                ? normalized.filter((item) => {
+                    const score = Number(item.rating ?? item.review_rating ?? item.reviewRating ?? 0);
+                    if (Number.isNaN(score)) return false;
+                    if (selectedStar >= 5) return score >= 5;
+                    return score >= selectedStar && score < selectedStar + 1;
+                })
+                : normalized;
+
             // 1차: 목록 응답 + canUpdate(수정/삭제 가능 여부) 보정
             const withPermissions = await Promise.all(
-                normalized.map(async (item) => {
+                filteredNormalized.map(async (item) => {
                     // 목록에서 canUpdate가 이미 boolean으로 오면 그대로 사용
                     if (typeof item.canUpdate === "boolean") return item;
                     const can = await fetchCanUpdate(item.review_id);
@@ -546,6 +557,7 @@ export default function UserMyReviewPage() {
 
             alert("후기가 수정되었어요.");
             handleCancelEdit();
+            window.location.reload();
         } catch (e) {
             console.error("리뷰 수정 오류:", e);
             alert("후기 수정 중 오류가 발생했습니다.");
@@ -590,10 +602,12 @@ export default function UserMyReviewPage() {
                         value={filterRating}
                         onChange={(e) => setFilterRating(Number(e.target.value))}
                     >
-                        <option value={0}>전체 평점</option>
-                        <option value={4.5}>4.5점 이상</option>
-                        <option value={4}>4.0점 이상</option>
-                        <option value={3}>3.0점 이상</option>
+                        <option value={0}>전체 별점</option>
+                        <option value={5}>5점</option>
+                        <option value={4}>4점</option>
+                        <option value={3}>3점</option>
+                        <option value={2}>2점</option>
+                        <option value={1}>1점</option>
                     </select>
 
                     <button type="submit" className="myreview-search-btn">
@@ -659,6 +673,26 @@ export default function UserMyReviewPage() {
                                     </div>
                                 </header>
 
+                                {/* 평점 (수정 모드에서는 숨김: 저장/취소 후 다시 보이게) */}
+                                {!isEditing && (
+                                    <div className="myreview-rating-row">
+                                        <div className="myreview-stars">
+                                            {Array.from({ length: 5 }).map((_, idx) => {
+                                                const score = Number(review.rating) || 0;
+
+                                                let starClass = "myreview-star";
+                                                if (score >= idx + 1) starClass += " myreview-star--on";
+                                                else if (score >= idx + 0.5) starClass += " myreview-star--half";
+
+                                                return (<span key={idx} className={starClass}>★</span>);
+                                            })}
+
+                                            <span className="myreview-score">
+                                                {formatRating(review.rating)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
 
 
                                 {/* 내용: 보기 / 수정 */}
