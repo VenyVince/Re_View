@@ -182,21 +182,6 @@ export default function OrderPaymentPage() {
         if (item.product_thumbnail_url) {
             return item.product_thumbnail_url;
         }
-
-        // 2순위: image_url이 절대 경로인 경우
-        if (item.image_url && /^https?:\/\//.test(item.image_url)) {
-            return item.image_url;
-        }
-
-        // 3순위: 상대 경로인 경우 MinIO Base URL 조합
-        if (item.image_url) {
-            const base = process.env.REACT_APP_MINIO_BASE_URL || "";
-            if (!base) return item.image_url;
-            const trimBase = base.replace(/\/$/, "");
-            const trimPath = String(item.image_url).replace(/^\//, "");
-            return `${trimBase}/${trimPath}`;
-        }
-
         return null;
     };
 
@@ -301,6 +286,31 @@ export default function OrderPaymentPage() {
 
         try {
             await axiosClient.post("/api/orders", orderPayload);
+
+            // 결제 완료 후: 장바구니에 같은 product_id가 있으면 삭제 처리
+            try {
+                const cartRes = await axiosClient.get("/api/cart");
+                const cartItems = Array.isArray(cartRes.data) ? cartRes.data : [];
+
+                const orderedProductIds = new Set(
+                    (items || []).map((it) => it.product_id).filter((v) => v != null)
+                );
+
+                const toDelete = cartItems.filter((ci) => orderedProductIds.has(ci.product_id));
+
+                if (toDelete.length > 0) {
+                    await Promise.all(
+                        toDelete.map((ci) =>
+                            axiosClient.delete("/api/cart", {
+                                data: { product_id: ci.product_id },
+                            })
+                        )
+                    );
+                }
+            } catch (cartErr) {
+                // 장바구니 삭제 실패가 주문 완료를 막으면 안 되므로 경고만 출력
+                console.warn("[OrderPaymentPage] 결제 후 장바구니 정리 실패:", cartErr);
+            }
 
             // 최신 주문 정보 확인 (Order ID 확보용)
             let latestOrderId = null;

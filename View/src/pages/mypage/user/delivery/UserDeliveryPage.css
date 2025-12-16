@@ -277,19 +277,26 @@
 .delivery-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0,0,0,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+
+    padding: 16px;            /* 중요: 작은 화면에서 잘림 방지 */
+    box-sizing: border-box;
 }
 
 .delivery-modal {
-    width: 360px;
-    background: #ffffff;
+    width: min(600px, calc(100vw - 32px));   /* 화면보다 넓어지지 않게 */
+    max-height: calc(100vh - 32px);          /* 화면보다 높아지면 */
+    overflow: auto;                          /* 내부 스크롤 */
+
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     padding: 20px 22px 18px;
+    box-sizing: border-box;
 }
 
 .delivery-modal-title {
@@ -522,6 +529,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;      /* 중요: 긴 텍스트/버튼 때문에 넘치지 않게 */
+
     padding: 14px 16px;
     border-radius: 14px;
     border: 1px solid #e5e7eb;
@@ -530,10 +540,21 @@
 
 .review-select-info {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    text-align: center;
+    min-width: 0;
+    text-align: left;
+}
+
+.review-select-btn {
+    /* ⚠️ margin 있으면 잘림 원인 됨 → 제거 */
+    min-width: 92px;
+    height: 36px;
+    border-radius: 999px;
+    border: none;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .review-select-name {
@@ -560,6 +581,7 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    margin: 10px;
 }
 
 .review-select-btn:hover {

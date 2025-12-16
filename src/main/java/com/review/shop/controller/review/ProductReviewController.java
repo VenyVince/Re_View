@@ -83,7 +83,7 @@ public class ProductReviewController {
             @ApiResponse(responseCode = "500", description = "DB 오류 (DatabaseException)")
     })
     public ResponseEntity<Map<String, Boolean>> canUpdate(
-            @RequestBody int review_id) {
+            @RequestParam("review_id") int review_id) {
         int user_id = security_Util.getCurrentUserId();
         boolean canUpdate = productReviewService.canUpdate(review_id, user_id);
         Map<String, Boolean> response = new HashMap<>();
