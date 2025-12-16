@@ -14,6 +14,18 @@ export default function ReviewDetailPage() {
 
     const [review, setReview] = useState(null);
     const [comments, setComments] = useState([]);
+    const [currentUserNickname, setCurrentUserNickname] = useState(null);
+
+    // 로그인 유저 정보 조회
+    useEffect(() => {
+        axiosClient.get("/api/auth/me")
+            .then((res) => {
+                setCurrentUserNickname(res.data.nickname);
+            })
+            .catch(() => {
+                setCurrentUserNickname(null); // 비로그인
+            });
+    }, []);
 
     // 리뷰 상세 + 댓글 조회
     useEffect(() => {
@@ -31,7 +43,11 @@ export default function ReviewDetailPage() {
                     category: p.category,
                 });
 
-                setComments(res.data.comments || []);
+                setComments((res.data.comments || []).map(c => ({
+                    ...c,
+                    comment_id:c.comment_id
+                }))
+                );
             })
             .catch((err) => {
                 console.error("리뷰 상세 조회 오류:", err);
@@ -54,15 +70,19 @@ export default function ReviewDetailPage() {
         }
     };
 
-    // 댓글 삭제
-    const handleDeleteComment = async (commentId) => {
+    // 댓글 삭제 (부모에서만 처리)
+    const handleDeleteComment = async (comment_id) => {
         if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
 
         try {
-            await axiosClient.delete(`/api/reviews/comments/${commentId}`);
+            await axiosClient.delete(`/api/reviews/comments/${comment_id}`);
 
             const res = await axiosClient.get(`/api/reviews/${reviewId}`);
-            setComments(res.data.comments || []);
+            setComments((res.data.comments || []).map(c => ({
+                    ...c,
+                    comment_id:c.comment_id
+                }))
+            );
         } catch (err) {
             if (err.response?.status === 401) {
                 alert("로그인이 필요합니다.");
@@ -77,7 +97,7 @@ export default function ReviewDetailPage() {
     // 리뷰 좋아요
     const handleLike = async () => {
         try {
-            if (review.user_disliked) {
+            if (review.is_like) {
                 await axiosClient.post(
                     `/api/reviews/${reviewId}/reaction`,
                     { is_like: false }
@@ -116,7 +136,7 @@ export default function ReviewDetailPage() {
     // 리뷰 싫어요
     const handleDislike = async () => {
         try {
-            if (review.user_liked) {
+            if (review.is_like) {
                 await axiosClient.post(
                     `/api/reviews/${reviewId}/reaction`,
                     { is_like: true }
@@ -171,7 +191,7 @@ export default function ReviewDetailPage() {
 
                 <ReviewCommentList
                     comments={comments}
-                    currentUserNickname={review.nickname}
+                    currentUserNickname={currentUserNickname}
                     onDelete={handleDeleteComment}
                 />
 
