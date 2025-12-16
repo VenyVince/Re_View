@@ -14,6 +14,18 @@ export default function ReviewDetailPage() {
 
     const [review, setReview] = useState(null);
     const [comments, setComments] = useState([]);
+    const [currentUserNickname, setCurrentUserNickname] = useState(null);
+
+    // 로그인 유저 정보 조회
+    useEffect(() => {
+        axiosClient.get("/api/auth/me")
+            .then((res) => {
+                setCurrentUserNickname(res.data.nickname);
+            })
+            .catch(() => {
+                setCurrentUserNickname(null); // 비로그인
+            });
+    }, []);
 
     // 리뷰 상세 + 댓글 조회
     useEffect(() => {
@@ -54,7 +66,7 @@ export default function ReviewDetailPage() {
         }
     };
 
-    // 댓글 삭제
+    // 댓글 삭제 (부모에서만 처리)
     const handleDeleteComment = async (commentId) => {
         if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
 
@@ -171,7 +183,7 @@ export default function ReviewDetailPage() {
 
                 <ReviewCommentList
                     comments={comments}
-                    currentUserNickname={review.nickname}
+                    currentUserNickname={currentUserNickname}
                     onDelete={handleDeleteComment}
                 />
 
