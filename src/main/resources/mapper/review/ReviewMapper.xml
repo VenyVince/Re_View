@@ -112,6 +112,7 @@
         FROM review_comment c
         JOIN USER_TABLE u ON c.user_id = u.user_id
         WHERE c.review_id = #{review_id}
+        and c.deleted_at is null
         ORDER BY c.created_at ASC
     </select>
 
