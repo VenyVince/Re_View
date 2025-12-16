@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { getPresignedUrls } from "../../../../api/review/reviewApi";
 
 export default function UserMyReviewPage() {
+    const MIN_EDIT_LENGTH = 20;
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -22,6 +23,11 @@ export default function UserMyReviewPage() {
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState("");
     const [editRating, setEditRating] = useState(0);
+
+    // 수정 폼 실시간 검증(최소 글자수)
+    const editTrimmed = editContent.trim();
+    const editContentLength = editTrimmed.length;
+    const isEditContentValid = editContentLength >= MIN_EDIT_LENGTH;
 
     // 기존(서버에 이미 저장된) 이미지 objectKey 목록
     const [editExistingImageKeys, setEditExistingImageKeys] = useState([]);
@@ -438,8 +444,13 @@ export default function UserMyReviewPage() {
             return;
         }
 
-        if (!editContent.trim()) {
+        const trimmed = editContent.trim();
+        if (!trimmed) {
             alert("리뷰 내용을 입력해주세요.");
+            return;
+        }
+        if (trimmed.length < 20) {
+            alert("리뷰는 20자 이상 작성해 주세요.");
             return;
         }
 
@@ -467,7 +478,7 @@ export default function UserMyReviewPage() {
 
             // PATCH /api/reviews/{review_id}
             await axiosClient.patch(`/api/reviews/${editingId}`, {
-                content: editContent.trim(),
+                content: trimmed,
                 rating: ratingNumber,
                 imageUrls: finalImageUrls,
             });
@@ -478,7 +489,7 @@ export default function UserMyReviewPage() {
                     r.review_id === editingId
                         ? {
                             ...r,
-                            content: editContent.trim(),
+                            content: trimmed,
                             rating: ratingNumber,
                             imageUrls: finalImageUrls,
                         }
@@ -599,27 +610,7 @@ export default function UserMyReviewPage() {
                                     </div>
                                 </header>
 
-                                {/* 평점 */}
-                                <div className="myreview-rating-row">
-                                    <div className="myreview-stars">
-                                        {Array.from({ length: 5 }).map((_, idx) => {
-                                            const score = isEditing ? Number(editRating) || 0 : Number(review.rating) || 0;
 
-                                            let starClass = "myreview-star";
-                                            if (score >= idx + 1) starClass += " myreview-star--on";
-                                            else if (score >= idx + 0.5) starClass += " myreview-star--half";
-
-                                            return (
-                                                <span key={idx} className={starClass}>
-                          ★
-                        </span>
-                                            );
-                                        })}
-                                        <span className="myreview-score">
-                      {isEditing ? Number(editRating || 0).toFixed(1) : formatRating(review.rating)}
-                    </span>
-                                    </div>
-                                </div>
 
                                 {/* 내용: 보기 / 수정 */}
                                 {!isEditing ? (
@@ -629,20 +620,37 @@ export default function UserMyReviewPage() {
                                         <div className="myreview-edit-header">
                                             <div className="myreview-edit-rating">
                                                 <span className="myreview-edit-label">별점</span>
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    max="5"
-                                                    step="0.5"
-                                                    className="myreview-edit-rating-input"
-                                                    value={editRating}
-                                                    onChange={(e) => setEditRating(e.target.value)}
-                                                />
-                                                <span className="myreview-edit-rating-max">/ 5</span>
+
+                                                <div className="myreview-stars" style={{ cursor: "pointer" }}>
+                                                    {Array.from({ length: 5 }).map((_, idx) => {
+                                                        const starValue = idx + 1;
+                                                        const current = Number(editRating) || 0;
+
+                                                        let starClass = "myreview-star";
+                                                        if (current >= starValue) starClass += " myreview-star--on";
+                                                        else if (current >= starValue - 0.5) starClass += " myreview-star--half";
+
+                                                        return (
+                                                            <span
+                                                                key={idx}
+                                                                className={starClass}
+                                                                onClick={() => setEditRating(starValue)}
+                                                                role="button"
+                                                                tabIndex={0}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") setEditRating(starValue);
+                                                                }}
+                                                            >
+                                                                ★
+                                                            </span>
+                                                        );
+                                                    })}
+                                                    <span className="myreview-score">
+                                                        {Number(editRating || 0).toFixed(1)} / 5.0
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <span className="myreview-edit-help">
-                        내용/별점/이미지를 수정한 뒤 &ldquo;저장하기&rdquo;를 눌러주세요.
-                      </span>
+
                                         </div>
 
                                         <textarea
@@ -652,6 +660,21 @@ export default function UserMyReviewPage() {
                                             rows={5}
                                             placeholder="상품을 사용해 본 느낌을 자세히 적어주세요."
                                         />
+                                        <p
+                                            className="myreview-edit-content-help"
+                                            style={{
+                                                marginTop: 6,
+                                                fontSize: 12,
+                                                color: editContentLength === 0 ? "#9ca3af" : isEditContentValid ? "#16a34a" : "#ef4444",
+
+                                            }}
+                                        >
+                                            {editContentLength === 0
+                                                ? "리뷰를 작성해 주세요."
+                                                : isEditContentValid
+                                                    ? "작성 조건을 충족했습니다."
+                                                    : `글자 수가 부족합니다. (현재 ${editContentLength}자 / 최소 ${MIN_EDIT_LENGTH}자)`}
+                                        </p>
 
                                         {/* 이미지 수정 UI (ReviewWrite 방식) */}
                                         <div className="myreview-edit-images">
@@ -660,87 +683,92 @@ export default function UserMyReviewPage() {
                                                 <span className="myreview-edit-help">최대 5장까지 첨부할 수 있어요.</span>
                                             </div>
 
-                                            {/* 기존 이미지(objectKey) */}
+                                            {/* 썸네일 + 이미지 추가 버튼을 같은 줄(그리드)로 */}
                                             <div className="myreview-edit-images-list">
-                                                {editExistingImageKeys.length > 0 ? (
-                                                    editExistingImageKeys.map((key, idx) => (
-                                                        <div key={`exist-${idx}`} className="myreview-edit-thumb">
-                                                            <img
-                                                                src={toImageSrc(key)}
-                                                                alt={`기존 리뷰 이미지 ${idx + 1}`}
-                                                                className="myreview-edit-thumb-img"
-                                                                onError={(e) => {
-                                                                    e.currentTarget.src = "data:image/svg+xml;charset=utf-8," +
-                                                                        encodeURIComponent(
-                                                                            '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-size="14">이미지 로드 실패</text></svg>'
-                                                                        );
-                                                                }}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                className="myreview-edit-thumb-remove"
-                                                                onClick={() => handleRemoveExistingImage(idx)}
-                                                            >
-                                                                삭제
-                                                            </button>
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <p className="myreview-edit-images-empty">등록된 이미지가 없습니다.</p>
+                                                {/* 기존 이미지(objectKey) */}
+                                                {editExistingImageKeys.map((key, idx) => (
+                                                    <div key={`exist-${idx}`} className="myreview-edit-thumb">
+                                                        <img
+                                                            src={toImageSrc(key)}
+                                                            alt={`기존 리뷰 이미지 ${idx + 1}`}
+                                                            className="myreview-edit-thumb-img"
+                                                            onError={(e) => {
+                                                                e.currentTarget.src =
+                                                                    "data:image/svg+xml;charset=utf-8," +
+                                                                    encodeURIComponent(
+                                                                        '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-size="14">이미지 로드 실패</text></svg>'
+                                                                    );
+                                                            }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="myreview-edit-thumb-remove"
+                                                            onClick={() => handleRemoveExistingImage(idx)}
+                                                        >
+                                                            삭제
+                                                        </button>
+                                                    </div>
+                                                ))}
+
+                                                {/* 새로 추가한 이미지(로컬 미리보기) */}
+                                                {editNewPreviews.map((src, idx) => (
+                                                    <div key={`new-${idx}`} className="myreview-edit-thumb">
+                                                        <img
+                                                            src={src}
+                                                            alt={`새 리뷰 이미지 ${idx + 1}`}
+                                                            className="myreview-edit-thumb-img"
+                                                            onError={(e) => {
+                                                                e.currentTarget.src =
+                                                                    "data:image/svg+xml;charset=utf-8," +
+                                                                    encodeURIComponent(
+                                                                        '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-size="14">이미지 로드 실패</text></svg>'
+                                                                    );
+                                                            }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="myreview-edit-thumb-remove"
+                                                            onClick={() => handleRemoveNewImage(idx)}
+                                                        >
+                                                            삭제
+                                                        </button>
+                                                    </div>
+                                                ))}
+
+                                                {/* 파일 선택: 썸네일 크기와 같은 타일 */}
+                                                {(editExistingImageKeys.length + editNewFiles.length) < 5 && (
+                                                    <div className="myreview-edit-add-tile">
+                                                        <label className="myreview-edit-file-label" htmlFor="myreviewEditFiles">
+                                                            + 이미지 추가
+                                                        </label>
+                                                        <input
+                                                            id="myreviewEditFiles"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            multiple
+                                                            className="myreview-edit-file-input"
+                                                            onChange={handleNewImageFilesChange}
+                                                        />
+                                                    </div>
                                                 )}
                                             </div>
 
-                                            {/* 새로 추가한 이미지(로컬 미리보기) */}
-                                            {editNewPreviews.length > 0 && (
-                                                <div className="myreview-edit-images-list" style={{ marginTop: 10 }}>
-                                                    {editNewPreviews.map((src, idx) => (
-                                                        <div key={`new-${idx}`} className="myreview-edit-thumb">
-                                                            <img
-                                                                src={src}
-                                                                alt={`새 리뷰 이미지 ${idx + 1}`}
-                                                                className="myreview-edit-thumb-img"
-                                                                onError={(e) => {
-                                                                    e.currentTarget.src = "data:image/svg+xml;charset=utf-8," +
-                                                                        encodeURIComponent(
-                                                                            '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-size="14">이미지 로드 실패</text></svg>'
-                                                                        );
-                                                                }}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                className="myreview-edit-thumb-remove"
-                                                                onClick={() => handleRemoveNewImage(idx)}
-                                                            >
-                                                                삭제
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            {/* 파일 선택 */}
-                                            {(editExistingImageKeys.length + editNewFiles.length) < 5 && (
-                                                <div className="myreview-edit-add-image-row">
-                                                    <label className="myreview-edit-file-label" htmlFor="myreviewEditFiles">
-                                                        + 이미지 추가
-                                                    </label>
-                                                    <input
-                                                        id="myreviewEditFiles"
-                                                        type="file"
-                                                        accept="image/*"
-                                                        multiple
-                                                        className="myreview-edit-file-input"
-                                                        onChange={handleNewImageFilesChange}
-                                                    />
-                                                </div>
+                                            {/* 이미지가 하나도 없을 때만 문구 표시 */}
+                                            {editExistingImageKeys.length === 0 && editNewPreviews.length === 0 && (
+                                                <p className="myreview-edit-images-empty">등록된 이미지가 없습니다.</p>
                                             )}
                                         </div>
-
                                         <div className="myreview-edit-actions">
                                             <button type="button" className="myreview-cancel-btn" onClick={handleCancelEdit}>
                                                 취소
                                             </button>
-                                            <button type="button" className="myreview-save-btn" onClick={handleSaveEdit}>
+                                            <button
+                                                type="button"
+                                                className="myreview-save-btn"
+                                                onClick={handleSaveEdit}
+                                                disabled={!isEditContentValid}
+                                                title={!isEditContentValid ? `리뷰는 ${MIN_EDIT_LENGTH}자 이상 작성해야 저장할 수 있어요.` : ""}
+                                            >
                                                 저장하기
                                             </button>
                                         </div>

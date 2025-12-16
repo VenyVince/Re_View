@@ -432,6 +432,150 @@
     background-color: #000;
 }
 
+/* ===========================
+   수정 폼: 이미지 첨부 UI
+=========================== */
+
+.myreview-edit-images {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.myreview-edit-images-header {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    text-align: center;
+}
+
+.myreview-edit-images-header .myreview-edit-label {
+    font-weight: 700;
+    font-size: 16px;
+    color: #111;
+}
+
+.myreview-edit-images-header .myreview-edit-help {
+    font-size: 13px;
+    color: #888;
+}
+
+.myreview-edit-images-empty {
+    margin: 0;
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+}
+
+.myreview-edit-images-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.myreview-edit-thumb {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f5f5f5;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.myreview-edit-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.myreview-edit-thumb-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    background: rgba(17, 17, 17, 0.85);
+    color: #fff;
+}
+
+.myreview-edit-thumb-remove:hover {
+    background: rgba(0, 0, 0, 0.92);
+}
+
+.myreview-edit-add-image-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.myreview-edit-file-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px dashed #d1d5db;
+    background: #fff;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.myreview-edit-file-label:hover {
+    background: #fafafa;
+}
+
+/* 핵심: 기본 파일 input UI 숨김 */
+.myreview-edit-file-input {
+    display: none;
+}
+
+.myreview-edit-add-tile {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.myreview-edit-file-label {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 12px;
+    border: 1px dashed #d1d5db;
+    background: #fff;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.myreview-edit-file-label:hover {
+    background: #fafafa;
+}
+
+.myreview-edit-images-empty {
+    margin: 6px 0 0;
+    text-align: left;
+    font-size: 13px;
+    color: #999;
+}
+
+.myreview-edit-content-help {
+    text-align: left;
+}
 /* 반응형 처리 */
 @media (max-width: 600px) {
     .myreview-search-bar {
