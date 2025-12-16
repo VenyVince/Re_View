@@ -14,6 +14,5 @@ public class CartitemResponseDTO {
     private int quantity;
     private Boolean is_sold_out;
 
-    private String image_url;
     private String product_thumbnail_url;
 }
