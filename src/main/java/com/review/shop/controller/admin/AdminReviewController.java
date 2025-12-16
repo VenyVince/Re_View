@@ -24,6 +24,7 @@ public class AdminReviewController {
     private final AdminReviewService adminReviewService;
 
 
+
     // =================================================================================
     // SECTION: 리뷰 관리 (Review)
     // =================================================================================
@@ -59,4 +60,17 @@ public class AdminReviewController {
         adminReviewService.setReviewSelection(review_id, is_selected);
         return ResponseEntity.ok(review_id + "가 운영자 채택 리뷰로 변경되었습니다.");
     }
+
+    //모든 리뷰 조회
+    @Operation(summary = "모든 리뷰 조회", description = "모든 리뷰를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+            @ApiResponse(responseCode = "500", description = "DB 조회 오류",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/reviews")
+    public ResponseEntity<?> getAllReviews() {
+        return ResponseEntity.ok(adminReviewService.getAllReviews());
+    }
+
 }

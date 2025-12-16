@@ -21,4 +21,17 @@
         where review_id = #{review_id}
     </select>
 
+    <select id="getAllReviews" resultType="com.review.shop.dto.review.ReviewAdminDTO">
+        SELECT
+            r.review_id,
+            COALESCE(u.nickname, u.name) AS writer,
+            r.content,
+            p.price,
+            r.is_selected
+        FROM review r
+                 JOIN USER_table u ON r.user_id = u.user_id
+                 JOIN product p ON r.product_id = p.product_id
+        WHERE r.deleted_at IS NULL
+    </select>
+
 </mapper>
