@@ -1,11 +1,10 @@
 package com.review.shop.controller.review;
 
-import com.review.shop.util.Security_Util;
 import com.review.shop.dto.review.community.CommentRequestDTO;
 import com.review.shop.dto.review.community.LikeRequestDTO;
 import com.review.shop.dto.review.community.ReportRequestDTO;
-import com.review.shop.dto.review.community.ReviewCommentResponseDTO;
 import com.review.shop.service.review.ReviewActionService;
+import com.review.shop.util.Security_Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,8 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -27,18 +24,6 @@ public class ReviewActionController {
     private final Security_Util securityUtil;
 
     // ==================== 댓글 (Comment) ====================
-
-    @Operation(summary = "댓글 목록 조회", description = "특정 리뷰에 달린 모든 댓글을 작성일 순으로 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "500", description = "서버(DB) 오류")
-    })
-    @GetMapping("/{review_id}/comments")
-    public ResponseEntity<List<ReviewCommentResponseDTO>> getComments(
-            @Parameter(description = "대상 리뷰 ID", required = true) @PathVariable int review_id
-    ) {
-        return ResponseEntity.ok(reviewActionService.getComments(review_id));
-    }
 
     @Operation(summary = "댓글 작성", description = "리뷰에 새로운 댓글을 등록합니다.")
     @ApiResponses(value = {
