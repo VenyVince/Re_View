@@ -43,6 +43,8 @@ services:
     build:
       context: ../View
       dockerfile: Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
     ports:
       - "80:80"
     depends_on:
