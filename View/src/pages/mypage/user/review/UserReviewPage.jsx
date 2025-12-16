@@ -133,6 +133,43 @@ export default function UserMyReviewPage() {
         return "";
     };
 
+    // === 권한(수정/삭제 가능 여부) 조회 ===
+    // ⚠️ 백엔드가 GET에 body를 받는 형태면 브라우저에서 body가 누락될 수 있습니다.
+    // "GET 유지(쿼리)" 버전으로 맞추기 위해 아래처럼 review_id를 query param 으로 호출합니다.
+
+    // 중복 호출 방지용(리뷰 수가 많으면 네트워크 폭주 방지)
+    const [canUpdateCache, setCanUpdateCache] = useState({}); // { [reviewId]: boolean }
+
+    const fetchCanUpdate = async (reviewId) => {
+        const rid = Number(reviewId);
+        if (!rid) return false;
+
+        // 캐시 히트
+        if (Object.prototype.hasOwnProperty.call(canUpdateCache, rid)) {
+            return Boolean(canUpdateCache[rid]);
+        }
+
+        const saveCache = (val) => {
+            setCanUpdateCache((prev) => ({ ...prev, [rid]: Boolean(val) }));
+        };
+
+        try {
+            // ✅ GET /api/reviews/exists/update?review_id=123
+            const res = await axiosClient.get("/api/reviews/exists/update", {
+                params: { review_id: rid },
+            });
+            const root = res?.data?.data ?? res?.data;
+            const can = root?.canUpdate ?? root?.can_update;
+            const boolVal = Boolean(can);
+            saveCache(boolVal);
+            return boolVal;
+        } catch (e) {
+            console.warn("[UserReviewPage] canUpdate(GET query) 실패:", e);
+            saveCache(false);
+            return false;
+        }
+    };
+
     // === 1. 내 리뷰 목록 불러오기 ===
     const fetchMyReviews = async ({
                                       keywordValue = keyword,
@@ -179,18 +216,28 @@ export default function UserMyReviewPage() {
                     review.image_urls ??
                     review.imageUrls ??
                     (review.image_url ? [review.image_url] : []),
-                canUpdate: review.canUpdate ?? review.can_update ?? true,
+                // 목록 API에 canUpdate가 없거나 신뢰하기 어려워서(또는 최신 규칙 반영 위해) 아래에서 별도 조회로 보정
+                canUpdate: review.canUpdate ?? review.can_update ?? null,
             }));
 
-            // 1차: 목록 응답 그대로 세팅
-            setReviews(normalized);
+            // 1차: 목록 응답 + canUpdate(수정/삭제 가능 여부) 보정
+            const withPermissions = await Promise.all(
+                normalized.map(async (item) => {
+                    // 목록에서 canUpdate가 이미 boolean으로 오면 그대로 사용
+                    if (typeof item.canUpdate === "boolean") return item;
+                    const can = await fetchCanUpdate(item.review_id);
+                    return { ...item, canUpdate: can };
+                })
+            );
+
+            setReviews(withPermissions);
             setCurrentPage(1);
 
             // 2차: 각 리뷰 상세에서 이미지 URL(또는 objectKey 리스트)을 다시 받아서 보정
             // ReviewDetailPage에서는 이미지가 정상 노출되므로 그 응답 구조를 우선 신뢰
             try {
                 const enriched = await Promise.all(
-                    normalized.map(async (item) => {
+                    withPermissions.map(async (item) => {
                         // 이미지가 아예 없으면 스킵
                         const cur = Array.isArray(item.imageUrls) ? item.imageUrls : [];
                         if (cur.length === 0) return item;
@@ -594,6 +641,7 @@ export default function UserMyReviewPage() {
                                                     className="myreview-meta-btn"
                                                     onClick={() => handleStartEdit(review)}
                                                     disabled={!canUpdate}
+                                                    title={!canUpdate ? "이 리뷰는 수정할 수 없습니다." : ""}
                                                 >
                                                     수정
                                                 </button>
@@ -602,6 +650,7 @@ export default function UserMyReviewPage() {
                                                     className="myreview-meta-btn"
                                                     onClick={() => handleDelete(review)}
                                                     disabled={!canUpdate}
+                                                    title={!canUpdate ? "이 리뷰는 삭제할 수 없습니다." : ""}
                                                 >
                                                     삭제
                                                 </button>
