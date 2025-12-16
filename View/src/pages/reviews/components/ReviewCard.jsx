@@ -6,22 +6,30 @@ import "./ReviewCard.css";
 export default function ReviewCard({ review }) {
     const navigate = useNavigate();
 
-    const hasImage = Boolean(review.image_url);
+    const imageSrc = review.image_url || review.product_image || "";
+
+    const hasImage = Boolean(imageSrc);
 
     return (
         <div
             className="reviewCard"
             onClick={() => navigate(`/review/${review.review_id}`)}
         >
-
             {/* 이미지 */}
             <div className={`reviewImageWrap ${hasImage ? "hasImage" : "noImage"}`}>
-                <img
-                    src={review.image_url || ""}
-                    alt={review.product_name}
-                    className={hasImage ? "hasImage" : "noImage"}
-                    onError={(e) => (e.currentTarget.style.display = "none")}  /* 이미지 깨질 때 숨김 */
-                />
+                {hasImage && (
+                    <img
+                        src={imageSrc}
+                        alt={review.product_name}
+                        className="hasImage"
+                        onError={(e) => {
+                            // 이미지 깨질 경우 fallback → noImage 처리
+                            e.currentTarget.style.display = "none";
+                            e.currentTarget.parentElement.classList.remove("hasImage");
+                            e.currentTarget.parentElement.classList.add("noImage");
+                        }}
+                    />
+                )}
             </div>
 
             {/* 브랜드 + 평점 */}

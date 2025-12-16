@@ -75,7 +75,7 @@ Re_View는 Baumann(바우만) 피부 타입 기반 추천 방식을 사용합니
 ```
 /
 ├─ API 명세서
-├─ infra/                 # docker-compose, MinIO 데이터
+├─ infra/                 # docker-compose, MinIO, DB 설정
 ├─ src/main/java/         # Spring Boot Backend
 ├─ src/main/resources/
 ├─ View/                  # React Frontend

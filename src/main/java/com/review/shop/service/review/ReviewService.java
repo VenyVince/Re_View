@@ -23,26 +23,24 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final ImageService imageService;
 
-    public List<ReviewDTO> getReviewList(String sort, String category) {
-        // 정렬 옵션 기본값 및 검증
+    // Service
+    public List<ReviewDTO> getReviewList(String sort, String category, int page, int size) {
         if (sort == null || sort.isEmpty()) sort = "latest";
 
         try {
-            List<ReviewDTO> reviews = reviewMapper.selectReviewList(sort, category);
 
-            // 이미지 Presigned URL 처리 (리뷰 이미지 + 상품 썸네일)
+            // offset 계산, 2페이지면 200개의 리뷰를 건너뛰어야하므로.
+            int offset = page * size;
+
+            List<ReviewDTO> reviews = reviewMapper.selectReviewList(sort, category, offset, size);
+
+            // 이미지 Presigned URL 처리
             reviews.forEach(review -> {
-
-                // 리뷰 이미지 변환
                 if (review.getImage_url() != null && !review.getImage_url().isEmpty()) {
-                    String presignedUrl = imageService.presignedUrlGet(review.getImage_url());
-                    review.setImage_url(presignedUrl);
+                    review.setImage_url(imageService.presignedUrlGet(review.getImage_url()));
                 }
-
-                // 2. 상품 썸네일 변환
                 if (review.getProduct_image() != null && !review.getProduct_image().isEmpty()) {
-                    String productUrl = imageService.presignedUrlGet(review.getProduct_image());
-                    review.setProduct_image(productUrl);
+                    review.setProduct_image(imageService.presignedUrlGet(review.getProduct_image()));
                 }
             });
 

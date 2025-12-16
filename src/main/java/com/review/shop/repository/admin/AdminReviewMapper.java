@@ -1,7 +1,10 @@
 package com.review.shop.repository.admin;
 
+import com.review.shop.dto.review.ReviewAdminDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface AdminReviewMapper {
@@ -16,4 +19,6 @@ public interface AdminReviewMapper {
 
     // 운영자 픽 시 리뷰 작성자 user_id 반환
     int findReviewer(@Param("review_id") int review_id);
+
+    List<ReviewAdminDTO> getAllReviews();
 }

@@ -32,20 +32,19 @@ export default function MiniBuyBox({
             /**
              * [구매하기]
              * - OrderPaymentPage에서 사용하는 데이터 구조로 전달
-             * - state.items는 반드시 배열
              */
             if (miniActionType === "buy") {
-                const orderItem = {
+                // 1. 변수명 선언
+                const checkoutItem = {
                     product_id: product.product_id,
-                    prd_name: product.prd_name,
-                    prd_brand: product.prd_brand,
-                    price: product.price,
-                    quantity: qty,
+                    buy_quantity: qty
                 };
 
                 navigate("/order/payment", {
                     state: {
-                        items: [orderItem],
+                        // 2. 수정됨: items -> checkoutItems (결제페이지 로직에 맞춤)
+                        // 3. 수정됨: orderItem -> checkoutItem (변수명 오타 수정)
+                        checkoutItems: [checkoutItem],
                     },
                 });
 

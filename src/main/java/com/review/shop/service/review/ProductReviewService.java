@@ -52,16 +52,15 @@ public class ProductReviewService {
         if (review == null) return false;
         if (review.getUser_id() != user_id) return false;
         if (review.getLike_count() >= 100) return false;
-        if (review.getIs_selected() >= 1) return false;
-
-        return true;
+        if (review.getIs_checked() != 0) return false;
+        return review.getIs_selected() == 0;
     }
 
 
     /**
      * 특정 상품의 리뷰 목록 조회
      */
-    public List<ProductReviewDTO> getProductReviews(int product_id, String sort) {
+    public List<ProductReviewDTO> getProductReviews(int product_id, String sort, int user_id) {
 
         // 상품 존재 여부 체크
         if (productReviewMapper.selectProductById(product_id) == null) {
@@ -72,18 +71,17 @@ public class ProductReviewService {
             sort = "like_count";
         }
 
-        // DB에서 조회 (image_url에는 Object Key가 들어있음)
-        List<ProductReviewDTO> reviewsWithImages = productReviewMapper.selectReviewsByProduct(product_id, sort);
+        // 매퍼에 user_id 전달
+        List<ProductReviewDTO> reviewsWithImages = productReviewMapper.selectReviewsByProduct(product_id, sort, user_id);
 
-        // 리뷰를 review_id로 그룹핑해서 이미지 배열 생성
+        // 리뷰 그룹핑 및 이미지 처리 로직
         Map<Integer, ProductReviewDTO> groupedReviews = new LinkedHashMap<>();
         for (ProductReviewDTO review : reviewsWithImages) {
             groupedReviews.putIfAbsent(review.getReview_id(), review);
 
-            // [변경] 이미지가 있으면 Key를 URL로 변환하여 추가
             String objectKey = review.getImage_url();
             if (objectKey != null && !objectKey.isEmpty()) {
-                String presignedUrl = imageService.presignedUrlGet(objectKey); // Key -> URL 변환
+                String presignedUrl = imageService.presignedUrlGet(objectKey);
                 groupedReviews.get(review.getReview_id()).getImages().add(presignedUrl);
             }
         }
@@ -184,6 +182,7 @@ public class ProductReviewService {
         // 유효성 검사
         if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
         if (rating < 1 || rating > 5) throw new WrongRequestException("평점은 1~5 사이여야 합니다");
+        if (!canUpdate(review_id, user_id)) throw new WrongRequestException("수정할 수 없는 리뷰입니다.");
 
         // 리뷰 내용 수정
         int updatedRows = productReviewMapper.updateReview(review_id, content, rating);

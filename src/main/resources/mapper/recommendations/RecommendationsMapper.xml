@@ -3,14 +3,16 @@
 
 <mapper namespace="com.review.shop.repository.recommendations.RecommendationsMapper">
 
+        <!--  1. 사용자의 바우만 타입 조회  -->
     <select id="getBaumannTypeByUserId" parameterType="int" resultType="Integer">
         SELECT BAUMANN_ID FROM USER_TABLE WHERE user_id = #{user_id}
     </select>
-
-    <select id="getBaumannDTOWithId" parameterType="integer" resultType="com.review.shop.dto.recommendations.RecommendationsUserDTO">
+    <select id="getBaumannDTOWithId" parameterType="integer" resultType="com.review.shop.dto.recommendations.BaumannDTO">
         SELECT FIRST, SECOND, THIRD, FOURTH FROM BAUMANN WHERE BAUMANN_ID = #{user_Baumann}
     </select>
 
+        <!-- 2. 공통되는 SQL파트 -->
+    <!-- 상품 기본 컬럼 -->
     <sql id="productSelectColumns">
         p.product_id,
         p.prd_name,
@@ -18,158 +20,197 @@
         p.price,
         p.rating,
         p.review_count,
-
-        -- 상품 대표 이미지
-        (SELECT pi.IMAGE_URL FROM PRODUCT_IMAGE pi WHERE pi.PRODUCT_ID = p.PRODUCT_ID AND pi.IS_THUMBNAIL = 'Y' AND ROWNUM = 1) AS image_url,
-
-        -- 베스트 리뷰 ID
-        (SELECT REVIEW_ID FROM (SELECT r.REVIEW_ID FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_id,
-
-        -- 베스트 리뷰 내용
-        (SELECT CONTENT FROM (SELECT r.CONTENT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_content,
-
-        -- 베스트 리뷰 좋아요 수 (DTO 필드명: top_review_likes에 맞춰 별칭 수정 권장)
-        (SELECT LIKE_COUNT FROM (SELECT r.LIKE_COUNT FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_likes,
-
-        -- 베스트 리뷰 평점
-        (SELECT RATING FROM (SELECT r.RATING FROM REVIEW r WHERE r.PRODUCT_ID = p.PRODUCT_ID ORDER BY r.LIKE_COUNT DESC) WHERE ROWNUM = 1) AS top_review_rating,
-
-        -- [추가됨] 베스트 리뷰의 이미지 URL
-        (
-            SELECT ri.IMAGE_URL
-            FROM REVIEW_IMAGES ri
-            WHERE ri.REVIEW_ID = (
-                SELECT REVIEW_ID
-                FROM (
-                    SELECT r.REVIEW_ID
-                    FROM REVIEW r
-                    WHERE r.PRODUCT_ID = p.PRODUCT_ID
-                    ORDER BY r.LIKE_COUNT DESC
-                ) WHERE ROWNUM = 1
-            )
-            AND ROWNUM = 1 -- 리뷰 이미지가 여러 개일 경우 하나만 가져옴
-        ) AS top_review_image_url
+        pi.image_url AS product_image_url
     </sql>
 
-    <sql id="matchScoreAll">
-        (
-            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
-                (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
-                (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END) +
-                (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
-        ) AS match_score
+    <!-- 상품 썸네일 -->
+    <sql id="productImageJoin">
+        LEFT JOIN LATERAL (
+            SELECT pi.image_url
+            FROM PRODUCT_IMAGE pi
+            WHERE pi.product_id = p.product_id
+              AND pi.is_thumbnail = 'Y'
+            FETCH FIRST 1 ROWS ONLY
+        ) pi ON 1 = 1
     </sql>
 
-    <sql id="matchScoreWithoutFirst">
+    <!-- 상품 바우만 매칭 점수 (최소 40점 이상 필터용) -->
+    <sql id="productBaumannScore">
         (
-            50 +
-            (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
-        ) AS match_score
+            (CASE WHEN b.FIRST  = #{userInfo[0]} THEN 30 WHEN b.FIRST  IS NULL THEN 10 ELSE 0 END) +
+                (CASE WHEN b.SECOND = #{userInfo[1]} THEN 30 WHEN b.SECOND IS NULL THEN 10 ELSE 0 END) +
+                (CASE WHEN b.THIRD  = #{userInfo[2]} THEN 30 WHEN b.THIRD  IS NULL THEN 10 ELSE 0 END) +
+                (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 30 WHEN b.FOURTH IS NULL THEN 10 ELSE 0 END)
+        )
     </sql>
 
-    <sql id="matchScoreWithoutSecond">
-        (
-            50 +
-            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
-        ) AS match_score
+    <!-- 상품 리뷰 수 점수 -->
+    <sql id="productReviewCountScore">
+        CASE
+            WHEN p.review_count >= 50 THEN 20
+            WHEN p.review_count >= 30 THEN 15
+            WHEN p.review_count >= 10 THEN 10
+            ELSE 0
+        END
     </sql>
 
-    <sql id="matchScoreWithoutThird">
-        (
-            50 +
-            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.FOURTH = #{userInfo[3]} THEN 50 WHEN b.FOURTH IS NULL THEN 10 ELSE -10 END)
-        ) AS match_score
-    </sql>
+    <!--  3. 상품 추천  -->
+    <select id="findRecommendProducts" parameterType="java.util.List" resultType="com.review.shop.dto.recommendations.RecommendProductDTO">
 
-    <sql id="matchScoreWithoutFourth">
+        SELECT *
+        FROM (
+        SELECT
+        <include refid="productSelectColumns"/>,
         (
-            50 +
-            (CASE WHEN b.FIRST = #{userInfo[0]} THEN 50 WHEN b.FIRST IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.SECOND = #{userInfo[1]} THEN 50 WHEN b.SECOND IS NULL THEN 10 ELSE -10 END) +
-            (CASE WHEN b.THIRD = #{userInfo[2]} THEN 50 WHEN b.THIRD IS NULL THEN 10 ELSE -10 END)
-        ) AS match_score
-    </sql>
+        <include refid="productBaumannScore"/>
+        +
+        <include refid="productReviewCountScore"/>
+        ) AS total_score
+        FROM PRODUCT p
+        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+        JOIN BAUMANN pb ON p.baumann_id = pb.baumann_id
 
-    <sql id="orderByMatchScore">
+        <include refid="productImageJoin"/>
+        )
+        WHERE total_score >= 40
         ORDER BY
-        match_score DESC,
-        DBMS_RANDOM.VALUE,
+        total_score DESC,
         review_count DESC
+        FETCH FIRST 16 ROWS ONLY
+    </select>
+    <!-- 4. 리뷰 추천 -->
+
+    <!-- 리뷰 바우만 매칭 점수(작성자와 사용자 바우만 타입 비교) -->
+    <sql id="reviewBaumannScore">
+        (
+            (CASE WHEN rb.FIRST  = #{userInfo[0]} THEN 10 ELSE 0 END) +
+            (CASE WHEN rb.SECOND = #{userInfo[1]} THEN 10 ELSE 0 END) +
+            (CASE WHEN rb.THIRD  = #{userInfo[2]} THEN 10 ELSE 0 END) +
+            (CASE WHEN rb.FOURTH = #{userInfo[3]} THEN 10 ELSE 0 END)
+        )
     </sql>
-
-    <select id="findRecommencementsWithAll" resultType="com.review.shop.dto.product.RecommendationDTO">
-        SELECT * FROM (
-        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreAll"/>
-        FROM PRODUCT p
-        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
+    <sql id="productBaumannMatchScore">
+        (
+            (CASE WHEN pb.FIRST = #{userInfo[0]} THEN 5 WHEN pb.FIRST IS NULL THEN 3 ELSE 0 END)
+                + (CASE WHEN pb.SECOND = #{userInfo[1]} THEN 5 WHEN pb.SECOND IS NULL THEN 3 ELSE 0 END)
+                + (CASE WHEN pb.THIRD = #{userInfo[2]} THEN 5 WHEN pb.THIRD IS NULL THEN 3 ELSE 0 END)
+                + (CASE WHEN pb.FOURTH = #{userInfo[3]} THEN 5 WHEN pb.FOURTH IS NULL THEN 3 ELSE 0 END)
         )
-        WHERE match_score > 0
-        <include refid="orderByMatchScore"/>
+    </sql>
+    <sql id="ratingSimilarityScore">
+        CASE
+        WHEN ABS(r.rating - p.rating) &lt;= 0.5 THEN 10
+        WHEN ABS(r.rating - p.rating) &lt;= 1.0 THEN 5
+        ELSE 0
+        END
+    </sql>
+    <!-- 리뷰 ResultMap -->
+    <resultMap id="RecommendReviewMap" type="com.review.shop.dto.recommendations.RecommendReviewDTO">
+
+        <id property="review_id" column="review_id"/>
+
+        <result property="content" column="content"/>
+        <result property="review_rating" column="review_rating"/>
+        <result property="like_count" column="like_count"/>
+
+        <result property="product_id" column="product_id"/>
+        <result property="prd_name" column="prd_name"/>
+        <result property="rating" column="rating"/>
+
+        <result property="total_score" column="total_score"/>
+
+        <collection property="review_image_urls" ofType="string" column="review_id" select="findReviewImagesByReviewId"/>
+    </resultMap>
+
+
+    <!-- 리뷰 추천 -->
+    <select id="findRecommendReviews"
+            parameterType="java.util.List"
+            resultType="com.review.shop.dto.recommendations.RecommendReviewDTO">
+
+        SELECT review_id, content, review_rating, like_count, nickname,
+        review_image_url, product_id, prd_name, rating, is_checked, total_score
+        FROM (
+        SELECT
+        r.review_id,
+        r.content,
+        r.rating AS review_rating,
+        r.like_count,
+        r.is_checked,
+        u.nickname,
+        ri.image_url AS review_image_url,
+        p.product_id,
+        p.prd_name,
+        p.rating,
+
+        CASE
+        WHEN r.is_checked = 1 THEN
+        ( (<include refid="reviewBaumannScore"/>
+        + <include refid="productBaumannMatchScore"/>
+        + <include refid="ratingSimilarityScore"/> ) * 1.2 )
+        ELSE
+        ( <include refid="reviewBaumannScore"/>
+        + <include refid="productBaumannMatchScore"/>
+        + <include refid="ratingSimilarityScore"/> )
+        END AS total_score,
+
+        ROW_NUMBER() OVER (
+        PARTITION BY p.product_id
+        ORDER BY
+        CASE
+        WHEN r.is_checked = 1 THEN
+        ( (<include refid="reviewBaumannScore"/>
+        + <include refid="productBaumannMatchScore"/>
+        + <include refid="ratingSimilarityScore"/> ) * 1.2 )
+        ELSE
+        ( <include refid="reviewBaumannScore"/>
+        + <include refid="productBaumannMatchScore"/>
+        + <include refid="ratingSimilarityScore"/> )
+        END DESC,
+        r.like_count DESC
+        ) AS rn
+
+        FROM REVIEW r
+        JOIN PRODUCT p ON r.product_id = p.product_id
+        JOIN USER_TABLE u ON r.user_id = u.user_id
+        JOIN BAUMANN rb ON u.baumann_id = rb.baumann_id
+        JOIN BAUMANN pb ON p.baumann_id = pb.baumann_id
+        LEFT JOIN LATERAL (
+        SELECT image_url
+        FROM REVIEW_IMAGES ri
+        WHERE ri.review_id = r.review_id
+        ORDER BY ri.review_image_id ASC
+        FETCH FIRST 1 ROWS ONLY
+        ) ri ON 1 = 1
+        )
+        WHERE rn = 1
+        ORDER BY total_score DESC, like_count DESC
+        FETCH FIRST 16 ROWS ONLY
     </select>
 
-    <select id="findRecommencementsWithFirst" resultType="com.review.shop.dto.product.RecommendationDTO">
-        SELECT * FROM (
-        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutFirst"/>
-        FROM PRODUCT p
-        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-        WHERE (b.FIRST = #{userInfo[0]} OR b.FIRST IS NULL)
-        )
-        WHERE match_score > 0
-        <include refid="orderByMatchScore"/>
-    </select>
 
-    <select id="findRecommencementsWithSecond" resultType="com.review.shop.dto.product.RecommendationDTO">
-        SELECT * FROM (
-        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutSecond"/>
-        FROM PRODUCT p
-        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-        WHERE (b.SECOND = #{userInfo[1]} OR b.SECOND IS NULL)
-        )
-        WHERE match_score > 0
-        <include refid="orderByMatchScore"/>
-    </select>
 
-    <select id="findRecommencementsWithThird" resultType="com.review.shop.dto.product.RecommendationDTO">
-        SELECT * FROM (
-        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutThird"/>
-        FROM PRODUCT p
-        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-        WHERE (b.THIRD = #{userInfo[2]} OR b.THIRD IS NULL)
-        )
-        WHERE match_score > 0
-        <include refid="orderByMatchScore"/>
-    </select>
-
-    <select id="findRecommencementsWithFourth" resultType="com.review.shop.dto.product.RecommendationDTO">
-        SELECT * FROM (
-        SELECT <include refid="productSelectColumns"/>, <include refid="matchScoreWithoutFourth"/>
-        FROM PRODUCT p
-        JOIN BAUMANN b ON p.baumann_id = b.baumann_id
-        WHERE (b.FOURTH = #{userInfo[3]} OR b.FOURTH IS NULL)
-        )
-        WHERE match_score > 0
-        <include refid="orderByMatchScore"/>
-    </select>
 
     <select id="getRandomRecommendationAdminPicks" resultType="com.review.shop.dto.recommendations.RecommendationAdminPickDTO">
         SELECT
-            p.product_id   as product_id,
-            p.prd_name      as product_name,
-            p.PRD_BRAND     as product_brand,
-            ri.IMAGE_URL    as thumbnail_url,   p.price,
-            r.content
+            p.product_id AS product_id, p.prd_name AS product_name, p.prd_brand AS product_brand, p.price,
+            ri.image_url AS thumbnail_url,
+            r.content, r.review_id,
+            u.nickname, u.baumann_id
         FROM review r
-                 INNER JOIN product p ON r.product_id = p.product_id
-                 LEFT JOIN review_images ri ON r.review_id = ri.review_id
-        WHERE r.IS_SELECTED = '1'
+                 INNER JOIN product p
+                            ON r.product_id = p.product_id
+                 INNER JOIN user_table u
+                            ON r.user_id = u.user_id
+                 LEFT JOIN LATERAL (
+            SELECT image_url
+            FROM review_images ri
+            WHERE ri.review_id = r.review_id
+            ORDER BY ri.review_image_id ASC
+                FETCH FIRST 1 ROWS ONLY
+                ) ri ON 1 = 1
+        WHERE r.is_selected = '1'
         ORDER BY DBMS_RANDOM.VALUE
             FETCH FIRST 1 ROWS ONLY
     </select>
-
 </mapper>

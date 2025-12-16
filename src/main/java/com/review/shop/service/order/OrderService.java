@@ -105,9 +105,6 @@ public class OrderService {
 
             // 총액 누적 계산
             calculatedTotalPrice += realPrice * quantity;
-            calculatedTotalPrice += DELIVERY_FEE; // 배송비 추가
-            calculatedTotalPrice -= using_point; // 사용 포인트 차감
-
 
             // ORDER_ITEM 테이블용 DTO 생성
             OrderItemDTO itemDTO = new OrderItemDTO();
@@ -119,6 +116,12 @@ public class OrderService {
             orderItemsToInsert.add(itemDTO);
         }
 
+
+
+        //포인트/ 배송비 로직
+        calculatedTotalPrice += DELIVERY_FEE; // 배송비 추가
+        calculatedTotalPrice -= using_point; // 사용 포인트 차감
+        
         //ORDERS 테이블 저장용 객체 생성
         OrderSaveDTO orderSaveDTO = new OrderSaveDTO();
         orderSaveDTO.setUser_id(orderCreateDTO.getUser_id());

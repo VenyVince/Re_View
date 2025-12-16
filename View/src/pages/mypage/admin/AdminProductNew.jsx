@@ -20,6 +20,14 @@ const BAUMANN_ID_MAP = {
     __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
 };
 
+const CATEGORY_OPTIONS = [
+    "로션",
+    "앰플",
+    "토너",
+    "크림",
+    "클렌징",
+];
+
 export default function AdminProductNew() {
     const nav = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -274,7 +282,14 @@ export default function AdminProductNew() {
                         </Cell>
                         <Cell>
                             <Label>카테고리</Label>
-                            <Input value={form.category} onChange={onChange("category")} />
+                            <Select value={form.category} onChange={onChange("category")}>
+                                <option value="">선택하세요</option>
+                                {CATEGORY_OPTIONS.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </Select>
                         </Cell>
                     </Row>
                     <Row>

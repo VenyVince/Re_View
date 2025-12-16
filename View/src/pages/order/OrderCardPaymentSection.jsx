@@ -1,6 +1,17 @@
 // src/pages/order/OrderCardPaymentSection.jsx
 import React, { useEffect, useState } from "react";
 
+// 카드번호 입력 보정: 숫자만 허용하고 4자리마다 '-' 자동 삽입
+function formatCardNumber(value) {
+  const digits = String(value ?? "").replace(/\D/g, "").slice(0, 16);
+  // 4자리씩 끊어서 하이픈 삽입
+  return digits.replace(/(\d{4})(?=\d)/g, "$1-");
+}
+
+function onlyDigits(value) {
+  return String(value ?? "").replace(/\D/g, "");
+}
+
 /**
  * props:
  * - amount: 최종 결제 금액
@@ -51,6 +62,16 @@ export default function OrderCardPaymentSection({
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // 카드 번호는 사용자가 '-'를 직접 입력하지 않아도 되도록 자동 포맷
+        if (name === "card_number") {
+            setForm((prev) => ({
+                ...prev,
+                card_number: formatCardNumber(value),
+            }));
+            return;
+        }
+
         setForm((prev) => ({
             ...prev,
             [name]: value,
@@ -68,14 +89,17 @@ export default function OrderCardPaymentSection({
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!form.card_company || !form.card_number) {
+        if (!form.card_company || !onlyDigits(form.card_number)) {
             alert("카드사와 카드 번호를 모두 입력해 주세요.");
             return;
         }
 
+        // 백엔드에는 항상 하이픈이 포함된 카드번호로 전달
+        const normalizedCardNumber = formatCardNumber(form.card_number);
+
         const payload = {
             card_company: form.card_company,
-            card_number: form.card_number,
+            card_number: normalizedCardNumber,
         };
 
         onCreateCard && onCreateCard(payload);
@@ -190,7 +214,8 @@ export default function OrderCardPaymentSection({
                                     name="card_number"
                                     value={form.card_number}
                                     onChange={handleChange}
-                                    placeholder="예: 1234-5678-****-****"
+                                    inputMode="numeric"
+                                    placeholder="예: 1234 5678 9012 3456"
                                 />
                             </div>
                         </div>
