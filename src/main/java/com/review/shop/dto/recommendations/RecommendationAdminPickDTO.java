@@ -13,7 +13,10 @@ public class RecommendationAdminPickDTO {
     int price;
 
     //리뷰 내용
+    int review_id;
     String content;
+    String nickname;
 
+    int baumann_id;
 
 }
