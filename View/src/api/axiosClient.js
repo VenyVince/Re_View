@@ -17,6 +17,15 @@ axiosClient.interceptors.request.use((config) => {
         config.headers["Content-Type"] = "application/json";
     }
 
+
+    // CSRF 토큰 설정
+    const csrfToken = document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    const decodedCsrfToken = decodeURIComponent(csrfToken);
+
+    if (decodedCsrfToken) {
+        config.headers['X-XSRF-TOKEN'] = decodedCsrfToken;
+    }
+
     return config;
 });
 
