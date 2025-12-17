@@ -70,11 +70,26 @@
     text-align: left;
 }
 
+.pd-brand-row {
+    display: flex;
+    align-items: center;        /* y축 정렬 */
+    justify-content: space-between; /* 좌 / 우 끝으로 */
+    margin-bottom: 8px;
+}
+
 .pd-brand {
     font-size: 16px;
     font-weight: 600;
 }
 
+.pd-baumann {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background-color: #f3f4f6;
+    color: #333;
+    white-space: nowrap;
+}
 .pd-name {
     font-size: 22px;
     font-weight: 700;

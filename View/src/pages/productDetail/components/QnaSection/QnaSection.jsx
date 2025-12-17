@@ -53,8 +53,8 @@ export default function QnaSection({ productId }) {
         setOpenId(openId === id ? null : id);
     };
 
-    // QnA 등록 (프론트 시뮬레이션)
-    const handleSubmit = () => {
+    // QnA 등록
+    const handleSubmit = async () => {
         if (!isLoggedIn) {
             alert("로그인이 필요합니다.");
             return;
@@ -65,21 +65,27 @@ export default function QnaSection({ productId }) {
             return;
         }
 
-        const today = new Date().toISOString();
+        try {
+            await axiosClient.post("/api/qna", {
+                product_id: productId,
+                title: writeTitle,
+                content: writeContent,
+            });
 
-        const newQna = {
-            qna_id: qnaList.length + 1,
-            title: writeTitle,
-            content: writeContent,
-            user_nickname: "user99",
-            created_at: today,
-            answer: null,
-        };
+            alert("문의가 등록되었습니다.");
 
-        setQnaList([newQna, ...qnaList]);
-        setWriteTitle("");
-        setWriteContent("");
+            setWriteTitle("");
+            setWriteContent("");
+
+            const res = await axiosClient.get(`/api/qna/list/${productId}`);
+            setQnaList(res.data);
+
+        } catch (err) {
+            console.error("QnA 등록 오류:", err);
+            alert("문의 등록 중 오류가 발생했습니다.");
+        }
     };
+
 
     return (
         <div className="pd-qna-wrapper">

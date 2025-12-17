@@ -4,6 +4,7 @@
     margin-bottom: 150px;
 }
 
+
 /* 정렬 탭 영역 */
 .review-sort {
     display: flex;
@@ -93,7 +94,18 @@
     color: #E63946;
     font-weight: 700;
 }
+/* 리뷰 신고*/
+.report-btn {
+    font-size: 12px;
+    color: #9ca3af;
+    cursor: pointer;
+    margin-right: 8px;
+}
 
+.report-btn:hover {
+    color: #ef4444;
+    text-decoration: underline;
+}
 /* 별점 표시 라인 */
 .rating-line {
     margin-bottom: 6px;

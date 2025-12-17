@@ -56,6 +56,20 @@
 /* ============================= */
 /* 오른쪽: 상품 정보 영역 */
 /* ============================= */
+.rdh-report-btn {
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    font-size: 12px;
+    color: #9ca3af;           /* 연한 회색 */
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.rdh-report-btn:hover {
+    color: #ef4444;           /* 빨간 포인트 */
+    text-decoration: underline;
+}
 .rdh-info {
     display: flex;
     flex-direction: column;

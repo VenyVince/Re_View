@@ -2,12 +2,21 @@ import React, { useState, useEffect } from "react";
 import "./ProductReviewSection.css";
 
 import axiosClient from "api/axiosClient";
+import ReviewReportModal from "../../../reviewDetail/components/ReviewReportModal";
+import { useNavigate } from "react-router-dom";
+
 
 export default function ProductReviewSection({ productId }) {
     const [reviewList, setReviewList] = useState([]);
     const [sortType, setSortType] = useState("like_count"); // 백엔드 기본값에 맞춤
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportTargetId, setReportTargetId] = useState(null);
+    const navigate = useNavigate();
 
+    const goToReviewDetail = (reviewId) => {
+        navigate(`/review/${reviewId}`);
+    };
     // 로그인 여부 확인
     useEffect(() => {
         const checkLogin = async () => {
@@ -135,6 +144,31 @@ export default function ProductReviewSection({ productId }) {
         }
     };
 
+    const handleReport = async ({ reason, description }) => {
+        if (!reportTargetId) return;
+
+        try {
+            await axiosClient.post(
+                `/api/reviews/${reportTargetId}/report`,
+                { reason, description }
+            );
+
+            alert("신고가 접수되었습니다.");
+            setIsReportOpen(false);
+            setReportTargetId(null);
+        } catch (err) {
+            if (err.response?.status === 401) {
+                alert("로그인이 필요합니다.");
+            } else if (err.response?.status === 409) {
+                alert("이미 신고한 리뷰입니다.");
+            } else {
+                console.error(err);
+                alert("신고 처리 중 오류가 발생했습니다.");
+            }
+        }
+    };
+
+
     return (
         <div className="review-wrapper">
             {/* 정렬 탭 */}
@@ -169,7 +203,15 @@ export default function ProductReviewSection({ productId }) {
                         아직 등록된 상품 후기가 없습니다.
                     </div>
                 )}
-
+                {isReportOpen && (
+                    <ReviewReportModal
+                        onClose={() => {
+                            setIsReportOpen(false);
+                            setReportTargetId(null);
+                        }}
+                        onSubmit={handleReport}
+                    />
+                )}
                 {reviewList.map((r) => (
                     <div className="review-card" key={r.review_id}>
                         <div className="review-top">
@@ -180,7 +222,21 @@ export default function ProductReviewSection({ productId }) {
                                 </span>
                             </div>
 
+
                             <div className="right">
+                                <span
+                                    className="report-btn"
+                                    onClick={() => {
+                                        if (!isLoggedIn) {
+                                            alert("로그인이 필요합니다.");
+                                            return;
+                                        }
+                                        setReportTargetId(r.review_id);
+                                        setIsReportOpen(true);
+                                    }}
+                                >
+                                     🚨 신고
+                                </span>
                                 {/* 좋아요 버튼 */}
                                 <span
                                     className={`like ${r.userLiked ? "active" : ""}`}
@@ -198,6 +254,7 @@ export default function ProductReviewSection({ productId }) {
                                 >
                                     👎 {r.dislike_count}
                                 </span>
+
                             </div>
                         </div>
 
@@ -212,7 +269,11 @@ export default function ProductReviewSection({ productId }) {
                         </div>
 
                         <div className="review-body">
-                            <div className="review-content">
+                            <div
+                                className="review-content"
+                                onClick={() => goToReviewDetail(r.review_id)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 {r.content}
                             </div>
 
@@ -223,8 +284,10 @@ export default function ProductReviewSection({ productId }) {
                                         className="review-img"
                                         src={r.images[0]}
                                         alt=""
+                                        onClick={() => goToReviewDetail(r.review_id)}
+                                        style={{ cursor: "pointer" }}
                                     />
-                                )}ORDER_ITEM
+                                )}
                                 <div className="date">
                                     {/* 날짜 형식에 따라 slice 조절 필요 */}
                                     {r.created_at ? r.created_at.slice(0, 10) : ""}

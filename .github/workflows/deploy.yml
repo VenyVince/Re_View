@@ -15,7 +15,7 @@ jobs:
         with:
           clean: false
 
-      - name: Create .env from secrets
+      - name: Create .env from secrets  # Make ".env" from Git Secrets
         run: |
           cd infra
           echo "${{ secrets.ENV_FILE }}" > .env
@@ -24,17 +24,17 @@ jobs:
           cd View
           echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env.production
 
-      - name: Stop & remove previous containers
+      - name: Stop & remove previous containers # Docker compose down
         run: |
           cd infra
           docker compose down || true
 
-      - name: Build new containers
+      - name: Build new containers              # Build Container
         run: |
           cd infra
           docker compose build --no-cache
 
-      - name: Start containers
+      - name: Start containers                   # Docker Compose Up
         run: |
           cd infra
           docker compose up -d
