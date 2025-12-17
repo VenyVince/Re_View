@@ -128,8 +128,18 @@
             parameterType="java.util.List"
             resultType="com.review.shop.dto.recommendations.RecommendReviewDTO">
 
-        SELECT review_id, content, review_rating, like_count, nickname,
-        review_image_url, product_id, prd_name, rating, is_checked, total_score
+        SELECT
+        review_id,
+        content,
+        review_rating,
+        like_count,
+        nickname,
+        review_image_url,
+        product_id,
+        prd_name,
+        rating,
+        is_checked,
+        total_score
         FROM (
         SELECT
         r.review_id,
@@ -138,20 +148,30 @@
         r.like_count,
         r.is_checked,
         u.nickname,
-        ri.image_url AS review_image_url,
+
+        /* ⭐ 핵심 수정 부분 */
+        COALESCE(
+        ri.image_url,
+        pi.image_url
+        ) AS review_image_url,
+
         p.product_id,
         p.prd_name,
         p.rating,
 
         CASE
         WHEN r.is_checked = 1 THEN
-        ( (<include refid="reviewBaumannScore"/>
+        (
+        (<include refid="reviewBaumannScore"/>
         + <include refid="productBaumannMatchScore"/>
-        + <include refid="ratingSimilarityScore"/> ) * 1.2 )
+        + <include refid="ratingSimilarityScore"/>) * 1.2
+        )
         ELSE
-        ( <include refid="reviewBaumannScore"/>
+        (
+        <include refid="reviewBaumannScore"/>
         + <include refid="productBaumannMatchScore"/>
-        + <include refid="ratingSimilarityScore"/> )
+        + <include refid="ratingSimilarityScore"/>
+        )
         END AS total_score,
 
         ROW_NUMBER() OVER (
@@ -159,13 +179,17 @@
         ORDER BY
         CASE
         WHEN r.is_checked = 1 THEN
-        ( (<include refid="reviewBaumannScore"/>
+        (
+        (<include refid="reviewBaumannScore"/>
         + <include refid="productBaumannMatchScore"/>
-        + <include refid="ratingSimilarityScore"/> ) * 1.2 )
+        + <include refid="ratingSimilarityScore"/>) * 1.2
+        )
         ELSE
-        ( <include refid="reviewBaumannScore"/>
+        (
+        <include refid="reviewBaumannScore"/>
         + <include refid="productBaumannMatchScore"/>
-        + <include refid="ratingSimilarityScore"/> )
+        + <include refid="ratingSimilarityScore"/>
+        )
         END DESC,
         r.like_count DESC
         ) AS rn
@@ -175,6 +199,8 @@
         JOIN USER_TABLE u ON r.user_id = u.user_id
         JOIN BAUMANN rb ON u.baumann_id = rb.baumann_id
         JOIN BAUMANN pb ON p.baumann_id = pb.baumann_id
+
+        /* 리뷰 이미지 (있을 수도, 없을 수도) */
         LEFT JOIN LATERAL (
         SELECT image_url
         FROM REVIEW_IMAGES ri
@@ -182,11 +208,21 @@
         ORDER BY ri.review_image_id ASC
         FETCH FIRST 1 ROWS ONLY
         ) ri ON 1 = 1
+
+        /* ⭐ 상품 썸네일 이미지 */
+        LEFT JOIN LATERAL (
+        SELECT image_url
+        FROM PRODUCT_IMAGE pi
+        WHERE pi.product_id = p.product_id
+        AND pi.is_thumbnail = 'Y'
+        FETCH FIRST 1 ROWS ONLY
+        ) pi ON 1 = 1
         )
         WHERE rn = 1
         ORDER BY total_score DESC, like_count DESC
         FETCH FIRST 16 ROWS ONLY
     </select>
+
 
 
 
