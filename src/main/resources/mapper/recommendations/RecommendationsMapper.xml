@@ -88,11 +88,13 @@
                       u.nickname,
                       COALESCE(ri.image_url, pi.image_url) AS review_image_url,
                       p.product_id, p.prd_name, p.rating,
+                      -- 리뷰 추천 점수계산로직
         CASE WHEN r.is_checked = 1 THEN
             (<include refid="reviewBaumannScore"/> + <include refid="productBaumannMatchScore"/> + <include refid="ratingSimilarityScore"/>) * 1.2
             ELSE
             (<include refid="reviewBaumannScore"/> + <include refid="productBaumannMatchScore"/> + <include refid="ratingSimilarityScore"/>)
             END AS total_score,
+                  -- 상품당 리뷰 하나만 추천하기 위해 다시 점수
                 ROW_NUMBER() OVER ( PARTITION BY p.product_id ORDER BY CASE WHEN r.is_checked = 1 THEN
                 (<include refid="reviewBaumannScore"/> + <include refid="productBaumannMatchScore"/> + <include refid="ratingSimilarityScore"/>) * 1.2
                 ELSE
@@ -101,8 +103,11 @@
         FROM REVIEW r
         JOIN PRODUCT p      ON r.product_id = p.product_id
         JOIN USER_TABLE u   ON r.user_id = u.user_id
+            -- 작성자 바우만 타입
         JOIN BAUMANN rb     ON u.baumann_id = rb.baumann_id
+            -- 상품 바우만 타입
         JOIN BAUMANN pb     ON p.baumann_id = pb.baumann_id
+            -- 리뷰 이미지 없으면 상품 이미지 대신 할당
         LEFT JOIN LATERAL (
         SELECT image_url
         FROM REVIEW_IMAGES
@@ -117,6 +122,7 @@
         AND is_thumbnail = 'Y'
         FETCH FIRST 1 ROWS ONLY
         ) pi ON 1 = 1 )
+        -- 상품별 1등 리뷰만 할당
         WHERE rn = 1
         ORDER BY total_score DESC, like_count DESC
         FETCH FIRST 16 ROWS ONLY
