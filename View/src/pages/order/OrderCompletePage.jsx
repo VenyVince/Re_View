@@ -34,6 +34,7 @@ export default function OrderCompletePage() {
     }
 
     const { amount, itemCount, firstItemName, address } = orderSummary;
+    const orderId = orderSummary.order_id || orderSummary.orderId;
 
     const productsLabel =
         itemCount === 1
@@ -81,7 +82,7 @@ export default function OrderCompletePage() {
                     <button
                         type="button"
                         className="order-complete-btn order-complete-btn-secondary"
-                        onClick={() => navigate("/mypage")}
+                        onClick={() => navigate(`/mypage/orders/${orderId}`)}
                     >
                         주문상세
                     </button>
