@@ -32,6 +32,21 @@ export default function ProductDetailPage() {
 
     const { adjustBottomBarPosition } = useBottomBar();
     const { adjustMiniBoxPosition } = useMiniBuyBox();
+    const BAUMANN_ID_MAP = {
+        DSPW: 1, DSPT: 2, DSP_: 3, DSNW: 4, DSNT: 5, DSN_: 6, DS_W: 7, DS_T: 8, DS__: 9,
+        DRPW: 10, DRPT: 11, DRP_: 12, DRNW: 13, DRNT: 14, DRN_: 15, DR_W: 16, DR_T: 17, DR__: 18,
+        D_PW: 19, D_PT: 20, D_P_: 21, D_NW: 22, D_NT: 23, D_N_: 24, D__W: 25, D__T: 26, D___: 27,
+        OSPW: 28, OSPT: 29, OSP_: 30, OSNW: 31, OSNT: 32, OSN_: 33, OS_W: 34, OS_T: 35, OS__: 36,
+        ORPW: 37, ORPT: 38, ORP_: 39, ORNW: 40, ORNT: 41, ORN_: 42, OR_W: 43, OR_T: 44, OR__: 45,
+        O_PW: 46, O_PT: 47, O_P_: 48, O_NW: 49, O_NT: 50, O_N_: 51, O__W: 52, O__T: 53, O___: 54,
+        _SPW: 55, _SPT: 56, _SP_: 57, _SNW: 58, _SNT: 59, _SN_: 60, _S_W: 61, _S_T: 62, _S__: 63,
+        _RPW: 64, _RPT: 65, _RP_: 66, _RNW: 67, _RNT: 68, _RN_: 69, _R_W: 70, _R_T: 71, _R__: 72,
+        __PW: 73, __PT: 74, __P_: 75, __NW: 76, __NT: 77, __N_: 78, ___W: 79, ___T: 80, ____: 81,
+    };
+
+    const BAUMANN_CODE_BY_ID = Object.fromEntries(
+        Object.entries(BAUMANN_ID_MAP).map(([code, id]) => [id, code])
+    );
 
     // 상품 상세 조회 API
     useEffect(() => {
@@ -111,7 +126,13 @@ export default function ProductDetailPage() {
                     </div>
 
                     <div className="pd-right">
-                        <div className="pd-brand">{product.prd_brand}</div>
+                        <div className="pd-brand-row">
+                            <div className="pd-brand">{product.prd_brand}</div>
+
+                            <div className="pd-baumann">
+                                {BAUMANN_CODE_BY_ID[product.baumann_id] || "미분류"}
+                            </div>
+                        </div>
                         <div className="pd-name">{product.prd_name}</div>
                         <div className="pd-price">{product.price.toLocaleString()}원</div>
 

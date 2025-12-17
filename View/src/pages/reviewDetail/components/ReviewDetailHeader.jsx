@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./ReviewDetailHeader.css";
 
-export default function ReviewDetailHeader({ review, onLike, onDislike }) {
+export default function ReviewDetailHeader({ review, onLike, onDislike, onReport }) {
     return (
         <div className="rdh-header">
 
@@ -27,6 +27,13 @@ export default function ReviewDetailHeader({ review, onLike, onDislike }) {
                     <div className="rdh-brand">{review.prd_brand}</div>
 
                     <div className="rdh-like-box">
+                        {!review.is_mine && (
+                            <button
+                                className="rdh-report-btn"
+                                onClick={onReport}
+                            >🚨신고
+                            </button>
+                        )}
                         <button
                             className={
                                 review.user_liked

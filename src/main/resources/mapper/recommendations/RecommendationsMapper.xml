@@ -47,8 +47,8 @@
     <!-- 상품 리뷰 수 점수 -->
     <sql id="productReviewCountScore">
         CASE
-            WHEN p.review_count >= 50 THEN 20
-            WHEN p.review_count >= 30 THEN 15
+            WHEN p.review_count >= 50 THEN 30
+            WHEN p.review_count >= 30 THEN 20
             WHEN p.review_count >= 10 THEN 10
             ELSE 0
         END

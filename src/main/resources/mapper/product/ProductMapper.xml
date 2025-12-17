@@ -30,13 +30,13 @@
                 p.price ASC, p.product_id DESC
                 </when>
                 <when test="sort == 'high_price'">
-                    p.price ASC, p.product_id DESC
+                    p.price DESC, p.product_id DESC
                 </when>
                 <when test="sort == 'name'">
                     p.prd_name ASC
                 </when>
                 <when test="sort == 'popular'">
-                    p.review_count ASC, p.product_id DESC
+                    p.review_count DESC
                 </when>
                 <when test="sort == 'latest'">
                     p.created_at DESC, p.product_id DESC

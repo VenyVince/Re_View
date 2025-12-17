@@ -8,13 +8,14 @@ import ReviewDetailHeader from "./components/ReviewDetailHeader";
 import ReviewDetailContent from "./components/ReviewDetailContent";
 import ReviewCommentList from "./components/ReviewCommentList";
 import ReviewCommentWriteBox from "./components/ReviewCommentWriteBox";
+import ReviewReportModal from "./components/ReviewReportModal";
 
 export default function ReviewDetailPage() {
     const { reviewId } = useParams();
-
     const [review, setReview] = useState(null);
     const [comments, setComments] = useState([]);
     const [currentUserNickname, setCurrentUserNickname] = useState(null);
+    const [isReportOpen, setIsReportOpen] = useState(false);
 
     // 로그인 유저 정보 조회
     useEffect(() => {
@@ -55,6 +56,7 @@ export default function ReviewDetailPage() {
     }, [reviewId]);
 
     if (!review) return <div>불러오는 중...</div>;
+
 
     // 댓글 작성 후 재조회
     const handleCommentSubmit = async () => {
@@ -172,6 +174,31 @@ export default function ReviewDetailPage() {
         }
     };
 
+    // 신고 요청
+    const handleReport = async ({ reason, description }) => {
+        try {
+            await axiosClient.post(
+                `/api/reviews/${reviewId}/report`,
+                {
+                    reason,
+                    description,
+                }
+            );
+
+            alert("신고가 접수되었습니다.");
+            setIsReportOpen(false);
+        } catch (err) {
+            if (err.response?.status === 401) {
+                alert("로그인이 필요합니다.");
+            } else if (err.response?.status === 409) {
+                alert("이미 신고한 리뷰입니다.");
+            } else {
+                console.error(err);
+                alert("신고 처리 중 오류가 발생했습니다.");
+            }
+        }
+    };
+
     return (
         <div className="rd-wrap">
             <section className="rd-main">
@@ -179,7 +206,9 @@ export default function ReviewDetailPage() {
                     review={review}
                     onLike={handleLike}
                     onDislike={handleDislike}
+                    onReport={() => setIsReportOpen(true)}
                 />
+
                 <ReviewDetailContent review={review} />
             </section>
 
@@ -200,6 +229,12 @@ export default function ReviewDetailPage() {
                     onSubmit={handleCommentSubmit}
                 />
             </section>
+            {isReportOpen && (
+                <ReviewReportModal
+                    onClose={() => setIsReportOpen(false)}
+                    onSubmit={handleReport}
+                />
+            )}
         </div>
     );
 }
