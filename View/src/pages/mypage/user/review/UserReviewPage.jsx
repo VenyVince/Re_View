@@ -285,8 +285,8 @@ export default function UserMyReviewPage() {
                 console.warn("[UserReviewPage] 리뷰 상세 기반 이미지 보정 실패:", enrichErr);
             }
         } catch (e) {
-            console.error("내 리뷰 목록 조회 오류:", e);
-            setError("작성한 후기를 불러오는 중 오류가 발생했어요.");
+            setError("아직 작성한 후기가 없습니다.");
+
         } finally {
             setLoading(false);
         }
