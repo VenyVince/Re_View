@@ -6,7 +6,7 @@ import com.review.shop.dto.review.review_create.CreateReviewRequestDTO;
 import com.review.shop.dto.review.review_create.CreateReviewResponseDTO;
 import com.review.shop.exception.DatabaseException;
 import com.review.shop.exception.WrongRequestException;
-import com.review.shop.image.ImageService; // [추가]
+import com.review.shop.image.ImageService;
 import com.review.shop.repository.OrderItemIdMapper;
 import com.review.shop.repository.review.ProductReviewMapper;
 import com.review.shop.service.userinfo.other.PointService;
@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -167,47 +164,74 @@ public class ProductReviewService {
         return response;
     }
 
+    private List<String> filterObjectKeys(List<String> images) {
+        if (images == null) return Collections.emptyList();
+
+        return images.stream()
+                .filter(img -> img != null && !img.startsWith("http"))
+                .collect(Collectors.toList());
+    }
+
     // 리뷰 수정
     public ProductReviewDTO updateReview(
             int review_id,
             int user_id,
             String content,
             double rating,
-            List<String> objectKeys // [변경] 수정된 이미지 키 리스트
+            List<String> imagesFromFE
     ) {
         // 리뷰 존재 여부 확인
         ProductReviewDTO review = productReviewMapper.selectReviewById(review_id);
-        if (review == null) throw new WrongRequestException("존재하지 않는 리뷰입니다");
+        if (review == null)
+            throw new WrongRequestException("존재하지 않는 리뷰입니다");
 
         // 유효성 검사
-        if (content == null || content.trim().isEmpty()) throw new WrongRequestException("리뷰 내용이 필수입니다");
-        if (rating < 1 || rating > 5) throw new WrongRequestException("평점은 1~5 사이여야 합니다");
-        if (!canUpdate(review_id, user_id)) throw new WrongRequestException("수정할 수 없는 리뷰입니다.");
+        if (content == null || content.trim().isEmpty())
+            throw new WrongRequestException("리뷰 내용이 필수입니다");
+
+        if (rating < 1 || rating > 5)
+            throw new WrongRequestException("평점은 1~5 사이여야 합니다");
+
+        if (!canUpdate(review_id, user_id))
+            throw new WrongRequestException("수정할 수 없는 리뷰입니다.");
 
         // 리뷰 내용 수정
         int updatedRows = productReviewMapper.updateReview(review_id, content, rating);
-        if (updatedRows != 1) throw new DatabaseException("리뷰 수정 실패");
+        if (updatedRows != 1)
+            throw new DatabaseException("리뷰 수정 실패");
 
-        // [변경] 이미지 갱신 로직 (삭제 후 재저장 -> ImageService 위임)
-        productReviewMapper.deleteReviewImagesByReviewId(review_id); // 기존 매핑 삭제
+        // FE에서 넘어온 값 중 objectKey만 추출
+        List<String> newObjectKeys = filterObjectKeys(imagesFromFE);
 
-        if (objectKeys != null && !objectKeys.isEmpty()) {
-            imageService.saveReviewImageObjectKey(review_id, objectKeys); // 새 키 저장
-        }
+        // objectKey가 하나도 안 왔을 때  → 이미지 수정 없음 → 기존 objectKey 유지
+        if (newObjectKeys.isEmpty()) {
+            ProductReviewDTO updatedReview =
+                    productReviewMapper.selectReviewById(review_id);
 
-        // 수정된 리뷰 조회 및 URL 변환
-        ProductReviewDTO updatedReview = productReviewMapper.selectReviewById(review_id);
-
-        List<String> imageUrls = new ArrayList<>();
-        if (objectKeys != null) {
-            imageUrls = objectKeys.stream()
-                    .map(key -> imageService.presignedUrlGet(key)) // URL 변환
+            List<String> imageUrls = updatedReview.getImages().stream()
+                    .map(imageService::presignedUrlGet)
                     .collect(Collectors.toList());
-        }
-        updatedReview.setImages(imageUrls);
 
+            updatedReview.setImages(imageUrls);
+            return updatedReview;
+        }
+
+        // objectKey가 실제로 넘어오면 → 이미지 교체
+        productReviewMapper.deleteReviewImagesByReviewId(review_id);
+        imageService.saveReviewImageObjectKey(review_id, newObjectKeys);
+
+        // 수정된 리뷰 조회
+        ProductReviewDTO updatedReview =
+                productReviewMapper.selectReviewById(review_id);
+
+        List<String> imageUrls = newObjectKeys.stream()
+                .map(imageService::presignedUrlGet)
+                .collect(Collectors.toList());
+
+        updatedReview.setImages(imageUrls);
         return updatedReview;
     }
+
 
     @Transactional
     public void deleteReviewWithPenalty(int product_id, int user_id, int review_id) {
