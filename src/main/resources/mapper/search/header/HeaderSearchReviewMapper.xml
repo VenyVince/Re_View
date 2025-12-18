@@ -6,35 +6,47 @@
 <mapper namespace="com.review.shop.repository.search.header.HeaderSearchReviewMapper">
     <select id="searchReviews" resultType="com.review.shop.dto.search.header.HeaderSearchReviewDTO">
         SELECT
-        r.review_id, r.content, r.rating, r.like_count, r.dislike_count, r.is_selected, r.created_at,
-        p.prd_name, p.prd_brand, p.category, p.product_id,
-        u.nickname,
-        b.type as user_baumann_type,
-        ri.image_url
+        r.review_id,       r.content,       r.rating,       r.like_count,
+        r.dislike_count,   r.is_selected,   r.created_at,
+        p.product_id,      p.prd_name,      p.prd_brand,    p.category,
+        u.nickname,        b.type AS user_baumann_type,
+        -- 이미지 (리뷰 이미지 없으면 상품 이미지)
+        COALESCE(
+        ri.image_url,
+        (SELECT pi.image_url
+        FROM product_image pi
+        WHERE pi.product_id = p.product_id
+        AND pi.is_thumbnail = 'Y'
+        FETCH FIRST 1 ROWS ONLY)
+        ) AS image_url
+
         FROM review r
         LEFT JOIN review_images ri
         ON ri.review_id = r.review_id
         AND ri.review_image_id = (
-            SELECT MIN(review_image_id)
-            FROM review_images
-            WHERE review_id = r.review_id
-            )
+        SELECT MIN(review_image_id)
+        FROM review_images
+        WHERE review_id = r.review_id
+        )
         JOIN product p ON r.product_id = p.product_id
         JOIN user_table u ON r.user_id = u.user_id
         JOIN baumann b ON u.baumann_id = b.baumann_id
+
         WHERE (
         r.content LIKE '%' || #{keyword} || '%'
         OR u.nickname LIKE '%' || #{keyword} || '%'
         )
         AND r.deleted_at IS NULL
+
         <if test="filter_brand != null and filter_brand != ''">
             AND p.prd_brand = #{filter_brand}
         </if>
         <if test="filter_category != null and filter_category != ''">
             AND p.category = #{filter_category}
         </if>
+
         <choose>
-            <when test="sort == 'latest'"> <!-- 신상품 순 -->
+            <when test="sort == 'latest'">
                 ORDER BY r.created_at DESC
             </when>
             <when test="sort == 'oldest'">
@@ -47,16 +59,14 @@
                 ORDER BY r.rating ASC
             </when>
             <when test="sort == 'likes'">
-                order by r.like_count DESC
+                ORDER BY r.like_count DESC
             </when>
             <when test="sort == 'popular'">
-                order by p.review_count DESC, r.like_count DESC, r.dislike_count ASC
+                ORDER BY p.review_count DESC, r.like_count DESC, r.dislike_count ASC
             </when>
             <otherwise>
                 ORDER BY r.created_at DESC
             </otherwise>
         </choose>
-
     </select>
-
 </mapper>
