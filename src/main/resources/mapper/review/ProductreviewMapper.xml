@@ -133,14 +133,17 @@
                  WITH review_stats AS (
                      SELECT
                          r.review_id, r.user_id, r.product_id, r.like_count, r.dislike_count,
-                         (SELECT COUNT(*) FROM REVIEW_COMMENT rc WHERE rc.REVIEW_ID = r.REVIEW_ID) AS comment_count,
+                         (SELECT COUNT(*) FROM REVIEW_COMMENT rc
+                                          WHERE rc.REVIEW_ID = r.REVIEW_ID) AS comment_count,
                          p.review_count,
-                         -- review_number은 리뷰의 순번. like가 같으면 임의로 순위가 조정되기 때문에 조건을 좀 더만듦.
+                         -- review_number은 리뷰의 순번.
+                         -- like가 같으면 임의로 순위가 조정되기 때문에 조건을 좀 더만듦.
                          -- (like → dislike → comment 기준)
                          ROW_NUMBER() OVER (
                     PARTITION BY r.product_id
                     ORDER BY r.like_count DESC, r.dislike_count ASC,
-                             (SELECT COUNT(*) FROM REVIEW_COMMENT rc WHERE rc.REVIEW_ID = r.REVIEW_ID) DESC
+                             (SELECT COUNT(*) FROM REVIEW_COMMENT rc
+                             WHERE rc.REVIEW_ID = r.REVIEW_ID) DESC
                 ) AS review_number
                      FROM review r
                               JOIN product p ON r.product_id = p.product_id
