@@ -348,8 +348,8 @@ export default function UserMyReviewPage() {
         setEditContent(review.content || "");
         setEditRating(Number(review.rating || 0));
 
-        // 기존 이미지(objectKey) 세팅
-        setEditExistingImageKeys(Array.isArray(review.imageUrls) ? review.imageUrls : []);
+        // 수정 모드에서는 기존 이미지를 유지하지 않고, 새로 추가하는 방식으로 진행
+        setEditExistingImageKeys([]);
 
         // 새로 추가한 파일/미리보기 초기화
         editNewPreviews.forEach((u) => URL.revokeObjectURL(u));
@@ -518,7 +518,7 @@ export default function UserMyReviewPage() {
             return;
         }
 
-        const totalCount = (editExistingImageKeys?.length || 0) + (editNewFiles?.length || 0);
+        const totalCount = (editNewFiles?.length || 0);
         if (totalCount > 5) {
             alert("이미지는 최대 5장까지 업로드 할 수 있습니다.");
             return;
@@ -531,8 +531,8 @@ export default function UserMyReviewPage() {
                 newObjectKeys = await uploadImagesToMinIO(editNewFiles);
             }
 
-            //  최종 imageUrls(objectKey) = 기존 남길 것 + 새로 업로드된 것
-            const finalImageUrls = [...(editExistingImageKeys || []), ...(newObjectKeys || [])];
+            //  최종 imageUrls(objectKey) = 새로 업로드된 것만 사용 (기존 이미지는 유지하지 않음)
+            const finalImageUrls = [...(newObjectKeys || [])];
 
             // PATCH /api/reviews/{review_id}
             await axiosClient.patch(`/api/reviews/${editingId}`, {
