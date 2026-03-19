@@ -22,42 +22,41 @@ export default function LoginPage() {
     // ✔ 로그인 요청
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // 아이디/비번이 비어있으면 데모 계정으로 로그인
+        const loginId = id.trim() || 'demo_user';
+        const loginPw = password.trim() || 'demo1234';
+        await doLogin(loginId, loginPw);
+    };
+
+    // 데모 원클릭 로그인
+    const handleDemoLogin = async () => {
+        await doLogin('demo_user', 'demo1234');
+    };
+
+    const doLogin = async (loginId, loginPw) => {
         setError('');
         setLoading(true);
 
         try {
             const response = await axiosClient.post(
                 '/api/auth/login',
-                { id, password },
+                { id: loginId, password: loginPw },
                 {
                     headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true,   // 세션 쿠키(JSESSIONID) 유지 필수
+                    withCredentials: true,
                 }
             );
 
             if (response.status === 200) {
-                // 전역 로그인 상태 반영
-                login({ id, nickname: id });
-
-                // 권한 체크
-                const me = await axiosClient.get("/api/auth/me", { withCredentials: true });
-
-                if (me.data.role === "ROLE_ADMIN") {
-                    navigate('/');
-                } else {
-                    navigate('/');
-                }
-
+                login({ id: loginId, nickname: loginId });
+                navigate('/');
                 return;
             }
 
-            // 그 외 정상 응답이 아니면 오류 처리
             setError("로그인 오류가 발생했습니다.");
         } catch (err) {
-
             if (err.response) {
                 const status = err.response.status;
-
                 if (status === 400 || status === 404) {
                     setError('아이디 또는 비밀번호가 올바르지 않습니다.');
                 } else if (status === 401) {
@@ -78,6 +77,21 @@ export default function LoginPage() {
     return (
         <div className="login-container">
             <img src={logo} alt="Re:View 로고" className="login-logo" />
+
+            {/* 데모 안내 박스 */}
+            <div className="demo-notice">
+                <p className="demo-notice__title">🚧 포트폴리오 데모 사이트</p>
+                <p>백엔드 서버가 종료된 상태로, 모든 데이터는 더미 데이터입니다.</p>
+                <p>아이디와 비밀번호를 입력하지 않아도 로그인할 수 있습니다.</p>
+                <button
+                    type="button"
+                    className="demo-login-btn"
+                    onClick={handleDemoLogin}
+                    disabled={loading}
+                >
+                    {loading ? '로그인 중...' : '⚡ 데모 계정으로 바로 로그인'}
+                </button>
+            </div>
 
             {/* 로그인 폼 */}
             <form className="login-form" onSubmit={handleSubmit}>

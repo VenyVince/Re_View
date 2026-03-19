@@ -33,6 +33,7 @@ import ReviewDetail from "./pages/reviewDetail/ReviewDetailPage"; //리뷰상세
 
 import SearchPage from './pages/search/SearchPage';
 import Header from "./components/layout/Header/Header";
+import DemoBanner from "./components/DemoBanner";
 
 import AdminProductPage from "./pages/mypage/admin/AdminProductPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
@@ -69,6 +70,7 @@ export default function App() {
     return (
         <AuthProvider>
             <div className="App">
+                <DemoBanner />
                 <Header />
                 <main className="page-content"> {/* 푸터를 항상 하단에 고정하기 위해 라우터들 감쌈*/}
                 <Routes>

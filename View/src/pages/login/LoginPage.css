@@ -81,3 +81,52 @@
     align-items: center;
     gap: 8px;     /* ← 이 간격이 체크박스~텍스트 사이 */
 }
+
+/* 데모 안내 박스 */
+.demo-notice {
+    width: 320px;
+    background: #fff8e6;
+    border: 1px solid #f0a500;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+}
+
+.demo-notice__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.demo-notice p {
+    margin: 0 0 4px 0;
+}
+
+.demo-login-btn {
+    margin-top: 12px;
+    width: 100%;
+    height: 42px;
+    background: #f0a500;
+    color: #fff;
+    border: none;
+    border-radius: 21px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.demo-login-btn:hover {
+    background: #d4900a;
+}
+
+.error-message {
+    color: #e53935;
+    font-size: 13px;
+    text-align: center;
+    margin: 0;
+}

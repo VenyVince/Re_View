@@ -29,4 +29,10 @@ axiosClient.interceptors.request.use((config) => {
     return config;
 });
 
+// 더미 백엔드 모드: REACT_APP_USE_MOCK=true 일 때 axios-mock-adapter 활성화
+if (process.env.REACT_APP_USE_MOCK === "true") {
+    const { setupMocks } = require("../mocks/setupMocks");
+    setupMocks(axiosClient);
+}
+
 export default axiosClient;
