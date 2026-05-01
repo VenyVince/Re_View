@@ -2,6 +2,9 @@
 
 **Re_View는 상품 리뷰와 이미지 데이터를 기반으로 하여, Baumann(바우만) 피부타입 분석을 적용한 개인 맞춤 스킨케어 추천 기능을 제공하는 풀스택 전자상거래 지원 서비스입니다.**
 
+
+Review (기획서 및 Wbs, 발표자료등의) 문서: https://github.com/VenyVince/5.Re_View_Doc
+Review 시연 영상:  https://www.youtube.com/watch?v=kP2HrcrGmvU
 ---
 
 ## 🚀 주요 목적
