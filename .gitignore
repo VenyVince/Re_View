@@ -3,7 +3,35 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+src/main/resources/application-secret.properties
+src/main/resources/application-secret.yml
 
+# Frontend env
+View/.env
+View/.env.*
+!View/.env.example
+
+# Root env
+.env
+.env.*
+!.env.example
+
+# Logs / temp
+*.log
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional local docs / agent notes
+Project_Context.md
+Todo.md
+Codex.md
+md/
 ### STS ###
 .apt_generated
 .classpath
