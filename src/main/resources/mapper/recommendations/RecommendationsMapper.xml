@@ -126,7 +126,6 @@
         WHERE rn = 1
         ORDER BY total_score DESC, like_count DESC
         FETCH FIRST 16 ROWS ONLY
-
     </select>
 
 
